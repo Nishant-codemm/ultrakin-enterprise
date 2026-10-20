@@ -1,0 +1,432 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Search,
+  MessageSquare,
+  FileText,
+  Mail,
+  CheckSquare,
+  GitBranch,
+  Video,
+  Terminal,
+  ArrowRight,
+  Sparkles,
+  X,
+  Keyboard,
+  Shield,
+} from 'lucide-react';
+import { useWorkspace } from '../context/WorkspaceContext';
+import { cn } from '../lib/cn';
+
+export default function CommandPaletteModal() {
+  const {
+    isSearchPaletteOpen,
+    closeSearchPalette,
+    setActiveModule,
+    setActiveChannel,
+    openDemoDrawer,
+    testAutomationsWorkflow,
+    setIsKeyboardModalOpen,
+  } = useWorkspace();
+
+  const [query, setQuery] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const inputRef = useRef(null);
+
+  // All searchable entities across the unified workspace kernel
+  const entities = [
+    // Commands
+    {
+      id: 'cmd_huddle',
+      type: 'command',
+      category: 'Commands',
+      title: 'Start WebRTC Huddle',
+      subtitle: 'Initiate Frankfurt SFU audio/video room with live STT',
+      icon: Video,
+      action: () => setActiveModule('huddle'),
+      badge: 'Action',
+      badgeColor: 'bg-violet-500/20 text-violet-300 border-violet-500/30',
+    },
+    {
+      id: 'cmd_task',
+      type: 'command',
+      category: 'Commands',
+      title: 'Create Kanban Task',
+      subtitle: 'Spawn a ticket in Sprint 24 pipeline',
+      icon: CheckSquare,
+      action: () => setActiveModule('tasks'),
+      badge: 'Action',
+      badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    },
+    {
+      id: 'cmd_mail',
+      type: 'command',
+      category: 'Commands',
+      title: 'Compose Domain Email',
+      subtitle: 'Dispatch RFC 8620 JMAP message with DKIM signing',
+      icon: Mail,
+      action: () => setActiveModule('mail'),
+      badge: 'Action',
+      badgeColor: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
+    },
+    {
+      id: 'cmd_dag',
+      type: 'command',
+      category: 'Commands',
+      title: 'Test Automations DAG Execution',
+      subtitle: 'Run Tarjan cycle validator and step through node simulation',
+      icon: GitBranch,
+      action: () => {
+        setActiveModule('automations');
+        testAutomationsWorkflow();
+      },
+      badge: 'Action',
+      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    },
+    {
+      id: 'cmd_demo',
+      type: 'command',
+      category: 'Commands',
+      title: 'Book Technical Architecture Demo',
+      subtitle: 'Schedule 30-min evaluation with Alex Mercer (Solutions Lead)',
+      icon: Terminal,
+      action: () => openDemoDrawer(),
+      badge: 'Sales',
+      badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+    },
+    {
+      id: 'cmd_shortcuts',
+      type: 'command',
+      category: 'Commands',
+      title: 'Keyboard Shortcuts Cheatsheet (⌘/)',
+      subtitle: 'View complete hotkey and navigation accelerator registry',
+      icon: Keyboard,
+      action: () => setIsKeyboardModalOpen(true),
+      badge: 'Help',
+      badgeColor: 'bg-slate-500/20 text-slate-300 border-slate-500/30',
+    },
+
+    // Spaces Chat
+    {
+      id: 'ch_incident',
+      type: 'space',
+      category: 'Spaces Chat',
+      title: '#incident-war-room',
+      subtitle: 'Frankfurt pod failover coordination & latency logs',
+      icon: MessageSquare,
+      action: () => {
+        setActiveModule('chat');
+        setActiveChannel('incident-war-room');
+      },
+      badge: 'Space',
+      badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+    },
+    {
+      id: 'ch_escalations',
+      type: 'space',
+      category: 'Spaces Chat',
+      title: '#client-escalations',
+      subtitle: 'VIP client SLA triage & high-priority webhook alerts',
+      icon: MessageSquare,
+      action: () => {
+        setActiveModule('chat');
+        setActiveChannel('client-escalations');
+      },
+      badge: 'Space',
+      badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+    },
+    {
+      id: 'ch_arch',
+      type: 'space',
+      category: 'Spaces Chat',
+      title: '#product-architecture',
+      subtitle: 'Obsidian design tokens, CRDT sync, and LibOlm Megolm E2EE',
+      icon: MessageSquare,
+      action: () => {
+        setActiveModule('chat');
+        setActiveChannel('product-architecture');
+      },
+      badge: 'Space',
+      badgeColor: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+    },
+
+    // Living Docs
+    {
+      id: 'doc_rfc_2026',
+      type: 'doc',
+      category: 'Living Docs',
+      title: 'Q4 EU Cluster RFC (doc_rfc_2026)',
+      subtitle: 'Collaborative TipTap doc with 3 active CRDT peers',
+      icon: FileText,
+      action: () => setActiveModule('docs'),
+      badge: 'Living Doc',
+      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    },
+    {
+      id: 'doc_msa',
+      type: 'doc',
+      category: 'Living Docs',
+      title: 'Master Service Agreement 2026.pdf',
+      subtitle: '99.99% enterprise uptime SLA and SOC 2 Type II terms',
+      icon: Shield,
+      action: () => setActiveModule('docs'),
+      badge: 'Security',
+      badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    },
+
+    // Domain Mail
+    {
+      id: 'em_ssl',
+      type: 'email',
+      category: 'Domain Mailbox',
+      title: 'david@acmecorp.com: SSL timeout on EU cluster',
+      subtitle: 'P0 escalation converted to Sprint task #tsk_1',
+      icon: Mail,
+      action: () => setActiveModule('mail'),
+      badge: 'JMAP Mail',
+      badgeColor: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
+    },
+    {
+      id: 'em_soc',
+      type: 'email',
+      category: 'Domain Mailbox',
+      title: 'elena@fintechscale.io: SOC 2 & CMEK key rotation audit',
+      subtitle: 'AWS KMS customer-managed key verification request',
+      icon: Mail,
+      action: () => setActiveModule('mail'),
+      badge: 'JMAP Mail',
+      badgeColor: 'bg-sky-500/20 text-sky-300 border-sky-500/30',
+    },
+
+    // Kanban Tasks
+    {
+      id: 'tsk_ssl',
+      type: 'task',
+      category: 'Tasks',
+      title: 'Task #tsk_1: Investigate SSL handshake timeouts',
+      subtitle: 'Priority P1 · Assigned to Sara Chen',
+      icon: CheckSquare,
+      action: () => setActiveModule('tasks'),
+      badge: 'P1 Task',
+      badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    },
+    {
+      id: 'tsk_ttl',
+      type: 'task',
+      category: 'Tasks',
+      title: 'Task #tsk_2: Revert token caching logic (PR #1042)',
+      subtitle: 'Priority P0 · Extracted from Huddle #18 commitment',
+      icon: CheckSquare,
+      action: () => setActiveModule('tasks'),
+      badge: 'P0 Task',
+      badgeColor: 'bg-rose-500/20 text-rose-300 border-rose-500/30',
+    },
+  ];
+
+  // Filtering matching items
+  const filtered = entities.filter((item) => {
+    const q = query.trim().toLowerCase();
+    if (!q) return true;
+    if (q.startsWith('>')) {
+      const commandQuery = q.slice(1).trim();
+      return (
+        item.type === 'command' &&
+        (item.title.toLowerCase().includes(commandQuery) ||
+          item.subtitle.toLowerCase().includes(commandQuery))
+      );
+    }
+    return (
+      item.title.toLowerCase().includes(q) ||
+      item.subtitle.toLowerCase().includes(q) ||
+      item.category.toLowerCase().includes(q)
+    );
+  });
+
+  // Global Keyboard Navigation inside modal
+  useEffect(() => {
+    if (!isSearchPaletteOpen) return;
+
+    const handleKeyDown = (e) => {
+      // Toggle modal with ⌘K / Ctrl+K
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        closeSearchPalette();
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeSearchPalette();
+      } else if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev + 1 < filtered.length ? prev + 1 : 0));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev - 1 >= 0 ? prev - 1 : filtered.length - 1));
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (filtered[selectedIndex]) {
+          filtered[selectedIndex].action();
+          closeSearchPalette();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSearchPaletteOpen, filtered, selectedIndex, closeSearchPalette]);
+
+  if (!isSearchPaletteOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 z-[90] flex items-start justify-center pt-[12vh] sm:pt-[15vh] px-4 select-none">
+        {/* Backdrop Scrim (Section 9.9: blur 8px, rgba(3, 7, 18, 0.75)) */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={closeSearchPalette}
+          className="fixed inset-0 bg-[#030712]/80 backdrop-blur-md -z-10"
+        />
+
+        {/* Dialog Box (Section 9.9: Width 640px, top 15vh, radius 12px, border white/14) */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96, y: -10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.96, y: -10 }}
+          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+          className={cn(
+            'w-full max-w-[640px] rounded-xl border border-white/12 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_24px_70px_rgba(0,0,0,0.85)]',
+            'bg-[#07090E]/95 backdrop-blur-2xl text-slate-200'
+          )}
+        >
+          {/* Header Search Input */}
+          <div className="p-4 border-b border-white/8 flex items-center gap-3 bg-[#0B0F19]/90 backdrop-blur-md">
+            <Search className="w-5 h-5 text-indigo-400 shrink-0" />
+            <input
+              ref={inputRef}
+              autoFocus
+              type="text"
+              placeholder="Type a command or search anything... (prefix '>' for commands)"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setSelectedIndex(0);
+              }}
+              className="w-full bg-transparent text-base sm:text-lg text-white placeholder-slate-500 focus:outline-none font-sans"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                className="p-1 hover:text-white text-slate-500 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+            <kbd className="hidden sm:inline-flex items-center gap-0.5 px-2 py-0.5 rounded bg-white/8 border border-white/10 text-[10px] font-mono text-slate-400">
+              ESC
+            </kbd>
+          </div>
+
+          {/* Results List */}
+          <div className="max-h-[380px] overflow-y-auto p-2 space-y-1">
+            {filtered.length > 0 ? (
+              filtered.map((item, idx) => {
+                const isSelected = selectedIndex === idx;
+                const IconComp = item.icon;
+
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => {
+                      item.action();
+                      closeSearchPalette();
+                    }}
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                    className={cn(
+                      'flex items-center justify-between p-3 rounded-lg transition-all duration-150 active:scale-[0.99] cursor-pointer',
+                      isSelected
+                        ? 'bg-indigo-600/20 border border-indigo-500/40 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]'
+                        : 'hover:bg-white/5 border border-transparent text-slate-300'
+                    )}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className={cn(
+                          'w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border',
+                          isSelected
+                            ? 'bg-indigo-500/30 text-indigo-200 border-indigo-400/50'
+                            : 'bg-white/5 text-slate-400 border-white/8'
+                        )}
+                      >
+                        <IconComp className="w-4 h-4" />
+                      </div>
+                      <div className="truncate">
+                        <div className="text-xs sm:text-sm font-semibold truncate flex items-center gap-2">
+                          <span className={isSelected ? 'text-white' : 'text-slate-200'}>
+                            {item.title}
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-slate-400 truncate">
+                          {item.subtitle}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0 ml-3">
+                      <span
+                        className={cn(
+                          'text-[10px] font-mono px-2 py-0.5 rounded border',
+                          item.badgeColor
+                        )}
+                      >
+                        {item.badge}
+                      </span>
+                      {isSelected && (
+                        <ArrowRight className="w-4 h-4 text-indigo-400 hidden sm:block" />
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="p-8 text-center text-slate-400 text-xs">
+                No matching workspace records or commands found for "{query}".
+              </div>
+            )}
+          </div>
+
+          {/* Footer Navigation Hints */}
+          <div className="px-4 py-2.5 bg-[#0B0F19]/90 backdrop-blur-md border-t border-white/8 flex items-center justify-between text-[11px] font-mono text-slate-400">
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded bg-white/8 border border-white/10 text-[9px]">
+                  ↑↓
+                </kbd>{' '}
+                Navigate
+              </span>
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded bg-white/8 border border-white/10 text-[9px]">
+                  ↵
+                </kbd>{' '}
+                Select
+              </span>
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded bg-white/8 border border-white/10 text-[9px]">
+                  &gt;
+                </kbd>{' '}
+                Commands
+              </span>
+            </div>
+            <span className="text-indigo-400 flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-indigo-400" />
+              Sub-80ms Retrieval
+            </span>
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+}

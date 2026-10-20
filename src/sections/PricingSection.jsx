@@ -72,7 +72,7 @@ export default function PricingSection() {
   ];
 
   return (
-    <section id="pricing" className="py-24 md:py-32 bg-[#0B0F19] border-t border-white/8 relative overflow-hidden">
+    <section id="pricing" className="py-24 md:py-32 bg-[#0B0F19] divider-hairline relative overflow-hidden">
       {/* Ambient background glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-indigo-500/5 blur-[140px] rounded-full pointer-events-none" />
 
@@ -87,16 +87,16 @@ export default function PricingSection() {
             Simple, honest pricing. <br />
             <span className="text-slate-400 font-normal">Replace 5 SaaS subscriptions with 1 unified platform.</span>
           </h2>
-          <p className="mt-4 text-base md:text-lg text-slate-400 leading-relaxed">
+          <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-normal">
             Eliminate $60+/seat/mo of redundant spend across Slack, Notion, Zoom, and Superhuman.
           </p>
 
           {/* Billing Toggle (Save 20%) */}
-          <div className="mt-8 inline-flex items-center gap-2 p-1.5 rounded-xl bg-[#07090E] border border-white/10 text-xs font-semibold">
+          <div className="mt-8 inline-flex items-center gap-2 p-1.5 rounded-xl bg-[#07090E] border border-white/10 text-xs font-semibold shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
             <button
               onClick={() => setAnnual(false)}
               className={cn(
-                'px-4 py-2 rounded-lg transition-all cursor-pointer',
+                'px-4 py-2 rounded-lg transition-all active:scale-95 cursor-pointer',
                 !annual
                   ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
                   : 'text-slate-400 hover:text-white'
@@ -107,7 +107,7 @@ export default function PricingSection() {
             <button
               onClick={() => setAnnual(true)}
               className={cn(
-                'px-4 py-2 rounded-lg transition-all flex items-center gap-2 cursor-pointer',
+                'px-4 py-2 rounded-lg transition-all flex items-center gap-2 active:scale-95 cursor-pointer',
                 annual
                   ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
                   : 'text-slate-400 hover:text-white'
@@ -131,14 +131,14 @@ export default function PricingSection() {
               viewport={{ once: true }}
               transition={{ delay: idx * 0.08, duration: 0.35 }}
               className={cn(
-                'relative rounded-2xl p-8 flex flex-col justify-between backdrop-blur-xl transition-all duration-200',
+                'relative rounded-2xl p-8 flex flex-col justify-between backdrop-blur-xl transition-all duration-300',
                 plan.popular
-                  ? 'bg-[#0F172A] border-2 border-indigo-500 shadow-2xl shadow-indigo-500/20 lg:-translate-y-2'
-                  : 'bg-[#07090E]/90 border border-white/8 hover:border-white/16 shadow-xl'
+                  ? 'bg-[#0F172A] border-2 border-indigo-500 shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_24px_60px_rgba(99,102,241,0.25)] lg:-translate-y-2'
+                  : 'bg-[#07090E]/90 border border-white/8 hover:border-white/16 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_16px_32px_rgba(0,0,0,0.6)] hover:-translate-y-1'
               )}
             >
               {plan.popular && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-indigo-600 text-white font-mono text-[10px] uppercase font-bold tracking-wider shadow-md shadow-indigo-500/30 flex items-center gap-1.5">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3.5 py-1 rounded-full bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-mono text-[10px] uppercase font-bold tracking-wider shadow-md shadow-indigo-500/40 border border-indigo-400/30 flex items-center gap-1.5">
                   <Zap className="w-3 h-3 text-white" />
                   MOST POPULAR FOR TEAMS
                 </div>
@@ -155,7 +155,7 @@ export default function PricingSection() {
                   <span className="text-4xl font-extrabold text-white tracking-tight">{plan.price}</span>
                   <span className="text-xs text-slate-400">{plan.period}</span>
                 </div>
-                <p className="text-xs text-slate-400 leading-relaxed mb-6">
+                <p className="text-xs text-slate-300 leading-relaxed mb-6">
                   {plan.desc}
                 </p>
 
@@ -174,10 +174,10 @@ export default function PricingSection() {
                   type="button"
                   onClick={plan.ctaAction}
                   className={cn(
-                    'w-full py-3 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all duration-150 cursor-pointer',
+                    'w-full py-3 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all duration-200 cursor-pointer active:scale-[0.98]',
                     plan.popular
-                      ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/30'
-                      : 'bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20'
+                      ? 'bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 hover:from-indigo-500 hover:to-indigo-500 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_8px_20px_-4px_rgba(99,102,241,0.5)]'
+                      : 'bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-md text-white border border-white/12 hover:border-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_4px_16px_rgba(0,0,0,0.3)]'
                   )}
                 >
                   {plan.cta}

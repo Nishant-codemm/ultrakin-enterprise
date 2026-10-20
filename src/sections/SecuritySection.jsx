@@ -12,8 +12,6 @@ import {
   X,
   Download,
   Server,
-  FileText,
-  ExternalLink,
 } from 'lucide-react';
 import { useWorkspace } from '../context/WorkspaceContext';
 
@@ -97,7 +95,7 @@ export default function SecuritySection() {
   const [selectedItem, setSelectedItem] = useState(null);
 
   return (
-    <section id="security" className="py-24 md:py-32 bg-[#0B0F19] border-t border-white/8 relative overflow-hidden">
+    <section id="security" className="py-24 md:py-32 bg-[#0B0F19] divider-hairline relative overflow-hidden">
       {/* Ambient background glow */}
       <div className="absolute top-1/3 left-10 w-96 h-96 bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -112,7 +110,7 @@ export default function SecuritySection() {
             <h2 className="text-4xl md:text-[48px] font-bold leading-[1.04] tracking-[-0.025em] text-white mb-5">
               Security that IT teams<br />actually trust.
             </h2>
-            <p className="text-lg leading-[1.65] text-slate-400 mb-8">
+            <p className="text-lg leading-[1.65] text-slate-300 mb-8 font-normal">
               Ultrakin is built for organizations where compliance is non-negotiable. SOC 2 Type II audited, GDPR compliant, and designed to meet enterprise procurement checklists without slowing your team down.
             </p>
 
@@ -128,15 +126,15 @@ export default function SecuritySection() {
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-[11px] font-mono">
-                <div className="p-2 rounded-lg bg-[#0F172A]/80 border border-white/6 text-center">
+                <div className="p-2 rounded-lg bg-[#0F172A]/80 border border-white/6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] text-center">
                   <div className="text-white font-bold">EU-Central</div>
                   <div className="text-slate-400 text-[10px]">Frankfurt · 18ms</div>
                 </div>
-                <div className="p-2 rounded-lg bg-[#0F172A]/80 border border-white/6 text-center">
+                <div className="p-2 rounded-lg bg-[#0F172A]/80 border border-white/6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] text-center">
                   <div className="text-white font-bold">US-East</div>
                   <div className="text-slate-400 text-[10px]">N. Virginia · 12ms</div>
                 </div>
-                <div className="p-2 rounded-lg bg-[#0F172A]/80 border border-white/6 text-center">
+                <div className="p-2 rounded-lg bg-[#0F172A]/80 border border-white/6 shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] text-center">
                   <div className="text-white font-bold">APAC</div>
                   <div className="text-slate-400 text-[10px]">Tokyo · 42ms</div>
                 </div>
@@ -176,7 +174,7 @@ export default function SecuritySection() {
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.4, delay: i * 0.07 }}
                 onClick={() => setSelectedItem(item)}
-                className="rounded-2xl border border-white/8 bg-[#07090E]/80 backdrop-blur-md p-5 hover:border-indigo-500/40 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
+                className="rounded-2xl border border-white/8 bg-[#07090E]/80 backdrop-blur-md p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_16px_32px_rgba(0,0,0,0.6)] hover:border-indigo-500/40 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_20px_48px_-8px_rgba(99,102,241,0.2)] hover:-translate-y-0.5 active:scale-[0.99] transition-all duration-300 cursor-pointer group"
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className={`h-10 w-10 rounded-xl ${item.bg} border ${item.border} flex items-center justify-center`}>
@@ -189,7 +187,7 @@ export default function SecuritySection() {
                 <h4 className="text-sm font-semibold text-white mb-1 group-hover:text-indigo-300 transition-colors">
                   {item.label}
                 </h4>
-                <p className="text-xs leading-relaxed text-slate-400">{item.desc}</p>
+                <p className="text-xs leading-relaxed text-slate-300">{item.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -201,7 +199,7 @@ export default function SecuritySection() {
         {selectedItem && (
           <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
             <div
-              className="fixed inset-0 bg-black/75 backdrop-blur-sm"
+              className="fixed inset-0 bg-black/80 backdrop-blur-md"
               onClick={() => setSelectedItem(null)}
             />
 
@@ -209,7 +207,7 @@ export default function SecuritySection() {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="relative z-10 w-full max-w-lg rounded-2xl bg-[#0F172A] border border-white/12 p-6 shadow-2xl text-slate-200 space-y-5"
+              className="relative z-10 w-full max-w-lg rounded-2xl bg-[#0B0F19]/95 backdrop-blur-2xl border border-white/12 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.85)] text-slate-200 space-y-5"
             >
               <div className="flex items-center justify-between border-b border-white/8 pb-4">
                 <div className="flex items-center gap-3">

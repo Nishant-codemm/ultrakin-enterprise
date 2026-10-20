@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Star, Quote, ArrowUpRight } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 const TESTIMONIALS = [
   {
@@ -37,7 +37,7 @@ const TESTIMONIALS = [
 
 export default function TestimonialsSection() {
   return (
-    <section className="py-24 md:py-32 bg-[#07090E] border-t border-white/8 relative overflow-hidden">
+    <section className="py-24 md:py-32 bg-[#07090E] divider-hairline relative overflow-hidden">
       {/* Ambient background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
 
@@ -51,7 +51,7 @@ export default function TestimonialsSection() {
             Loved by product teams. <br />
             <span className="text-slate-400 font-normal">Sanctioned by enterprise CISOs.</span>
           </h2>
-          <p className="mt-4 text-base md:text-lg text-slate-400 leading-relaxed">
+          <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-normal">
             See how forward-thinking leaders consolidate their fragmented stacks and accelerate work velocity.
           </p>
         </div>
@@ -64,7 +64,7 @@ export default function TestimonialsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1, duration: 0.4 }}
-              className="bg-[#0B0F19]/90 rounded-2xl border border-white/8 p-8 shadow-xl backdrop-blur-xl flex flex-col justify-between hover:border-white/16 hover:-translate-y-1 transition-all duration-200"
+              className="bg-[#0B0F19]/90 rounded-2xl border border-white/8 p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_16px_32px_rgba(0,0,0,0.6)] backdrop-blur-xl flex flex-col justify-between hover:border-indigo-500/35 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_20px_48px_-8px_rgba(99,102,241,0.18)] hover:-translate-y-1 transition-all duration-300"
             >
               <div>
                 <div className="flex items-center justify-between mb-6">

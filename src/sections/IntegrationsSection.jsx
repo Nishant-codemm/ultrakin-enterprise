@@ -1,16 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Layers,
   ArrowRight,
   Code2,
-  Cpu,
-  Share2,
-  Workflow,
-  Sparkles,
-  CheckCircle2,
-  ExternalLink,
-  Plus,
 } from 'lucide-react';
 import { cn } from '../lib/cn';
 
@@ -75,7 +67,7 @@ export default function IntegrationsSection() {
     : INTEGRATIONS.filter(item => item.category === selectedCat);
 
   return (
-    <section id="integrations" className="py-24 md:py-32 bg-[#07090E] border-t border-white/8 relative overflow-hidden">
+    <section id="integrations" className="py-24 md:py-32 bg-[#07090E] divider-hairline relative overflow-hidden">
       {/* Ambient background glow */}
       <div className="absolute top-1/2 right-10 w-96 h-96 bg-indigo-600/5 rounded-full blur-[100px] pointer-events-none" />
 
@@ -99,7 +91,7 @@ export default function IntegrationsSection() {
           <div className="flex items-center gap-2">
             <a
               href="#mcp"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-[#0F172A]/70 px-5 py-2.5 text-xs font-semibold text-slate-300 hover:text-white hover:border-white/20 hover:bg-[#1E293B] transition-all shadow-sm cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-[#0F172A]/70 px-5 py-2.5 text-xs font-semibold text-slate-300 hover:text-white hover:border-white/20 hover:bg-[#1E293B] active:scale-[0.98] transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] cursor-pointer"
             >
               <Code2 className="h-4 w-4 text-indigo-400" />
               Build a custom MCP Server
@@ -114,7 +106,7 @@ export default function IntegrationsSection() {
               key={cat}
               onClick={() => setSelectedCat(cat)}
               className={cn(
-                'px-4 py-2 rounded-full text-xs font-semibold transition-all duration-150 cursor-pointer',
+                'px-4 py-2 rounded-full text-xs font-semibold transition-all duration-150 cursor-pointer active:scale-[0.98]',
                 selectedCat === cat
                   ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
                   : 'bg-[#0F172A]/70 text-slate-400 hover:text-white hover:bg-[#1E293B] border border-white/8'
@@ -134,7 +126,7 @@ export default function IntegrationsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.05, duration: 0.3 }}
-              className="group p-6 rounded-2xl border border-white/8 bg-[#0B0F19]/90 hover:border-indigo-500/40 hover:bg-[#0F172A]/80 shadow-xl backdrop-blur-xl transition-all duration-200 flex flex-col justify-between"
+              className="group p-6 rounded-2xl border border-white/8 bg-[#0B0F19]/90 hover:border-indigo-500/40 hover:bg-[#0F172A]/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_16px_32px_rgba(0,0,0,0.6)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_20px_48px_-8px_rgba(99,102,241,0.2)] hover:-translate-y-0.5 backdrop-blur-xl transition-all duration-300 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-start justify-between mb-4">
@@ -148,7 +140,7 @@ export default function IntegrationsSection() {
                 <h3 className="text-base font-bold text-white mb-1 group-hover:text-indigo-300 transition-colors">
                   {item.name}
                 </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-slate-300 leading-relaxed">
                   {item.desc}
                 </p>
               </div>

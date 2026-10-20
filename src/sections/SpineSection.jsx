@@ -42,7 +42,7 @@ const STEPS = [
 
 export default function SpineSection() {
   return (
-    <section className="relative overflow-hidden bg-[#0B0F19] py-24 md:py-32 border-t border-white/8">
+    <section className="relative overflow-hidden bg-[#0B0F19] py-24 md:py-32 divider-hairline">
       {/* Subtle grid */}
       <div
         className="pointer-events-none absolute inset-0 opacity-20"
@@ -124,7 +124,7 @@ export default function SpineSection() {
         <div className="mt-16 flex flex-col sm:flex-row items-center gap-4">
           <a
             href="https://app.ultrakin.com/auth"
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:bg-indigo-500 hover:-translate-y-0.5 transition-all shadow-lg shadow-indigo-500/20 cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 px-6 py-3 text-sm font-semibold text-white hover:from-indigo-500 hover:to-indigo-500 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_8px_20px_-4px_rgba(99,102,241,0.45)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_12px_28px_-4px_rgba(99,102,241,0.6)] cursor-pointer"
           >
             See it in action
             <ArrowRight className="h-4 w-4" />

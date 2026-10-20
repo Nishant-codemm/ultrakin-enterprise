@@ -14,6 +14,9 @@ import FAQSection from './sections/FAQSection';
 import CTASection from './sections/CTASection';
 import Footer from './sections/Footer';
 import EnterpriseDemoDrawer from './components/showcase/EnterpriseDemoDrawer';
+import FloatingOrbitPill from './components/FloatingOrbitPill';
+import CommandPaletteModal from './components/CommandPaletteModal';
+import KeyboardShortcutsModal from './components/KeyboardShortcutsModal';
 import { WorkspaceProvider } from './context/WorkspaceContext';
 
 export default function App() {
@@ -37,6 +40,9 @@ export default function App() {
         </main>
         <Footer />
         <EnterpriseDemoDrawer />
+        <FloatingOrbitPill />
+        <CommandPaletteModal />
+        <KeyboardShortcutsModal />
       </div>
     </WorkspaceProvider>
   );

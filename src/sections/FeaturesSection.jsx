@@ -6,27 +6,16 @@ import {
   Bot,
   Search,
   Folder,
-  ArrowRight,
   Sparkles,
   CheckCircle2,
-  Clock,
-  User,
   Plus,
-  Send,
-  SlidersHorizontal,
-  ChevronRight,
-  ExternalLink,
   Shield,
   FileText,
-  Mail,
   MessageSquare,
   Video,
-  Database,
-  Layers,
 } from 'lucide-react';
 import { cn } from '../lib/cn';
 import Badge from '../components/primitives/Badge';
-import Button from '../components/primitives/Button';
 
 const MODULE_TABS = [
   { id: 'kanban', label: 'Kanban Boards', icon: CheckSquare, desc: 'Signal-driven task flow' },
@@ -40,7 +29,7 @@ export default function FeaturesSection() {
   const [activeTab, setActiveTab] = useState('kanban');
 
   return (
-    <section id="modules" className="py-24 md:py-32 bg-[#0B0F19] border-t border-white/8 relative overflow-hidden">
+    <section id="features" className="py-24 md:py-32 bg-[#0B0F19] divider-hairline relative overflow-hidden">
       {/* Background ambient lighting */}
       <div className="absolute top-0 right-1/4 w-96 h-96 bg-indigo-600/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-violet-600/5 rounded-full blur-3xl pointer-events-none" />
@@ -73,8 +62,8 @@ export default function FeaturesSection() {
                 className={cn(
                   'p-4 rounded-xl border text-left transition-all duration-200 flex flex-col justify-between cursor-pointer group',
                   isActive
-                    ? 'bg-[#1E293B]/90 border-indigo-500/60 shadow-lg shadow-indigo-500/10 ring-1 ring-indigo-500/40'
-                    : 'bg-[#0F172A]/60 border-white/8 hover:bg-[#0F172A] hover:border-white/16'
+                    ? 'bg-[#1E293B]/90 border-indigo-500/60 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_10px_24px_rgba(99,102,241,0.2)] ring-1 ring-indigo-500/40 active:scale-[0.98]'
+                    : 'bg-[#0F172A]/60 border-white/8 hover:bg-[#0F172A] hover:border-white/16 active:scale-[0.98]'
                 )}
               >
                 <div className="flex items-center justify-between mb-3">
@@ -102,7 +91,7 @@ export default function FeaturesSection() {
         </div>
 
         {/* Dynamic Display Stage */}
-        <div className="bg-[#07090E]/90 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-xl overflow-hidden p-6 sm:p-8">
+        <div className="bg-[#07090E]/90 rounded-2xl border border-white/12 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_64px_rgba(0,0,0,0.7)] backdrop-blur-xl overflow-hidden p-6 sm:p-8">
           <AnimatePresence mode="wait">
             {/* 1. KANBAN BOARD */}
             {activeTab === 'kanban' && (

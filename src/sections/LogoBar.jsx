@@ -18,10 +18,10 @@ const LOGOS = [
 
 function LogoItem({ item }) {
   return (
-    <div className="flex items-center justify-center px-8 py-3 select-none">
+    <div className="flex items-center justify-center px-8 py-3 select-none group">
       <span
         className={cn(
-          'text-slate-500 transition-colors duration-200 hover:text-white cursor-default',
+          'text-slate-500 transition-all duration-200 group-hover:text-slate-200 group-hover:scale-105 cursor-default inline-block',
           item.font
         )}
       >
@@ -35,19 +35,19 @@ export default function LogoBar() {
   const all = [...LOGOS, ...LOGOS, ...LOGOS];
 
   return (
-    <section className="border-y border-white/6 bg-[#07090E] py-10 relative overflow-hidden">
+    <section className="divider-hairline bg-[#07090E] py-10 relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 mb-5 text-center">
         <p className="text-[11px] font-mono uppercase tracking-[0.22em] text-slate-500">
           TRUSTED BY HIGH-VELOCITY ENGINEERING TEAMS &amp; SCALE-UPS
         </p>
       </div>
 
-      <div className="relative overflow-hidden w-full">
+      <div className="relative overflow-hidden w-full group/marquee">
         {/* Soft edge feather gradient masks */}
         <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-32 bg-gradient-to-r from-[#07090E] to-transparent" />
         <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-32 bg-gradient-to-l from-[#07090E] to-transparent" />
 
-        <div className="animate-marquee flex items-center">
+        <div className="animate-marquee flex items-center group-hover/marquee:[animation-play-state:paused]">
           {all.map((item, i) => (
             <LogoItem key={`${item.name}-${i}`} item={item} />
           ))}

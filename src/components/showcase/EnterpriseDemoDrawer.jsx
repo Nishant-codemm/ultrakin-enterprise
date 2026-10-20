@@ -67,12 +67,12 @@ export default function EnterpriseDemoDrawer() {
     <div className="fixed inset-0 z-[100] flex justify-end">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/70 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity"
         onClick={resetAndClose}
       />
 
       {/* Slide-over Container */}
-      <div className="relative z-10 w-full max-w-xl bg-[#07090E] border-l border-white/12 shadow-[0_0_60px_rgba(0,0,0,0.8)] flex flex-col h-full text-slate-200 overflow-hidden">
+      <div className="relative z-10 w-full max-w-xl bg-[#07090E]/95 backdrop-blur-2xl border-l border-white/12 shadow-[-24px_0_60px_rgba(0,0,0,0.85)] flex flex-col h-full text-slate-200 overflow-hidden">
         {/* Header Bar */}
         <div className="p-6 border-b border-white/8 bg-[#0F172A]/70 flex items-center justify-between">
           <div className="flex items-center gap-3">

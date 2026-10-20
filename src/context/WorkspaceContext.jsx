@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const WorkspaceContext = createContext(null);
+let toastSeq = 0;
 
 export function WorkspaceProvider({ children }) {
   // Navigation & Active Module
@@ -205,46 +206,387 @@ Director of IT Operations, UberLogistics DE`,
   const [huddleTaskSynced, setHuddleTaskSynced] = useState(false);
   const [huddleDocSynced, setHuddleDocSynced] = useState(false);
 
-  // Kanban Board Tasks (connected to Event Bus)
+  // Kanban Board Tasks (connected to Event Bus - 4 columns: backlog, in_progress, review, done)
   const [kanbanTasks, setKanbanTasks] = useState([
     {
       id: 'tsk_1',
-      col: 'triage',
+      col: 'backlog',
       title: 'Investigate intermittent SSL handshake timeouts on EU cluster',
+      description: 'Correlate HAProxy ingress logs with Envoy TLS session cache eviction timestamps in Frankfurt eu-central-1.',
       source: 'From Mailbox',
       sourceType: 'mail',
+      sourceId: 'em_101',
       priority: 'P1',
       time: '10m ago',
       assignee: 'Sara Chen',
+      assigneeAvatar: 'SC',
+      subtasks: [
+        { id: 'st_1', text: 'Verify Redis Sentinel token TTL in Frankfurt', done: true },
+        { id: 'st_2', text: 'Inspect Envoy proxy TLS 1.3 handshake traces', done: false },
+        { id: 'st_3', text: 'Validate certificate revocation list (CRL) endpoints', done: false },
+      ],
+      auditLog: [
+        { time: '10:32 AM', actor: 'Ukin AI Daemon', action: 'Synthesized from Inbound JMAP Email #em_101' },
+        { time: '10:35 AM', actor: 'Sara Chen', action: 'Assigned to self and tagged Priority P1' },
+      ],
     },
     {
       id: 'tsk_2',
       col: 'in_progress',
-      title: 'Revert token caching logic & bump TTL to 3600s',
+      title: 'Revert token caching logic & bump TTL to 3600s in PR #1042',
+      description: 'Revert premature 60s cache eviction introduced in commit b9f21a. Verified P99 latency drops to 18ms.',
       source: 'From Huddle #18',
       sourceType: 'huddle',
+      sourceId: 'huddle_18',
       priority: 'P0',
       time: 'Active',
       assignee: 'Sara Chen',
+      assigneeAvatar: 'SC',
       prLinked: 'PR #1042',
+      subtasks: [
+        { id: 'st_4', text: 'Hotfix branch checkout & cherry-pick', done: true },
+        { id: 'st_5', text: 'Run integration test suite against staging Redis', done: true },
+        { id: 'st_6', text: 'Deploy canary pods to eu-central-1', done: false },
+      ],
+      auditLog: [
+        { time: '10:42 AM', actor: 'Ukin AI Speech Scribe', action: 'Commitment extracted from audio utterance by Sara Chen' },
+        { time: '10:44 AM', actor: 'Alex Mercer', action: 'Approved P0 urgency status' },
+      ],
     },
     {
       id: 'tsk_3',
+      col: 'review',
+      title: 'Audit SOC 2 Type II CMEK key rotation telemetry',
+      description: 'Customer requested verification of AWS KMS customer-managed key rotation policies and audit trails.',
+      source: 'From Space #compliance',
+      sourceType: 'chat',
+      sourceId: 'client-escalations',
+      priority: 'P2',
+      time: '1h ago',
+      assignee: 'Elena Rostova',
+      assigneeAvatar: 'ER',
+      subtasks: [
+        { id: 'st_7', text: 'Generate SHA-256 ledger proof', done: true },
+        { id: 'st_8', text: 'Draft risk assessment signoff package', done: true },
+      ],
+      auditLog: [
+        { time: '09:20 AM', actor: 'Elena Rostova', action: 'Card created from space discussion' },
+      ],
+    },
+    {
+      id: 'tsk_4',
       col: 'done',
       title: 'Update Redis Sentinel cluster failover thresholds',
+      description: 'Reduced failover timeout from 5000ms to 1200ms with quorum configuration across 3 availability zones.',
       source: 'Closed by Commit',
       sourceType: 'commit',
+      sourceId: 'commit_8a129',
       priority: 'P2',
       time: 'Yesterday',
       assignee: 'Alex Mercer',
+      assigneeAvatar: 'AM',
+      subtasks: [
+        { id: 'st_9', text: 'Quorum latency verification in staging', done: true },
+        { id: 'st_10', text: 'Production cluster rolling reboot', done: true },
+      ],
+      auditLog: [
+        { time: 'Yesterday', actor: 'Alex Mercer', action: 'Closed via merge commit #0736535' },
+      ],
     },
   ]);
+
+  // Kanban Task Inspector Drawer State
+  const [selectedKanbanTask, setSelectedKanbanTask] = useState(null);
+  const [isTaskDrawerOpen, setIsTaskDrawerOpen] = useState(false);
+
+  const openTaskDrawer = (task) => {
+    setSelectedKanbanTask(task);
+    setIsTaskDrawerOpen(true);
+  };
+
+  const closeTaskDrawer = () => {
+    setIsTaskDrawerOpen(false);
+  };
+
+  const moveKanbanTask = (taskId, targetCol) => {
+    setKanbanTasks((prev) =>
+      prev.map((t) => {
+        if (t.id === taskId) {
+          const audit = {
+            time: 'Just now',
+            actor: 'Sara Chen (You)',
+            action: `Shifted column to [${targetCol.toUpperCase()}]`,
+          };
+          return {
+            ...t,
+            col: targetCol,
+            auditLog: [audit, ...(t.auditLog || [])],
+          };
+        }
+        return t;
+      })
+    );
+
+    // If active in drawer, keep updated
+    setSelectedKanbanTask((prev) => {
+      if (prev && prev.id === taskId) {
+        return {
+          ...prev,
+          col: targetCol,
+          auditLog: [
+            { time: 'Just now', actor: 'Sara Chen (You)', action: `Shifted column to [${targetCol.toUpperCase()}]` },
+            ...(prev.auditLog || []),
+          ],
+        };
+      }
+      return prev;
+    });
+
+    addToast('Kanban Optimistic Move', `Task shifted to ${targetCol.replace('_', ' ').toUpperCase()} (0.8ms event emission).`, 'success');
+  };
+
+  const updateKanbanTask = (taskId, updates) => {
+    setKanbanTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, ...updates } : t))
+    );
+    setSelectedKanbanTask((prev) => (prev && prev.id === taskId ? { ...prev, ...updates } : prev));
+    addToast('Task Updated', 'Changes synchronized across team peers in real time.', 'info');
+  };
+
+  const toggleKanbanSubtask = (taskId, subtaskId) => {
+    setKanbanTasks((prev) =>
+      prev.map((t) => {
+        if (t.id === taskId) {
+          const nextSubs = (t.subtasks || []).map((st) =>
+            st.id === subtaskId ? { ...st, done: !st.done } : st
+          );
+          return { ...t, subtasks: nextSubs };
+        }
+        return t;
+      })
+    );
+    setSelectedKanbanTask((prev) => {
+      if (prev && prev.id === taskId) {
+        const nextSubs = (prev.subtasks || []).map((st) =>
+          st.id === subtaskId ? { ...st, done: !st.done } : st
+        );
+        return { ...prev, subtasks: nextSubs };
+      }
+      return prev;
+    });
+  };
+
+  // Sprint Week 6: Visual Automations State (DAG Engine & Tarjan Cycle Rejection)
+  const [automationsWorkflows, setAutomationsWorkflows] = useState([
+    {
+      id: 'wf_p0_triage',
+      name: 'Auto-Triage P0 Escalations to SRE & Space',
+      description: 'Triggered when inbound JMAP email or form matches Sev-1 incident SLA.',
+      active: true,
+      runCount: 1428,
+      lastRun: '2m ago',
+      nodes: [
+        {
+          id: 'n_trigger_1',
+          type: 'trigger',
+          title: 'Inbound Email Received',
+          category: 'Trigger',
+          icon: 'Mail',
+          x: 40,
+          y: 120,
+          config: { filter: 'Subject contains [URGENT] or [P0]', source: 'JMAP Stream' },
+        },
+        {
+          id: 'n_cond_1',
+          type: 'condition',
+          title: 'Evaluate Priority SLA',
+          category: 'Condition',
+          icon: 'Shield',
+          x: 360,
+          y: 120,
+          config: { rule: 'Priority == P0 AND Sender Domain is Enterprise' },
+        },
+        {
+          id: 'n_action_1',
+          type: 'action',
+          title: 'Spawn P0 Kanban Task',
+          category: 'Action',
+          icon: 'CheckSquare',
+          x: 680,
+          y: 50,
+          config: { column: 'in_progress', assignee: 'Sara Chen', tag: 'SRE-Incident' },
+        },
+        {
+          id: 'n_action_2',
+          type: 'action',
+          title: 'Notify #incident-war-room',
+          category: 'Action',
+          icon: 'MessageSquare',
+          x: 680,
+          y: 200,
+          config: { space: '#incident-war-room', mention: '@channel', alertAudio: true },
+        },
+      ],
+      edges: [
+        { id: 'e1', from: 'n_trigger_1', to: 'n_cond_1' },
+        { id: 'e2', from: 'n_cond_1', to: 'n_action_1' },
+        { id: 'e3', from: 'n_cond_1', to: 'n_action_2' },
+      ],
+    },
+    {
+      id: 'wf_huddle_doc',
+      name: 'Synthesize Huddle Audio to Living RFC',
+      description: 'Automatically extracts commitments when audio WebRTC stream ends.',
+      active: true,
+      runCount: 614,
+      lastRun: '18m ago',
+      nodes: [
+        {
+          id: 'n_trig_huddle',
+          type: 'trigger',
+          title: 'WebRTC Huddle Concluded',
+          category: 'Trigger',
+          icon: 'Radio',
+          x: 40,
+          y: 120,
+          config: { source: 'LiveKit SFU Frankfurt' },
+        },
+        {
+          id: 'n_cond_tokens',
+          type: 'condition',
+          title: 'Confidence Score > 95%',
+          category: 'Condition',
+          icon: 'Sparkles',
+          x: 360,
+          y: 120,
+          config: { threshold: '95% STT accuracy' },
+        },
+        {
+          id: 'n_act_rfc',
+          type: 'action',
+          title: 'Commit to Living Doc RFC-2026',
+          category: 'Action',
+          icon: 'FileText',
+          x: 680,
+          y: 120,
+          config: { docId: 'doc_rfc_2026', format: 'CRDT Margin Comment' },
+        },
+      ],
+      edges: [
+        { id: 'eh1', from: 'n_trig_huddle', to: 'n_cond_tokens' },
+        { id: 'eh2', from: 'n_cond_tokens', to: 'n_act_rfc' },
+      ],
+    },
+  ]);
+
+  const [activeWorkflowId, setActiveWorkflowId] = useState('wf_p0_triage');
+  const [isAutomationsTesting, setIsAutomationsTesting] = useState(false);
+  const [activeExecutionStep, setActiveExecutionStep] = useState(null);
+  const [executionLogs, setExecutionLogs] = useState([
+    {
+      id: 'ex_1',
+      time: '10:31 AM',
+      workflow: 'Auto-Triage P0 Escalations',
+      duration: '210ms',
+      status: 'SUCCESS',
+      summary: 'Processed email #em_101 -> Created Task #tsk_1 -> Dispatched notification',
+    },
+    {
+      id: 'ex_2',
+      time: '10:44 AM',
+      workflow: 'Synthesize Huddle Audio to Living RFC',
+      duration: '340ms',
+      status: 'SUCCESS',
+      summary: 'Huddle #18 commitment parsed -> Annotated RFC doc node_huddle_summary',
+    },
+  ]);
+
+  // Tarjan Cycle Rejection Checker: returns true if adding (fromId -> toId) introduces a directed cycle
+  const hasDirectedPath = (fromId, toId, edges) => {
+    if (fromId === toId) return true;
+    const visited = new Set();
+    const queue = [fromId];
+
+    while (queue.length > 0) {
+      const curr = queue.shift();
+      if (curr === toId) return true;
+      if (!visited.has(curr)) {
+        visited.add(curr);
+        const nextNodes = edges.filter((e) => e.from === curr).map((e) => e.to);
+        for (const next of nextNodes) {
+          queue.push(next);
+        }
+      }
+    }
+    return false;
+  };
+
+  const addWorkflowEdge = (fromId, toId) => {
+    const activeWf = automationsWorkflows.find((w) => w.id === activeWorkflowId);
+    if (!activeWf) return false;
+
+    // Check if path exists from toId back to fromId
+    if (hasDirectedPath(toId, fromId, activeWf.edges)) {
+      addToast(
+        'Tarjan Cycle Rejection',
+        `Connection from "${fromId}" to "${toId}" introduces a directed cycle. DAG must remain acyclic.`,
+        'error'
+      );
+      return false;
+    }
+
+    // Edge is acyclic - safe to add
+    const newEdge = { id: `e_${fromId}_${toId}`, from: fromId, to: toId };
+    setAutomationsWorkflows((prev) =>
+      prev.map((w) =>
+        w.id === activeWorkflowId ? { ...w, edges: [...w.edges, newEdge] } : w
+      )
+    );
+    addToast('DAG Edge Connected', `Linked ${fromId} -> ${toId} with zero cycles.`, 'success');
+    return true;
+  };
+
+  const testAutomationsWorkflow = () => {
+    if (isAutomationsTesting) return;
+    setIsAutomationsTesting(true);
+    addToast('Workflow Simulation Started', 'Testing execution DAG with mock Sev-1 event payload...', 'info');
+
+    // Step 1: Trigger fires
+    setActiveExecutionStep('trigger');
+    setTimeout(() => {
+      // Step 2: Condition evaluates
+      setActiveExecutionStep('condition');
+      setTimeout(() => {
+        // Step 3: Actions execute
+        setActiveExecutionStep('action');
+        setTimeout(() => {
+          setActiveExecutionStep('complete');
+          setIsAutomationsTesting(false);
+
+          // Add execution record
+          const newLog = {
+            id: 'ex_' + Date.now(),
+            time: 'Just now',
+            workflow: 'Auto-Triage P0 Escalations',
+            duration: '184ms',
+            status: 'SUCCESS',
+            summary: 'Simulated Sev-1 email ingested -> Priority P0 verified -> Task dispatched & Space notified',
+          };
+          setExecutionLogs((prev) => [newLog, ...prev]);
+
+          addToast('DAG Execution Complete', 'All 4 nodes executed successfully in 184ms with 0 errors.', 'success');
+          setTimeout(() => setActiveExecutionStep(null), 3000);
+        }, 800);
+      }, 800);
+    }, 800);
+  };
 
   // Toasts / Telemetry Feed
   const [toasts, setToasts] = useState([]);
 
   const addToast = (title, desc, type = 'info') => {
-    const id = Date.now().toString();
+    toastSeq = (toastSeq + 1) % 1000000;
+    const id = `t_${Date.now()}_${toastSeq}_${Math.random().toString(36).slice(2, 6)}`;
     setToasts((prev) => [...prev, { id, title, desc, type }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -335,13 +677,23 @@ Director of IT Operations, UberLogistics DE`,
 
     const newTask = {
       id: 'tsk_' + Date.now(),
-      col: 'triage',
+      col: 'backlog',
       title: `Escalation: ${email.subject}`,
+      description: email.snippet || email.body.slice(0, 140),
       source: `From ${email.sender}`,
       sourceType: 'mail',
+      sourceId: email.id,
       priority: 'P0',
       time: 'Just now',
       assignee: 'Sara Chen',
+      assigneeAvatar: 'SC',
+      subtasks: [
+        { id: 'st_e1', text: 'Triage customer SLA error logs', done: false },
+        { id: 'st_e2', text: 'Dispatch response to client executive', done: false },
+      ],
+      auditLog: [
+        { time: 'Just now', actor: 'Sara Chen', action: `Converted email from ${email.sender} into P0 task` },
+      ],
     };
     setKanbanTasks((prev) => [newTask, ...prev]);
     addToast('Email Converted to Task', `Synthesized email from ${email.sender} into a P0 Kanban ticket.`, 'success');
@@ -353,11 +705,22 @@ Director of IT Operations, UberLogistics DE`,
       id: 'tsk_huddle_' + Date.now(),
       col: 'in_progress',
       title: 'Huddle #18 Action: Revert token cache TTL to 3600s',
+      description: 'Audio commitment extracted by Ukin AI Scribe during live WebRTC architecture sync.',
       source: 'From Huddle #18',
       sourceType: 'huddle',
+      sourceId: 'huddle_18',
       priority: 'P0',
       time: 'Just now',
       assignee: 'Sara Chen',
+      assigneeAvatar: 'SC',
+      prLinked: 'PR #1042',
+      subtasks: [
+        { id: 'st_h1', text: 'Revert token cache TTL to 3600s in PR #1042', done: true },
+        { id: 'st_h2', text: 'Verify Frankfurt cluster latency drops to 18ms', done: true },
+      ],
+      auditLog: [
+        { time: 'Just now', actor: 'Ukin AI Meeting Scribe', action: 'Live audio commitment synced to Sprint Kanban' },
+      ],
     };
     setKanbanTasks((prev) => [huddleTask, ...prev]);
     addToast('Huddle Action Extracted', 'Speech commitment synced to Sprint 24 Kanban pipeline.', 'success');
@@ -496,6 +859,72 @@ Director of IT Operations, UberLogistics DE`,
   const activeMessages = messagesByChannel[activeChannel] || [];
   const activeEmail = emails.find((e) => e.id === activeEmailId) || emails[0];
 
+  // Sprint Week 7: Universal ⌘K Command Palette & Keyboard Shortcuts
+  const [isSearchPaletteOpen, setIsSearchPaletteOpen] = useState(false);
+  const [isKeyboardModalOpen, setIsKeyboardModalOpen] = useState(false);
+
+  const openSearchPalette = () => setIsSearchPaletteOpen(true);
+  const closeSearchPalette = () => setIsSearchPaletteOpen(false);
+
+  useEffect(() => {
+    const handleGlobalShortcuts = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchPaletteOpen((prev) => !prev);
+      }
+      if ((e.metaKey || e.ctrlKey) && (e.key === '/' || e.code === 'Slash' || e.key === '?')) {
+        e.preventDefault();
+        setIsKeyboardModalOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalShortcuts);
+    return () => window.removeEventListener('keydown', handleGlobalShortcuts);
+  }, []);
+
+  // ── Navigation Morph & Section Scroll-Spy ──
+  const [activeSection, setActiveSection] = useState('hero');
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const heroEl = document.getElementById('hero');
+      // Bottom dock stays while Hero section is visible in viewport;
+      // As user scrolls past the Hero, it morphs into sticky top command bar
+      const isHeroInView = heroEl
+        ? heroEl.getBoundingClientRect().bottom > 150
+        : scrollY < 600;
+      setIsHeroVisible(isHeroInView);
+
+      const sectionIds = ['hero', 'workflows', 'features', 'platform', 'security', 'pricing', 'faq'];
+      const scrollPosition = scrollY + window.innerHeight * 0.35;
+
+      for (let i = sectionIds.length - 1; i >= 0; i--) {
+        const el = document.getElementById(sectionIds[i]);
+        if (el) {
+          const top = el.offsetTop;
+          if (scrollPosition >= top) {
+            setActiveSection(sectionIds[i]);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const yOffset = -70;
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
   return (
     <WorkspaceContext.Provider
       value={{
@@ -535,6 +964,22 @@ Director of IT Operations, UberLogistics DE`,
         simulateHuddleUtterance,
         synthesizeHuddleToDoc,
         kanbanTasks,
+        selectedKanbanTask,
+        setSelectedKanbanTask,
+        isTaskDrawerOpen,
+        openTaskDrawer,
+        closeTaskDrawer,
+        moveKanbanTask,
+        updateKanbanTask,
+        toggleKanbanSubtask,
+        automationsWorkflows,
+        activeWorkflowId,
+        setActiveWorkflowId,
+        isAutomationsTesting,
+        activeExecutionStep,
+        executionLogs,
+        addWorkflowEdge,
+        testAutomationsWorkflow,
         toasts,
         addToast,
         isDemoDrawerOpen,
@@ -542,6 +987,15 @@ Director of IT Operations, UberLogistics DE`,
         closeDemoDrawer,
         complianceModalItem,
         setComplianceModalItem,
+        isSearchPaletteOpen,
+        openSearchPalette,
+        closeSearchPalette,
+        isKeyboardModalOpen,
+        setIsKeyboardModalOpen,
+        activeSection,
+        setActiveSection,
+        isHeroVisible,
+        scrollToSection,
       }}
     >
       {children}

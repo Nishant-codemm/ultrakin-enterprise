@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
 import {
   Video,
   Mic,
@@ -9,14 +8,8 @@ import {
   Sparkles,
   ArrowRight,
   GitBranch,
-  UserCheck,
   CheckCircle2,
-  Clock,
-  Send,
-  Plus,
   Radio,
-  FileCode,
-  ExternalLink,
 } from 'lucide-react';
 import Badge from '../components/primitives/Badge';
 import Button from '../components/primitives/Button';
@@ -27,8 +20,8 @@ export default function WorkflowSpotlight() {
   const [mailConverted, setMailConverted] = useState(false);
 
   return (
-    <section id="how-it-works" className="py-24 md:py-32 bg-[#07090E] border-t border-white/8">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 space-y-32">
+    <section id="workflows" className="py-24 md:py-32 bg-[#07090E] divider-hairline relative">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 space-y-20 md:space-y-32">
         {/* Spotlight 1: Huddle & Automated Meeting Transcripts */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Narrative */}
@@ -72,7 +65,7 @@ export default function WorkflowSpotlight() {
           </div>
 
           {/* Right Mockup: Live Huddle & Transcript Visualizer */}
-          <div className="lg:col-span-7 bg-[#0B0F19] rounded-2xl border border-white/10 shadow-[0_24px_48px_rgba(0,0,0,0.6)] overflow-hidden text-left">
+          <div className="lg:col-span-7 bg-[#0B0F19] rounded-2xl border border-white/12 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_48px_rgba(0,0,0,0.6)] overflow-hidden text-left">
             {/* Huddle Window Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b border-white/8 bg-[#0F172A]/80 text-xs">
               <div className="flex items-center gap-2.5 text-white font-semibold">
@@ -88,7 +81,7 @@ export default function WorkflowSpotlight() {
             </div>
 
             {/* Main Stage: Grid of Call Participants */}
-            <div className="p-6 grid grid-cols-3 gap-3 bg-[#07090E]/80 border-b border-white/8">
+            <div className="p-4 sm:p-6 grid grid-cols-3 gap-2 sm:gap-3 bg-[#07090E]/80 border-b border-white/8">
               {[
                 { name: 'Sara Chen', role: 'Staff Eng', speaking: true, color: 'bg-violet-600', initials: 'SC' },
                 { name: 'Ravi Mehta', role: 'Lead DevOps', speaking: false, color: 'bg-emerald-600', initials: 'RM' },
@@ -97,7 +90,7 @@ export default function WorkflowSpotlight() {
                 <div
                   key={p.name}
                   className={cn(
-                    'p-4 rounded-xl flex flex-col items-center text-center justify-between transition-all',
+                    'p-2.5 sm:p-4 rounded-xl flex flex-col items-center text-center justify-between transition-all',
                     p.speaking
                       ? 'bg-[#1E293B] ring-2 ring-indigo-500/80 shadow-lg'
                       : 'bg-[#0B0F19] border border-white/8'
@@ -186,7 +179,7 @@ export default function WorkflowSpotlight() {
         {/* Spotlight 2: Native Domain Mail Converted Directly into Tasks */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           {/* Left Mockup: Native Mailbox Workspace UI */}
-          <div className="lg:col-span-7 order-2 lg:order-1 bg-[#0B0F19] rounded-2xl border border-white/10 shadow-[0_24px_48px_rgba(0,0,0,0.6)] overflow-hidden text-left">
+          <div className="lg:col-span-7 order-2 lg:order-1 bg-[#0B0F19] rounded-2xl border border-white/12 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_48px_rgba(0,0,0,0.6)] overflow-hidden text-left">
             {/* Mail Shell Header */}
             <div className="flex items-center justify-between px-5 py-3 border-b border-white/8 bg-[#0F172A]/80 text-xs">
               <div className="flex items-center gap-2 font-bold text-white">
@@ -342,7 +335,7 @@ export default function WorkflowSpotlight() {
           </div>
 
           {/* Right Mockup: Living Doc Interface */}
-          <div className="lg:col-span-7 bg-[#0B0F19] rounded-2xl border border-white/10 shadow-[0_24px_48px_rgba(0,0,0,0.6)] p-6 md:p-8 text-left space-y-5">
+          <div className="lg:col-span-7 bg-[#0B0F19] rounded-2xl border border-white/12 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_24px_48px_rgba(0,0,0,0.6)] p-6 md:p-8 text-left space-y-5">
             {/* Document Header */}
             <div className="flex items-center justify-between border-b border-white/8 pb-4">
               <div className="flex items-center gap-3">

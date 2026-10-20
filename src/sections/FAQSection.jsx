@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, HelpCircle, Shield, ArrowRight } from 'lucide-react';
+import { ChevronDown, HelpCircle, ArrowRight } from 'lucide-react';
 import { cn } from '../lib/cn';
 
 const FAQS = [
@@ -34,7 +34,7 @@ export default function FAQSection() {
   const [openIdx, setOpenIdx] = useState(0);
 
   return (
-    <section id="faq" className="py-24 md:py-32 bg-[#07090E] border-t border-white/8 relative overflow-hidden">
+    <section id="faq" className="py-24 md:py-32 bg-[#07090E] divider-hairline relative overflow-hidden">
       {/* Ambient background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
 
@@ -48,7 +48,7 @@ export default function FAQSection() {
             Everything you need to know <br />
             <span className="text-slate-400 font-normal">about running on Ultrakin.</span>
           </h2>
-          <p className="mt-4 text-base text-slate-400">
+          <p className="mt-4 text-base text-slate-300">
             Real answers to architectural, migration, and security questions.
           </p>
         </div>
@@ -60,9 +60,9 @@ export default function FAQSection() {
               <div
                 key={faq.q}
                 className={cn(
-                  'rounded-2xl border transition-all duration-200 overflow-hidden backdrop-blur-xl',
+                  'rounded-2xl border transition-all duration-200 overflow-hidden backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_8px_24px_rgba(0,0,0,0.5)]',
                   isOpen
-                    ? 'border-indigo-500/40 bg-[#0F172A]/90 shadow-lg shadow-indigo-500/10'
+                    ? 'border-indigo-500/50 bg-[#0F172A]/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_12px_32px_rgba(99,102,241,0.15)] ring-1 ring-indigo-500/30'
                     : 'border-white/8 bg-[#0B0F19]/80 hover:border-white/16 hover:bg-[#0B0F19]'
                 )}
               >

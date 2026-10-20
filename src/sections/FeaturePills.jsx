@@ -10,9 +10,7 @@ import {
   Files,
   FolderOpen,
   Hash,
-  ImageIcon,
   Inbox,
-  Link2,
   Mail,
   MessageSquare,
   Paperclip,
@@ -20,8 +18,6 @@ import {
   Search,
   Send,
   Sparkles,
-  Star,
-  Tag,
   Users,
   Zap,
 } from 'lucide-react'

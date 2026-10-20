@@ -16,7 +16,7 @@ export default function Button({
   ...props
 }) {
   const baseStyles =
-    'relative inline-flex items-center justify-center font-medium transition-all duration-150 select-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6366F1] focus-visible:ring-offset-2 focus-visible:ring-offset-[#07090E] disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98]';
+    'group relative inline-flex items-center justify-center font-medium transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] select-none cursor-pointer transform-gpu focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6366F1] focus-visible:ring-offset-2 focus-visible:ring-offset-[#07090E] disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] motion-reduce:transform-none motion-reduce:transition-none';
 
   const sizeStyles = {
     sm: 'h-8 px-3 text-xs rounded-md gap-1.5',
@@ -26,15 +26,15 @@ export default function Button({
 
   const variantStyles = {
     primary:
-      'bg-[#6366F1] hover:bg-[#4F46E5] active:bg-[#4338CA] text-white shadow-[0_1px_3px_rgba(0,0,0,0.4),0_8px_20px_-4px_rgba(99,102,241,0.45)] border border-indigo-400/30',
+      'bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 hover:from-indigo-500 hover:to-indigo-500 active:bg-indigo-700 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.25),0_8px_20px_-4px_rgba(99,102,241,0.45)] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.35),0_12px_28px_-4px_rgba(99,102,241,0.6)] border border-indigo-400/40 hover:-translate-y-0.5 active:translate-y-0',
     secondary:
-      'bg-[#0F172A]/80 hover:bg-[#1E293B] text-[#F1F5F9] border border-white/10 hover:border-white/20 shadow-[0_4px_16px_rgba(0,0,0,0.3)]',
+      'bg-white/[0.04] hover:bg-white/[0.08] backdrop-blur-md text-[#F1F5F9] border border-white/12 hover:border-white/20 shadow-[0_2px_8px_rgba(0,0,0,0.4)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.5)] hover:-translate-y-0.5 active:translate-y-0',
     ghost:
-      'bg-transparent hover:bg-white/5 text-[#94A3B8] hover:text-[#F1F5F9] border border-transparent',
+      'bg-transparent hover:bg-white/6 text-slate-300 hover:text-white border border-transparent',
     outline:
-      'bg-transparent hover:bg-white/5 text-[#F1F5F9] border border-white/15 hover:border-indigo-500/40',
+      'bg-white/[0.02] hover:bg-white/[0.06] text-slate-200 hover:text-white border border-white/14 hover:border-white/24 shadow-sm hover:-translate-y-0.5 active:translate-y-0',
     destructive:
-      'bg-[#F43F5E] hover:bg-[#E11D48] text-white shadow-[0_4px_16px_-4px_rgba(244,63,94,0.45)] border border-rose-400/30',
+      'bg-[#F43F5E] hover:bg-[#E11D48] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_16px_-4px_rgba(244,63,94,0.45)] border border-rose-400/30 hover:-translate-y-0.5 active:translate-y-0',
   };
 
   return (
@@ -48,11 +48,11 @@ export default function Button({
       {isLoading ? (
         <Loader2 className="w-4 h-4 animate-spin text-current" />
       ) : Icon ? (
-        <Icon className="w-4 h-4 shrink-0" />
+        <Icon className="w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-105" />
       ) : null}
       <span>{children}</span>
       {!isLoading && IconRight ? (
-        <IconRight className="w-4 h-4 shrink-0 transition-transform duration-150 group-hover:translate-x-0.5" />
+        <IconRight className="w-4 h-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" />
       ) : null}
     </button>
   );
