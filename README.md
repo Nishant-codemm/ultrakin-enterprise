@@ -4,7 +4,7 @@
 [![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.3-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Oxlint](https://img.shields.io/badge/Linter-Oxlint-F59E0B?style=flat-square)](https://oxc.rs/)
-[![Bundle Size](https://img.shields.io/badge/Gzip_Bundle-%3C205_KB-10B981?style=flat-square)](https://github.com/Nishant-codemm/ultrakin-enterprise)
+[![Bundle Size](https://img.shields.io/badge/JavaScript_Gzip-%7E190_KB-10B981?style=flat-square)](https://github.com/Nishant-codemm/ultrakin-enterprise)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
 > The Autonomous Unified Workspace for High-Velocity Teams. A single, sovereign surface uniting decentralized chat, living docs, domain email, and real-time execution.
@@ -23,16 +23,13 @@ This repository contains the complete enterprise landing page and interactive pr
 
 ## Key Features
 
-- **Interactive Workspace Showcase:** Live interactive simulator featuring four primary application modules:
-  - **Matrix E2EE Chat:** Real-time channel communications, threaded conversations, and AI copilot actions.
-  - **Living Docs:** Real-time document editor with embedded task references and team presence.
-  - **Custom Domain Mailbox:** Native domain email handling (`@acme.corp`) with automated triage and action synthesis.
-  - **Live Huddles:** Ultra-low latency voice/video simulation with live transcript processing.
+- **Interactive Workspace Showcase:** Sample product experiences for Chat, Threads, Huddles, Docs, Files, Mail, Agents, and Tasks.
+- **Workflow Storytelling:** Interactive examples show how team discussion can carry context into documentation, assignments, and review.
 - **In-Memory Event Bus Telemetry:** Live event ledger demonstrating real-time message ingestion, task generation, and automated cross-system updates.
 - **Dynamic Navigation Morph System:** A smart scroll-responsive top navigation bar that smoothly transitions between a full enterprise header and an elevated sticky command bar.
 - **Global Command Palette (`⌘K` / `Ctrl+K`):** Fast workspace switching, quick action dispatching, and fuzzy section search.
 - **Enterprise Design System:** Custom dark-mode UI with high-contrast typography, refined glassmorphic surfaces, layered elevation, and fluid spring micro-interactions.
-- **Strict Performance Budget:** Fully bundled client assets under **205 KB gzipped**, achieving near-instant first contentful paint (FCP) and smooth 60 FPS animation loops.
+- **Code-Split Production Build:** Vite splits React, motion, icons, and application code into separate production chunks.
 
 ---
 
@@ -62,15 +59,15 @@ The project is structured around decoupled presentation and state layers:
 ├──────────────────────────────┴──────────────────────────────┤
 │                      WorkspaceContext                       │
 │    • Active Section & Scroll Position                       │
-│    • Workspace Module State (Chat, Docs, Mail, Tasks)       │
+│    • Workspace Module State (Chat, Threads, Huddles, Docs,  │
+│      Files, Mail, Agents, Tasks)                              │
 │    • Real-Time Event Bus Queue & Telemetry                  │
 ├─────────────────────────────────────────────────────────────┤
 │                    Application Sections                     │
 │    • HeroSection & Interactive Product Showcase             │
-│    • FeaturePills & Capabilities Grid                       │
-│    • BentoGrid Architectural Overview                       │
-│    • Security & Compliance Framework                        │
-│    • Transparent Enterprise Pricing                         │
+│    • WorkflowSpotlight & BentoGrid                           │
+│    • Integrations and Security                               │
+│    • Workspace, Agents, Security, and Pricing routes         │
 │    • Footer & Global Brand Anchors                          │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -81,42 +78,25 @@ The project is structured around decoupled presentation and state layers:
 
 ```
 ultrakin-enterprise/
-├── docs/                        # Architectural specifications & blueprints
-│   ├── 00_Ultrakin_Master_Specification.md
-│   ├── 01_Slack_Enterprise_Research_Report.md
-│   ├── 02_Ultrakin_Current_State_Audit.md
-│   ├── 03_Slack_vs_Ultrakin_Strategic_Gap_Analysis.md
-│   ├── 04_Ultrakin_Enterprise_Product_Requirements_Document.md
-│   ├── 05_Ultrakin_Enterprise_Experience_Architecture.md
-│   ├── 06_Ultrakin_Enterprise_Design_System_Specification.md
-│   └── 07_Ultrakin_Engineering_Implementation_Blueprint.md
-├── public/                      # Static assets & web manifest
-│   ├── favicon.svg              # Canonical vector logo favicon
-│   ├── manifest.webmanifest     # PWA metadata
-│   ├── robots.txt
-│   └── sitemap.xml
+├── docs/                        # Product, design, and engineering references
+├── public/                      # Favicon, web manifest, robots, and sitemap
 ├── src/
-│   ├── assets/                  # Images and static media
-│   ├── components/              # Modular UI components
-│   │   ├── primitives/          # Atomic primitives (Button, Badge, GlassCard, UltrakinLogo)
-│   │   ├── showcase/            # Interactive engine simulators (Chat, Docs, Mail, Tasks)
+│   ├── components/
+│   │   ├── primitives/           # Button, Badge, and UltrakinLogo
+│   │   ├── showcase/             # Interactive workspace and agent demos
 │   │   ├── CommandPaletteModal.jsx
-│   │   ├── FloatingOrbitPill.jsx
 │   │   ├── KeyboardShortcutsModal.jsx
 │   │   └── Navbar.jsx
-│   ├── context/                 # Centralized state management
-│   │   └── WorkspaceContext.jsx # In-memory event bus and reactive state
-│   ├── lib/                     # Utility helpers (classnames / cn)
-│   ├── sections/                # Full landing page sections
-│   ├── App.jsx                  # Root application assembly
-│   ├── index.css                # Global Tailwind directives & custom utilities
-│   └── main.jsx                 # React root mount
-├── .gitignore                   # Standard production ignore rules
-├── .oxlintrc.json               # Linter configuration
-├── index.html                   # HTML template & typography preconnects
-├── package.json                 # Project dependencies & build scripts
-├── README.md                    # Project documentation
-└── vite.config.js               # Vite build configuration
+│   ├── context/                  # Shared workspace state
+│   ├── lib/                      # Small shared utilities
+│   ├── pages/                    # Workspace, Agents, Security, and Pricing routes
+│   ├── sections/                 # Landing page sections
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
+├── index.html
+├── package.json
+└── vite.config.js
 ```
 
 ---
@@ -168,8 +148,8 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## Performance & Optimization
 
-- **Bundle Efficiency:** Minified and tree-shaken with Vite/Rollup; gzipped bundle is **~183 KB** (JS) and **~20 KB** (CSS).
-- **GPU-Accelerated Transforms:** Dynamic cards, floating badges, and interactive drawers utilize 3D transforms (`translate3d`, `scale3d`) to prevent layout thrashing and maintain 60 FPS.
+- **Bundle Efficiency:** The current production build emits about **190 KB gzipped JavaScript** and **23 KB gzipped CSS**, split across application and vendor chunks.
+- **Motion:** Framer Motion and CSS transitions are used for interactive states; `prefers-reduced-motion` is respected. No frame-rate guarantee is implied by the build output.
 - **Typography Optimization:** Preconnected Google Fonts (`Inter`, `Inter Display`, `JetBrains Mono`) with `font-display: swap` to prevent render blocking.
 - **Resource Hygiene:** Zero unoptimized heavy runtime dependencies; SVG icons are modularly tree-shaken via `lucide-react`.
 
@@ -177,10 +157,10 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## Accessibility & UX
 
-- **Semantic HTML:** Correct document outlines using `<nav>`, `<main>`, `<section>`, `<article>`, and `<footer>`.
-- **Keyboard Navigation:** Full keyboard navigation support across all buttons, quick-switchers, and modal dialogs.
-- **Reduced Motion:** Fully respects user OS preferences via `prefers-reduced-motion` media queries.
-- **Color Contrast:** Dark obsidian surfaces (`#07090E`, `#0B0F19`) paired with slate/white foreground text meet WCAG 2.1 AA contrast requirements.
+- **Semantic HTML:** Uses navigation, main, section, article, and footer landmarks.
+- **Keyboard Navigation:** Interactive navigation and dialogs provide keyboard access and visible focus states.
+- **Reduced Motion:** CSS motion rules and Framer Motion respond to the user's reduced-motion preference.
+- **Contrast:** Main body copy and controls use high-contrast foreground colors on the dark surfaces.
 
 ---
 

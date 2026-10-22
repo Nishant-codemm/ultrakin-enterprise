@@ -5,7 +5,7 @@ let toastSeq = 0;
 
 export function WorkspaceProvider({ children }) {
   // Navigation & Active Module
-  const [activeModule, setActiveModule] = useState('huddle'); // start on huddle for Week 5 showcase
+  const [activeModule, setActiveModule] = useState('chat');
   const [activeChannel, setActiveChannel] = useState('general-arch');
 
   // Enterprise Demo & Sales Drawer State (Week 5 Deliverable)
@@ -889,14 +889,13 @@ Director of IT Operations, UberLogistics DE`,
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const heroEl = document.getElementById('hero');
-      // Bottom dock stays while Hero section is visible in viewport;
-      // As user scrolls past the Hero, it morphs into sticky top command bar
+      // Keep the full navigation until the Hero section has completely left view.
       const isHeroInView = heroEl
-        ? heroEl.getBoundingClientRect().bottom > 150
-        : scrollY < 600;
+        ? heroEl.getBoundingClientRect().bottom > 0
+        : false;
       setIsHeroVisible(isHeroInView);
 
-      const sectionIds = ['hero', 'workflows', 'features', 'platform', 'security', 'pricing', 'faq'];
+      const sectionIds = ['hero', 'workflows', 'features', 'platform', 'security', 'evaluation', 'faq'];
       const scrollPosition = scrollY + window.innerHeight * 0.35;
 
       for (let i = sectionIds.length - 1; i >= 0; i--) {

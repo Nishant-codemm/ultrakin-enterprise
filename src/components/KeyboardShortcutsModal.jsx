@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Keyboard, X } from 'lucide-react';
 import { useWorkspace } from '../context/WorkspaceContext';
@@ -6,6 +6,8 @@ import { cn } from '../lib/cn';
 
 export default function KeyboardShortcutsModal() {
   const { isKeyboardModalOpen, setIsKeyboardModalOpen } = useWorkspace();
+  const dialogRef = useRef(null);
+  const closeButtonRef = useRef(null);
 
   const shortcutGroups = [
     {
@@ -38,28 +40,62 @@ export default function KeyboardShortcutsModal() {
   useEffect(() => {
     if (!isKeyboardModalOpen) return;
 
+    const previouslyFocused = document.activeElement === document.body ? null : document.activeElement;
+    const focusFrame = window.requestAnimationFrame(() => closeButtonRef.current?.focus());
+
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         e.preventDefault();
         setIsKeyboardModalOpen(false);
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        const focusable = dialogRef.current?.querySelectorAll(
+          'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusable?.length) {
+          e.preventDefault();
+          return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (!dialogRef.current?.contains(document.activeElement)) {
+          e.preventDefault();
+          (e.shiftKey ? last : first).focus();
+        } else if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      window.removeEventListener('keydown', handleKeyDown);
+      if (previouslyFocused?.isConnected && previouslyFocused.getClientRects().length > 0) {
+        previouslyFocused.focus();
+      }
+    };
   }, [isKeyboardModalOpen, setIsKeyboardModalOpen]);
 
   if (!isKeyboardModalOpen) return null;
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[95] flex items-center justify-center p-4 select-none">
+      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 select-none">
         {/* Scrim */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={() => setIsKeyboardModalOpen(false)}
+          aria-hidden="true"
           className="fixed inset-0 bg-[#030712]/80 backdrop-blur-md -z-10"
         />
 
@@ -69,6 +105,10 @@ export default function KeyboardShortcutsModal() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 10 }}
           transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="keyboard-shortcuts-title"
           className={cn(
             'w-full max-w-[560px] rounded-xl border border-white/12 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_24px_70px_rgba(0,0,0,0.85)]',
             'bg-[#07090E]/95 backdrop-blur-2xl text-slate-200'
@@ -78,15 +118,17 @@ export default function KeyboardShortcutsModal() {
           <div className="p-4 border-b border-white/8 flex items-center justify-between bg-[#0B0F19]/90 backdrop-blur-md">
             <div className="flex items-center gap-2">
               <Keyboard className="w-4 h-4 text-indigo-400" />
-              <span className="font-semibold text-sm text-white">Keyboard Shortcuts</span>
+              <h2 id="keyboard-shortcuts-title" className="font-semibold text-sm text-white">Keyboard Shortcuts</h2>
               <span className="text-[10px] font-mono text-indigo-300 bg-indigo-500/15 border border-indigo-500/25 px-2 py-0.5 rounded-full">
                 Section 11.1
               </span>
             </div>
             <button
+              ref={closeButtonRef}
               type="button"
               onClick={() => setIsKeyboardModalOpen(false)}
-              className="p-1 hover:text-white text-slate-400 hover:bg-white/5 active:scale-95 rounded-md cursor-pointer transition-all"
+              aria-label="Close keyboard shortcuts"
+              className="p-1 hover:text-white text-slate-400 hover:bg-white/5 active:scale-95 rounded-md cursor-pointer transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300"
             >
               <X className="w-4 h-4" />
             </button>

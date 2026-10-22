@@ -51,32 +51,67 @@
   --uk-border-active: rgba(99, 102, 241, 0.4);
 
   --uk-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+  background: var(--uk-bg-base);
+}
+
+body {
+  background:
+    radial-gradient(ellipse 70% 34rem at 50% -12rem, rgba(91, 99, 186, 0.075), transparent 76%),
+    var(--uk-bg-base);
+  font-kerning: normal;
+  font-feature-settings: 'ss01' on, 'cv11' on;
+}
+
+::selection {
+  background: rgba(129, 140, 248, 0.28);
+  color: #f8fafc;
+}
+
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
+h1, h2, h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
 }
 
 /* Glassmorphic Utilities */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 19, 28, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.065);
 }
 
 .glass-card {
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.45);
+  background: rgba(16, 20, 29, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 12px 30px -20px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255,255,255,.025);
 }
 
 .glass-card-hover {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: background-color 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glass-card-hover:hover {
-  background: rgba(30, 41, 59, 0.7);
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: 0 12px 40px -4px rgba(99, 102, 241, 0.18), 0 8px 24px -4px rgba(0, 0, 0, 0.5);
-  transform: translateY(-2px);
+  background: rgba(24, 29, 40, 0.82);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 36px -22px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255,255,255,.04);
 }
 
 /* Specular Hairline Borders */
@@ -142,12 +177,12 @@
 
 /* Linear-Grade Dual-Border Elevation */
 .elevation-dual-border {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.08), 0 16px 40px -8px rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.035), 0 18px 42px -28px rgba(0, 0, 0, 0.9);
 }
 .elevation-dual-border:hover {
-  border-color: rgba(99, 102, 241, 0.35);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.14), 0 20px 48px -8px rgba(99, 102, 241, 0.18), 0 16px 36px rgba(0, 0, 0, 0.8);
+  border-color: rgba(255, 255, 255, 0.13);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.055), 0 20px 46px -28px rgba(0, 0, 0, 0.95);
 }
 
 /* Hairline Gradient Section Divider */

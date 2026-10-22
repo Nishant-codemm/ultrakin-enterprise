@@ -32,6 +32,51 @@ export default function CommandPaletteModal() {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
+  const dialogRef = useRef(null);
+  const restoreFocusRef = useRef(null);
+  const resultRefs = useRef([]);
+
+  useEffect(() => {
+    if (!isSearchPaletteOpen) return undefined;
+
+    const previouslyFocused = document.activeElement;
+    restoreFocusRef.current = previouslyFocused === document.body ? null : previouslyFocused;
+    const focusFrame = window.requestAnimationFrame(() => inputRef.current?.focus());
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      const restoreTarget = restoreFocusRef.current;
+      if (restoreTarget?.isConnected && !restoreTarget.hasAttribute('disabled') && restoreTarget.getClientRects().length > 0) {
+        restoreTarget.focus();
+      }
+      restoreFocusRef.current = null;
+    };
+  }, [isSearchPaletteOpen]);
+
+  const trapDialogFocus = (event) => {
+    if (event.key !== 'Tab') return;
+    const focusable = dialogRef.current?.querySelectorAll(
+      'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+    );
+    if (!focusable?.length) {
+      event.preventDefault();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const activeElement = document.activeElement;
+    if (!dialogRef.current?.contains(activeElement)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus();
+    } else if (event.shiftKey && activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
 
   // All searchable entities across the unified workspace kernel
   const entities = [
@@ -87,8 +132,8 @@ export default function CommandPaletteModal() {
       id: 'cmd_demo',
       type: 'command',
       category: 'Commands',
-      title: 'Book Technical Architecture Demo',
-      subtitle: 'Schedule 30-min evaluation with Alex Mercer (Solutions Lead)',
+      title: 'Contact the Ultrakin team',
+      subtitle: 'Open an email draft to ask about a product evaluation',
       icon: Terminal,
       action: () => openDemoDrawer(),
       badge: 'Sales',
@@ -259,10 +304,14 @@ export default function CommandPaletteModal() {
         closeSearchPalette();
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev + 1 < filtered.length ? prev + 1 : 0));
+        const nextIndex = filtered.length ? (selectedIndex + 1) % filtered.length : 0;
+        setSelectedIndex(nextIndex);
+        if (document.activeElement !== inputRef.current) resultRefs.current[nextIndex]?.focus();
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setSelectedIndex((prev) => (prev - 1 >= 0 ? prev - 1 : filtered.length - 1));
+        const nextIndex = filtered.length ? (selectedIndex - 1 + filtered.length) % filtered.length : 0;
+        setSelectedIndex(nextIndex);
+        if (document.activeElement !== inputRef.current) resultRefs.current[nextIndex]?.focus();
       } else if (e.key === 'Enter') {
         e.preventDefault();
         if (filtered[selectedIndex]) {
@@ -280,13 +329,14 @@ export default function CommandPaletteModal() {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[90] flex items-start justify-center pt-[12vh] sm:pt-[15vh] px-4 select-none">
+      <div className="fixed inset-0 z-[110] flex items-start justify-center pt-[12vh] sm:pt-[15vh] px-4 select-none">
         {/* Backdrop Scrim (Section 9.9: blur 8px, rgba(3, 7, 18, 0.75)) */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={closeSearchPalette}
+          aria-hidden="true"
           className="fixed inset-0 bg-[#030712]/80 backdrop-blur-md -z-10"
         />
 
@@ -296,18 +346,32 @@ export default function CommandPaletteModal() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: -10 }}
           transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Search Ultrakin"
+          aria-describedby="command-palette-description"
+          onKeyDown={trapDialogFocus}
           className={cn(
             'w-full max-w-[640px] rounded-xl border border-white/12 overflow-hidden shadow-[inset_0_1px_0_rgba(255,255,255,0.12),0_24px_70px_rgba(0,0,0,0.85)]',
             'bg-[#07090E]/95 backdrop-blur-2xl text-slate-200'
           )}
         >
+          <p id="command-palette-description" className="sr-only">
+            Search workspace records and commands. Use the arrow keys to move through results and Enter to select.
+          </p>
           {/* Header Search Input */}
           <div className="p-4 border-b border-white/8 flex items-center gap-3 bg-[#0B0F19]/90 backdrop-blur-md">
-            <Search className="w-5 h-5 text-indigo-400 shrink-0" />
+            <Search aria-hidden="true" className="w-5 h-5 text-indigo-400 shrink-0" />
             <input
               ref={inputRef}
-              autoFocus
               type="text"
+              role="combobox"
+              aria-label="Search workspace and commands"
+              aria-autocomplete="list"
+              aria-expanded={filtered.length > 0}
+              aria-controls="command-palette-results"
+              aria-activedescendant={filtered[selectedIndex] ? `command-option-${filtered[selectedIndex].id}` : undefined}
               placeholder="Type a command or search anything... (prefix '>' for commands)"
               value={query}
               onChange={(e) => {
@@ -319,6 +383,7 @@ export default function CommandPaletteModal() {
             {query && (
               <button
                 type="button"
+                aria-label="Clear search"
                 onClick={() => setQuery('')}
                 className="p-1 hover:text-white text-slate-500 cursor-pointer"
               >
@@ -331,22 +396,29 @@ export default function CommandPaletteModal() {
           </div>
 
           {/* Results List */}
-          <div className="max-h-[380px] overflow-y-auto p-2 space-y-1">
+          <div id="command-palette-results" role="listbox" aria-label="Search results" className="max-h-[380px] overflow-y-auto p-2 space-y-1">
             {filtered.length > 0 ? (
               filtered.map((item, idx) => {
                 const isSelected = selectedIndex === idx;
                 const IconComp = item.icon;
 
                 return (
-                  <div
+                  <button
                     key={item.id}
+                    ref={(element) => { resultRefs.current[idx] = element; }}
+                    id={`command-option-${item.id}`}
+                    type="button"
+                    role="option"
+                    aria-selected={isSelected}
+                    aria-label={`${item.title}. ${item.category}. ${item.subtitle}. ${item.badge}.`}
                     onClick={() => {
                       item.action();
                       closeSearchPalette();
                     }}
                     onMouseEnter={() => setSelectedIndex(idx)}
+                    onFocus={() => setSelectedIndex(idx)}
                     className={cn(
-                      'flex items-center justify-between p-3 rounded-lg transition-all duration-150 active:scale-[0.99] cursor-pointer',
+                      'flex w-full items-center justify-between p-3 rounded-lg text-left transition-all duration-150 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300',
                       isSelected
                         ? 'bg-indigo-600/20 border border-indigo-500/40 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]'
                         : 'hover:bg-white/5 border border-transparent text-slate-300'
@@ -388,11 +460,11 @@ export default function CommandPaletteModal() {
                         <ArrowRight className="w-4 h-4 text-indigo-400 hidden sm:block" />
                       )}
                     </div>
-                  </div>
+                  </button>
                 );
               })
             ) : (
-              <div className="p-8 text-center text-slate-400 text-xs">
+              <div role="status" aria-live="polite" className="p-8 text-center text-slate-400 text-xs">
                 No matching workspace records or commands found for "{query}".
               </div>
             )}

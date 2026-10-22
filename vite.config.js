@@ -8,4 +8,29 @@ export default defineConfig({
     tailwindcss(),
     react(),
   ],
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: 'react-vendor',
+              test: /node_modules[\\/]react(?:-dom)?[\\/]/,
+              priority: 10,
+            },
+            {
+              name: 'motion-vendor',
+              test: /node_modules[\\/](?:framer-motion|motion-dom|motion-utils)[\\/]/,
+              priority: 9,
+            },
+            {
+              name: 'icon-vendor',
+              test: /node_modules[\\/]lucide-react[\\/]/,
+              priority: 8,
+            },
+          ],
+        },
+      },
+    },
+  },
 })

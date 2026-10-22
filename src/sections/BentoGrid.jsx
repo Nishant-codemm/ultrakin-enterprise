@@ -1,415 +1,175 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
-  Bot,
-  Zap,
-  Search,
-  CheckCircle2,
+  ArrowRight,
+  Check,
   FileText,
-  Mail,
+  GitBranch,
+  LockKeyhole,
   MessageSquare,
-  Cpu,
-  Lock,
-  ChevronRight,
-  Terminal,
+  Search,
+  ShieldCheck,
+  SquareCheckBig,
 } from 'lucide-react';
 import { cn } from '../lib/cn';
 
-const WORKFLOW_STEPS = [
-  {
-    id: 0,
-    title: 'Signal Ingest',
-    type: 'Chat / Email',
-    icon: MessageSquare,
-    desc: 'Bug reported in #client-support with logs attached',
-    time: '10:14 AM',
-  },
-  {
-    id: 1,
-    title: 'Agentic Analysis',
-    type: 'Ukin Agent',
-    icon: Bot,
-    desc: 'Correlates stack trace, searches docs, drafts remediation',
-    time: '10:15 AM',
-  },
-  {
-    id: 2,
-    title: 'Action & Execution',
-    type: 'Docs & Tasks',
-    icon: FileText,
-    desc: 'Spawns hotfix PR, updates release doc & notifies team',
-    time: '10:16 AM',
-  },
+const LENSES = [
+  { id: 'memory', number: '01', label: 'Find the thread', hint: 'Search that understands context', icon: Search },
+  { id: 'control', number: '02', label: 'Keep the say', hint: 'People stay in control', icon: ShieldCheck },
+  { id: 'continuity', number: '03', label: 'Keep it connected', hint: 'Decisions travel with work', icon: GitBranch },
 ];
 
-function AutonomousExecutionLoopCard({ activePipeline, setActivePipeline }) {
+function MemoryView() {
+  const [query, setQuery] = useState('What did we decide about SSO?');
+  const records = [
+    { icon: MessageSquare, type: 'CONVERSATION', title: 'Release planning · #identity', body: 'Keep the current certificate path; add a retry guard before rollout.', time: 'Yesterday' },
+    { icon: FileText, type: 'DECISION NOTE', title: 'SSO rollout checklist', body: 'Maya to verify EU tenant recovery before release.', time: 'Updated 2h ago' },
+  ];
+  const terms = query.toLowerCase().split(/\W+/).filter((word) => word.length > 2);
+  const matches = records.filter((record) => terms.length === 0 || terms.some((term) => `${record.title} ${record.body} ${record.type}`.toLowerCase().includes(term)));
+
   return (
-    <div className="h-full bg-[#0B0F19]/90 rounded-2xl border border-white/8 p-6 sm:p-7 md:p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_16px_40px_-8px_rgba(0,0,0,0.7)] hover:border-indigo-500/35 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_20px_48px_-8px_rgba(99,102,241,0.18)] hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-xl flex flex-col justify-between">
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <span className="inline-flex items-center gap-1.5 text-xs font-mono text-indigo-300 font-semibold bg-indigo-500/15 border border-indigo-500/20 px-2.5 py-1 rounded-md">
-            <Cpu className="h-3.5 w-3.5 text-indigo-400" /> UNIFIED EVENT BUS
-          </span>
-          <span className="text-xs text-slate-400">Zero context switching</span>
-        </div>
-        <h3 className="text-xl md:text-2xl font-bold text-white mb-2 tracking-tight">
-          The Autonomous Execution Loop
-        </h3>
-        <p className="text-sm text-slate-300 mb-6 max-w-xl leading-relaxed">
-          When a customer email arrives or a colleague drops an idea in chat, Ukin extracts entities,
-          drafts action plans, and keeps every stakeholder in sync automatically.
-        </p>
-
-        {/* Interactive Pipeline Mockup */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-5">
-          {WORKFLOW_STEPS.map((step, idx) => (
-            <button
-              key={step.id}
-              onClick={() => setActivePipeline(idx)}
-              className={cn(
-                'text-left p-3.5 rounded-xl border transition-all duration-200 cursor-pointer active:scale-[0.98]',
-                activePipeline === idx
-                  ? 'border-indigo-500/60 bg-indigo-500/10 shadow-lg shadow-indigo-500/10 ring-1 ring-indigo-500/30'
-                  : 'border-white/8 bg-[#0F172A]/50 hover:bg-[#0F172A] hover:border-white/16'
-              )}
-            >
-              <div className="flex items-center justify-between mb-1.5">
-                <step.icon
-                  className={cn(
-                    'h-4 w-4 transition-colors',
-                    activePipeline === idx ? 'text-indigo-400' : 'text-slate-400'
-                  )}
-                />
-                <span className="text-[10px] font-mono text-slate-400">{step.time}</span>
-              </div>
-              <div className="font-semibold text-xs text-white mb-0.5">{step.title}</div>
-              <div className="text-[11px] text-slate-300 leading-snug">{step.desc}</div>
-            </button>
-          ))}
-        </div>
-
-        {/* Live console detail */}
-        <div className="bg-[#07090E] rounded-xl p-3.5 font-mono text-xs text-slate-300 border border-white/8 overflow-x-auto shadow-inner">
-          <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/8 text-slate-400 text-[11px]">
-            <span>ukin-runtime // telemetry</span>
-            <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              SYNCED
-            </span>
-          </div>
-          {activePipeline === 0 && (
-            <div className="space-y-1">
-              <div className="text-slate-400"># Ingesting webhook from SendGrid API...</div>
-              <div className="text-emerald-400">✓ Parsed incoming payload (sender: "cto@acme.inc", priority: "P0")</div>
-              <div className="text-slate-300">→ Routed to channel #incident-war-room and dispatched context to AI agent</div>
-            </div>
-          )}
-          {activePipeline === 1 && (
-            <div className="space-y-1">
-              <div className="text-slate-400"># Ukin Agent correlating historical signals...</div>
-              <div className="text-indigo-300">⚡ Found related PR #412 merged 2 hours ago</div>
-              <div className="text-slate-300">→ Synthesized diagnostic summary and drafted rollback plan</div>
-            </div>
-          )}
-          {activePipeline === 2 && (
-            <div className="space-y-1">
-              <div className="text-slate-400"># Executing task mutations...</div>
-              <div className="text-emerald-400">✓ Created Task #894: "Emergency patch release"</div>
-              <div className="text-slate-300">→ Notified on-call engineers via high-priority audio huddle</div>
-            </div>
-          )}
-        </div>
+    <div className="relative z-10 mx-auto max-w-2xl">
+      <div className="mb-8 flex items-center justify-between gap-4">
+        <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-slate-500">Workspace memory</span>
+        <span className="flex items-center gap-1.5 text-[10px] text-slate-500"><LockKeyhole className="h-3 w-3" /> Permission-aware</span>
       </div>
-    </div>
-  );
-}
-
-function SemanticSearchCard() {
-  return (
-    <div className="h-full bg-[#0B0F19]/90 rounded-2xl border border-white/8 p-6 sm:p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_16px_40px_-8px_rgba(0,0,0,0.7)] hover:border-indigo-500/35 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_20px_48px_-8px_rgba(99,102,241,0.18)] hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-xl flex flex-col justify-between">
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <span className="inline-flex items-center gap-1.5 text-xs font-mono text-slate-300 font-semibold bg-white/5 border border-white/10 px-2.5 py-1 rounded-md">
-            <Search className="h-3.5 w-3.5 text-indigo-400" /> SEMANTIC SEARCH
-          </span>
-        </div>
-        <h3 className="text-xl font-bold text-white mb-2 tracking-tight">
-          Ask anything across everything
-        </h3>
-        <p className="text-sm text-slate-300 mb-6 leading-relaxed">
-          Search does not just match strings. It understands concepts across chat threads, email attachments, meeting transcripts, and docs.
-        </p>
-
-        {/* Search Bar Visual */}
-        <div className="rounded-xl border border-white/8 bg-[#0F172A]/70 p-3 mb-4 shadow-sm">
-          <div className="flex items-center gap-2 text-xs text-slate-400 border-b border-white/8 pb-2 mb-2">
-            <Search className="h-3.5 w-3.5 text-indigo-400" />
-            <span className="text-slate-200 font-medium truncate">"What was agreed regarding SLA policy?"</span>
-          </div>
-          <div className="space-y-2">
-            <div className="bg-[#1E293B]/60 p-2.5 rounded-lg border border-white/6 text-[11px]">
-              <div className="flex items-center justify-between text-slate-400 mb-1">
-                <span className="font-semibold text-indigo-300 flex items-center gap-1 truncate">
-                  <FileText className="h-3 w-3 shrink-0" /> Master Service Agreement.pdf
-                </span>
-                <span className="text-[10px] font-mono shrink-0">Page 14</span>
-              </div>
-              <p className="text-slate-300">"99.95% uptime with 1-hour priority response window."</p>
-            </div>
-            <div className="bg-[#1E293B]/60 p-2.5 rounded-lg border border-white/6 text-[11px]">
-              <div className="flex items-center justify-between text-slate-400 mb-1">
-                <span className="font-semibold text-violet-300 flex items-center gap-1 truncate">
-                  <Mail className="h-3 w-3 shrink-0" /> Thread: Legal confirmation
-                </span>
-                <span className="text-[10px] font-mono shrink-0">2d ago</span>
-              </div>
-              <p className="text-slate-300">Signed off by Legal Counsel Elena Vance on Oct 18.</p>
-            </div>
-          </div>
-        </div>
+      <label className="sr-only" htmlFor="memory-query">Search workspace memory</label>
+      <div className="flex items-center gap-3 border-b border-white/[0.15] pb-4">
+        <Search className="h-4 w-4 shrink-0 text-indigo-200" />
+        <input id="memory-query" value={query} onChange={(event) => setQuery(event.target.value)} className="min-w-0 flex-1 bg-transparent text-base font-light tracking-[-0.02em] text-slate-100 outline-none placeholder:text-slate-600 sm:text-lg" aria-label="Search workspace memory" />
+        <span className="hidden rounded border border-white/10 px-1.5 py-1 font-mono text-[9px] text-slate-600 sm:inline">⌘ K</span>
       </div>
-      <div className="text-xs text-slate-400 pt-3 border-t border-white/8 flex items-center gap-1.5">
-        <span className="text-indigo-400 font-bold">⚡</span> Instant vector embeddings with zero cold start
-      </div>
-    </div>
-  );
-}
-
-function McpExtensibilityCard() {
-  return (
-    <div className="h-full bg-[#0B0F19]/90 rounded-2xl border border-white/8 p-6 sm:p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_16px_40px_-8px_rgba(0,0,0,0.7)] hover:border-emerald-500/35 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_20px_48px_-8px_rgba(16,185,129,0.18)] hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-xl flex flex-col justify-between">
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <span className="inline-flex items-center gap-1.5 text-xs font-mono text-emerald-300 font-semibold bg-emerald-500/15 border border-emerald-500/20 px-2.5 py-1 rounded-md">
-            <Terminal className="h-3.5 w-3.5 text-emerald-400" /> MODEL CONTEXT PROTOCOL
-          </span>
-        </div>
-        <h3 className="text-xl font-bold text-white mb-2 tracking-tight">
-          Open MCP Architecture
-        </h3>
-        <p className="text-sm text-slate-300 mb-6 leading-relaxed">
-          Connect your internal Postgres databases, custom internal CLI tools, or external SaaS APIs directly into your agents with standard MCP servers.
-        </p>
-
-        {/* Code visual */}
-        <div className="bg-[#07090E] rounded-xl p-3.5 font-mono text-[11px] text-slate-300 border border-white/8 mb-4 shadow-inner">
-          <div className="text-slate-500 mb-1">// ukin.mcp.json</div>
-          <div className="text-indigo-400">"mcpServers": &#123;</div>
-          <div className="pl-3 text-emerald-400">"internal-crm": &#123;</div>
-          <div className="pl-6 text-slate-300">"command": "npx -y @corp/mcp",</div>
-          <div className="pl-6 text-amber-400">"auth": "vault:sec-99"</div>
-          <div className="pl-3 text-emerald-400">&#125;</div>
-          <div className="text-indigo-400">&#125;</div>
-        </div>
-      </div>
-      <div className="text-xs text-slate-400 pt-3 border-t border-white/8">
-        Run local or cloud-hosted MCP servers with zero friction
-      </div>
-    </div>
-  );
-}
-
-function EnterpriseGovernanceCard() {
-  return (
-    <div className="h-full bg-[#0B0F19]/90 rounded-2xl border border-white/8 p-6 sm:p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_16px_40px_-8px_rgba(0,0,0,0.7)] hover:border-violet-500/35 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_20px_48px_-8px_rgba(139,92,246,0.18)] hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-xl flex flex-col justify-between">
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <span className="inline-flex items-center gap-1.5 text-xs font-mono text-violet-300 font-semibold bg-violet-500/15 border border-violet-500/20 px-2.5 py-1 rounded-md">
-            <Lock className="h-3.5 w-3.5 text-violet-400" /> ENTERPRISE GOVERNANCE
-          </span>
-        </div>
-        <h3 className="text-xl font-bold text-white mb-2 tracking-tight">
-          Attribute-Based Access Control
-        </h3>
-        <p className="text-sm text-slate-300 mb-6 leading-relaxed">
-          AI agents strictly respect employee permission boundaries. An agent will never leak finance documents to engineering or unverified guests.
-        </p>
-
-        <div className="space-y-2 mb-4">
-          {[
-            { role: 'Engineering Lead', scope: 'Repos, Architecture Docs, Sentry' },
-            { role: 'Contractor / Guest', scope: 'Assigned Project Space only' },
-            { role: 'Autonomous Agent', scope: 'Inherits Invoking User Context' },
-          ].map((item, i) => (
-            <div key={i} className="flex items-center justify-between p-2.5 rounded-lg border border-white/6 bg-[#0F172A]/60 text-xs">
+      <div className="mt-3 text-[10px] text-slate-600">Across conversations, notes, and active work</div>
+      <div className="mt-8 divide-y divide-white/[0.075]" aria-live="polite">
+        {matches.map((record, index) => {
+          const Icon = record.icon;
+          return (
+            <motion.div key={record.title} initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05, duration: 0.24 }} className="grid grid-cols-[26px_1fr] gap-3 py-4 first:pt-0 sm:grid-cols-[26px_1fr_auto] sm:gap-4">
+              <Icon className="mt-1 h-4 w-4 text-indigo-200/80" />
               <div>
-                <div className="font-semibold text-slate-200">{item.role}</div>
-                <div className="text-[11px] text-slate-400">{item.scope}</div>
+                <p className="text-[9px] font-medium tracking-[0.14em] text-slate-600">{record.type}</p>
+                <h3 className="mt-1 text-[13px] font-medium text-slate-200">{record.title}</h3>
+                <p className="mt-1 text-[11px] leading-5 text-slate-400">{record.body}</p>
               </div>
-              <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="text-xs text-slate-400 pt-3 border-t border-white/8">
-        Role isolation verified on every single prompt execution
+              <span className="hidden pt-1 text-[9px] text-slate-600 sm:block">{record.time}</span>
+            </motion.div>
+          );
+        })}
+        {matches.length === 0 && <p className="py-5 text-xs text-slate-400">No matching workspace context.</p>}
       </div>
     </div>
   );
 }
 
-function CrdtReplicationCard() {
+function ControlView() {
+  const [approved, setApproved] = useState(false);
   return (
-    <div className="h-full bg-[#0B0F19]/90 rounded-2xl border border-white/8 p-6 sm:p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_16px_40px_-8px_rgba(0,0,0,0.7)] hover:border-amber-500/35 hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.14),0_20px_48px_-8px_rgba(245,158,11,0.18)] hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-xl flex flex-col justify-between">
+    <div className="relative z-10 mx-auto grid max-w-3xl gap-10 sm:grid-cols-[1fr_0.7fr] sm:items-center sm:gap-14">
       <div>
-        <div className="flex items-center justify-between mb-4">
-          <span className="inline-flex items-center gap-1.5 text-xs font-mono text-amber-300 font-semibold bg-amber-500/15 border border-amber-500/20 px-2.5 py-1 rounded-md">
-            <Zap className="h-3.5 w-3.5 text-amber-400" /> CRDT REPLICATION
-          </span>
-        </div>
-        <h3 className="text-xl font-bold text-white mb-2 tracking-tight">
-          Sub-20ms Sync Worldwide
-        </h3>
-        <p className="text-sm text-slate-300 mb-6 leading-relaxed">
-          Offline-first state engine built with conflict-free replicated data types. Write offline on a flight, and it seamlessly merges upon reconnect.
-        </p>
-
-        <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/10 text-xs text-amber-200 mb-4 shadow-sm">
-          <div className="flex items-center justify-between font-mono text-[11px] text-amber-300 mb-2">
-            <span>EDGE REPLICATION LATENCY</span>
-            <span className="font-bold">14ms AVG</span>
-          </div>
-          <div className="h-1.5 w-full bg-amber-950/60 rounded-full overflow-hidden">
-            <div className="h-full w-[85%] bg-amber-400 rounded-full" />
-          </div>
+        <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-slate-500">Suggested action</span>
+        <h3 className="mt-4 max-w-md text-2xl font-light leading-[1.1] tracking-[-0.04em] text-white sm:text-3xl">Create a task from the SSO release conversation.</h3>
+        <p className="mt-4 max-w-sm text-xs leading-6 text-slate-400">The source, owner, and related decision stay attached. A person makes the call.</p>
+        <button type="button" onClick={() => setApproved((value) => !value)} aria-pressed={approved} className={cn('mt-7 inline-flex min-h-10 items-center gap-2 rounded-md px-3.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300', approved ? 'bg-emerald-300/10 text-emerald-200' : 'bg-white text-[#12151c] hover:bg-indigo-100')}>
+          {approved ? <Check className="h-3.5 w-3.5" /> : <ArrowRight className="h-3.5 w-3.5" />}
+          {approved ? 'Approved for the board' : 'Review and approve'}
+        </button>
+      </div>
+      <div className="border-l border-white/[0.12] pl-5 sm:pl-7">
+        <div className="mb-5 flex items-center gap-2 text-[10px] text-slate-400"><LockKeyhole className="h-3.5 w-3.5 text-indigo-200" /> Access inherited</div>
+        <div className="space-y-4">
+          {[
+            ['Maya Chen', 'Release planning'],
+            ['Ukin', 'Only this suggested action'],
+            ['Workspace admin', 'Policy controls'],
+          ].map(([name, access]) => <div key={name} className="flex items-start justify-between gap-4 border-t border-white/[0.075] pt-3"><span className="text-[11px] text-slate-300">{name}</span><span className="max-w-[135px] text-right text-[10px] leading-4 text-slate-600">{access}</span></div>)}
         </div>
       </div>
-      <div className="text-xs text-slate-400 pt-3 border-t border-white/8">
-        Global edge distribution with end-to-end data integrity
+    </div>
+  );
+}
+
+function ContinuityView() {
+  const points = [
+    { icon: MessageSquare, tag: 'SOURCE', title: 'A release decision', note: '#identity' },
+    { icon: FileText, tag: 'CONTEXT', title: 'The SSO checklist', note: 'Updated with owner' },
+    { icon: SquareCheckBig, tag: 'FOLLOW-THROUGH', title: 'Verify EU recovery', note: 'Maya · Thursday' },
+  ];
+  return (
+    <div className="relative z-10 mx-auto max-w-3xl">
+      <div className="mb-10 flex items-center justify-between gap-4">
+        <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-slate-500">One continuous thread</span>
+        <span className="text-[10px] text-slate-600">Context stays linked</span>
+      </div>
+      <div className="relative grid gap-7 sm:grid-cols-3 sm:gap-4">
+        <div className="absolute left-[13%] right-[13%] top-[21px] hidden h-px bg-gradient-to-r from-indigo-300/15 via-indigo-200/50 to-emerald-200/20 sm:block" />
+        {points.map((point, index) => {
+          const Icon = point.icon;
+          return (
+            <motion.div key={point.tag} initial={{ opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.06, duration: 0.28 }} className="relative">
+              <span className="relative z-10 flex h-[42px] w-[42px] items-center justify-center rounded-full border border-white/[0.1] bg-[#151922] text-slate-300 shadow-[0_8px_24px_-16px_rgba(0,0,0,.9)]"><Icon className="h-4 w-4" /></span>
+              <p className="mt-5 text-[9px] font-medium tracking-[0.16em] text-slate-600">{point.tag}</p>
+              <h3 className="mt-2 text-[13px] font-medium text-slate-200">{point.title}</h3>
+              <p className="mt-1 text-[10px] text-slate-500">{point.note}</p>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
 export default function BentoGrid() {
-  const [activePipeline, setActivePipeline] = useState(1);
-  const [mobileCarouselIdx, setMobileCarouselIdx] = useState(0);
-  const mobileCarouselRef = useRef(null);
-
-  // Mobile carousel scroll listener to synchronize active dot index
-  const handleMobileScroll = () => {
-    if (!mobileCarouselRef.current) return;
-    const scrollLeft = mobileCarouselRef.current.scrollLeft;
-    const cardWidth = mobileCarouselRef.current.offsetWidth * 0.85;
-    const newIdx = Math.round(scrollLeft / cardWidth);
-    setMobileCarouselIdx(Math.min(Math.max(newIdx, 0), 4));
-  };
-
-  const scrollToMobileSlide = (idx) => {
-    if (!mobileCarouselRef.current) return;
-    const cardWidth = mobileCarouselRef.current.offsetWidth * 0.88;
-    mobileCarouselRef.current.scrollTo({
-      left: idx * cardWidth,
-      behavior: 'smooth',
-    });
-    setMobileCarouselIdx(idx);
-  };
+  const [active, setActive] = useState('memory');
+  const lens = LENSES.find((item) => item.id === active) ?? LENSES[0];
+  const ActiveIcon = lens.icon;
+  const content = active === 'memory' ? <MemoryView /> : active === 'control' ? <ControlView /> : <ContinuityView />;
 
   return (
-    <section id="platform" className="py-24 md:py-32 bg-[#07090E] divider-hairline relative overflow-hidden">
-      {/* Ambient background glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[700px] h-[400px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-5 lg:px-8 relative z-10">
-        {/* Section Header */}
-        <div className="max-w-3xl mb-12 md:mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-500/20 bg-indigo-500/10 text-indigo-300 text-xs font-mono font-medium tracking-wide mb-4">
-            <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse" />
-            THE ARCHITECTURAL DIFFERENCE
+    <section id="platform" className="relative overflow-hidden bg-transparent py-24 md:py-28">
+      <div aria-hidden="true" className="pointer-events-none absolute -left-[30rem] top-1/4 h-[48rem] w-[48rem] rounded-full border border-white/[0.025]" />
+      <div aria-hidden="true" className="pointer-events-none absolute -left-[24rem] top-[30%] h-[36rem] w-[36rem] rounded-full border border-white/[0.025]" />
+      <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
+        <div className="mb-16 grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
+          <div>
+            <p className="mb-5 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-slate-500"><span className="h-px w-7 bg-indigo-300/70" /> A workspace that holds the thread</p>
+            <h2 className="max-w-2xl text-[clamp(2.7rem,5.2vw,4.8rem)] font-medium leading-[0.96] tracking-[-0.06em] text-white">Context shouldn’t<br className="hidden sm:block" /> disappear between tools.</h2>
           </div>
-          <h2 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-[1.08]">
-            Built as one kernel. <br className="hidden sm:block" />
-            <span className="text-slate-400 font-normal">Not seven apps duct-taped together.</span>
-          </h2>
-          <p className="mt-4 text-base md:text-lg text-slate-400 leading-relaxed">
-            Slack requires dozens of third-party webhooks that break context. Teams nests disparate Office products.
-            Ultrakin connects memory, actions, and identities into a single real-time layer.
-          </p>
+          <p className="max-w-xs text-[13px] leading-6 text-slate-400 md:pb-1">Explore how memory, control, and follow-through work as one system.</p>
         </div>
 
-        {/* =========================================================================
-            WEEK 6 MOBILE TOUCH CAROUSEL ADAPTATION (< md screens)
-           ========================================================================= */}
-        <div className="md:hidden">
-          {/* Mobile Carousel Indicators & Helper */}
-          <div className="flex items-center justify-between py-2 px-1 mb-3">
-            <div className="flex items-center gap-1.5">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => scrollToMobileSlide(i)}
-                  className={cn(
-                    'h-1.5 rounded-full transition-all cursor-pointer',
-                    mobileCarouselIdx === i ? 'w-6 bg-indigo-500' : 'w-2 bg-white/20'
-                  )}
-                  aria-label={`Go to slide ${i + 1}`}
-                />
-              ))}
-            </div>
-            <span className="text-[11px] font-mono text-slate-400 flex items-center gap-1">
-              <span>Card {mobileCarouselIdx + 1} of 5</span>
-              <ChevronRight className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
-            </span>
+        <div className="grid gap-10 border-t border-white/[0.08] pt-7 lg:grid-cols-[250px_1fr] lg:gap-16">
+          <div role="tablist" aria-label="Explore how the workspace connects" className="flex gap-3 overflow-x-auto lg:flex-col lg:gap-0 lg:overflow-visible">
+            {LENSES.map((item) => {
+              const Icon = item.icon;
+              const selected = active === item.id;
+              return (
+                <button key={item.id} type="button" role="tab" id={`lens-tab-${item.id}`} aria-selected={selected} aria-controls="lens-panel" onClick={() => setActive(item.id)} className={cn('group relative min-w-[190px] flex-1 border-b border-white/[0.07] py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 lg:min-w-0 lg:flex-none lg:py-5', selected ? 'text-white' : 'text-slate-500 hover:text-slate-300')}>
+                  <span className="flex items-center gap-3">
+                    <span className={cn('font-mono text-[9px]', selected ? 'text-indigo-200' : 'text-slate-700')}>{item.number}</span>
+                    <Icon className={cn('h-3.5 w-3.5', selected ? 'text-indigo-200' : 'text-slate-600')} />
+                    <span className="text-xs font-medium">{item.label}</span>
+                  </span>
+                  <span className="mt-2 hidden pl-[3.45rem] text-[10px] text-slate-600 lg:block">{item.hint}</span>
+                  {selected && <motion.span layoutId="lens-indicator" className="absolute bottom-[-1px] left-0 right-0 h-px bg-indigo-200/70 lg:right-auto lg:top-0 lg:h-auto lg:w-px" />}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Swipeable Scroll Container */}
-          <div
-            ref={mobileCarouselRef}
-            onScroll={handleMobileScroll}
-            className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-4 -mx-5 px-5 no-scrollbar scroll-smooth"
-          >
-            <div className="snap-center shrink-0 w-[86vw] sm:w-[420px]">
-              <AutonomousExecutionLoopCard
-                activePipeline={activePipeline}
-                setActivePipeline={setActivePipeline}
-              />
-            </div>
-            <div className="snap-center shrink-0 w-[86vw] sm:w-[420px]">
-              <SemanticSearchCard />
-            </div>
-            <div className="snap-center shrink-0 w-[86vw] sm:w-[420px]">
-              <McpExtensibilityCard />
-            </div>
-            <div className="snap-center shrink-0 w-[86vw] sm:w-[420px]">
-              <EnterpriseGovernanceCard />
-            </div>
-            <div className="snap-center shrink-0 w-[86vw] sm:w-[420px]">
-              <CrdtReplicationCard />
-            </div>
+          <div id="lens-panel" role="tabpanel" aria-labelledby={`lens-tab-${active}`} className="relative isolate min-h-[400px] overflow-hidden rounded-[1.65rem] border border-white/[0.08] bg-[#0b0e14]/80 py-6 shadow-[0_38px_90px_-68px_rgba(0,0,0,.95),inset_0_1px_0_rgba(255,255,255,.055)] sm:py-8 lg:min-h-[430px] lg:px-10 lg:py-9 lg:[transform:perspective(1400px)_rotateY(-1.1deg)_rotateX(.35deg)] lg:[transform-origin:30%_50%] lg:transition-transform lg:duration-700 lg:hover:[transform:perspective(1400px)_rotateY(0deg)_rotateX(0deg)]">
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_76%_44%,rgba(105,111,200,.12),transparent_56%),linear-gradient(132deg,rgba(255,255,255,.035),transparent_28%,transparent_74%,rgba(146,151,255,.035))]" />
+            <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <AnimatePresence mode="wait">
+              <motion.div key={active} initial={{ opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }} transition={{ duration: 0.22 }}>
+                {content}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
-
-        {/* =========================================================================
-            DESKTOP 12-COLUMN BENTO GRID (>= md screens)
-           ========================================================================= */}
-        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-12 gap-6">
-          {/* Card 1: Main Pipeline (Large span 8) */}
-          <div className="lg:col-span-8">
-            <AutonomousExecutionLoopCard
-              activePipeline={activePipeline}
-              setActivePipeline={setActivePipeline}
-            />
-          </div>
-
-          {/* Card 2: Enterprise Universal Search (Span 4) */}
-          <div className="lg:col-span-4">
-            <SemanticSearchCard />
-          </div>
-
-          {/* Card 3: MCP & Extensibility (Span 4) */}
-          <div className="lg:col-span-4">
-            <McpExtensibilityCard />
-          </div>
-
-          {/* Card 4: Fine-Grained Permissions & Governance (Span 4) */}
-          <div className="lg:col-span-4">
-            <EnterpriseGovernanceCard />
-          </div>
-
-          {/* Card 5: High-Speed Desktop & Mobile Sync (Span 4) */}
-          <div className="lg:col-span-4">
-            <CrdtReplicationCard />
-          </div>
+        <div className="mt-5 flex items-center justify-between text-[9px] uppercase tracking-[0.14em] text-slate-700">
+          <span className="flex items-center gap-2"><ActiveIcon className="h-3 w-3" /> {lens.label}</span>
+          <span>Interactive preview · sample data</span>
         </div>
       </div>
     </section>
