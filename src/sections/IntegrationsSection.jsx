@@ -83,7 +83,7 @@ export default function IntegrationsSection() {
         <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
           <div>
             <p className="mb-5 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-slate-500"><span className="h-px w-7 bg-indigo-300/70" /> BUILT IN, THEN OPEN</p>
-            <h2 className="max-w-xl text-[clamp(2.6rem,5vw,4.6rem)] font-medium leading-[0.96] tracking-[-0.06em] text-white">One workspace.<br /><span className="font-serif font-normal italic text-slate-400">Room to extend.</span></h2>
+            <h2 className="max-w-xl text-[clamp(2.5rem,4.8vw,4.5rem)] font-medium leading-[0.96] tracking-[-0.06em] text-white">One workspace.<br /><span className="font-serif font-normal italic text-slate-400">Room to extend.</span></h2>
           </div>
           <div className="lg:justify-self-end lg:pb-1">
             <p className="max-w-sm text-[13px] leading-6 text-slate-400">Chat, mail, meetings, calendar, tasks, docs, and Ukin share one workspace. Add apps and approved MCP tools when the work calls for them.</p>

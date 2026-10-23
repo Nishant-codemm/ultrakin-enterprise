@@ -133,7 +133,7 @@ export default function BentoGrid() {
         <div className="mb-16 grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
           <div>
             <p className="mb-5 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-slate-500"><span className="h-px w-7 bg-indigo-300/70" /> A workspace that holds the thread</p>
-            <h2 className="max-w-2xl text-[clamp(2.7rem,5.2vw,4.8rem)] font-medium leading-[0.96] tracking-[-0.06em] text-white">Context shouldn’t<br className="hidden sm:block" /> disappear between tools.</h2>
+            <h2 className="max-w-2xl text-[clamp(2.6rem,5vw,4.5rem)] font-medium leading-[0.96] tracking-[-0.06em] text-white">Context shouldn’t<br className="hidden sm:block" /> disappear between tools.</h2>
           </div>
           <p className="max-w-xs text-[13px] leading-6 text-slate-400 md:pb-1">Explore how memory, control, and follow-through work as one system.</p>
         </div>

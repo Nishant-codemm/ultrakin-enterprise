@@ -12,7 +12,7 @@ export default function CTASection() {
           <span className="hidden font-mono text-[9px] tracking-[0.15em] text-slate-700 sm:inline">ULTRAKIN / WORKSPACE</span>
         </div>
         <div className="grid gap-10 lg:grid-cols-[1fr_340px] lg:items-end lg:gap-16">
-          <h2 className="max-w-4xl text-[clamp(2.7rem,6vw,5.5rem)] font-medium leading-[0.96] tracking-[-0.062em]">
+          <h2 className="max-w-4xl text-[clamp(2.6rem,5.2vw,4.5rem)] font-medium leading-[0.96] tracking-[-0.062em]">
             See whether Ultrakin fits the way your team works.
           </h2>
           <div className="border-l border-white/[0.09] pl-5 sm:pl-7">

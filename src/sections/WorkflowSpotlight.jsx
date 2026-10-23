@@ -52,7 +52,7 @@ export default function WorkflowSpotlight() {
           <p className="mb-6 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-slate-500">
             <span className="h-px w-7 bg-[#7779ee]" /> THE WORK, IN CONTEXT
           </p>
-          <h2 className="text-[clamp(2.7rem,5.6vw,5rem)] font-medium leading-[0.95] tracking-[-0.065em] text-white">
+          <h2 className="text-[clamp(2.6rem,5.2vw,4.5rem)] font-medium leading-[0.95] tracking-[-0.065em] text-white">
             A signal comes in.
             <span className="mt-1 block font-serif font-normal italic tracking-[-0.055em] text-[#a7a9ff]">The work moves on.</span>
           </h2>

@@ -14,7 +14,7 @@ export default function AgentsPage() {
     <div className="min-h-screen bg-[#080a10] pb-24 pt-28 text-white sm:pt-32">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <header className="grid gap-7 border-b border-white/[0.08] pb-8 lg:grid-cols-[1fr_330px] lg:items-end">
-          <div className="max-w-3xl"><p className="mb-5 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[.2em] text-indigo-200/75"><Bot size={13} /> Ukin agents</p><h1 className="text-[clamp(2.8rem,6vw,5.2rem)] font-medium leading-[.95] tracking-[-.065em]">Useful AI, in the flow of work.</h1><p className="mt-6 max-w-2xl text-sm leading-7 text-slate-400">Ukin agents can connect signals across chat, mail, docs, meetings, and tasks—then prepare work your team can review.</p></div>
+          <div className="max-w-3xl"><p className="mb-5 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[.2em] text-indigo-200/75"><Bot size={13} /> Ukin agents</p><h1 className="text-[clamp(2.8rem,5.4vw,4.5rem)] font-medium leading-[.95] tracking-[-.065em]">Useful AI, in the flow of work.</h1><p className="mt-6 max-w-2xl text-sm leading-7 text-slate-400">Ukin agents can connect signals across chat, mail, docs, meetings, and tasks—then prepare work your team can review.</p></div>
           <a href="https://app.ultrakin.com" target="_blank" rel="noreferrer" className="inline-flex h-10 w-fit items-center gap-2 rounded-lg bg-[#7779ee] px-4 text-xs font-semibold text-white transition-colors hover:bg-[#8587f5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#080a10]">Open Ultrakin<ArrowRight size={14} /></a>
         </header>
 

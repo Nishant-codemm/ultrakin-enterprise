@@ -79,7 +79,7 @@ export default function PricingPage() {
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <header className="mx-auto max-w-3xl text-center">
           <p className="mb-5 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-indigo-200/80">Plans that grow with your team</p>
-          <h1 className="text-[clamp(2.8rem,6vw,5.25rem)] font-medium leading-[0.94] tracking-[-0.065em]">Start free.<br className="hidden sm:block" /> Scale when you’re ready.</h1>
+          <h1 className="text-[clamp(2.8rem,5.4vw,4.5rem)] font-medium leading-[0.94] tracking-[-0.065em]">Start free.<br className="hidden sm:block" /> Scale when you’re ready.</h1>
           <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-slate-400">Every plan brings the workday together. Add room for more people, customer operations, agents, and enterprise controls as your needs grow.</p>
           <div className="mt-7 inline-flex items-center gap-1 rounded-full border border-white/[0.09] bg-white/[0.025] p-1" role="group" aria-label="Billing period">
             <button type="button" aria-pressed={annual} onClick={() => setAnnual(true)} className={`rounded-full px-4 py-2 text-xs transition-colors ${annual ? 'bg-white text-[#11131a]' : 'text-slate-400 hover:text-white'}`}>Annual <span className="ml-1 text-[10px] opacity-70">Save ~25%</span></button>

@@ -283,7 +283,7 @@ function HeroWorkspaceContent() {
           <div
             className="rounded-2xl border border-white/12 bg-[#0B0F19] transition-transform duration-700 ease-out hover:rotate-x-0 overflow-hidden relative group/showcase"
             style={{
-              transform: 'rotateX(2.2deg) translateZ(0)',
+              transform: 'rotateX(0.7deg) translateZ(0)',
               transformStyle: 'preserve-3d',
               boxShadow:
                 '0 0 0 1px rgba(255,255,255,0.12), 0 20px 50px -10px rgba(0,0,0,0.9), 0 40px 100px -20px rgba(0,0,0,0.95), 0 0 80px -15px rgba(99,102,241,0.22)',
@@ -291,7 +291,7 @@ function HeroWorkspaceContent() {
           >
             {/* Specular Screen Glass Reflection */}
             <div
-              className="pointer-events-none absolute inset-x-0 top-0 h-44 z-20 opacity-30 select-none overflow-hidden"
+              className="pointer-events-none absolute inset-x-0 top-0 h-44 z-20 opacity-[0.16] select-none overflow-hidden"
               style={{
                 background:
                   'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 30%, transparent 100%)',
