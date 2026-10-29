@@ -1,0 +1,17 @@
+{
+  "name": "Ultrakin Enterprise Workspace",
+  "short_name": "Ultrakin",
+  "description": "The Autonomous Unified Workspace for High-Velocity Teams. One surface for conversations, living docs, domain email, and real-time execution.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FCFCFD",
+  "theme_color": "#FCFCFD",
+  "icons": [
+    {
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

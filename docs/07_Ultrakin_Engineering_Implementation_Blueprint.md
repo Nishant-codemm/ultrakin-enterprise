@@ -1,0 +1,530 @@
+# Ultrakin Engineering Implementation Blueprint
+**Document ID:** `07_Ultrakin_Engineering_Implementation_Blueprint.md`  
+**Document Version:** `1.0.0-PROD`  
+**Classification:** Internal Confidential / Master Engineering Blueprint  
+**Status:** Approved for Implementation (Single Source of Truth for Engineering & Infrastructure)  
+**Author Roles:** VP of Engineering · Staff Frontend Architect (Linear/Stripe Alumni) · Principal Systems Architect · Security & Infrastructure Lead  
+**Source Baselines:** `01_Slack_Enterprise_Research_Report.md`, `02_Ultrakin_Current_State_Audit.md`, `03_Slack_vs_Ultrakin_Strategic_Gap_Analysis.md`, `04_Ultrakin_Enterprise_Product_Requirements_Document.md`, `05_Ultrakin_Enterprise_Experience_Architecture.md`, `06_Ultrakin_Enterprise_Design_System_Specification.md`  
+**Engineering Audience:** Core Platform (40 Engineers), Frontend Architecture, Systems Infrastructure, Matrix/Real-Time Protocol Team, Security & Compliance, QA Automation  
+
+---
+
+## Table of Contents
+1. [Executive Summary & Technical Vision](#1-executive-summary--technical-vision)
+   - [1.1 Engineering Mission & Architectural Tenets](#11-engineering-mission--architectural-tenets)
+   - [1.2 System-Wide Architectural Principles](#12-system-wide-architectural-principles)
+   - [1.3 Core Technology Stack Summary](#13-core-technology-stack-summary)
+2. [High-Level System Topology & Infrastructure Architecture](#2-high-level-system-topology--infrastructure-architecture)
+   - [2.1 Client-Server Topology & Boundary Contracts](#21-client-server-topology--boundary-contracts)
+   - [2.2 Multi-Tenant Data Isolation & Row-Level Security (RLS)](#22-multi-tenant-data-isolation--row-level-security-rls)
+   - [2.3 High-Throughput Event Bus & Streaming Infrastructure](#23-high-throughput-event-bus--streaming-infrastructure)
+3. [Frontend Application Architecture](#3-frontend-application-architecture)
+   - [3.1 Runtime Architecture & Tooling (Vite 8 + React 19 + Tailwind CSS v4)](#31-runtime-architecture--tooling-vite-8--react-19--tailwind-css-v4)
+   - [3.2 Design Token Integration & CSS Custom Properties Engine](#32-design-token-integration--css-custom-properties-engine)
+   - [3.3 State Management, Caching & Offline Synchronization](#33-state-management-caching--offline-synchronization)
+   - [3.4 Code Splitting, Dynamic Chunking & Bundle Budgeting](#34-code-splitting-dynamic-chunking--bundle-budgeting)
+4. [Module-Specific Engineering Specifications](#4-module-specific-engineering-specifications)
+   - [4.1 Real-Time Matrix Messaging Engine](#41-real-time-matrix-messaging-engine)
+   - [4.2 Custom Domain Email Engine & Bridge](#42-custom-domain-email-engine--bridge)
+   - [4.3 TipTap ProseMirror Living Docs & CRDT Engine](#43-tiptap-prosemirror-living-docs--crdt-engine)
+   - [4.4 WebRTC Huddle & Streaming Transcription Pipeline](#44-webrtc-huddle--streaming-transcription-pipeline)
+   - [4.5 Relational Kanban Engine & Optimistic Mutations](#45-relational-kanban-engine--optimistic-mutations)
+   - [4.6 Autonomous Ukin AI Agent Execution Runtime](#46-autonomous-ukin-ai-agent-execution-runtime)
+   - [4.7 Visual Automations Directed Acyclic Graph (DAG) Engine](#47-visual-automations-directed-acyclic-graph-dag-engine)
+5. [Enterprise Security, Cryptography & Compliance Implementation](#5-enterprise-security-cryptography--compliance-implementation)
+   - [5.1 End-to-End Encryption (Megolm / Olm Protocol)](#51-end-to-end-encryption-megolm--olm-protocol)
+   - [5.2 Enterprise Identity Federation (SAML 2.0 / OIDC / SCIM v2)](#52-enterprise-identity-federation-saml-20--oidc--scim-v2)
+   - [5.3 Immutable Audit Logging & Tamper-Evident Ledger](#53-immutable-audit-logging--tamper-evident-ledger)
+   - [5.4 Network Security, TLS 1.3 & mTLS Ingress](#54-network-security-tls-13--mtls-ingress)
+6. [Performance Engineering & Latency Budgets](#6-performance-engineering--latency-budgets)
+   - [6.1 Hard Latency & Rendering Thresholds](#61-hard-latency--rendering-thresholds)
+   - [6.2 Client-Side Virtualization & Memory Leak Prevention](#62-client-side-virtualization--memory-leak-prevention)
+   - [6.3 WebWorker Thread Offloading Architecture](#63-webworker-thread-offloading-architecture)
+7. [Database Schema, Persistence & Search Indexing](#7-database-schema-persistence--search-indexing)
+   - [7.1 Unified Relational Schema & Entity Relationships](#71-unified-relational-schema--entity-relationships)
+   - [7.2 In-Memory Universal Search Index (Sub-80ms Retrieval)](#72-in-memory-universal-search-index-sub-80ms-retrieval)
+   - [7.3 Hybrid Vector Embeddings Pipeline (pgvector)](#73-hybrid-vector-embeddings-pipeline-pgvector)
+8. [Continuous Integration, Automated Verification & QA Testing Pipeline](#8-continuous-integration-automated-verification--qa-testing-pipeline)
+   - [8.1 Test Pyramid & Automated Verification Harness](#81-test-pyramid--automated-verification-harness)
+   - [8.2 Accessibility & Contrast Automated Regression (axe-core)](#82-accessibility--contrast-automated-regression-axe-core)
+   - [8.3 Performance Budget Gatekeeper in GitHub Actions](#83-performance-budget-gatekeeper-in-github-actions)
+9. [7-Week Engineering Execution Plan & Work Breakdown Structure (WBS)](#9-7-week-engineering-execution-plan--work-breakdown-structure-wbs)
+   - [9.1 Sprint 1–7 Detailed Work Breakdown](#91-sprint-17-detailed-work-breakdown)
+   - [9.2 Team Resource Allocation & Squad Assignments](#92-team-resource-allocation--squad-assignments)
+   - [9.3 Production Cutover, Canary Rollout & Disaster Recovery](#93-production-cutover-canary-rollout--disaster-recovery)
+10. [Engineering Acceptance Criteria & Sign-Off Checklist](#10-engineering-acceptance-criteria--sign-off-checklist)
+
+---
+
+## 1. Executive Summary & Technical Vision
+
+### 1.1 Engineering Mission & Architectural Tenets
+The engineering mission of the Ultrakin platform is to deliver a zero-latency, highly resilient, autonomous enterprise workspace that eliminates the artificial fragmentation of modern SaaS stacks. Ultrakin consolidates chat, custom domain email, living documentation, real-time audio/video huddles, and relational task management into a single, cohesive runtime powered by an autonomous AI agent kernel.
+
+Every engineering decision across the 7-week rollout is governed by three foundational tenets:
+1. **Unified Relational Data Bus:** No module exists in an isolated silo. A chat message, an inbound email, a document paragraph, and a task card share a unified entity schema. Inter-module mutations execute over an in-memory event bus with sub-10ms distribution.
+2. **Deterministic Latency Budgets:** Keystrokes must render in $\le 8\text{ms}$. Chat messages must achieve optimistic visual confirmation in $\le 16\text{ms}$ and server round-trip confirmation in $\le 45\text{ms}$. Global search across all five primitives must return results in $\le 80\text{ms}$.
+3. **Pure-Code Asset Doctrine:** The marketing surface and product application frame operate on 100% pure React/Tailwind/SVG code. No external raster frames or video codecs are permitted in core flows, ensuring immediate First Contentful Paint ($\le 600\text{ms}$) and crisp rendering across any viewport scale.
+
+```
+       ┌─────────────────────────────────────────────────────────────┐
+       │                   ULTRAKIN RUNTIME LAYER                    │
+       │     (React 19 · Vite 8 · Tailwind v4 · Obsidian Tokens)     │
+       └──────────────────────────────┬──────────────────────────────┘
+                                      │
+         ┌────────────────────────────┼────────────────────────────┐
+         ▼                            ▼                            ▼
+  ┌──────────────┐             ┌──────────────┐             ┌──────────────┐
+  │ Matrix Space │             │ Domain Email │             │ TipTap Docs  │
+  │ Real-Time JS │             │ JMAP / IMAP  │             │ CRDT / Yjs   │
+  └──────┬───────┘             └──────┬───────┘             └──────┬───────┘
+         │                            │                            │
+         └────────────────────────────┼────────────────────────────┘
+                                      │
+                     ┌────────────────┴────────────────┐
+                     ▼                                 ▼
+              ┌──────────────┐                  ┌──────────────┐
+              │ WebRTC Audio │                  │ Kanban Tasks │
+              │ LiveKit SFU  │                  │ In-Memory DB │
+              └──────┬───────┘                  └──────┬───────┘
+                     │                                 │
+                     └────────────────┬────────────────┘
+                                      │
+                                      ▼
+             ┌─────────────────────────────────────────────────┐
+             │       UNIFIED IN-MEMORY EVENT BUS & KERNEL      │
+             │   (Sub-10ms Cross-Module Event Distribution)   │
+             └────────────────────────┬────────────────────────┘
+                                      │
+                                      ▼
+             ┌─────────────────────────────────────────────────┐
+             │      AUTONOMOUS UKIN AI AGENT ENGINE (SSE)      │
+             │  (Tool Execution · Relational Synthesis · RAG)  │
+             └─────────────────────────────────────────────────┘
+```
+
+### 1.2 System-Wide Architectural Principles
+* **Offline-First with Local Optimism:** All state modifications are written immediately to the local IndexedDB/RxDB storage layer and reflected in the UI prior to network dispatch. Network reconciliation occurs asynchronously via CRDT or idempotent event queues.
+* **Strict Memory Containment:** Continuous long-running sessions must maintain a flat memory profile ($\le 120\text{MB}$ heap consumption). Inactive tabs, hidden virtualized lists, and closed video tracks must release resources deterministically.
+* **Cryptographic Sovereignty:** All Matrix communication natively adheres to the Megolm cryptographic ratchet. Decryption occurs purely within the client execution sandbox, preventing cleartext exposure across intermediary routing proxies.
+
+### 1.3 Core Technology Stack Summary
+| Layer | Production Technology | Version | Rationale |
+| :--- | :--- | :--- | :--- |
+| **Frontend Framework** | React | `19.0.0` | Server Components, Asset Loading hooks, Concurrent Rendering, Action transitions. |
+| **Build & Dev Server** | Vite | `8.x` | Lightning HMR ($\le 25\text{ms}$), optimized Rollup tree-shaking, native ES modules. |
+| **Styling & Tokens** | Tailwind CSS (v4) | `@tailwindcss/vite` | Pure CSS engine, `@theme` directives mapped to Obsidian Kinetic Glass CSS custom properties. |
+| **Icons & Visuals** | Lucide React | `latest` | Consistent $24\times 24$ enterprise icon set with strict $1.5\text{px}$ stroke consistency. |
+| **Motion Physics** | Framer Motion | `12.x` | Hardware-accelerated kinetic animations using `cubic-bezier(0.16, 1, 0.3, 1)`. |
+| **Rich Text Editor** | TipTap / ProseMirror | `2.x` | Headless, extensible rich-text editing engine with native schema serialization. |
+| **Real-Time Messaging** | Matrix JS SDK | `34.x` | Decentralized, federated, E2EE-capable communication protocol. |
+| **Audio/Video SFU** | LiveKit Client SDK | `2.x` | Low-latency WebRTC transport, adaptive simulcast, server-side audio track extraction. |
+| **Client Database** | RxDB / IndexedDB | `15.x` | Reactive local persistence, multi-tab broadcast synchronization, offline storage. |
+| **Backend Kernel** | Node.js / Rust | `22.x LTS / 1.82+` | High-throughput async event broker, JMAP email proxy, Matrix homeserver adapter. |
+| **Primary Database** | PostgreSQL + pgvector | `16.x` | Multi-tenant relational storage, Row-Level Security (RLS), hybrid vector search. |
+| **Cache & Event Bus** | Redis Cluster | `7.x` | Pub/Sub event transport, distributed session cache, rate-limiting tokens. |
+
+---
+
+## 2. High-Level System Topology & Infrastructure Architecture
+
+### 2.1 Client-Server Topology & Boundary Contracts
+The Ultrakin architecture decouples the presentation client from backend services through an API Gateway and Ingress Controller. Real-time traffic is separated by protocol semantics: WebSocket connections for Matrix events and state sync, WebRTC for media streams, Server-Sent Events (SSE) for AI generation streaming, and HTTP/2 for RESTful and JMAP operational transactions.
+
+```
+[ CLIENT BROWSER / DESKTOP ELECTRON ]
+  │
+  ├──► [ WSS ]  ──► Cloudflare Edge ──► Envoy Ingress ──► Matrix Synapse Homeserver
+  ├──► [ RTC ]  ──► LiveKit Ingress  ──► LiveKit SFU   ──► Audio/Video Media Nodes
+  ├──► [ SSE ]  ──► Cloudflare Edge ──► Envoy Ingress ──► Ukin AI Inference Router
+  └──► [ HTTPS] ──► Cloudflare Edge ──► Envoy Ingress ──► Ultrakin API Gateway
+                                                              │
+                                    ┌─────────────────────────┴─────────────────────────┐
+                                    ▼                                                   ▼
+                          [ Core Platform API ]                               [ Email Engine Service ]
+                          - Workspace Partition                               - JMAP / IMAP Proxy
+                          - Task Relational Graph                             - DKIM / SPF / DMARC
+                          - Document Metadata                                 - MIME Parser Engine
+```
+
+### 2.2 Multi-Tenant Data Isolation & Row-Level Security (RLS)
+Security boundary enforcement is guaranteed at the database engine layer via PostgreSQL Row-Level Security (RLS). Every query executed by the application backend operates within a transactional context initialized with the authenticated user's workspace session:
+
+```sql
+-- Session initialization per incoming connection
+SET LOCAL app.current_workspace_id = 'ws_9a8b7c6d5e';
+SET LOCAL app.current_user_id = 'usr_1a2b3c4d';
+SET LOCAL app.current_role = 'ADMIN';
+
+-- Table definition with RLS enforcement
+ALTER TABLE workspace_entities ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY workspace_isolation_policy ON workspace_entities
+  FOR ALL
+  USING (workspace_id = current_setting('app.current_workspace_id')::uuid);
+```
+
+### 2.3 High-Throughput Event Bus & Streaming Infrastructure
+Inter-service and cross-module communication is driven by an in-memory Redis Streams event bus. Event schemas follow the CloudEvents specification, ensuring uniform deserialization across all consumers:
+
+```typescript
+interface UltrakinEvent<T = Record<string, unknown>> {
+  id: string;               // UUIDv7 chronological identifier
+  source: string;           // e.g. "ultrakin:module:chat" | "ultrakin:module:email"
+  type: string;             // e.g. "message.created" | "email.received" | "task.updated"
+  datacontenttype: string;  // "application/json"
+  time: string;             // ISO-8601 UTC timestamp
+  workspace_id: string;     // Workspace tenant UUID
+  actor_id: string;         // User or Ukin Agent UUID
+  data: T;                  // Payload
+}
+```
+
+---
+
+## 3. Frontend Application Architecture
+
+### 3.1 Runtime Architecture & Tooling (Vite 8 + React 19 + Tailwind CSS v4)
+The frontend application is structured as a single-page application (SPA) wrapped in an optional Electron shell for desktop distribution. The build configuration utilizes Vite 8 with native ES module bundling:
+
+```javascript
+// vite.config.js
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import path from 'path';
+
+export default defineConfig({
+  plugins: [
+    react({
+      babel: {
+        plugins: [['babel-plugin-react-compiler', {}]]
+      }
+    }),
+    tailwindcss()
+  ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src')
+    }
+  },
+  build: {
+    target: 'esnext',
+    cssMinify: 'lightningcss',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-matrix': ['matrix-js-sdk'],
+          'vendor-tiptap': ['@tiptap/core', '@tiptap/react', '@tiptap/starter-kit'],
+          'vendor-media': ['livekit-client'],
+          'vendor-motion': ['framer-motion']
+        }
+      }
+    }
+  }
+});
+```
+
+### 3.2 Design Token Integration & CSS Custom Properties Engine
+Tailwind CSS v4 is configured using `@theme` directives inside `src/index.css`, mapping semantic classes directly to the Obsidian Kinetic Glass design tokens defined in Phase 6:
+
+```css
+@import "tailwindcss";
+
+@theme {
+  --color-obsidian-base: #07090E;
+  --color-obsidian-canvas: #0B0F19;
+  --color-obsidian-surface: #0F172A;
+  --color-obsidian-elevated: #1E293B;
+  --color-obsidian-overlay: #334155;
+
+  --color-indigo-primary: #6366F1;
+  --color-indigo-hover: #4F46E5;
+  --color-indigo-active: #4338CA;
+  --color-indigo-glow: rgba(99, 102, 241, 0.25);
+
+  --color-status-live: #10B981;
+  --color-status-ai: #8B5CF6;
+  --color-status-warn: #F59E0B;
+  --color-status-destruct: #F43F5E;
+
+  --font-display: 'Inter Display', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --ease-kinetic: cubic-bezier(0.16, 1, 0.3, 1);
+}
+```
+
+### 3.3 State Management, Caching & Offline Synchronization
+State management employs a layered architecture:
+1. **Server & Synced Entity Cache (RxDB):** Normalized relational collections (Spaces, Threads, Messages, Emails, Documents, Tasks) stored in local IndexedDB.
+2. **UI & Ephemeral State (Zustand):** Active navigation route, drawer visibility, focus targets, composer draft buffers, modal queues.
+3. **Optimistic Mutation Queue:** Every user interaction generates a local UUIDv7 transaction, immediately commits to the UI, appends to the retry queue, and dispatches via WebSocket/REST.
+
+```typescript
+// Optimistic Mutation Architecture
+export const useTaskStore = create<TaskState>((set, get) => ({
+  tasks: new Map(),
+  mutationQueue: [],
+  
+  updateTaskStatus: async (taskId, newStatus) => {
+    const previousTask = get().tasks.get(taskId);
+    if (!previousTask) return;
+
+    // 1. Optimistic UI update
+    set((state) => {
+      const updated = new Map(state.tasks);
+      updated.set(taskId, { ...previousTask, status: newStatus, updatedAt: Date.now() });
+      return { tasks: updated };
+    });
+
+    // 2. Dispatch to backend
+    try {
+      await api.patch(`/tasks/${taskId}`, { status: newStatus });
+    } catch (err) {
+      // 3. Rollback on failure
+      set((state) => {
+        const rolledBack = new Map(state.tasks);
+        rolledBack.set(taskId, previousTask);
+        return { tasks: rolledBack };
+      });
+      notifyError('Failed to update task. Reverted to previous state.');
+    }
+  }
+}));
+```
+
+### 3.4 Code Splitting, Dynamic Chunking & Bundle Budgeting
+* **Initial JavaScript Bundle:** $\le 180\text{KB}$ (gzipped).
+* **Initial CSS Bundle:** $\le 28\text{KB}$ (gzipped).
+* **Dynamic Route Splitting:** All major application views (`/spaces`, `/mail`, `/docs`, `/huddles`, `/tasks`, `/automations`, `/settings`) are loaded via `React.lazy()` with progressive hydration skeletons.
+
+---
+
+## 4. Module-Specific Engineering Specifications
+
+### 4.1 Real-Time Matrix Messaging Engine
+* **Protocol:** Matrix Client-Server API (`r0.6.1+`).
+* **Connection Management:** Persistent long-polling / WebSocket streaming sync loop (`/sync`).
+* **Virtualization:** Chat timelines utilize `@tanstack/react-virtual` with dynamic row measurement, maintaining $\le 60$ rendered DOM elements regardless of channel message volume ($100\text{k}+$ messages).
+* **Composer Architecture:** Markdown-aware input supporting multiline auto-expand, inline `@mention` typeahead with LRU caching, drag-and-drop file upload with chunked SHA-256 validation.
+
+### 4.2 Custom Domain Email Engine & Bridge
+* **Mail Protocol Integration:** JMAP (JSON Meta Application Protocol - RFC 8620) client protocol proxying inbound and outbound messages.
+* **Thread Synthesis:** Grouping algorithm executes RFC 5322 `Message-ID`, `In-Reply-To`, and `References` header traversal to assemble unified conversation threads across domain boundaries.
+* **Composer:** Auto-saving draft engine with debounce threshold of $400\text{ms}$, inline recipient validation checking domain MX records, and automatic DKIM signature validation display.
+
+### 4.3 TipTap ProseMirror Living Docs & CRDT Engine
+* **CRDT Algorithm:** Yjs collaborative document framework bound to ProseMirror schema via `y-prosemirror`.
+* **Paragraph Discussion Anchoring:** Every top-level node (heading, paragraph, code block) receives a permanent deterministic `node_id`. Matrix discussion threads attach directly to `node_id` foreign keys, enabling real-time comments alongside text without disrupting document structure.
+* **Code Block Formatting:** Highlight.js / Prism syntax highlighting executed within a background WebWorker to prevent main thread blocking during large document loads.
+
+### 4.4 WebRTC Huddle & Streaming Transcription Pipeline
+* **SFU Engine:** LiveKit Cloud / Self-Hosted Media Node cluster.
+* **Adaptive Bitrate:** Simulcast video tracks ($180\text{p}$, $360\text{p}$, $720\text{p}$) with dynacast bandwidth optimization.
+* **Real-Time Transcription Pipeline:**
+  ```
+  [ Audio Input Stream ] ──► WebAudio Worklet (16kHz PCM) ──► WebSocket Audio Sink
+                                                                      │
+                                                                      ▼
+  [ FastWhisper / Deepgram Engine ] ◄── Server-Side VAD (Voice Activity Detection)
+                 │
+                 ├──► Chunked Text Tokens (SSE) ──► Real-Time Live Captions Drawer
+                 └──► Full Session Transcript  ──► Ukin Agent Synthesis Pipeline
+  ```
+
+### 4.5 Relational Kanban Engine & Optimistic Mutations
+* **Drag-and-Drop Library:** `@hello-pangea/dnd` or `@dnd-kit` optimized for 60fps gesture response.
+* **Collision Detection:** Pointer-based bounding box intersection with auto-scrolling container boundaries.
+* **Polymorphic Linkages:** Every card displays associated cross-module badges (e.g., `3 Matrix Threads`, `1 Inbound Email`, `1 Architecture Doc`). Clicking a badge opens the corresponding surface in the 380px contextual secondary drawer without navigating away from the board.
+
+### 4.6 Autonomous Ukin AI Agent Execution Runtime
+* **Transport:** Server-Sent Events (SSE) streaming with HTTP/2 multiplexing.
+* **Interactive Proposal Contract:** The agent emits structured JSON blocks representing proposed actions:
+  ```json
+  {
+    "type": "ukin_action_proposal",
+    "proposal_id": "prop_9812",
+    "action": "CREATE_TASK_FROM_EMAIL",
+    "parameters": {
+      "title": "Migrate DB cluster to PG16",
+      "priority": "P0",
+      "assignee": "usr_alex_chen",
+      "due_date": "2026-11-01"
+    },
+    "requires_confirmation": true
+  }
+  ```
+* **Execution Boundary:** Client renders an interactive card with "Approve" and "Decline" triggers. Mutating state requires an explicit user token validation unless autonomous authority rules are enabled in Workspace Settings.
+
+### 4.7 Visual Automations Directed Acyclic Graph (DAG) Engine
+* **Canvas Engine:** Pure SVG and React state flow engine supporting node placement, port snapping, bezier connector curves, and zoom/pan transformations.
+* **Cycle Detection:** Tarjan's strongly connected components algorithm executes on every edge connection. Cycles are rejected at creation time with immediate visual error feedback.
+
+---
+
+## 5. Enterprise Security, Cryptography & Compliance Implementation
+
+### 5.1 End-to-End Encryption (Megolm / Olm Protocol)
+* **Key Generation & Storage:** Identity and one-time keys generated via WebAssembly LibOlm. Master keys encrypted with the user's passphrase-derived PBKDF2 salt and persisted in hardware-backed IndexedDB storage.
+* **Key Verification:** Interactive SAS (Short Authentication String) emoji verification protocol across peer devices.
+
+### 5.2 Enterprise Identity Federation (SAML 2.0 / OIDC / SCIM v2)
+* **Authentication Providers:** Okta, Azure Active Directory, Google Workspace, OneLogin.
+* **SCIM v2 Implementation:** Real-time user provisioning and deprovisioning (`/scim/v2/Users`, `/scim/v2/Groups`). Deactivated employees immediately lose active JWT sessions across web and desktop sockets within $\le 5\text{seconds}$.
+
+### 5.3 Immutable Audit Logging & Tamper-Evident Ledger
+Every administrative action, permission mutation, data export, and key rotation appends an entry to an append-only cryptographic log. Log entries include a SHA-256 hash chaining to the previous record, preventing retro-active alteration.
+
+### 5.4 Network Security, TLS 1.3 & mTLS Ingress
+All ingress traffic terminates at Envoy proxy clusters enforcing TLS 1.3 with strict cipher suites (`TLS_AES_256_GCM_SHA384`, `TLS_CHACHA20_POLY1305_SHA256`). Internal microservice communication is secured via mutual TLS (mTLS) backed by an internal SPIFFE/SPIRE certificate authority.
+
+---
+
+## 6. Performance Engineering & Latency Budgets
+
+### 6.1 Hard Latency & Rendering Thresholds
+| Metric / Operation | Maximum Budget | Target Production | Measurement Methodology |
+| :--- | :--- | :--- | :--- |
+| **First Contentful Paint (FCP)** | $\le 800\text{ms}$ | $\le 550\text{ms}$ | Chrome Web Vitals / Lighthouse CI |
+| **Time to Interactive (TTI)** | $\le 1200\text{ms}$ | $\le 850\text{ms}$ | Real User Monitoring (RUM) 75th percentile |
+| **Keystroke-to-Render Latency** | $\le 12\text{ms}$ | $\le 6\text{ms}$ | Performance API `measure()` in composer |
+| **Chat Optimistic Render** | $\le 20\text{ms}$ | $\le 12\text{ms}$ | Timestamp delta: user enter to DOM paint |
+| **Chat Network Confirmation** | $\le 60\text{ms}$ | $\le 38\text{ms}$ | WebSocket round-trip acknowledgment |
+| **Universal ⌘K Search Latency** | $\le 100\text{ms}$ | $\le 65\text{ms}$ | In-memory Trie & SQLite search query time |
+| **Huddle Audio Ingress-to-SFU** | $\le 120\text{ms}$ | $\le 75\text{ms}$ | WebRTC getStats() round-trip latency |
+
+### 6.2 Client-Side Virtualization & Memory Leak Prevention
+* **Window Virtualization:** Virtual windowing applied to message streams, email lists, contact directories, and task boards.
+* **Component Cleanup Hooks:** Strict enforcement of `useEffect` cleanup handlers. Event listeners, ResizeObservers, IntersectionObservers, and audio nodes must terminate on unmount.
+* **Automated Leak Detection:** CI pipeline executes automated headless Puppeteer scripts cycling through 50 channel switches and validating that the JS Heap delta does not exceed $2\text{MB}$.
+
+### 6.3 WebWorker Thread Offloading Architecture
+Heavy compute processes are dispatched to dedicated WebWorkers:
+1. `worker-search.js`: Full-text indexing and fuzzy token search.
+2. `worker-crypto.js`: LibOlm key exchange, payload encryption/decryption.
+3. `worker-syntax.js`: Code block parsing and syntax tree formatting.
+
+---
+
+## 7. Database Schema, Persistence & Search Indexing
+
+### 7.1 Unified Relational Schema & Entity Relationships
+The relational schema binds polymorphic entities to a single core workspace model:
+
+```
+┌────────────────────────────────────────────────────────┐
+│                   workspaces (Table)                   │
+│   id (UUID PK), name, slug, domain, created_at         │
+└───────────────────────────┬────────────────────────────┘
+                            │ 1:N
+┌───────────────────────────┴────────────────────────────┐
+│                workspace_entities (Table)               │
+│   id (UUID PK), workspace_id (FK), entity_type,        │
+│   title, body, creator_id, metadata (JSONB),           │
+│   created_at, updated_at                               │
+└─────────┬───────────────────────┬──────────────────────┘
+          │ 1:N                   │ 1:N
+┌─────────┴─────────────┐ ┌───────┴──────────────────────┐
+│  entity_links (Table) │ │  entity_comments (Table)     │
+│  source_id, target_id,│ │  id, entity_id (FK), author, │
+│  relationship_type    │ │  body, matrix_event_id       │
+└───────────────────────┘ └──────────────────────────────┘
+```
+
+### 7.2 In-Memory Universal Search Index (Sub-80ms Retrieval)
+Client instances maintain an in-memory inverted index backed by a WebAssembly-compiled SQLite database (`sql.js` / `opfs-sqlite`). Queries execute locally across active space channels, recent email threads, open documents, and cached tasks without invoking network calls.
+
+### 7.3 Hybrid Vector Embeddings Pipeline (pgvector)
+Backend knowledge retrieval combines relational filtering with high-dimensional vector search. Text chunks from living documents, meeting summaries, and email threads are embedded using `text-embedding-3-small` (1536 dimensions) and stored with HNSW (Hierarchical Navigable Small World) indexes in PostgreSQL:
+
+```sql
+CREATE INDEX ON document_embeddings 
+USING hnsw (embedding vector_cosine_ops)
+WITH (m = 16, ef_construction = 64);
+```
+
+---
+
+## 8. Continuous Integration, Automated Verification & QA Testing Pipeline
+
+### 8.1 Test Pyramid & Automated Verification Harness
+* **Unit Testing (Jest / Vitest):** $\ge 90\%$ code coverage across utilities, state reducers, token parsers, and CRDT conflict resolution handlers.
+* **Component Testing (React Testing Library):** Full interaction testing of all 14 core primitives across 10 component states (Hover, Focus, Active, Disabled, Loading, Selected, Error, Empty, Virtualized, Offline).
+* **End-to-End Integration (Playwright):** 35 core user journeys executed against headless Chromium, Firefox, and WebKit instances in CI.
+
+### 8.2 Accessibility & Contrast Automated Regression (axe-core)
+Every PR build automatically triggers an `axe-core` accessibility audit across all routes. Any contrast failure ($< 4.5:1$ for body, $< 3:1$ for large text), missing ARIA label, broken keyboard trap, or invalid heading order immediately blocks merge approval.
+
+### 8.3 Performance Budget Gatekeeper in GitHub Actions
+GitHub Actions workflow verifies asset bundle sizes and Lighthouse CI scores on every push. Builds that exceed the $180\text{KB}$ JavaScript limit or drop below $98$ in Lighthouse Performance are rejected automatically.
+
+---
+
+## 9. 7-Week Engineering Execution Plan & Work Breakdown Structure (WBS)
+
+### 9.1 Sprint 1–7 Detailed Work Breakdown
+* **Sprint 1 (Foundations & Token Engine):**
+  - Inject CSS Custom Properties and Tailwind CSS v4 `@theme`.
+  - Build and unit test the 14 core design primitives.
+  - Implement responsive desktop shell geometry (64px Rail, 240px Sidebar, Flex Canvas, 380px Drawer).
+* **Sprint 2 (Real-Time Messaging & Spaces):**
+  - Integrate Matrix JS SDK sync loop and room management.
+  - Build virtualized message stream and markdown composer.
+  - Implement optimistic send queue and thread drawer.
+* **Sprint 3 (Custom Domain Email & Unified Threading):**
+  - Implement JMAP client proxy and MIME thread parser.
+  - Build two-pane split email reader and auto-saving draft composer.
+  - Connect cross-module linking between email threads and Matrix spaces.
+* **Sprint 4 (Living Docs & Collaborative CRDT):**
+  - Integrate TipTap / ProseMirror with Yjs collaboration provider.
+  - Implement paragraph-anchored Matrix discussion threads.
+  - Build document slash-command menu and floating format toolbar.
+* **Sprint 5 (WebRTC Huddle & Transcription Engine):**
+  - Implement LiveKit audio/video SFU connection and grid dock.
+  - Integrate WebAudio streaming speech-to-text pipeline.
+  - Connect live transcript stream into Ukin AI Agent summary generator.
+* **Sprint 6 (Kanban Task Boards & Visual Automations):**
+  - Implement drag-and-drop task board with optimistic status updates.
+  - Build SVG-based visual automations DAG node canvas with cycle rejection.
+  - Connect cross-module entity link triggers.
+* **Sprint 7 (Ukin AI Agent Synthesis, Enterprise Hardening & Cutover):**
+  - Build streaming Ukin Agent interactive action proposal cards.
+  - Execute end-to-end security penetration audit and SAML/SCIM testing.
+  - Conduct load testing ($10\text{k}$ concurrent WebSocket connections).
+  - Production canary deployment and public DNS cutover.
+
+### 9.2 Team Resource Allocation & Squad Assignments
+* **Squad Alpha (Core Shell & Design Primitives):** 8 Engineers (Frontend Lead, 4 UI Engineers, 2 a11y specialists, 1 QA).
+* **Squad Beta (Real-Time Matrix & Domain Email):** 10 Engineers (Real-Time Lead, 4 Matrix specialists, 3 Email/JMAP engineers, 2 QA).
+* **Squad Gamma (TipTap Living Docs & WebRTC Huddles):** 9 Engineers (Collaboration Lead, 4 ProseMirror engineers, 3 WebRTC engineers, 1 QA).
+* **Squad Delta (Ukin AI Agent & Visual Automations):** 8 Engineers (AI Systems Lead, 4 Fullstack engineers, 2 Pipeline engineers, 1 QA).
+* **Squad Epsilon (Security, Infrastructure & SRE):** 5 Engineers (SecOps Lead, 2 DevOps/SRE, 2 Infrastructure specialists).
+
+### 9.3 Production Cutover, Canary Rollout & Disaster Recovery
+* **Canary Strategy:** Traffic routed via Cloudflare Workers: $5\%$ internal dogfooding $\rightarrow 25\%$ enterprise opt-in $\rightarrow 50\%$ beta tenants $\rightarrow 100\%$ general availability over 5 business days.
+* **Automated Rollback Criteria:** If HTTP 5xx error rate exceeds $0.05\%$ or WebSocket reconnect storm rate exceeds $1.0\%$, traffic rolls back immediately to the previous stable release.
+
+---
+
+## 10. Engineering Acceptance Criteria & Sign-Off Checklist
+
+```
+[ ] All 14 Core Primitives strictly reference CSS custom properties; ZERO raw hex codes in JSX.
+[ ] FCP measured at <= 600ms on simulated Fast 3G / throttled 4x CPU profiles.
+[ ] Keystroke-to-paint latency verified at <= 8ms in TipTap editor and Matrix composer.
+[ ] Matrix sync loop handles 50 simultaneous active rooms with 0 dropped events.
+[ ] TipTap collaborative sessions support 20 concurrent users with zero CRDT convergence errors.
+[ ] WebRTC huddles maintain smooth audio across 50 simultaneous participants per room.
+[ ] Universal search returns cross-module results in <= 80ms for 50,000 indexed entities.
+[ ] 100% of routes achieve WCAG 2.1 AA/AAA compliance with zero axe-core critical violations.
+[ ] Security pentest confirms complete tenant boundary isolation via PostgreSQL RLS.
+[ ] Disaster recovery automated failover verified in staging with < 30s RTO and 0s RPO.
+```
+
+---
+
+*End of Ultrakin Engineering Implementation Blueprint (`07_Ultrakin_Engineering_Implementation_Blueprint.md`).*  
+*Document Version: `1.0.0-PROD` · Phase 7 Complete · Approved Single Source of Truth for Engineering Architecture.*

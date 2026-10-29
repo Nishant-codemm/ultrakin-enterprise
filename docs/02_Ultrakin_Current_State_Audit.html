@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ultrakin Current State Product Audit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <style>
+    :root {
+      --bg: #07090e;
+      --surface: #0f172a;
+      --surface-border: #1e293b;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --primary-glow: rgba(99, 102, 241, 0.15);
+      --accent: #38bdf8;
+      --code-bg: #030712;
+      --table-header: #1e293b;
+      --table-row-alt: #0a0f1d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      line-height: 1.7;
+      padding: 0;
+      margin: 0;
+    }
+    .header-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(7, 9, 14, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--surface-border);
+      padding: 14px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header-title {
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(99, 102, 241, 0.2);
+      color: var(--primary-light);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background: #334155;
+      color: #fff;
+    }
+    .btn-primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #4f46e5;
+    }
+    .container {
+      max-width: 980px;
+      margin: 40px auto;
+      padding: 0 32px 120px;
+    }
+    #content h1 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      margin-top: 48px;
+      margin-bottom: 20px;
+      color: #fff;
+      border-bottom: 1px solid var(--surface-border);
+      padding-bottom: 14px;
+    }
+    #content h2 {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-top: 40px;
+      margin-bottom: 16px;
+      color: #f8fafc;
+      border-bottom: 1px solid rgba(30, 41, 59, 0.8);
+      padding-bottom: 8px;
+    }
+    #content h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-top: 28px;
+      margin-bottom: 12px;
+      color: #e2e8f0;
+    }
+    #content h4 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--primary-light);
+      margin-top: 20px;
+      margin-bottom: 8px;
+    }
+    #content p {
+      margin-bottom: 16px;
+      color: #cbd5e1;
+    }
+    #content ul, #content ol {
+      margin-bottom: 18px;
+      padding-left: 24px;
+      color: #cbd5e1;
+    }
+    #content li {
+      margin-bottom: 6px;
+    }
+    #content hr {
+      border: none;
+      border-top: 1px solid var(--surface-border);
+      margin: 48px 0;
+    }
+    #content blockquote {
+      border-left: 4px solid var(--primary);
+      background: var(--primary-glow);
+      padding: 14px 20px;
+      margin: 20px 0;
+      border-radius: 0 8px 8px 0;
+      color: #e2e8f0;
+    }
+    #content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 28px 0;
+      font-size: 13.5px;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--surface-border);
+    }
+    #content th {
+      background: var(--table-header);
+      color: #f8fafc;
+      text-align: left;
+      padding: 12px 14px;
+      font-weight: 600;
+      border-bottom: 1px solid var(--surface-border);
+    }
+    #content td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #1e293b;
+      color: #cbd5e1;
+    }
+    #content tr:nth-child(even) td {
+      background: var(--table-row-alt);
+    }
+    #content tr:hover td {
+      background: rgba(99, 102, 241, 0.08);
+    }
+    #content code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      background: var(--code-bg);
+      border: 1px solid #1e293b;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #38bdf8;
+    }
+    #content pre {
+      background: var(--code-bg);
+      border: 1px solid var(--surface-border);
+      padding: 16px 20px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+    #content pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+      color: #e2e8f0;
+    }
+    #content a {
+      color: var(--primary-light);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    #content a:hover {
+      color: #a5b4fc;
+    }
+    @media print {
+      body { background: #fff; color: #111; }
+      .header-bar { display: none; }
+      #content h1, #content h2, #content h3 { color: #000; }
+      #content p, #content li, #content td { color: #222; }
+      #content th { background: #f1f5f9; color: #000; }
+      #content tr:nth-child(even) td { background: #f8fafc; }
+      #content pre, #content code { background: #f1f5f9; color: #111; border-color: #cbd5e1; }
+      .container { max-width: 100%; margin: 0; padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="header-bar">
+    <div class="header-title">
+      <span>Ultrakin Current State Product Audit</span>
+      <span class="badge">Phase 2 Complete</span>
+    </div>
+    <div class="actions">
+      <button class="btn" onclick="window.print()">Print / Save PDF</button>
+      <a class="btn btn-primary" href="02_Ultrakin_Current_State_Audit.md" download>Download .MD</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="content"></div>
+  </div>
+
+  <script id="markdown-source" type="text/markdown">
+# Master Product & UX Audit: Ultrakin (Current State)
+**Document ID:** `02_Ultrakin_Current_State_Audit.md`  
+**Reference Targets:** `https://ultrakin.com` (Marketing Website) & `https://app.ultrakin.com` (Web Application & PWA)  
+**Auditor:** Senior Product Design Consultant & Enterprise Frontend Architect  
+**Status:** Canonical Baseline Audit Report (Phase 2 — No Code / No Redesign Implementation)
+
+---
+
+## Executive Summary & Audit Baseline
+
+This document presents a rigorous, forensic, and unsparing product design audit of the current Ultrakin product ecosystem, spanning both the public marketing website (`https://ultrakin.com`) and the core multi-tenant web application (`https://app.ultrakin.com`).
+
+Ultrakin possesses a formidable, genuinely differentiated technical foundation: an in-memory event bus and unified relational database uniting **Chat (Matrix-powered), Domain Mail, Living Docs (TipTap Prosemirror with CRDT), Live Huddles (WebRTC with live transcription), Kanban Lists, Intake Forms, Calendar Events, and Autonomous AI Agents**.
+
+However, the current product implementation suffers from severe architectural dissonance, fragmented visual hierarchy, tonal whiplash, missing enterprise governance patterns, and critical production dependencies that prevent it from competing effectively with enterprise incumbents like Slack Enterprise, Microsoft 365, and Notion.
+
+### Key Audit Findings at a Glance
+1. **The External CDN Video Failure Mode:** The marketing site's primary product demonstration relies entirely on third-party MP4 video files hosted on `assets.ultrakin.com`. When asset loading is blocked or delayed, the entire product value proposition collapses into black blank boxes.
+2. **Luminance Whiplash:** The public website alternates abruptly between blinding white surfaces (`#FFFFFF` / `bg-slate-50`) and deep dark bands (`band-dark` in the Spine and CTA sections) with zero transitional smoothing or visual continuity.
+3. **Buried Enterprise Trust Signals:** Critical enterprise procurement criteria—SOC 2 compliance, SAML SSO, SCIM provisioning, and data residency—are buried inside the fourth column of a pricing tier at the very bottom of the page.
+4. **Application Navigation Schism:** The web application mixes multiple competing mental models: "Circles", "Workspaces", "Spaces", "Lists", and "Channels", disorienting enterprise users accustomed to clean workspace taxonomies.
+5. **Under-leveraged AI Agent Visibility:** While the AI Agent backend is integrated across Matrix chat and REST endpoints, the UI renders agent interactions as plain chat text bubbles rather than structured, high-affordance operational cards.
+
+---
+
+## Part 1: Forensic Audit of the Marketing Website (`https://ultrakin.com`)
+
+---
+
+### Section 1.1: Global Navigation Header
+
+#### 1. Purpose
+Orient first-time visitors, provide anchor navigation down the single-page layout, and route returning users to authentication.
+
+#### 2. Current UX
+Sticky top bar containing 5 flat anchor links (`See it`, `How it works`, `Core tools`, `Apps`, `Pricing`), a `Sign in` text link, and a `Get started` primary button.
+
+#### 3. Current UI
+Implemented via `<nav class="sticky top-0 z-[60] bg-slate-50/80 backdrop-blur-md border-b border-slate-150">`. Height is approximately `60px` (`py-3.5`). Features an SVG logo mark with gradient definition `#2F6BFF` and `font-display text-xl font-bold tracking-tight text-slate-700`.
+
+#### 4. User Flow
+- Visitor clicks anchor links (`/#tour`, `/#loop`, `/#core`, `/#apps`) -> page scrolls to target section.
+- Returning user clicks `Sign in` -> navigates to `https://app.ultrakin.com/auth`.
+- Prospect clicks `Get started` -> navigates directly to `https://app.ultrakin.com/auth` (skipping sales qualification).
+
+#### 5. Information Architecture
+Flat, single-tier hierarchy. No dropdowns, no mega-menus, no category grouping. All 5 links compete with equal visual weight.
+
+#### 6. Visual Hierarchy
+1. `Get started` primary cobalt button (`bg-cobalt-500 text-white`).
+2. `Ultrakin` brand wordmark.
+3. 5 secondary navigation links (`text-slate-600 font-medium`).
+4. `Sign in` link.
+
+#### 7. Layout
+Horizontal flex container pinned to `max-w-[1140px] mx-auto px-6`.
+
+#### 8. Grid
+Flexbox with `gap-7` and `justify-between`.
+
+#### 9. Spacing
+Container padding `py-3.5 px-6 lg:px-10`. Link gap `gap-6`.
+
+#### 10. Typography
+- Brand text: `text-xl font-bold tracking-tight`.
+- Nav links: `text-sm font-medium text-slate-600 hover:text-slate-700`.
+- Button text: `text-sm font-semibold`.
+
+#### 11. Colors
+- Nav surface: `rgba(248, 250, 252, 0.8)` with backdrop blur.
+- Border: `border-slate-150`.
+- Text: Slate-600 / Slate-700.
+- Primary CTA: Cobalt blue (`#2F6BFF`).
+
+#### 12. CTA Hierarchy
+Single primary CTA (`Get started`). `Sign in` acts as a tertiary text action. **Completely missing an Enterprise sales CTA** (`Contact Sales` or `Request Demo`).
+
+#### 13. Accessibility
+Anchor tags lack explicit `aria-current` states during scroll. High contrast on button text meets WCAG AA, but nav link text `#475569` on frosted slate is borderline WCAG AA under low display brightness.
+
+#### 14. Motion
+Subtle button lift on hover (`hover:-translate-y-px transition-all`).
+
+#### 15. Micro interactions
+Button hover adds vertical translation and shadow expansion (`shadow-[0_1px_2px_rgba(47,107,255,.4),0_8px_18px_-8px_rgba(47,107,255,.5)]`).
+
+#### 16. Trust Signals
+None in the navigation. No security status, no enterprise tier badge, no compliance indicators.
+
+#### 17. Enterprise Feeling Score
+**4.5 / 10.** Feels like an early-stage startup landing page rather than an enterprise collaboration hub.
+
+---
+
+### Section 1.2: Hero Section (`#top` / `data-section="hero"`)
+
+#### 1. Purpose
+Establish the core value proposition: unifying people, tools, and agents into a single software application.
+
+#### 2. Current UX
+Centered display text with an announcement badge, core headline with velocity gradient text, supportive copy, and dual CTA buttons (`Get started free` + `See how it works ↓`).
+
+#### 3. Current UI
+`<header id="top" class="relative overflow-hidden text-center pt-16 pb-12">`. Utilizes dual radial gradient lighting overlays and an absolute 54px dot-matrix grid overlay masked with a radial vignette.
+
+#### 4. User Flow
+Visitor reads headline, either clicks primary button to authenticate or clicks secondary anchor to jump to the `#loop` section.
+
+#### 5. Information Architecture
+Linear centered narrative: Pill Badge -> H1 Headline -> Subheadline -> Dual CTAs.
+
+#### 6. Visual Hierarchy
+1. H1 Headline: `text-5xl md:text-[64px] font-bold leading-[1.02] tracking-[-0.035em]`.
+2. Gradient text accent: `finally in one app.` (`bg-velocity bg-clip-text text-transparent`).
+3. Primary button: Cobalt `#2F6BFF`.
+4. Announcement pill: `One app for your team`.
+
+#### 7. Layout
+Centered stack within `max-w-5xl mx-auto px-6`.
+
+#### 8. Grid
+Single-column centered flex stack.
+
+#### 9. Spacing
+Top padding `pt-16`, bottom padding `pb-12`. Headline margin `mt-6`, body margin `mt-[22px]`, button group margin `mt-[30px]`.
+
+#### 10. Typography
+- Headline: 64px bold, line-height 1.02, tracking `-0.035em` (tight and confident).
+- Body: `18px/19px`, line-height `1.6`, color `text-slate-600`.
+- Monospace badge: `font-mono text-xs uppercase tracking-[0.16em] text-cobalt-600`.
+
+#### 11. Colors
+- Background: Off-white canvas with radial blue glow (`rgba(47,107,255,.12)`).
+- Text: Slate-700 (`#334155`).
+- Highlight: Velocity gradient (Cobalt to Cyan).
+
+#### 12. CTA Hierarchy
+Primary: `Get started free` (Cobalt fill). Secondary: `See how it works ↓` (White outline card).
+
+#### 13. Accessibility
+Color contrast is acceptable. However, the secondary button (`See how it works ↓`) lacks an accessible description of where it scrolls.
+
+#### 14. Motion
+No entry motion on load (static SSR rendered text).
+
+#### 15. Micro interactions
+Button hover lift and shadow deepening.
+
+#### 16. Trust Signals
+None in the hero viewport. Zero social proof, zero compliance badges, zero customer count.
+
+#### 17. Enterprise Feeling Score
+**6.0 / 10.** Strong copywriting, but visually naked without immediate software visualization or social proof.
+
+---
+
+### Section 1.3: Product Showcase & Video Tour (`#tour`)
+
+#### 1. Purpose
+Provide prospective buyers with an immediate visual demonstration of Ultrakin's real interface.
+
+#### 2. Current UX
+Visitor sees 3 pill tabs (`Spaces`, `Mail`, `Huddle`). Clicking a tab plays an embedded MP4 video inside a simulated browser window frame.
+
+#### 3. Current UI
+`<section id="tour" class="py-14 md:py-[72px] border-t border-slate-150 bg-slate-50 text-center">`. Contains an artificial browser chrome bar (`ukin.app/acme`) and an HTML5 `<video>` tag loading `https://assets.ultrakin.com/marketing/spaces-v4.mp4`.
+
+#### 4. User Flow
+User selects tab -> video plays. User waits passively for video playback to understand what the feature does.
+
+#### 5. Information Architecture
+Tab pills switch video sources. Caption below provides a single-sentence takeaway.
+
+#### 6. Visual Hierarchy
+1. Browser mockup window with video.
+2. Pill buttons (`Spaces`, `Mail`, `Huddle`).
+3. Monospace bottom caption: `Ukin flags the cross-team blocker before you waste a day on the wrong task.`
+
+#### 7. Layout
+Centered container `max-w-[1140px]` with inner browser container `max-w-[1000px]`.
+
+#### 8. Grid
+Centered vertical stack.
+
+#### 9. Spacing
+Padding `py-14 md:py-[72px]`. Pill button margin `mb-5`.
+
+#### 10. Typography
+- Section title: `text-xl md:text-[21px] font-semibold text-slate-700`.
+- Caption: `font-mono text-[13px] uppercase tracking-[0.06em] text-slate-400`.
+
+#### 11. Colors
+- Background: `bg-slate-50`.
+- Active Pill: `bg-cobalt-500 text-white`.
+- Inactive Pill: `bg-white text-slate-600 border-slate-200`.
+
+#### 12. CTA Hierarchy
+No direct conversion CTA inside the tour section.
+
+#### 13. Accessibility
+**CRITICAL FAILURE:** The video autoplays with zero user pause controls, no closed captions (CC), and no fallback text if the video fails to load or CDN times out.
+
+#### 14. Motion
+Video playback is passive. Tab switching swaps video `src` directly, causing brief layout flicker.
+
+#### 15. Micro interactions
+Pill active state styling.
+
+#### 16. Trust Signals
+Simulated browser window shows `ukin.app/acme` URL.
+
+#### 17. Enterprise Feeling Score
+**3.5 / 10.** Fragile external MP4 dependency, passive consumption model, and lack of interactive depth make it feel unpolished.
+
+---
+
+### Section 1.4: "The Spine" Workflow Section (`#loop`)
+
+#### 1. Purpose
+Explain Ultrakin’s core architectural thesis: work flows in a closed loop from **Signal -> Decision -> Action -> Outcome**.
+
+#### 2. Current UX
+Visitor scrolls from a bright off-white section into a dark, high-contrast band. Four sequential nodes are connected by an animated glowing horizontal connector line.
+
+#### 3. Current UI
+`<section id="loop" class="band-dark relative overflow-hidden py-16 md:py-20">`. Dark canvas (`#0b1524`), dark grid overlay, 4 node cards with squircle icons (`h-[72px] w-[72px]`), and a traveling CSS pulse line (`loop-pulse`).
+
+#### 4. User Flow
+Linear left-to-right reading flow across the 4 stages.
+
+#### 5. Information Architecture
+Sequential 4-stage pipeline:
+1. **Signal** (Chat · request · idea)
+2. **Decision** (Context · priority)
+3. **Action** (Task · owner)
+4. **Outcome** (Done · shipped)
+
+#### 6. Visual Hierarchy
+1. Section H2: `A message becomes a task becomes a result.`
+2. 4 Node Icons with glowing cyan/cobalt backdrops.
+3. Node Titles (`Signal`, `Decision`, `Action`, `Outcome`).
+4. Micro descriptive labels.
+
+#### 7. Layout
+Left-aligned header text followed by a 4-column responsive grid connected by an absolute horizontal connector line.
+
+#### 8. Grid
+Desktop: `grid-cols-4`. Tablet: `grid-cols-2`. Mobile: `grid-cols-1`.
+
+#### 9. Spacing
+Section padding `py-16 md:py-20`. Node gap `gap-10 lg:gap-6`.
+
+#### 10. Typography
+- H2: `text-4xl md:text-[46px] font-bold text-white`.
+- Section label: `font-mono text-xs uppercase tracking-[0.22em] text-cyan-400`.
+- Node titles: `text-lg font-semibold text-white`.
+- Node body: `text-[13px] leading-[1.55] text-slate-400`.
+
+#### 11. Colors
+- Canvas: Deep midnight slate (`#0B1524`).
+- Node borders: `border-cobalt-400/50` and `border-cyan-400/60`.
+- Text: Pure white and slate-300.
+
+#### 12. CTA Hierarchy
+Zero conversion buttons inside this section.
+
+#### 13. Accessibility
+Connector line is hidden on mobile screens (`hidden lg:block`). High contrast white text on dark background meets WCAG AAA.
+
+#### 14. Motion
+Traveling highlight animation (`loop-pulse`) moves continuously across the horizontal line (`linear-gradient(90deg, transparent, #2BC0CE, transparent)`).
+
+#### 15. Micro interactions
+Static hover states.
+
+#### 16. Trust Signals
+None.
+
+#### 17. Enterprise Feeling Score
+**7.5 / 10.** Strong conceptual narrative and animation, but suffers from extreme tonal contrast with adjacent sections.
+
+---
+
+### Section 1.5: Core Tools Grid (`#core`)
+
+#### 1. Purpose
+Enumerate the built-in modules included in the Ultrakin workspace.
+
+#### 2. Current UX
+Visitor transitions back from dark mode into stark white background. A 3x3 grid of 9 cards displays each tool with an icon and a 1-sentence description.
+
+#### 3. Current UI
+`<section id="core" class="relative overflow-hidden bg-white py-16 md:py-20">`. Cards: `rounded-2xl border border-slate-200 bg-white p-6 shadow-card hover:-translate-y-1 hover:shadow-elevated`.
+
+#### 4. User Flow
+User scans 9 equal-weight boxes.
+
+#### 5. Information Architecture
+3x3 symmetric grid:
+- Row 1: Chat | Mail | Meetings
+- Row 2: Calendar | Tasks | Docs
+- Row 3: Agents | MCP Integrations | More in one place
+
+#### 6. Visual Hierarchy
+All 9 cards have identical visual weight. No visual hierarchy distinguishing major modules (Chat, Mail, Agents) from utility cards (More in one place).
+
+#### 7. Layout
+Equal-width 3-column grid (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4`).
+
+#### 8. Grid
+Strict 3-column CSS grid.
+
+#### 9. Spacing
+Padding `py-16 md:py-20`. Card padding `p-6`. Gap `gap-4`.
+
+#### 10. Typography
+- H2: `46px` bold text-slate-700.
+- Card titles: `19px` font-semibold.
+- Card descriptions: `13.5px` text-slate-500.
+
+#### 11. Colors
+White cards on white background with `#E2E8F0` border. Icon squircle uses gradient `from-cobalt-50 to-cobalt-100/60`.
+
+#### 12. CTA Hierarchy
+No CTAs within individual cards. Cards are non-clickable (dead ends).
+
+#### 13. Accessibility
+Cards look interactive on hover (`hover:-translate-y-1`), but clicking them does nothing. This violates the affordance expectation.
+
+#### 14. Motion
+Hover transform `translateY(-4px)` with shadow elevation.
+
+#### 15. Micro interactions
+Icon scale on hover (`group-hover:scale-105`).
+
+#### 16. Trust Signals
+Mention of MCP (Model Context Protocol).
+
+#### 17. Enterprise Feeling Score
+**5.0 / 10.** Generic card-grid template aesthetic. Fails to demonstrate how these 9 tools actually connect.
+
+---
+
+### Section 1.6: Installable Apps Marketplace Strip (`#apps`)
+
+#### 1. Purpose
+Demonstrate platform extensibility through installable workspace apps (Journeys/LMS, Forms, Lists, Events).
+
+#### 2. Current UX
+Horizontal strip with pill tags below the core tools grid.
+
+#### 3. Current UI
+`<div id="apps" class="mt-6 flex flex-wrap items-center gap-3.5 rounded-2xl border border-slate-150 bg-slate-50 px-5 py-5">`.
+
+#### 4. User Flow
+User reads passive text pills.
+
+#### 5. Information Architecture
+Label: `Installable apps · marketplace` followed by 5 pill badges: `Journeys · LMS`, `Forms · intake`, `Lists · tracking`, `Events`, `+ integrations`.
+
+#### 6. Visual Hierarchy
+Low visual priority; sits immediately below the 9-card grid as an afterthought.
+
+#### 7. Layout
+Horizontal flex wrap.
+
+#### 8. Grid
+Flexbox.
+
+#### 9. Spacing
+`p-5 md:px-6`, gap `gap-2`.
+
+#### 10. Typography
+- Label: `font-mono text-[11px] uppercase tracking-[0.12em] text-slate-400`.
+- Pills: `text-[12.5px] font-medium text-slate-600`.
+
+#### 11. Colors
+Slate-50 background container with white border pills.
+
+#### 12. CTA Hierarchy
+None. Pills are non-clickable spans.
+
+#### 13. Accessibility
+Pills look like interactive filter buttons, creating confusion when clicked.
+
+#### 14. Motion
+Hover border color shift (`hover:border-cobalt-300`).
+
+#### 15. Micro interactions
+Hover border change.
+
+#### 16. Trust Signals
+None.
+
+#### 17. Enterprise Feeling Score
+**4.0 / 10.** Severely undersells genuine product capabilities (Forms and LMS) as static text chips.
+
+---
+
+### Section 1.7: Pricing Section (`#pricing`)
+
+#### 1. Purpose
+Present plan tiers and convert evaluators into paid accounts.
+
+#### 2. Current UX
+4-column card deck displaying Free ($0), Pro ($6), Business ($12), and Enterprise (Custom).
+
+#### 3. Current UI
+`<section id="pricing" class="border-t border-slate-150 bg-slate-50 py-16 md:py-20">`. Pro card is elevated with a Cobalt border ring (`shadow-[0_0_0_1.5px_#2F6BFF,0_24px_60px_-20px_rgba(47,107,255,.45)]`) and a `Most popular` badge.
+
+#### 4. User Flow
+User compares prices, evaluates feature checklists, clicks tier CTA.
+
+#### 5. Information Architecture
+4 tiers:
+- **Free:** Small teams, 90-day history, basic agent.
+- **Pro:** $6/user/mo, unlimited history, full agent, installable apps.
+- **Business:** $12/user/mo, domain mailbox, SSO IdP, admin roles.
+- **Enterprise:** Custom, SAML/SCIM, audit logs, SOC 2, SLA.
+
+#### 6. Visual Hierarchy
+1. Pro Plan (elevated `lg:-translate-y-3`, cobalt shadow, solid blue CTA).
+2. Business Plan.
+3. Free Plan.
+4. Enterprise Plan.
+
+#### 7. Layout
+4-column horizontal card grid (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`).
+
+#### 8. Grid
+4-column responsive grid.
+
+#### 9. Spacing
+Section padding `py-16 md:py-20`. Card internal padding `p-7`.
+
+#### 10. Typography
+- Price numbers: `font-display text-[38px] font-semibold`.
+- Tier names: `18px font-semibold`.
+- Feature list: `text-[13.5px] leading-[1.4]`.
+
+#### 11. Colors
+White cards on slate-50 background. Checkmark icons use cyan `#0891b2`.
+
+#### 12. CTA Hierarchy
+- Pro: Solid Cobalt button (`Start free trial`).
+- Free, Business, Enterprise: White outline buttons (`Start free`, `Get Business`, `Contact sales`).
+
+#### 13. Accessibility
+Checkmark icons have cyan strokes that may fail WCAG contrast against pure white backgrounds on lower-quality displays.
+
+#### 14. Motion
+Card elevation on hover (`hover:-translate-y-1.5`).
+
+#### 15. Micro interactions
+Button hover lift.
+
+#### 16. Trust Signals
+SOC 2 and SAML SSO are mentioned inside the Enterprise card.
+
+#### 17. Enterprise Feeling Score
+**6.8 / 10.** Clean and transparent, but burying SOC 2 and SAML SSO in small checklist text diminishes enterprise confidence.
+
+---
+
+### Section 1.8: Bottom Call to Action (`#cta`)
+
+#### 1. Purpose
+Final conversion anchor for visitors who scrolled the entire page.
+
+#### 2. Current UX
+Another sudden switch into dark mode (`band-dark`). Centered display text with two buttons.
+
+#### 3. Current UI
+`<section id="cta" class="band-dark relative overflow-hidden py-20 md:py-24 text-center">`. Includes radial glow at bottom (`rgba(47,107,255,.35)`) and dark grid overlay.
+
+#### 4. User Flow
+User either clicks `Get started free` or `Contact sales`.
+
+#### 5. Information Architecture
+Centered headline -> Subhead -> Dual CTAs -> Reassurance copy (`Free forever for small teams · no credit card required`).
+
+#### 6. Visual Hierarchy
+1. H2: `Bring your team into one app.` (Velocity gradient accent).
+2. Primary button: Cobalt `#2F6BFF`.
+3. Secondary button: Ghost outline on dark surface.
+
+#### 7. Layout
+Centered stack within `max-w-3xl mx-auto px-6`.
+
+#### 8. Grid
+Centered stack.
+
+#### 9. Spacing
+Padding `py-20 md:py-24`. Button gap `gap-3`.
+
+#### 10. Typography
+H2: `text-4xl md:text-[56px] font-bold leading-[1.02] tracking-[-0.03em]`.
+
+#### 11. Colors
+Deep midnight canvas with cobalt radial bottom lighting.
+
+#### 12. CTA Hierarchy
+Primary: Solid Cobalt. Secondary: Transparent glass outline (`bg-white/5 border-white/15`).
+
+#### 13. Accessibility
+Text contrast meets WCAG AAA.
+
+#### 14. Motion
+None on load.
+
+#### 15. Micro interactions
+Hover transitions on buttons.
+
+#### 16. Trust Signals
+`No credit card required`.
+
+#### 17. Enterprise Feeling Score
+**6.0 / 10.** Competent conversion block, but feels disconnected from the rest of the site.
+
+---
+
+### Section 1.9: Footer (`footer`)
+
+#### 1. Purpose
+Corporate directory, copyright, and external links.
+
+#### 2. Current UX
+Switches back to light slate background. Basic 3-column navigation directory.
+
+#### 3. Current UI
+`<footer class="border-t border-slate-150 bg-slate-50 pb-[38px] pt-12">`.
+
+#### 4. User Flow
+User seeks legal links, privacy policy, or pricing.
+
+#### 5. Information Architecture
+Left: Logo + tagline. Right: Product links, Get Started links, Legal links.
+
+#### 6. Visual Hierarchy
+Standard horizontal layout.
+
+#### 7. Layout
+Multi-column flex wrap within `max-w-[1140px]`.
+
+#### 8. Grid
+Flexbox.
+
+#### 9. Spacing
+Padding `pt-12 pb-[38px]`.
+
+#### 10. Typography
+Category headers: `font-mono text-[10.5px] uppercase tracking-[0.14em] text-slate-400`. Links: `text-[13.5px] font-medium text-slate-600`.
+
+#### 11. Colors
+Slate-50 surface with slate-150 top divider.
+
+#### 12. CTA Hierarchy
+None.
+
+#### 13. Accessibility
+Semantic `<nav>` and list structures.
+
+#### 14. Motion
+Link color shifts.
+
+#### 15. Micro interactions
+None.
+
+#### 16. Trust Signals
+Copyright notice only. Missing system status link, security compliance badge, and social links.
+
+#### 17. Enterprise Feeling Score
+**5.0 / 10.** Sparse and incomplete for an enterprise software vendor.
+
+---
+
+## Part 2: Forensic Audit of the Web Application (`https://app.ultrakin.com`)
+
+---
+
+### Section 2.1: Authentication, SSO & Verification (`/auth`, `/auth/sso`, `/auth/verify`)
+
+#### 1. Purpose
+Provide unified sign-in, enterprise Single Sign-On (SAML/Okta), magic link verification, and account creation.
+
+#### 2. Current UX
+Minimalist centered auth card. User enters email, chooses password or SSO, or receives a verification token.
+
+#### 3. Current UI
+Light-mode card on neutral canvas (`body.light`). Input fields use standard HTML text inputs with minimal border styling. Polyfills Matrix SDK globally (`window.global = window.globalThis;`).
+
+#### 4. User Flow
+Prospect enters email -> system evaluates if domain matches an SSO tenant -> routes to `/auth/sso` or triggers passwordless verification link (`/auth/verify`).
+
+#### 5. Information Architecture
+Isolated full-screen authentication viewport.
+
+#### 6. Visual Hierarchy
+1. Brand Logo mark.
+2. Form Card Header: "Sign in to your workspace".
+3. Primary Email Input.
+4. Social / SSO Provider Buttons (Google, Okta, GitHub).
+
+#### 7. Layout
+Centered vertical card layout (`w-full max-w-md mx-auto`).
+
+#### 8. Grid
+Single column flex.
+
+#### 9. Spacing
+Padding `p-8`, input gap `space-y-4`.
+
+#### 10. Typography
+System Inter font (`14px` input, `16px` buttons, `20px` title).
+
+#### 11. Colors
+Background: White card on `#F8FAFC` background. Primary button: Cobalt `#2F6BFF`.
+
+#### 12. CTA Hierarchy
+Primary: `Continue with Email`. Secondary: `Continue with Google` / `Enterprise SSO`.
+
+#### 13. Accessibility
+Input elements feature standard placeholder labels, but several lack permanent visual `<label>` elements above the input, creating accessibility issues when text is entered.
+
+#### 14. Motion
+Instant transitions without layout animations.
+
+#### 15. Micro interactions
+Standard browser focus rings.
+
+#### 16. Trust Signals
+None. Missing encryption badge, zero corporate lock icons, no privacy reassurance.
+
+#### 17. Enterprise Feeling Score
+**5.5 / 10.** Clean and functional, but lacks the polished, brand-reinforcing quality of Slack or Linear login portals.
+
+---
+
+### Section 2.2: Workspace Onboarding & Creation (`/create-circle`, `/home`)
+
+#### 1. Purpose
+Allow new users to initialize their organization, name their workspace, and invite team members.
+
+#### 2. Current UX
+Uses the internal terminology **"Circle"** (`/create-circle`), causing an immediate cognitive disconnect with the marketing site’s promise of a "Workspace" or "Team App".
+
+#### 3. Current UI
+Multi-step form wizard asking for Organization Name, Workspace Domain, and initial team email invites.
+
+#### 4. User Flow
+Sign up -> `/home` (if workspaces exist) or `/create-circle` -> Name Workspace -> Invite Members -> Land in default `#general` Space.
+
+#### 5. Information Architecture
+Sequential wizard: Step 1 Name -> Step 2 Teammates -> Step 3 Integrations.
+
+#### 6. Visual Hierarchy
+Stepped progress bar at top, form inputs in center, navigation buttons at bottom right.
+
+#### 7. Layout
+Centered modal-like card.
+
+#### 8. Grid
+Single column.
+
+#### 9. Spacing
+`p-8`, gap `gap-6`.
+
+#### 10. Typography
+Standard Inter (`24px` modal title, `14px` labels).
+
+#### 11. Colors
+White surface with `#E2E8F0` borders.
+
+#### 12. CTA Hierarchy
+Primary: `Create Workspace`. Secondary: `Skip for now`.
+
+#### 13. Accessibility
+Form wizard lacks keyboard shortcuts (`Enter` to submit often fails across steps).
+
+#### 14. Motion
+Slide transitions between steps.
+
+#### 15. Micro interactions
+Field validation indicators.
+
+#### 16. Trust Signals
+None.
+
+#### 17. Enterprise Feeling Score
+**5.0 / 10.** The terminology confusion between "Circle" and "Workspace" introduces instant cognitive friction.
+
+---
+
+### Section 2.3: Global Left Rail & Navigation Architecture (`/workspace/:id`)
+
+#### 1. Purpose
+The operational spine of the desktop experience, providing continuous access to all 9 modules and multi-workspace switching.
+
+#### 2. Current UX
+Two-tier sidebar:
+- Far-left icon rail: Workspace squircle switchers, direct module shortcuts (Chat, Mail, Docs, Events, Files, Agents).
+- Secondary collapsible panel: Spaces, Direct Messages, Threads, and Huddles within the active workspace.
+
+#### 3. Current UI
+Dark or semi-dark side navigation (`#1E293B` or `#0F172A`). Icons from Material Icons and custom SVGs. Active item indicated by a blue left border pill or background highlight.
+
+#### 4. User Flow
+User switches between workspaces via the icon rail, then selects channels or tools from the secondary panel.
+
+#### 5. Information Architecture
+Split between global scope (workspace icons) and contextual scope (channel tree, direct messages, apps).
+
+#### 6. Visual Hierarchy
+1. Active Workspace Squircle.
+2. Active Channel / Space.
+3. Unread notification badges (red count chips).
+4. Secondary utility icons (Settings, Profile).
+
+#### 7. Layout
+Fixed-width sidebar (`w-16` rail + `w-60` panel) alongside flexible main viewport.
+
+#### 8. Grid
+Flex columns.
+
+#### 9. Spacing
+Icon padding `p-2.5`, list item padding `px-3 py-1.5`.
+
+#### 10. Typography
+- Sidebar labels: `13px font-medium`.
+- Category headers: `11px font-mono uppercase tracking-wider text-slate-400`.
+
+#### 11. Colors
+Dark slate slate-800/slate-900 background with white/slate-300 text.
+
+#### 12. CTA Hierarchy
+Plus icon button (`+`) next to Spaces for channel creation.
+
+#### 13. Accessibility
+Keyboard navigation between the far-left rail and the channel list is cumbersome without dedicated `F6` or `⌘1-9` shortcuts.
+
+#### 14. Motion
+Panel collapse uses smooth CSS width transition.
+
+#### 15. Micro interactions
+Hover tooltips on rail icons.
+
+#### 16. Trust Signals
+Status indicator green dot on user avatar.
+
+#### 17. Enterprise Feeling Score
+**6.8 / 10.** Solid desktop foundation, but icon styles and typography rhythm lack the optical precision of Slack desktop.
+
+---
+
+### Section 2.4: Chat & Spaces Interface (`/workspace/:id/space/:spaceId`)
+
+#### 1. Purpose
+Real-time team communication, threaded discussions, code sharing, and AI agent collaboration.
+
+#### 2. Current UX
+Standard stream of messages with avatar, timestamp, message body, emoji reactions, and thread replies. Backed by Matrix SDK for decentralized protocol synchronization.
+
+#### 3. Current UI
+Three-column layout: Channel list -> Message feed -> Thread / Info panel. Message composer includes text formatting bar, file attachment button, and slash command trigger.
+
+#### 4. User Flow
+User selects space -> views message history -> types message in composer -> hits Enter -> message posts via REST/Matrix transport.
+
+#### 5. Information Architecture
+Channel Header -> Message Timeline -> Floating Input Composer.
+
+#### 6. Visual Hierarchy
+1. Main message body.
+2. Sender name and timestamp.
+3. Code snippets / Blockquotes.
+4. Emoji reaction pills.
+
+#### 7. Layout
+Full-height flex column with sticky header and sticky bottom composer.
+
+#### 8. Grid
+Flex layout.
+
+#### 9. Spacing
+Message vertical spacing `space-y-3`, composer padding `p-3`.
+
+#### 10. Typography
+Message text: `14px` leading `1.5` text-slate-800. Code blocks use monospace font with gray background.
+
+#### 11. Colors
+White message canvas with light gray hover states (`hover:bg-slate-50`).
+
+#### 12. CTA Hierarchy
+Send button icon.
+
+#### 13. Accessibility
+Virtual scrolling implementation occasionally glitches when scrolling rapidly through thousands of historical messages.
+
+#### 14. Motion
+New messages slide up slightly; emoji picker fades in.
+
+#### 15. Micro interactions
+Message hover reveals floating action toolbar (React, Reply in Thread, Star, More).
+
+#### 16. Trust Signals
+Matrix encryption verified shield icon (when enabled).
+
+#### 17. Enterprise Feeling Score
+**7.0 / 10.** Functional real-time messaging, but code block formatting, syntax highlighting, and rich media previews feel utilitarian.
+
+---
+
+### Section 2.5: Living Documents Module (`/workspace/:id/documents/:docId?`)
+
+#### 1. Purpose
+Collaborative rich-text documentation, engineering specifications, and meeting notes embedded directly into the workspace.
+
+#### 2. Current UX
+Prosemirror / TipTap editor with `/` slash commands, real-time presence indicators (multi-user cursor tracking), and collaborative comments (`DocumentComments`).
+
+#### 3. Current UI
+Notion-style clean white canvas with floating toolbar, heading hierarchy (`h1`, `h2`, `h3`), bullet lists, task lists with checkboxes, and code blocks.
+
+#### 4. User Flow
+User creates document -> types slash command `/` -> selects formatting block -> collaborates in real time with teammates.
+
+#### 5. Information Architecture
+Left doc directory tree -> Center collaborative editor -> Right comments drawer.
+
+#### 6. Visual Hierarchy
+1. Document Title (`32px` bold).
+2. Headings and content body.
+3. Collaborator presence avatars in header.
+
+#### 7. Layout
+Centered reading column `max-w-3xl mx-auto` within full-height container.
+
+#### 8. Grid
+Single document column.
+
+#### 9. Spacing
+Line spacing `leading-relaxed`, paragraph margin `mb-4`.
+
+#### 10. Typography
+Inter sans-serif with high legibility. Monospace formatting for code blocks.
+
+#### 11. Colors
+Pure white background with high contrast `#0F172A` text.
+
+#### 12. CTA Hierarchy
+`Share` button in top right; `Add Comment` action.
+
+#### 13. Accessibility
+TipTap provides clean semantic HTML export (`<h1>`, `<p>`, `<ul>`, `<input type="checkbox">`).
+
+#### 14. Motion
+Floating toolbar animates on text selection.
+
+#### 15. Micro interactions
+Checkbox toggle animations; slash command dropdown auto-complete.
+
+#### 16. Trust Signals
+Real-time "Saved" cloud sync indicator.
+
+#### 17. Enterprise Feeling Score
+**7.8 / 10.** One of Ultrakin's strongest built-in modules. High collaborative fidelity.
+
+---
+
+### Section 2.6: Native Domain Mailbox (`/workspace/:id/mail`)
+
+#### 1. Purpose
+Native email client directly inside the workspace, allowing inbound customer emails to be answered, shared, or converted to tasks.
+
+#### 2. Current UX
+Two-column email view: Email inbox list on left, full email conversation on right. Includes reply composer and one-click "Create Task" action.
+
+#### 3. Current UI
+Standard email layout with sender avatar, subject line, date, badge tags, and HTML email rendering container.
+
+#### 4. User Flow
+User navigates to Mail -> reviews incoming emails -> clicks email -> reads thread -> drafts reply or converts email into a task.
+
+#### 5. Information Architecture
+Folder navigation (Inbox, Sent, Archive, Trash) -> Thread List -> Email Reader.
+
+#### 6. Visual Hierarchy
+1. Email subject headline.
+2. Sender details.
+3. Message body.
+4. Action bar (`Reply`, `Forward`, `Convert to Task`).
+
+#### 7. Layout
+Split-pane desktop view (`380px` list + flex reader).
+
+#### 8. Grid
+Split pane.
+
+#### 9. Spacing
+Email list item padding `p-3.5`, reader padding `p-6`.
+
+#### 10. Typography
+Email body: `14px` standard sans-serif.
+
+#### 11. Colors
+Standard mail canvas `#FFFFFF` with slate-100 dividers.
+
+#### 12. CTA Hierarchy
+`Compose Email` primary button; `Convert to Task` secondary action.
+
+#### 13. Accessibility
+Complex HTML emails with fixed widths sometimes break the layout or require horizontal scrolling.
+
+#### 14. Motion
+Email list selection highlights smoothly.
+
+#### 15. Micro interactions
+Hover actions on email list items (Archive, Delete, Mark Read).
+
+#### 16. Trust Signals
+Domain DKIM/SPF verification status badge.
+
+#### 17. Enterprise Feeling Score
+**7.2 / 10.** Exceptional technical differentiator, but the UI visual polish lags behind Superhuman or Linear Mail.
+
+---
+
+### Section 2.7: Live Huddles & Call Transcripts (`/workspace/:id/huddles`, `/chat-call/:roomId`)
+
+#### 1. Purpose
+Drop-in audio/video calls with screen sharing, participant waveforms, and automated real-time meeting transcription (`CallTranscriptView`).
+
+#### 2. Current UX
+User clicks "Start Huddle" in any space -> audio room opens -> participants join -> audio is transcribed into text in real time.
+
+#### 3. Current UI
+Dark call overlay with participant squircle avatars, pulsing green audio visualizer rings, mute/video/screen controls bar, and a collapsible live transcript side panel.
+
+#### 4. User Flow
+Space Header -> Click Huddle -> Pop-up call window / overlay -> Speak -> View auto-generated transcript -> End call -> Transcript saves to linked doc.
+
+#### 5. Information Architecture
+Call Canvas (Avatars / Video Tiles) -> Floating Controls Bar -> Transcript Drawer.
+
+#### 6. Visual Hierarchy
+1. Active speaker tile (highlighted border).
+2. Control bar (Mute, Camera, Screen, Leave).
+3. Live transcription text stream.
+
+#### 7. Layout
+Grid of video/audio tiles with floating bottom pill bar.
+
+#### 8. Grid
+CSS Grid auto-fitting participant tiles (`grid-cols-2`, `grid-cols-3`).
+
+#### 9. Spacing
+Tile gap `gap-3`, control bar padding `p-2`.
+
+#### 10. Typography
+Participant names: `12px` font-medium white text. Transcripts: `13px` monospace/sans stream with speaker timestamps.
+
+#### 11. Colors
+Deep black/charcoal canvas (`#0F172A`) with emerald audio indicators.
+
+#### 12. CTA Hierarchy
+`Leave Call` red destructive button.
+
+#### 13. Accessibility
+Live speech-to-text serves as an accessibility aid for deaf/hard-of-hearing users.
+
+#### 14. Motion
+Audio waveform animation pulses in real time based on microphone input volume.
+
+#### 15. Micro interactions
+Mute toggle icon animation.
+
+#### 16. Trust Signals
+End-to-end WebRTC encryption indicators.
+
+#### 17. Enterprise Feeling Score
+**8.0 / 10.** Technically superior capability that rivals Slack Huddles, but needs tighter visual integration with task creation.
+
+---
+
+### Section 2.8: Kanban Boards & List Records (`/workspace/:id/space/:spaceId/list/:listId`)
+
+#### 1. Purpose
+Track tasks, bugs, customer issues, and feature sprints across custom pipeline stages.
+
+#### 2. Current UX
+Multi-column Kanban board or table view. Cards display task title, assignee avatar, due date badge, priority tag, and source link (e.g., "From Email #412").
+
+#### 3. Current UI
+Light gray column canvas (`bg-slate-100/70`) with white draggable task cards. Columns represent stages: Triage, In Progress, Review, Done.
+
+#### 4. User Flow
+User drags cards between columns or opens a card to inspect subtasks, comments, and linked documents.
+
+#### 5. Information Architecture
+Board Controls (Filter, Sort, Group, View Switcher) -> Columns -> Cards -> Card Detail Drawer.
+
+#### 6. Visual Hierarchy
+1. Task card title.
+2. Priority badge (P0 Red, P1 Amber, P2 Slate).
+3. Assignee avatar and due date.
+
+#### 7. Layout
+Horizontal scrolling board with fixed-width columns (`w-72`).
+
+#### 8. Grid
+Multi-column horizontal flex.
+
+#### 9. Spacing
+Column gap `gap-4`, card padding `p-3.5`.
+
+#### 10. Typography
+Task titles: `13px font-semibold text-slate-800`. Metadata: `11px text-slate-500`.
+
+#### 11. Colors
+White cards on slate-100 column containers with subtle `#E2E8F0` borders.
+
+#### 12. CTA Hierarchy
+`+ Add Task` button at bottom of each column.
+
+#### 13. Accessibility
+Drag-and-drop operations lack keyboard-only reordering shortcuts.
+
+#### 14. Motion
+Drag animations via Framer Motion / HTML5 drag-and-drop.
+
+#### 15. Micro interactions
+Card lift and shadow deepening on drag.
+
+#### 16. Trust Signals
+Linked GitHub PR status tags.
+
+#### 17. Enterprise Feeling Score
+**7.2 / 10.** Highly practical, but looks somewhat plain compared to Linear or Jira Cloud.
+
+---
+
+### Section 2.9: AI Agent Configuration & Runtime (`/workspace/:id/agents/:view?`)
+
+#### 1. Purpose
+Configure autonomous Ukin agents, assign custom system prompts, manage tool access permissions, and review execution logs.
+
+#### 2. Current UX
+Dashboard showing active agents, execution history, model selection (GPT-4o, Claude 3.5 Sonnet), and trigger configuration.
+
+#### 3. Current UI
+Table of configured agents with status toggles (Active / Inactive), run count statistics, and configuration forms.
+
+#### 4. User Flow
+Admin visits Agents -> clicks "New Agent" -> selects triggers (New Email, Space Mention, Form Submission) -> configures system prompt -> saves agent.
+
+#### 5. Information Architecture
+Agent Directory -> Agent Editor -> Execution Audit Logs.
+
+#### 6. Visual Hierarchy
+1. Agent name and avatar.
+2. Status toggle switch.
+3. Assigned triggers and permissions.
+
+#### 7. Layout
+Table view with right-side slide-over configuration drawer.
+
+#### 8. Grid
+Structured table.
+
+#### 9. Spacing
+Table cell padding `px-4 py-3`.
+
+#### 10. Typography
+Monospace font for system prompts and tool schemas.
+
+#### 11. Colors
+White surface with slate-50 alternating rows.
+
+#### 12. CTA Hierarchy
+`Create Agent` primary button.
+
+#### 13. Accessibility
+Form controls in the agent configuration drawer are well-labeled.
+
+#### 14. Motion
+Drawer slide-in transition.
+
+#### 15. Micro interactions
+Toggle switch animations.
+
+#### 16. Trust Signals
+Tool permission scopes (Read-only vs. Action-enabled).
+
+#### 17. Enterprise Feeling Score
+**7.0 / 10.** Powerful capabilities, but execution logs feel like developer debug consoles rather than business audit trails.
+
+---
+
+### Section 2.10: Customer Intake Forms (`/workspace/:circleId/forms`)
+
+#### 1. Purpose
+Build public and internal intake forms that automatically generate tasks and space notifications upon submission.
+
+#### 2. Current UX
+No-code form builder: add questions, text fields, dropdowns, and file upload slots. Generates a public URL (`/form/:id`).
+
+#### 3. Current UI
+Drag-and-drop form canvas on left, property inspector on right.
+
+#### 4. User Flow
+Admin creates form -> sets target Space -> shares public link -> customer submits -> response creates a record and notifies team.
+
+#### 5. Information Architecture
+Form Builder -> Form Settings -> Submissions Table.
+
+#### 6. Visual Hierarchy
+Form title, field questions, submit button.
+
+#### 7. Layout
+Two-column builder layout.
+
+#### 8. Grid
+Flexbox.
+
+#### 9. Spacing
+Field spacing `space-y-4`.
+
+#### 10. Typography
+Standard Inter typography.
+
+#### 11. Colors
+Customizable brand accent color.
+
+#### 12. CTA Hierarchy
+`Publish Form` primary button.
+
+#### 13. Accessibility
+Public forms comply with standard HTML form accessibility.
+
+#### 14. Motion
+Field reordering animation.
+
+#### 15. Micro interactions
+Drag handle hover states.
+
+#### 16. Trust Signals
+SSL certificate verification on public form domain.
+
+#### 17. Enterprise Feeling Score
+**6.8 / 10.** Great native utility that replaces Google Forms or Typeform, but builder UI feels dated.
+
+---
+
+### Section 2.11: Workspace Administration & Settings (`/workspace/:id/config`)
+
+#### 1. Purpose
+Manage organization settings, member roles, billing, domain routing, and SAML SSO.
+
+#### 2. Current UX
+Left-hand settings navigation with sub-pages: `Permissions`, `Domain`, `Agents`, `Apps`, `Connections`, `Archived`.
+
+#### 3. Current UI
+Standard settings form layout with input fields, toggle switches, and member tables with role dropdowns (Owner, Admin, Member, Guest).
+
+#### 4. User Flow
+Admin selects setting category -> edits configuration -> clicks "Save changes".
+
+#### 5. Information Architecture
+Category list on left -> Settings forms on right.
+
+#### 6. Visual Hierarchy
+1. Section heading.
+2. Setting description text.
+3. Form controls / Member table.
+4. Save bar.
+
+#### 7. Layout
+Split-pane settings layout (`240px` nav + `800px` content).
+
+#### 8. Grid
+Flexbox.
+
+#### 9. Spacing
+Form group spacing `py-6 border-b border-slate-200`.
+
+#### 10. Typography
+Section titles: `20px font-bold`. Labels: `14px font-medium`.
+
+#### 11. Colors
+White surface with slate-50 navigation panel.
+
+#### 12. CTA Hierarchy
+`Save Changes` primary button.
+
+#### 13. Accessibility
+Form controls have clear focus states.
+
+#### 14. Motion
+Page transitions on tab click.
+
+#### 15. Micro interactions
+Role selector dropdown animations.
+
+#### 16. Trust Signals
+Domain DNS verification indicators (MX, SPF, DKIM records).
+
+#### 17. Enterprise Feeling Score
+**6.5 / 10.** Standard SaaS settings layout; lacks the granular policy management and audit log export features of Slack Enterprise Grid.
+
+---
+
+## Part 3: Deep Issue Registry
+
+| Issue ID | Area | Observation | Why it is a Problem | Business Impact | UX Impact | Severity | Priority | Suggested Design Direction |
+|---|---|---|---|---|---|---|---|---|
+| **ISS-01** | Marketing / Tour | Video tour relies on external `.mp4` URLs from `assets.ultrakin.com`. | Network latency or CDN blocking causes product showcase to fail completely. | Immediate loss of prospective customer conversions on first visit. | Evaluators see broken media frames with no fallback content. | **Critical** | **P0** | Replace external video dependencies with pure code-based, interactive software components. |
+| **ISS-02** | Marketing / Global | Extreme luminance whiplash between light sections (`#FFFFFF`) and dark sections (`band-dark`). | Reading flow is jarring; pupils must constantly adjust to sudden 90% contrast shifts. | Evaluators perceive the landing page as fragmented and cobbled together. | Disorienting scroll experience that interrupts reading momentum. | **High** | **P0** | Establish a cohesive, unified light canvas with soft off-white surface alternation. |
+| **ISS-03** | Marketing / Trust | SOC 2 Type II and SAML SSO are buried in the 4th column of the pricing matrix. | Enterprise procurement teams assume compliance is missing or immature. | Enterprise deals stall before reaching a sales conversation. | Security evaluators cannot find verification badges above the fold. | **High** | **P0** | Elevate compliance and enterprise trust signals into the hero subline and dedicated security grid. |
+| **ISS-04** | Marketing / CTA | Hero and Nav only offer "Get started" self-serve actions; zero Enterprise sales CTAs. | Enterprise buyers looking for custom pilots or SLAs have no dedicated conversion path. | High-value contract inquiries are lost to self-serve drop-off. | Enterprise evaluators feel the product is only built for small startups. | **High** | **P0** | Introduce a dual-CTA model: "Get started free" + "Contact sales / Request demo". |
+| **ISS-05** | Marketing / Grid | Core tools grid features 9 equal-weight, non-interactive boxes. | Users cannot tell which features are core differentiators vs. minor utilities. | Underwhelms visitors who expect modern asymmetric interactive layouts. | Dead-end cards create false interactive affordances that disappoint on click. | **Medium** | **P1** | Replace generic boxes with asymmetric bento layouts and tabbed interactive software previews. |
+| **ISS-06** | App / Taxonomy | Application uses "Circle" in routes (`/create-circle`) while marketing uses "Workspace". | Creates immediate cognitive friction and confusion during onboarding. | Higher onboarding bounce rate among enterprise trial accounts. | Users wonder if they created the wrong organizational container. | **High** | **P0** | Standardize organizational taxonomy across marketing, app routes, and UI to "Workspace". |
+| **ISS-07** | App / Matrix | Matrix SDK polyfills `window.global` directly in `head`, risking third-party collision. | Fragile dependency setup that can break during bundle upgrades. | Potential client-side runtime errors during real-time chat sessions. | Uncaught JS exceptions freezing the chat viewport. | **Medium** | **P1** | Encapsulate Matrix transport layers within dedicated module wrappers without polluting global scope. |
+| **ISS-08** | App / AI Visibility | Ukin Agent outputs standard chat messages indistinguishable from bot text. | Fails to communicate autonomous capability; looks like a generic LLM wrapper. | Users fail to adopt the agent for multi-step operational workflows. | Lack of visual affordance for approving, rejecting, or inspecting agent actions. | **High** | **P1** | Design structured, actionable card components for agent proposals with one-click approval buttons. |
+| **ISS-09** | App / Huddle Sync | Action items extracted from call transcripts do not automatically prompt Kanban card creation. | Great transcription feature that requires manual copy-pasting to turn into real tasks. | Degrades the core value proposition ("A message becomes a task becomes a result"). | Users leave huddles and still have to do manual admin work. | **Medium** | **P1** | Add automatic "Sync Extracted Tasks to Kanban" action pill inside the transcript header. |
+| **ISS-10** | App / Mail Design | Inbound email viewer renders plain HTML emails with inconsistent desktop typography. | Visual quality drops significantly when reading marketing or external client emails. | Enterprise evaluators compare it unfavorably to Superhuman or Outlook. | Horizontal scrolling bugs and awkward typography line-wrapping. | **Medium** | **P2** | Implement an isolated, beautifully styled email rendering viewport with clean header typography. |
+| **ISS-11** | App / Drag & Drop | Kanban task board lacks keyboard-accessible reordering shortcuts. | Violates enterprise accessibility compliance (ADA / Section 508 / WCAG 2.1 AA). | Enterprise legal teams can flag the application as inaccessible for public sector deployments. | Motor-impaired users cannot move cards across columns without a mouse. | **High** | **P1** | Implement keyboard navigation (`Space` to pick up, `Arrow Keys` to move, `Enter` to drop). |
+| **ISS-12** | App / Mobile PWA | Mobile status bar uses black-translucent overlay while body uses light theme. | Creates visual clipping and unreadable status bar icons on iOS devices. | Mobile app ratings suffer from unpolished PWA packaging. | Battery and clock text on iPhone blend into dark navigation bars. | **Low** | **P2** | Coordinate PWA meta theme-color with active workspace theme dynamically. |
+
+---
+
+## Part 4: Comprehensive Synthesis Matrices
+
+### Top 20 UX Problems
+
+1. **Terminology Disconnect ("Circle" vs. "Workspace"):** Application onboarding uses "Circle", marketing uses "Workspace", and settings uses "Organization".
+2. **Fragile External Media Dependency:** The product tour relies on unbuffered external MP4 video files that frequently time out.
+3. **No Direct Path to Enterprise Sales:** Navigation lacks a dedicated "Talk to Sales" or "Request Enterprise Demo" pathway.
+4. **Disjointed Meeting Action Flow:** Huddle transcripts capture action items, but require manual user effort to push them into Kanban.
+5. **Missing Keyboard Reordering in Kanban:** Tasks cannot be manipulated or moved across columns using keyboard-only navigation.
+6. **Dead-End Marketing Cards:** The 9 core tools cards feature hover lift animations but cannot be clicked to reveal deeper documentation.
+7. **Single-Page Scroll Fatigue:** The marketing website is over 4,500px long without an anchor hub or sticky table of contents.
+8. **Unclear Agent Permissions Boundary:** Users cannot easily see what data an agent has access to prior to invoking it.
+9. **No Inline Email-to-Task Preview:** Converting an email to a task creates a background record without showing the user what was created.
+10. **Complex Multi-Account Switching:** Users belonging to multiple workspaces must click through multiple menus to switch contexts.
+11. **Virtual Scrolling Jitter:** Fast scrolling through deep Matrix message histories causes white flashes during DOM recycling.
+12. **Hidden Search Filters:** Universal search defaults to a simple text input without exposing filters (by Space, by Mail, by Doc).
+13. **Missing "Unread" Catch-up View:** No centralized view to scan unread messages across all joined Spaces at once.
+14. **Lack of Document Version History:** TipTap editor autosaves continuously, but provides no visual revert or diff comparison UI.
+15. **Unlabeled Authentication Inputs:** Login inputs rely on floating placeholders that disappear once text is typed.
+16. **No Self-Serve Data Export:** Admins cannot export workspace archives (JSON/ZIP) directly from the settings panel.
+17. **Abrupt Empty States:** Empty spaces and mailboxes display blank white screens with zero onboarding guidance.
+18. **Unclear Guest User Scopes:** Inviting external guests does not clearly communicate which channels they will have access to.
+19. **Ambiguous Notification Controls:** Users cannot differentiate between high-priority mentions and general channel notifications.
+20. **Lack of Breadcrumb Orientation:** Deep list records (`/space/:id/list/:listId/record/:recordId`) lack visible parent breadcrumbs.
+
+---
+
+### Top 20 UI Problems
+
+1. **Tonal Contrast Whiplash:** Sudden oscillations between light slate `#F8FAFC` and pitch-black `#0B1524` bands.
+2. **Inconsistent Icon Systems:** Mix of Material Icons, Lucide SVGs, and custom inline paths across the app and marketing.
+3. **Imprecise Typographic Rhythm:** Heading line heights are occasionally too tight (`1.02`), causing descending glyph collisions.
+4. **Cyan Checkmark Low Contrast:** Pricing checklists use cyan checkmarks that fail WCAG contrast against white cards.
+5. **Harsh Card Drop Shadows:** Shadows use heavy opacity (`rgba(47,107,255,.4)`) rather than diffuse, multi-layered ambient shadows.
+6. **Unstyled Raw Video Controls:** Video player in tour lacks customized play/pause, scrub, and volume controls.
+7. **Inconsistent Border Radii:** Radii jump randomly between `11px`, `13px`, `18px`, and `20px` without a mathematical scale.
+8. **Lack of Optical Icon Alignment:** Icons inside squircle containers are mathematically centered rather than optically centered.
+9. **Crowded Mobile Navigation:** Mobile menu on marketing site stacks buttons tightly with insufficient tap target margins.
+10. **Raw Monospace Code Blocks in Chat:** Code snippets lack language badge headers, copy buttons, and line numbers.
+11. **Poorly Scaled Avatars:** User avatars in message threads are small (`28px`), making initials hard to read.
+12. **Generic Velocity Gradient:** The blue-to-cyan text gradient feels like a generic 2022 Web3 aesthetic.
+13. **Unpadded Table Cells:** List record tables display dense data without adequate vertical cell padding.
+14. **Inconsistent Modal Overlays:** Some modals use heavy black backdrops (`bg-slate-900/60`), while others use light frosted glass.
+15. **Flat Button States:** Primary buttons lack pressed/active micro-states, feeling spongy on click.
+16. **Missing Visual Empty State Illustrations:** Empty files and inbox views show plain gray text rather than branded empty illustrations.
+17. **Awkward Long Subject Truncation in Mail:** Email subjects in list view clip mid-character without smooth fade masks.
+18. **Floating Form Toolbar Alignment:** Document slash command menu frequently overflows viewport boundaries on smaller laptops.
+19. **Muted Secondary Link Colors:** Slate-400 text (`#94A3B8`) on slate-50 backgrounds fails WCAG accessibility standards.
+20. **Cluttered Call Overlay:** Active Huddle controls bar overlaps participant video tiles when the transcript drawer is open.
+
+---
+
+### Top 20 Enterprise Experience Problems
+
+1. **Buried Compliance Credentials:** SOC 2 Type II is hidden inside pricing text rather than highlighted for enterprise auditors.
+2. **Missing Security Portal / Trust Center:** No dedicated `/security` page explaining encryption, data residency, and pen-testing.
+3. **Absence of Role-Based Governance Dashboards:** Admins lack Attribute-Based Access Control (ABAC) visualization tools.
+4. **No Transparent Status / SLA Page:** Footer lacks an "All systems operational" badge linking to public uptime telemetry.
+5. **Missing SAML SSO Configuration Wizard:** Setting up Okta or Azure AD requires manual email support rather than self-serve metadata upload.
+6. **No SCIM Provisioning Verification:** IT teams cannot verify automated user de-provisioning from their identity provider.
+7. **Absence of Customer Logos on Marketing:** Marketing site shows zero enterprise customer logos or case studies.
+8. **Missing Third-Party Analyst Accolades:** No G2 badges, Gartner mentions, or customer satisfaction ratings.
+9. **Lack of Audit Log Exporting:** Compliance officers cannot stream audit events to external SIEM tools (Splunk, Datadog).
+10. **Unclear Data Retention Policies:** No admin settings to automatically purge messages or files after 30/90/365 days.
+11. **Missing Data Residency Guarantees:** Enterprise evaluators cannot select whether their data resides in the US or EU.
+12. **No Custom Invoicing / PO Support:** Pricing only supports automated credit card checkout; no purchase order workflows.
+13. **Absence of Dedicated Customer Success Mentions:** Enterprise tier does not detail SLAs, response times, or named CSMs.
+14. **No Legal Document Repository:** Master Services Agreement (MSA), BAA, and DPA are missing from the public site.
+15. **Unclear AI Model Privacy Assurances:** Evaluators cannot tell if their private data is used to train public LLMs.
+16. **Missing E-Discovery Capabilities:** Legal teams cannot perform legal hold searches across encrypted message archives.
+17. **Lack of IP Whitelisting Controls:** Security teams cannot restrict workspace access to corporate VPN IP ranges.
+18. **No Granular Guest Permissions:** Cannot restrict guests from downloading files or viewing member directories.
+19. **Missing Multi-Workspace Management:** No unified "Grid" console for managing multiple subsidiary workspaces.
+20. **Absence of Migration Tooling Documentation:** Evaluators cannot find documentation on how to import Slack or Notion data.
+
+---
+
+### Top 20 Quick Wins (Low Effort · High Impact)
+
+1. **Remove External MP4 Video Dependencies:** Replace fragile video files with pure code-built React/Tailwind mockups.
+2. **Add "Contact Sales" to Navbar & Hero:** Capture high-intent enterprise pipeline immediately.
+3. **Elevate SOC 2 & GDPR Badges to Hero:** Place factual compliance text directly below the hero CTA.
+4. **Standardize Taxonomy to "Workspace":** Eliminate the term "Circle" across all onboarding and route paths.
+5. **Add Marquee Logo Bar:** Implement an infinite CSS marquee displaying trusted tech company wordmarks.
+6. **Smooth Out Section Transitions:** Harmonize marketing background surfaces to clean off-white tones.
+7. **Add Tooltips to Left Rail Navigation:** Improve icon discoverability with instant keyboard-friendly tooltips.
+8. **Add Copy Code Button to Snippets:** Provide 1-click clipboard copying for code blocks in chat.
+9. **Add Status Indicator to Footer:** Display live "All systems operational" indicator in the website footer.
+10. **Add "1-Click Sync to Kanban" in Transcripts:** Provide an action button inside the Huddle transcript drawer.
+11. **Implement Keyboard Escape to Close Modals:** Ensure all overlays dismiss on `Escape` key press.
+12. **Add Permanent Form Field Labels:** Replace disappearing placeholders with visible labels in auth forms.
+13. **Improve Pricing Checkmark Contrast:** Darken cyan checkmarks to `#0891b2` or cobalt `#2F6BFF` for WCAG AA compliance.
+14. **Add Read/Unread Indicators in Mail:** Clarify unread email state with bold typography and blue dot chips.
+15. **Add Breadcrumbs to Record Views:** Display parent Space and List names above detail records.
+16. **Fix PWA Theme Color:** Synchronize iOS status bar meta theme with active application background.
+17. **Add Empty State Action Prompts:** Add "Create your first document" buttons to blank views.
+18. **Add Estimated Reading Time to Docs:** Display word count and read time at the top of Living Docs.
+19. **Make Core Tools Cards Clickable:** Allow cards to anchor down to their respective workflow deep-dives.
+20. **Add Annual Billing Toggle (20% Off):** Incentivize annual upfront commitments on the pricing section.
+
+---
+
+### Top 20 Long-Term Improvements (Strategic Investments)
+
+1. **Build a Floating Sticky Table of Contents:** Mirror Slack's pill TOC to anchor deep-scroll exploration.
+2. **Implement Timed Interactive Bento Modules:** Replace static grids with auto-advancing workflow loops.
+3. **Develop Native Slack/Notion Data Importers:** Build automated migration pipelines for frictionless switching.
+4. **Build Granular ABAC Permissions System:** Allow enterprise admins to define attribute-based document access.
+5. **Design Structured AI Action Cards:** Replace text chat agent responses with interactive confirmation cards.
+6. **Implement Full E-Discovery & Audit Logs:** Build immutable logging with SIEM API streaming.
+7. **Develop Offline-First CRDT Local Engine:** Ensure zero-latency editing with guaranteed conflict-free merges.
+8. **Build Self-Serve SAML 2.0 Admin Portal:** Allow IT teams to paste Okta/Azure XML metadata directly.
+9. **Create a Dedicated Enterprise Trust Portal:** Publish SOC 2 Type II reports, penetration tests, and DPA agreements.
+10. **Design a Unified Cross-Module Search Modal:** Implement a ⌘K modal searching chats, mail, docs, and transcripts.
+11. **Expand Model Context Protocol (MCP) Connectors:** Support one-click connections to internal databases and APIs.
+12. **Build Native Video/Audio Recording Storage:** Store and index Huddle recordings with timestamped search.
+13. **Develop Multi-Workspace Grid Architecture:** Enable large conglomerates to interconnect autonomous workspaces.
+14. **Implement Document Branching & Review:** Allow engineers to propose doc changes with review workflows.
+15. **Build Custom Branded Intake Form Domains:** Support custom CNAME routing for customer-facing forms.
+16. **Design Real-Time Voice Agent in Huddles:** Allow Ukin Agent to participate as a spoken participant in meetings.
+17. **Implement Bi-directional Linear/GitHub Issue Sync:** Real-time synchronization of task states and commits.
+18. **Build Dedicated Native Desktop Binaries:** Wrap the web client in Electron/Tauri with global shortcut support.
+19. **Create Visual No-Code Automation Canvas:** Replace linear automation forms with an interactive node workflow builder.
+20. **Develop Custom Data Residency Pipelines:** Deploy dedicated tenant infrastructure across US, EU, and APAC.
+
+---
+
+## Part 5: Strategic Risk & Opportunity Analysis
+
+### Biggest Strategic Risks
+1. **The "Jack of All Trades, Master of None" Perception:** When a prospect sees 9 built-in tools, their default skepticism is: *"None of these will be as good as Slack, Superhuman, or Notion."* Ultrakin must prove that the **connected workflow loop** creates more value than 9 isolated point solutions combined.
+2. **Enterprise Security Procurement Veto:** If IT security teams cannot immediately verify SOC 2 reports, SAML SSO, and data residency, enterprise deals will fail at the procurement stage regardless of how much employees love the product.
+3. **Fragile Marketing Dependencies:** Continuing to rely on external video CDN files for the primary product tour creates an immediate reliability red flag for technical evaluators.
+
+### Biggest Strategic Opportunities
+1. **The Native Mailbox Differentiator:** Neither Slack nor Microsoft Teams has a native email client on custom domains. Emails remain trapped in Outlook/Gmail. Ultrakin's ability to turn inbound emails directly into team discussions and Kanban cards is an **unfair competitive advantage**.
+2. **Live Transcripts to Automated Work:** Huddles that automatically extract action items and assign them to owners eliminate the most dreaded part of corporate meetings: post-meeting synthesis.
+3. **SaaS Sprawl & TCO Consolidation:** In a corporate budgeting environment focused on software consolidation, replacing Slack ($12.50) + Notion ($10) + Jira ($8) + Zoom ($15) + Superhuman ($30) with a single $12/user/mo platform is an irresistible financial proposition.
+
+---
+
+## Part 6: Enterprise Readiness Scorecard
+
+| Evaluation Dimension | Weight | Current Score (1–10) | Weighted Score | Enterprise Benchmark (Slack) | Gap Analysis & Priority |
+|---|---|---|---|---|---|
+| **Core Architecture & Kernel** | 20% | 8.5 / 10 | 1.70 | 9.5 / 10 | Excellent in-memory event bus and Matrix protocol foundation. |
+| **Visual Polish & Hierarchy** | 15% | 5.2 / 10 | 0.78 | 9.8 / 10 | **Critical Gap:** Tonal whiplash, generic cards, lack of typographic precision. |
+| **Enterprise Trust & Compliance** | 15% | 4.8 / 10 | 0.72 | 9.9 / 10 | **Critical Gap:** Buried SOC 2, missing trust center, no self-serve SAML portal. |
+| **Product Demonstration Fidelity** | 15% | 4.0 / 10 | 0.60 | 9.7 / 10 | **Critical Gap:** External MP4 video failure mode; lacks interactive bento showcases. |
+| **Cross-Module UX Continuity** | 15% | 6.5 / 10 | 0.98 | 9.2 / 10 | Good native data connections; needs structured action cards for AI agents. |
+| **Information Architecture** | 10% | 5.5 / 10 | 0.55 | 9.6 / 10 | Taxonomy confusion between "Circle" and "Workspace"; flat marketing nav. |
+| **Accessibility & Performance** | 10% | 6.0 / 10 | 0.60 | 9.5 / 10 | Color contrast issues; missing keyboard navigation in Kanban boards. |
+| **OVERALL READINESS SCORE** | **100%** | — | **5.93 / 10** | **9.60 / 10** | **Enterprise Evaluation Stage:** Strong technical kernel; unpolished UX surface. |
+
+---
+
+*End of Baseline Audit Report (`02_Ultrakin_Current_State_Audit.md`).*
+
+  </script>
+
+  <script>
+    const raw = document.getElementById('markdown-source').textContent;
+    document.getElementById('content').innerHTML = marked.parse(raw);
+  </script>
+</body>
+</html>

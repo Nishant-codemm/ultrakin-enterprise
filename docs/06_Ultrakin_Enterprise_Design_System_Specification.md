@@ -1,0 +1,1049 @@
+# Ultrakin Enterprise Design System Specification
+**Document ID:** `06_Ultrakin_Enterprise_Design_System_Specification.md`  
+**Design System Codename:** **Obsidian Kinetic Glass** (`v1.0.0-PROD`)  
+**Classification:** Internal Confidential / Master Design System Blueprint  
+**Status:** Approved for Implementation (Single Source of Truth for Visual & Interaction Tokens)  
+**Author Roles:** Principal Design System Architect · Staff Frontend Architect (Linear/Stripe Alumni) · Principal UX Architect · Enterprise Accessibility Specialist  
+**Source Baselines:** `01_Slack_Enterprise_Research_Report.md`, `02_Ultrakin_Current_State_Audit.md`, `03_Slack_vs_Ultrakin_Strategic_Gap_Analysis.md`, `04_Ultrakin_Enterprise_Product_Requirements_Document.md`, `05_Ultrakin_Enterprise_Experience_Architecture.md`  
+**Engineering Audience:** Core Platform (40 Engineers), Frontend Architecture, Design Systems Team, Component Library Maintainers, QA Automation  
+
+---
+
+## Table of Contents
+1. [Executive Summary & Design Foundations](#1-executive-summary--design-foundations)
+   - [1.1 Design Philosophy: Obsidian Kinetic Glass](#11-design-philosophy-obsidian-kinetic-glass)
+   - [1.2 Core Brand Attributes & Product Voice](#12-core-brand-attributes--product-voice)
+   - [1.3 Foundational Design Principles](#13-foundational-design-principles)
+   - [1.4 The Anti-Pattern Index (What Ultrakin Rejects)](#14-the-anti-pattern-index-what-ultrakin-rejects)
+2. [Design Token Architecture & Taxonomy](#2-design-token-architecture--taxonomy)
+   - [2.1 Three-Tier Token Architecture](#21-three-tier-token-architecture)
+   - [2.2 Token Naming Standard & BEM/DTCG Syntax](#22-token-naming-standard--bematcg-syntax)
+   - [2.3 Multi-Platform Token Export Map](#23-multi-platform-token-export-map)
+3. [The Color System (Obsidian Kinetic Glass Palette)](#3-the-color-system-obsidian-kinetic-glass-palette)
+   - [3.1 Canvas, Surface & Elevation Palette](#31-canvas-surface--elevation-palette)
+   - [3.2 The Neutral & Greyscale Ramp (Slate/Obsidian)](#32-the-neutral--greyscale-ramp-slateobsidian)
+   - [3.3 Primary Brand & Accent Palette (Electric Indigo)](#33-primary-brand--accent-palette-electric-indigo)
+   - [3.4 Functional Semantic Status Palettes](#34-functional-semantic-status-palettes)
+   - [3.5 Glassmorphic Surface System & Backdrop Blur Matrix](#35-glassmorphic-surface-system--backdrop-blur-matrix)
+   - [3.6 Hairline Border & Subtractive Edge Illumination](#36-hairline-border--subtractive-edge-illumination)
+   - [3.7 WCAG 2.1 Contrast Ratios & Legibility Matrix](#37-wcag-21-contrast-ratios--legibility-matrix)
+4. [Architectonic Typography System](#4-architectonic-typography-system)
+   - [4.1 Font Family Trio & Functional Roles](#41-font-family-trio--functional-roles)
+   - [4.2 Master Typographic Scale & Rhythm Table](#42-master-typographic-scale--rhythm-table)
+   - [4.3 Optical Kerning, Letter-Spacing & Tracking Standards](#43-optical-kerning-letter-spacing--tracking-standards)
+   - [4.4 Reading Measure, Line-Length & Hierarchy Constraints](#44-reading-measure-line-length--hierarchy-constraints)
+   - [4.5 Monospace, Tabular Figures & Code Syntax Styling](#45-monospace-tabular-figures--code-syntax-styling)
+5. [Spatial Grid, Sizing & Layout Geometry](#5-spatial-grid-sizing--layout-geometry)
+   - [5.1 The Strict 8pt Spatial Rhythm Grid](#51-the-strict-8pt-spatial-rhythm-grid)
+   - [5.2 Spacing Token Dictionary](#52-spacing-token-dictionary)
+   - [5.3 Container Widths & Viewport Breakpoint Registry](#53-container-widths--viewport-breakpoint-registry)
+   - [5.4 The 4-Tier Authenticated Desktop Shell Geometry](#54-the-4-tier-authenticated-desktop-shell-geometry)
+   - [5.5 Mobile & Tablet Responsive Layout Geometry](#55-mobile--tablet-responsive-layout-geometry)
+6. [Elevation, Depth, Shadows & Border Radius](#6-elevation-depth-shadows--border-radius)
+   - [6.1 Border Radius Scale & Corner Curvature Rules](#61-border-radius-scale--corner-curvature-rules)
+   - [6.2 Dark-Mode Multi-Layer Ambient Shadow System](#62-dark-mode-multi-layer-ambient-shadow-system)
+   - [6.3 Surface Depth Hierarchy & z-index Layering Spectrum](#63-surface-depth-hierarchy--z-index-layering-spectrum)
+7. [Kinetic Motion & Micro-Interaction Engine](#7-kinetic-motion--micro-interaction-engine)
+   - [7.1 Physics Easing Curves & Exponential Deceleration](#71-physics-easing-curves--exponential-deceleration)
+   - [7.2 Duration Tiers & Timing Budgets](#72-duration-tiers--timing-budgets)
+   - [7.3 Interaction Motion Matrix by Event](#73-interaction-motion-matrix-by-event)
+   - [7.4 Reduced Motion Accessibility Standards (`prefers-reduced-motion`)](#74-reduced-motion-accessibility-standards-prefers-reduced-motion)
+8. [Iconography & Graphic Asset Standards](#8-iconography--graphic-asset-standards)
+   - [8.1 Core Icon Library: Lucide Enterprise Specification](#81-core-icon-library-lucide-enterprise-specification)
+   - [8.2 Optical Stroke Weights & Sizing Grid](#82-optical-stroke-weights--sizing-grid)
+   - [8.3 Semantic Icon Mapping Catalog](#83-semantic-icon-mapping-catalog)
+   - [8.4 Pure-Code Asset Philosophy (Zero External Raster/Video Assets)](#84-pure-code-asset-philosophy-zero-external-rastervideo-assets)
+9. [Component Anatomy & Master State Matrix](#9-component-anatomy--master-state-matrix)
+   - [9.1 The Universal 10-State Interaction Contract](#91-the-universal-10-state-interaction-contract)
+   - [9.2 Buttons & Action Triggers](#92-buttons--action-triggers)
+   - [9.3 Input Fields, Textareas & Search Inputs](#93-input-fields-textareas--search-inputs)
+   - [9.4 Select, Dropdowns & Context Menus](#94-select-dropdowns--context-menus)
+   - [9.5 Checkbox, Switch & Radio Controls](#95-checkbox-switch--radio-controls)
+   - [9.6 Badges, Tag Pills & Status Dots](#96-badges-tag-pills--status-dots)
+   - [9.7 Avatars, Team Presence & AI Daemon Indicators](#97-avatars-team-presence--ai-daemon-indicators)
+   - [9.8 Cards, Bento Tiles & Floating Hover Surfaces](#98-cards-bento-tiles--floating-hover-surfaces)
+   - [9.9 Modals, Sheets & Universal ⌘K Command Dialog](#99-modals-sheets--universal-k-command-dialog)
+   - [9.10 Slide-out Inspector Drawers (380px Architecture)](#910-slide-out-inspector-drawers-380px-architecture)
+   - [9.11 Tabs, Segmented Controls & Filter Bars](#911-tabs-segmented-controls--filter-bars)
+   - [9.12 Data Tables, Virtualized Lists & Kanban Columns](#912-data-tables-virtualized-lists--kanban-columns)
+   - [9.13 Toast Notifications, In-App Alerts & Banner System](#913-toast-notifications-in-app-alerts--banner-system)
+10. [Module-Specific Specialized UI Pattern Specifications](#10-module-specific-specialized-ui-pattern-specifications)
+    - [10.1 Matrix Chat Stream & Message Composer Pattern](#101-matrix-chat-stream--message-composer-pattern)
+    - [10.2 Domain Mail Split-Pane & Conversation Reader Pattern](#102-domain-mail-split-pane--conversation-reader-pattern)
+    - [10.3 TipTap Prosemirror Living Doc & Inline Thread Pattern](#103-tiptap-prosemirror-living-doc--inline-thread-pattern)
+    - [10.4 Multi-View Kanban Drag-and-Drop & Task Drawer Pattern](#104-multi-view-kanban-drag-and-drop--task-drawer-pattern)
+    - [10.5 WebRTC Video Stage, Control Dock & Transcript Pattern](#105-webrtc-video-stage-control-dock--transcript-pattern)
+    - [10.6 Autonomous Ukin Agent Interactive Action Proposal Cards](#106-autonomous-ukin-agent-interactive-action-proposal-cards)
+    - [10.7 Visual Automations Node Graph & Edge Connector Pattern](#107-visual-automations-node-graph--edge-connector-pattern)
+11. [Accessibility, Inclusivity & Ergonomics Guidelines](#11-accessibility-inclusivity--ergonomics-guidelines)
+    - [11.1 Keyboard Navigation & Visible Focus Architecture](#111-keyboard-navigation--visible-focus-architecture)
+    - [11.2 Screen Reader Announcements & ARIA Role Registry](#112-screen-reader-announcements--aria-role-registry)
+    - [11.3 High Contrast Mode & Color-Blind Compensations](#113-high-contrast-mode--color-blind-compensations)
+    - [11.4 Touch Targets & Mobile Ergonomics](#114-touch-targets--mobile-ergonomics)
+12. [Master Design Token Implementation Manifest](#12-master-design-token-implementation-manifest)
+    - [12.1 CSS Custom Properties Master Registry (`:root`)](#121-css-custom-properties-master-registry-root)
+    - [12.2 Tailwind CSS v4 Theme Directives (`@theme`)](#122-tailwind-css-v4-theme-directives-theme)
+    - [12.3 Token Governance, Versioning & Contribution Protocol](#123-token-governance-versioning--contribution-protocol)
+
+---
+
+## 1. Executive Summary & Design Foundations
+
+### 1.1 Design Philosophy: Obsidian Kinetic Glass
+Ultrakin's design language is termed **Obsidian Kinetic Glass**. It was developed from the forensic competitive analysis of Slack Enterprise, Notion, Linear, Superhuman, and Stripe, resolving the fundamental aesthetic crisis of modern enterprise collaboration tools.
+
+Where legacy enterprise software looks like a 2012 desktop Windows utility (Microsoft Teams) or an over-saturated consumer chat application filled with cartoon banter (Slack), Ultrakin is conceived as a **precision builder instrument**. It is engineered for high-velocity software engineering, product, and leadership teams who spend 8 to 12 hours daily in the interface.
+
+The design language is founded on four distinct pillars:
+1. **Obsidian Substratum:** Deep, neutral obsidian tones (`#07090E`, `#0B0F19`, `#0F172A`) that eliminate ocular fatigue and OLED power draw while providing an infinite-depth background against which data entities stand in sharp relief.
+2. **Kinetic Responsive Physics:** Every state transition, card drag, drawer slide, and modal entrance uses a strict mathematical exponential out curve (`cubic-bezier(0.16, 1, 0.3, 1)`), giving elements the crisp, predictable tactile deceleration of machined physical hardware.
+3. **Multi-Planar Glassmorphism:** Surfaces do not rely on heavy opaque drop shadows or flat solid borders. Instead, elevation is created through multi-layer frosted glass panels (`backdrop-filter: blur(12px)` to `blur(24px)`) paired with hairline subtractive borders (`rgba(255, 255, 255, 0.06)` to `rgba(255, 255, 255, 0.12)`) that catch light like beveled dark sapphire glass.
+4. **Information Architecture Density:** Information density is treated as a core feature, not a liability. Screen real estate is optimized with compact 32px toolbars, 20px status chips, and virtualized list rows, ensuring power users see maximum operational context without scrolling.
+
+### 1.2 Core Brand Attributes & Product Voice
+- **Authoritative & Quiet:** The interface never shouts. It has zero intrusive tooltips, celebratory confetti bursts, or neon gradient marketing text. It earns authority through speed, typography, and mathematical alignment.
+- **Architectonic & Precise:** Typography, borders, and margins snap to a rigorous 8pt spatial grid. Everything feels built by software architects, for software architects.
+- **Sovereign & Enterprise-Grade:** Security, compliance, data residency, and RBAC permissions are visually integrated into every surface rather than hidden in obscure admin menus.
+- **Unified & Polymorphic:** A message in chat, an inbound email, an assigned task, and a block in a document feel like aspects of the same shared data kernel, visually unified by consistent token treatment.
+
+### 1.3 Foundational Design Principles
+1. **Speed as the Foundational Aesthetic:** Visual simplicity is direct service to frame rates. We reject complex heavy canvas shaders, video backgrounds, and multi-megabyte 3D bundles in favor of pure SVG geometry, CSS custom properties, and sub-16ms GPU-composited animations.
+2. **Zero Visual Whiplash:** Users must never experience a sudden flash of blinding white when opening a modal, switching channels, or reviewing a document. Dark mode is the primary first-class citizen; contrast ratios are calibrated for low-light sustained work.
+3. **Intentional Semantic Accentuation:** Colors are reserved strictly for semantic state:
+   - **Electric Indigo (`#6366F1`):** Primary human affordances and active workflows.
+   - **Kinetic Violet (`#8B5CF6`):** Autonomous AI operations and Ukin Agent proposals.
+   - **Emerald (`#10B981`):** Live peer presence, active WebRTC audio, and healthy system status.
+   - **Amber (`#F59E0B`):** Required human review, blocking warnings, and pending approvals.
+   - **Rose / Crimson (`#F43F5E`):** Destructive actions, P0 outages, and authentication errors.
+4. **Optimistic Visual Continuity:** When an action is taken (e.g. converting an email to a task, dragging a Kanban card, resolving a thread), the UI reflects the change in the immediate animation frame (16ms). The system never blocks the user behind a full-screen loading spinner for an optimistic operation.
+
+### 1.4 The Anti-Pattern Index (What Ultrakin Rejects)
+| Anti-Pattern | Where It Occurs in Legacy SaaS | Ultrakin Enforcement Policy |
+|---|---|---|
+| **Cartoon Gamification** | Slack confetti on task completion, cartoon mascot illustrations | **Strictly Prohibited.** Task completions use a crisp 180ms check animation and quiet audio tick. |
+| **Whitescreen Whiplash** | Google Docs / Jira opening bright white pages in dark mode | **Strictly Prohibited.** TipTap documents, mail reading panes, and modals use unified dark slate surfaces. |
+| **External Video/MP4 Hero Bloat** | Marketing pages loading 40MB autoplays with compression artifacts | **Strictly Prohibited.** Marketing hero is a 100% pure React/SVG code-based interactive simulation. |
+| **Bespoke Module Navigation** | Slack channels vs. Canvas vs. Lists having 3 different UI patterns | **Strictly Prohibited.** All modules share the 4-tier layout shell, 380px inspector drawer, and ⌘K search. |
+| **Opaque Third-Party Chatbots** | Floating ChatGPT widget pinned in bottom-right corner | **Strictly Prohibited.** AI actions surface as structured inline React proposal cards directly in the data flow. |
+| **Generic Marketing Copy** | "Supercharge your productivity with modern AI tools" | **Strictly Prohibited.** All copy is specific, operational, and grounded in real engineering capabilities. |
+
+---
+
+## 2. Design Token Architecture & Taxonomy
+
+### 2.1 Three-Tier Token Architecture
+Ultrakin organizes design tokens into a deterministic three-tier hierarchy following the Design Tokens Community Group (DTCG) standard:
+
+```
+┌────────────────────────────────────────────────────────┐
+│ TIER 1: GLOBAL TOKENS (Raw / Primitive Values)         │
+│ • Raw color values: colors.slate.900, colors.indigo.500 │
+│ • Absolute measurements: space.8 = 8px, radius.md = 6px│
+│ • Base physics: ease.out = cubic-bezier(0.16, 1, 0.3, 1)│
+└───────────────────────────┬────────────────────────────┘
+                            │
+┌───────────────────────────▼────────────────────────────┐
+│ TIER 2: SEMANTIC TOKENS (Contextual Aliases)           │
+│ • Surface semantics: surface.canvas = colors.slate.950 │
+│ • Text semantics: text.primary = colors.slate.50       │
+│ • Action semantics: action.primary = colors.indigo.500 │
+│ • Border semantics: border.subtle = rgba(255,255,255,0.06)
+└───────────────────────────┬────────────────────────────┘
+                            │
+┌───────────────────────────▼────────────────────────────┐
+│ TIER 3: COMPONENT TOKENS (Scoped Implementations)      │
+│ • Button: button.primary.bg = action.primary           │
+│ • Drawer: drawer.inspector.width = 380px               │
+│ • Chat: chat.composer.bg = surface.elevated-1          │
+│ • TaskCard: task.card.border = border.subtle           │
+└────────────────────────────────────────────────────────┘
+```
+
+### 2.2 Token Naming Standard & BEM/DTCG Syntax
+Every token string conforms to the strict format:
+```
+--[namespace]-[category]-[concept]-[property]-[variant]-[state]
+```
+
+Examples:
+- `--uk-color-surface-canvas`: Base workspace background color.
+- `--uk-color-action-primary-hover`: Primary action button hover fill.
+- `--uk-border-surface-subtle`: Standard 1px glass card hairline border.
+- `--uk-typography-heading-h1-size`: H1 font size.
+- `--uk-motion-ease-exponential`: Master deceleration curve.
+
+### 2.3 Multi-Platform Token Export Map
+Design tokens originate in a canonical JSON repository (`tokens.json`) and compile via Style Dictionary into target platform formats:
+
+| Platform | Output Artifact | Consumption Target |
+|---|---|---|
+| **Web (CSS Custom Properties)** | `src/styles/tokens.css` | Plain CSS, CSS Modules, Styled Components |
+| **Tailwind CSS v4** | `src/styles/theme.css` | `@theme` directive variables |
+| **TypeScript / React** | `src/lib/tokens.ts` | Strongly-typed design token object with intellisense |
+| **Mobile (React Native / iOS)** | `mobile/tokens.json` | React Native StyleSheet / Swift constants |
+| **Figma Tokens Sync** | `figma/tokens.sync.json` | Tokens Studio plugin bidirectional synchronization |
+
+---
+
+## 3. The Color System (Obsidian Kinetic Glass Palette)
+
+### 3.1 Canvas, Surface & Elevation Palette
+The workspace foundation is constructed from five calibrated dark elevation tiers:
+
+| Token Name | Hex Value | RGB Channels | Semantic Purpose & Usage |
+|---|---|---|---|
+| `--uk-surface-obsidian-root` | `#07090E` | `7, 9, 14` | The absolute root canvas; visible in gutters, margins, and outermost letterbox frames. |
+| `--uk-surface-canvas` | `#0B0F19` | `11, 15, 25` | Left Activity Rail background and primary application viewport substrate. |
+| `--uk-surface-elevated-1` | `#0F172A` | `15, 23, 42` | Contextual sidebar, Kanban column backgrounds, and resting card containers. |
+| `--uk-surface-elevated-2` | `#1E293B` | `30, 41, 59` | Hovered cards, active tab pills, popover menus, and toolbars. |
+| `--uk-surface-elevated-3` | `#334155` | `51, 65, 85` | Active pressed states, modal dialog containers, and dropdown menu focus states. |
+| `--uk-surface-overlay-dim` | `rgba(3, 7, 18, 0.75)` | `3, 7, 18, 0.75` | Fullscreen modal scrim backdrop with `backdrop-filter: blur(8px)`. |
+
+### 3.2 The Neutral & Greyscale Ramp (Slate/Obsidian)
+Text, icons, and borders map strictly to this 10-step neutral scale:
+
+| Token | Hex | Intended Role | Minimum Contrast on `#0F172A` |
+|---|---|---|---|
+| `--uk-neutral-50` | `#F8FAFC` | Primary headlines, modal titles, high-emphasis text | **15.8:1** (AAA Compliant) |
+| `--uk-neutral-100` | `#F1F5F9` | Standard body text, message timeline text | **14.2:1** (AAA Compliant) |
+| `--uk-neutral-200` | `#E2E8F0` | Secondary labels, author names, active icons | **12.1:1** (AAA Compliant) |
+| `--uk-neutral-300` | `#CBD5E1` | Form labels, table cells, secondary icons | **9.6:1** (AAA Compliant) |
+| `--uk-neutral-400` | `#94A3B8` | Placeholder text, timestamps, breadcrumbs, unread count pills | **5.9:1** (AA Compliant) |
+| `--uk-neutral-500` | `#64748B` | Muted metadata, deactivated toggle tracks, column counters | **3.5:1** (Graphics Only) |
+| `--uk-neutral-600` | `#475569` | Subtle separator lines, disabled icon buttons | **2.2:1** (Non-Text Only) |
+| `--uk-neutral-700` | `#334155` | Structural borders, nested container dividers | **1.6:1** (Decorative Borders) |
+| `--uk-neutral-800` | `#1E293B` | Surface container borders, card outlines | **1.2:1** (Structural Grids) |
+| `--uk-neutral-900` | `#0F172A` | Resting container fills, search box background | Base Surface |
+
+### 3.3 Primary Brand & Accent Palette (Electric Indigo)
+Electric Indigo represents human intentionality, primary user actions, and interactive focus states:
+
+```
+[50: #EEF2FF]  [100: #E0E7FF]  [200: #C7D2FE]  [300: #A5B4FC]  [400: #818CF8]
+[500: #6366F1] PRIMARY AFFORDANCE ────► High-status execution trigger
+[600: #4F46E5] HOVER / ACTIVE
+[700: #4338CA] PRESSED / SELECTED
+[800: #3730A3] SUBTLE CONTAINER
+[900: #312E81] TINTED GLOW BASE
+[950: #1E1B4B] DEEP AMBIENT GLOW (rgba(99, 102, 241, 0.12))
+```
+
+- **Primary Button Fill:** `#6366F1` (`--uk-action-primary-default`)
+- **Primary Button Hover:** `#4F46E5` (`--uk-action-primary-hover`)
+- **Primary Button Pressed:** `#4338CA` (`--uk-action-primary-active`)
+- **Focus Ring Glow:** `rgba(99, 102, 241, 0.45)` (`--uk-action-primary-focus-ring`)
+- **Ambient Accent Tint:** `rgba(99, 102, 241, 0.08)` (`--uk-action-primary-surface`)
+
+### 3.4 Functional Semantic Status Palettes
+
+#### Live Connections & Success: Emerald
+Used for active peer presence, live WebRTC audio streams, and verified task completions:
+- Base: `#10B981` (`--uk-semantic-success-default`)
+- Light Text: `#34D399` (`--uk-semantic-success-text`)
+- Surface Tint: `rgba(16, 185, 129, 0.10)` (`--uk-semantic-success-surface`)
+- Border Hairline: `rgba(16, 185, 129, 0.25)` (`--uk-semantic-success-border`)
+
+#### Autonomous AI Operations: Kinetic Violet
+Reserved exclusively for Ukin Agent proposals, AI-generated doc summaries, and background daemons:
+- Base: `#8B5CF6` (`--uk-semantic-ai-default`)
+- Light Text: `#A78BFA` (`--uk-semantic-ai-text`)
+- Surface Tint: `rgba(139, 92, 246, 0.12)` (`--uk-semantic-ai-surface`)
+- Border Hairline: `rgba(139, 92, 246, 0.30)` (`--uk-semantic-ai-border`)
+
+#### Warning & Required Human Review: Amber
+Used for pending agent action approvals, unverified DNS records, and expiring trials:
+- Base: `#F59E0B` (`--uk-semantic-warning-default`)
+- Light Text: `#FBBF24` (`--uk-semantic-warning-text`)
+- Surface Tint: `rgba(245, 158, 11, 0.10)` (`--uk-semantic-warning-surface`)
+- Border Hairline: `rgba(245, 158, 11, 0.28)` (`--uk-semantic-warning-border`)
+
+#### Destructive Actions & Critical Incidents: Crimson
+Used for P0 bug tags, SAML verification failures, and dangerous deletion prompts:
+- Base: `#F43F5E` (`--uk-semantic-destructive-default`)
+- Light Text: `#FB7185` (`--uk-semantic-destructive-text`)
+- Surface Tint: `rgba(244, 63, 94, 0.12)` (`--uk-semantic-destructive-surface`)
+- Border Hairline: `rgba(244, 63, 94, 0.30)` (`--uk-semantic-destructive-border`)
+
+#### Informational & External Sources: Sky Cyan
+Used for inbound external email chips, linked GitHub PRs, and informational tooltips:
+- Base: `#0EA5E9` (`--uk-semantic-info-default`)
+- Light Text: `#38BDF8` (`--uk-semantic-info-text`)
+- Surface Tint: `rgba(14, 165, 233, 0.10)` (`--uk-semantic-info-surface`)
+- Border Hairline: `rgba(14, 165, 233, 0.25)` (`--uk-semantic-info-border`)
+
+### 3.5 Glassmorphic Surface System & Backdrop Blur Matrix
+Ultrakin surfaces achieve depth through calibrated optical blur and refractive transparency:
+
+| Glass Tier | Background Fill | Backdrop Blur Filter | Top Inset Highlight | Outer Hairline Border |
+|---|---|---|---|---|
+| **Glass-1 (Resting Cards)** | `rgba(15, 23, 42, 0.65)` | `blur(12px)` | `inset 0 1px 0 rgba(255,255,255,0.08)` | `1px solid rgba(255, 255, 255, 0.06)` |
+| **Glass-2 (Active / Hovered)**| `rgba(15, 23, 42, 0.85)` | `blur(16px)` | `inset 0 1px 0 rgba(255,255,255,0.12)` | `1px solid rgba(255, 255, 255, 0.10)` |
+| **Glass-3 (Floating Overlays)**| `rgba(7, 9, 14, 0.90)` | `blur(20px)` | `inset 0 1px 0 rgba(255,255,255,0.16)` | `1px solid rgba(255, 255, 255, 0.14)` |
+| **Glass-4 (Global Navbar)** | `rgba(7, 9, 14, 0.82)` | `blur(16px)` | None | `bottom 1px solid rgba(255, 255, 255, 0.08)` |
+
+### 3.6 Hairline Border & Subtractive Edge Illumination
+To make dark surfaces feel machined and tactile, every container incorporates a dual-layer optical border:
+```css
+/* The Canonical Obsidian Glass Border Pattern */
+border: 1px solid rgba(255, 255, 255, 0.07);
+box-shadow: 
+  inset 0 1px 0 0 rgba(255, 255, 255, 0.10), /* Top specular highlight */
+  0 4px 20px -2px rgba(0, 0, 0, 0.45);        /* Ambient downward shadow */
+```
+This pattern creates an optical bevel that makes containers appear physically raised by 1mm off the obsidian substratum.
+
+### 3.7 WCAG 2.1 Contrast Ratios & Legibility Matrix
+Every color pairing in Ultrakin is audited to exceed accessibility standards:
+
+| Text Element | Text Token | Surface Token | Contrast Ratio | WCAG Compliance |
+|---|---|---|---|---|
+| Primary Headings | `--uk-neutral-50` (`#F8FAFC`) | Canvas (`#0B0F19`) | **16.2:1** | AAA (Pass) |
+| Standard Body Copy | `--uk-neutral-100` (`#F1F5F9`) | Elevated-1 (`#0F172A`) | **14.2:1** | AAA (Pass) |
+| Secondary Metadata | `--uk-neutral-300` (`#CBD5E1`) | Elevated-1 (`#0F172A`) | **9.6:1** | AAA (Pass) |
+| Timestamps / Badges | `--uk-neutral-400` (`#94A3B8`) | Elevated-1 (`#0F172A`) | **5.9:1** | AA (Pass) |
+| Primary Button Text | `#FFFFFF` | Primary Indigo (`#6366F1`)| **4.6:1** | AA (Pass) |
+| Live Emerald Badge | `--uk-semantic-success-text` (`#34D399`)| Glass-1 Surface | **6.8:1** | AA (Pass) |
+| AI Violet Badge | `--uk-semantic-ai-text` (`#A78BFA`) | Glass-1 Surface | **6.1:1** | AA (Pass) |
+
+---
+
+## 4. Architectonic Typography System
+
+### 4.1 Font Family Trio & Functional Roles
+Ultrakin uses three specialized typefaces, each strictly assigned to a functional responsibility:
+
+1. **Display & Headings: `Inter Display`**
+   - CSS Stack: `'Inter Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`
+   - Role: Hero headlines, section titles, card headers, modal titles.
+   - Distinctive Feature: Optical kerning with tightened letterforms, crisp capital proportions, and negative tracking (-0.03em) that produces architectural authority.
+2. **Body & Interface: `Inter`**
+   - CSS Stack: `'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`
+   - Role: Chat timeline messages, email reading panes, living document body copy, form fields, table cells.
+   - Distinctive Feature: High x-height, clear differentiation between `I` (uppercase i), `l` (lowercase L), and `1` (numeral one); calibrated for comfortable sustained 10-hour reading sessions.
+3. **Code & Telemetry: `JetBrains Mono`**
+   - CSS Stack: `'JetBrains Mono', 'SF Mono', Consolas, Menlo, monospace`
+   - Role: Code block syntax highlighting, Git commit hashes, Task IDs (`#4082`), API endpoints, timestamps, and tabular data tables.
+   - Distinctive Feature: Increased glyph width, crisp ligatures, and tabular numerals that prevent layout jitter during live counter animations.
+
+### 4.2 Master Typographic Scale & Rhythm Table
+
+| Scale Token | Font Size | Line Height | Letter Spacing (Tracking) | Font Weight | Primary Usage |
+|---|---|---|---|---|---|
+| `--uk-font-display-2xl` | `56px` (3.5rem) | `64px` (1.14) | `-0.035em` | `800` (Extra Bold) | Landing Page Hero Headline |
+| `--uk-font-display-xl` | `44px` (2.75rem) | `52px` (1.18) | `-0.030em` | `700` (Bold) | Section Big Statements, PRD Title |
+| `--uk-font-display-lg` | `36px` (2.25rem) | `44px` (1.22) | `-0.025em` | `700` (Bold) | Bento Grid Header, H1 Marketing |
+| `--uk-font-heading-h1` | `28px` (1.75rem) | `36px` (1.28) | `-0.020em` | `700` (Bold) | Living Doc H1, Workspace Home Greeting |
+| `--uk-font-heading-h2` | `22px` (1.375rem)| `30px` (1.36) | `-0.015em` | `600` (Semi Bold)| Living Doc H2, Modal Titles, Section Dividers |
+| `--uk-font-heading-h3` | `18px` (1.125rem)| `26px` (1.44) | `-0.010em` | `600` (Semi Bold)| Living Doc H3, Inspector Drawer Headers |
+| `--uk-font-heading-h4` | `15px` (0.9375rem)|`22px` (1.46) | `-0.005em` | `600` (Semi Bold)| Kanban Column Titles, Field Group Labels |
+| `--uk-font-body-lg` | `16px` (1.0rem) | `26px` (1.625)| `0.000em` | `400` (Regular) | Primary Document Body Text, Long Emails |
+| `--uk-font-body-md` | `14px` (0.875rem)| `22px` (1.57) | `0.000em` | `400` / `500` | Chat Timeline Messages, Table Cells, Form Inputs |
+| `--uk-font-body-sm` | `13px` (0.8125rem)|`19px` (1.46) | `+0.005em` | `400` / `500` | Sidebar Channel Items, Thread Replies, Tooltips |
+| `--uk-font-caption` | `11px` (0.6875rem)|`16px` (1.45) | `+0.025em` | `600` (Semi Bold)| Category Badges (UPPERCASE), Timestamp Chips |
+| `--uk-font-code-inline` | `13px` (0.8125rem)|`18px` (1.38) | `0.000em` | `500` (Medium) | Inline code snippets (`JetBrains Mono`) |
+| `--uk-font-code-block` | `13px` (0.8125rem)|`20px` (1.54) | `0.000em` | `400` (Regular) | Multi-line code editor blocks |
+
+### 4.3 Optical Kerning, Letter-Spacing & Tracking Standards
+- **Negative Tracking on Large Headings:** As font size increases, mechanical spacing between letters appears optically too wide. Headings above 24px must apply negative letter-spacing from `-0.015em` down to `-0.035em`.
+- **Positive Tracking on Micro Badges:** Badges rendered at 11px in uppercase must apply `letter-spacing: +0.05em` to maintain scannability across pixel boundaries.
+- **Zero Tracking on Body Text:** 14px and 16px body copy maintains natural tracking (`0.000em`) to ensure native font hinting engines render without distortion.
+
+### 4.4 Reading Measure, Line-Length & Hierarchy Constraints
+- **Maximum Reading Line Measure:** The width of prose text in Living Docs and Email Reading Panes is strictly constrained to **`720px`** (approximately 72–78 characters per line). Text lines exceeding 85 characters lead to ocular tracking fatigue.
+- **Vertical Typographic Rhythm:** Paragraphs are separated by `margin-bottom: 16px` (`1rem`). Headings incorporate an asymmetric vertical spacing rule: larger space before (`margin-top: 32px`), smaller space after (`margin-bottom: 12px`), ensuring headings visually anchor to the text that follows.
+
+### 4.5 Monospace, Tabular Figures & Code Syntax Styling
+All numbers representing timestamps, currency, counters, or latency figures must enable tabular numbers via CSS:
+```css
+font-variant-numeric: tabular-nums;
+```
+This guarantees that when numbers increment (e.g., meeting timer counting from `09:59` to `10:00` or WASW counter incrementing), adjacent characters do not jump horizontally.
+
+Code syntax blocks feature an obsidian substrate (`#030712`) with a 1px border (`rgba(255, 255, 255, 0.08)`), soft inner padding (`16px 20px`), and `JetBrains Mono` syntax highlighting:
+- Keywords: `#818CF8` (Soft Indigo)
+- Strings & Values: `#34D399` (Soft Emerald)
+- Variables & Identifiers: `#38BDF8` (Sky Cyan)
+- Comments: `#64748B` (Muted Slate)
+
+---
+
+## 5. Spatial Grid, Sizing & Layout Geometry
+
+### 5.1 The Strict 8pt Spatial Rhythm Grid
+Ultrakin uses a strict 8-point spatial grid for all structural layout, container dimensions, and margins. A half-step (4px) micro-grid is permitted exclusively for tight UI elements: icon alignment, input padding, badge padding, and button interiors. Odd-pixel margins or arbitrary Tailwind sizes (`mt-[13px]`, `w-[347px]`) are strictly prohibited in the codebase.
+
+### 5.2 Spacing Token Dictionary
+
+| Token Name | Rem Value | Pixel Value | Permitted Application Context |
+|---|---|---|---|
+| `--uk-space-0` | `0rem` | `0px` | Reset spacing, border collision elimination |
+| `--uk-space-0-5` | `0.125rem` | `2px` | Micro border offsets, active tab underline thickness |
+| `--uk-space-1` | `0.25rem` | `4px` | Icon-to-text gap, badge internal padding, micro tag gaps |
+| `--uk-space-1-5` | `0.375rem` | `6px` | Compact button internal Y-padding, dropdown item padding |
+| `--uk-space-2` | `0.5rem` | `8px` | Base unit: button X-padding, list item row gaps, avatar gaps |
+| `--uk-space-3` | `0.75rem` | `12px` | Standard button internal padding, input field Y-padding |
+| `--uk-space-4` | `1.0rem` | `16px` | Card internal padding, form field vertical spacing |
+| `--uk-space-6` | `1.5rem` | `24px` | Modal internal padding, section margins, sidebar padding |
+| `--uk-space-8` | `2.0rem` | `32px` | Large container padding, header-to-content separation |
+| `--uk-space-12` | `3.0rem` | `48px` | Major surface dividers, Hero CTA vertical offsets |
+| `--uk-space-16` | `4.0rem` | `64px` | Activity rail height/width anchor, marketing section padding |
+| `--uk-space-24` | `6.0rem` | `96px` | Large marketing section vertical padding (`py-24`) |
+| `--uk-space-32` | `8.0rem` | `128px` | Viewport hero top padding on 4K displays |
+
+### 5.3 Container Widths & Viewport Breakpoint Registry
+
+```
+BREAKPOINTS
+sm:  640px   (Mobile landscape / Small tablets)
+md:  768px   (Tablets portrait)
+lg:  1024px  (Tablets landscape / Small laptops)
+xl:  1280px  (Standard desktop - Primary design baseline)
+2xl: 1440px  (Large desktop monitors)
+3xl: 1920px  (Ultrawide monitors - Content capped at 1440px centered)
+```
+
+- **Marketing Max Container:** `1280px` (`--uk-container-marketing`) centered with `px-6 lg:px-8`.
+- **Application Max Viewport:** `100vw` full-width flex container; internal document measure capped at `720px`.
+- **Modal Dialog Max Width:** `640px` for standard dialogs, `840px` for multi-step creation wizards.
+- **Command Palette (⌘K) Width:** `640px` fixed with maximum list height of `480px`.
+
+### 5.4 The 4-Tier Authenticated Desktop Shell Geometry
+The workspace desktop canvas is partitioned into four contiguous horizontal planes:
+
+```
+┌──────────┬───────────────┬──────────────────────────────────┬─────────────────┐
+│ TIER 1   │ TIER 2        │ TIER 3                           │ TIER 4          │
+│ 64px     │ 240px         │ Flex-1 (Remaining Viewport)      │ 380px           │
+│ Activity │ Contextual    │ Main Operational Canvas          │ Contextual      │
+│ Rail     │ Sidebar       │                                  │ Inspector       │
+│          │ (Collapsible) │                                  │ (Slide-out)     │
+│          │               │                                  │                 │
+│ • Tenant │ • Channel Dir │ • Matrix Chat Timeline Stream    │ • Active Thread │
+│ • Module │ • Folders     │ • Domain Mail Reading Pane       │ • Doc Comments  │
+│   Icons  │ • Doc Tree    │ • TipTap Living Doc Canvas       │ • Task Detail   │
+│ • Presence│ • Views      │ • Kanban Virtual Columns         │ • Live Diarized │
+│ • Status │               │ • WebRTC Video Stage             │   Transcript    │
+└──────────┴───────────────┴──────────────────────────────────┴─────────────────┘
+```
+
+- **Tier 1 (Left Activity Rail):** Exactly `64px` fixed width. Never scrolls with canvas. Icons are centered 40x40 touch targets.
+- **Tier 2 (Contextual Sidebar):** `240px` fixed width. Collapsible via `⌘+B` or hover edge toggle to `0px`. Contains nested tree navigation.
+- **Tier 3 (Operational Canvas):** `flex: 1 1 0%`. Expands to consume available width. Automatically adjusts when Tier 4 opens.
+- **Tier 4 (Contextual Inspector Drawer):** Exactly `380px` fixed width. Slides in over the right edge or docks alongside canvas.
+
+### 5.5 Mobile & Tablet Responsive Layout Geometry
+- **Tablet (768px – 1023px):** Activity Rail collapses to a 48px slim rail. Contextual Sidebar converts to an off-canvas drawer opened via hamburger. Tier 4 Inspector opens as a 380px modal overlay.
+- **Mobile (< 768px):** Activity Rail transforms into a **Persistent 56px Bottom Navigation Bar** with 4 primary destinations: `[Spaces]`, `[Mail]`, `[Docs]`, `[Search]`. Main canvas consumes 100% viewport. Sidebars and inspectors open as full-screen sliding views with swipe-to-dismiss gesture handling.
+
+---
+
+## 6. Elevation, Depth, Shadows & Border Radius
+
+### 6.1 Border Radius Scale & Corner Curvature Rules
+Border radii follow a mathematical doubling rhythm designed to match physical device bezel curvatures:
+
+| Radius Token | Value | Applied UI Elements |
+|---|---|---|
+| `--uk-radius-none` | `0px` | Full-viewport canvas edges, seamless split-pane dividers |
+| `--uk-radius-xs` | `2px` | Micro badges, status indicator dots |
+| `--uk-radius-sm` | `4px` | Inline code blocks, keyboard shortcut keys (`<kbd>`), checkboxes |
+| `--uk-radius-md` | `6px` | Form inputs, select dropdowns, standard buttons, context menu items |
+| `--uk-radius-lg` | `8px` | Kanban task cards, Bento grid inner cells, popover containers |
+| `--uk-radius-xl` | `12px` | Large Bento cards, modal dialogs, slide-out inspector drawers |
+| `--uk-radius-2xl`| `16px` | Marketing hero application mockup frame, floating announcement cards |
+| `--uk-radius-pill`| `9999px` | Avatar presence pills, sticky orbit pills, filter chip buttons |
+
+*Curvature Nesting Rule:* When a container with radius `R` has child padding `P`, any enclosed child card must have radius `R_child = R - P`. This prevents awkward mismatched corner optical gaps.
+
+### 6.2 Dark-Mode Multi-Layer Ambient Shadow System
+Standard single-layer drop shadows create muddy, dirty dark UI. Ultrakin utilizes **multi-layered composite shadows** combining a tight contact shadow, a soft ambient spread, and a colored tint:
+
+```css
+/* Shadow 1: Resting Card (Subtle elevation off slate canvas) */
+--uk-shadow-card: 
+  0 1px 2px 0 rgba(0, 0, 0, 0.40),
+  0 4px 12px -2px rgba(0, 0, 0, 0.30);
+
+/* Shadow 2: Floating Card / Dropdown Menu */
+--uk-shadow-menu: 
+  0 0 0 1px rgba(255, 255, 255, 0.08),
+  0 4px 6px -1px rgba(0, 0, 0, 0.50),
+  0 12px 24px -4px rgba(0, 0, 0, 0.60);
+
+/* Shadow 3: Lifted Dragged Kanban Card (High elevation) */
+--uk-shadow-lifted: 
+  0 0 0 1px rgba(99, 102, 241, 0.35),
+  0 12px 28px -4px rgba(0, 0, 0, 0.75),
+  0 24px 48px -8px rgba(0, 0, 0, 0.65);
+
+/* Shadow 4: Modal Dialog / Universal Command Palette */
+--uk-shadow-modal: 
+  0 0 0 1px rgba(255, 255, 255, 0.12),
+  0 24px 48px -12px rgba(0, 0, 0, 0.85),
+  0 48px 96px -24px rgba(0, 0, 0, 0.75);
+
+/* Shadow 5: Electric Indigo Primary Accent Glow */
+--uk-shadow-glow-indigo: 
+  0 0 24px 0 rgba(99, 102, 241, 0.28),
+  0 1px 2px 0 rgba(0, 0, 0, 0.40);
+```
+
+### 6.3 Surface Depth Hierarchy & z-index Layering Spectrum
+To prevent conflicting z-index wars in the codebase, all surfaces adhere to a strict numbered elevation spectrum:
+
+| z-index Value | Semantic Layer | Covered Components |
+|---|---|---|
+| `z-0` | Canvas Substratum | Root obsidian viewport, background grid lines |
+| `z-10` | Surface Content | Chat timeline, Living Doc prose, Kanban cards |
+| `z-20` | Sticky Headers | Space channel header, list column sticky header, doc breadcrumbs |
+| `z-30` | Fixed Shell Rails | Left activity rail (64px), contextual sidebar (240px) |
+| `z-40` | Floating Controls | Quick Meeting HUD pill, sticky orbit pill, persistent audio dock |
+| `z-50` | Global Header | Marketing sticky blurred navigation bar |
+| `z-60` | Contextual Drawers | 380px Slide-out Inspector Drawer, DocumentComments |
+| `z-70` | Dropdown Menus | Context menus, popover toolbars, date pickers |
+| `z-80` | Modal Backdrops | Scrim overlay (`rgba(3, 7, 18, 0.75)`) |
+| `z-90` | Modal Dialogs | Universal ⌘K Search, Invite Modal, Create Workspace Wizard |
+| `z-100` | System Overlays | Global toast notifications, connection drop alert banner |
+
+---
+
+## 7. Kinetic Motion & Micro-Interaction Engine
+
+### 7.1 Physics Easing Curves & Exponential Deceleration
+Animation in Ultrakin must feel like machined physical hardware. We strictly forbid playful, bouncy spring oscillations (`cubic-bezier(0.68, -0.55, 0.27, 1.55)`) or sluggish linear fades.
+
+- **Primary Master Deceleration Curve:**  
+  `cubic-bezier(0.16, 1, 0.3, 1)` (`--uk-ease-out`)  
+  *Characteristics:* Enters with maximum initial velocity, then glides smoothly to an instantaneous halt. Used for 85% of all interface movements: modal entrances, drawer slides, hover expansions, card moves.
+- **Exit / Acceleration Curve:**  
+  `cubic-bezier(0.7, 0, 0.84, 0)` (`--uk-ease-in`)  
+  *Characteristics:* Pulls element off-screen with sharp acceleration. Used exclusively for dismissals and exits.
+- **Linear Progress Curve:**  
+  `linear` (`--uk-ease-linear`)  
+  *Characteristics:* Strictly reserved for progress bars, upload percentage indicators, and infinite logo marquee streams.
+
+### 7.2 Duration Tiers & Timing Budgets
+Every visual feedback loop is constrained to human perception thresholds:
+
+| Duration Tier | Value | Applied Interaction Context |
+|---|---|---|
+| **Tier 1 (Instant Micro)** | `80ms` | Button background color shifts, checkbox check ticks, toggle switch flicks |
+| **Tier 2 (Responsive Fast)** | `140ms` | Dropdown menu appearance, tooltip reveal, tab indicator movement |
+| **Tier 3 (Standard Motion)** | `200ms` | Slide-out thread drawer entrance, Kanban card status move |
+| **Tier 4 (Macro Surface)** | `280ms` | Full modal dialog entrance, workspace switcher tenant transition |
+| **Tier 5 (Narrative Intro)** | `450ms` | Marketing hero component sequence load (staggered) |
+
+*Hard Rule:* No animation in the authenticated workspace may exceed `300ms`. Animations that force power users to wait for UI completion are treated as blocking performance bugs.
+
+### 7.3 Interaction Motion Matrix by Event
+
+| Interaction Event | Trigger Property | CSS Transition Definition | Visual Result |
+|---|---|---|---|
+| **Button Hover** | `background-color`, `box-shadow` | `all 120ms cubic-bezier(0.16, 1, 0.3, 1)` | Subtle luminance lift + top border specular highlight |
+| **Button Active / Press** | `transform`, `filter` | `transform 60ms ease-out` | Micro-scale (`scale(0.98)`) simulating mechanical key press |
+| **Card Drag Lift** | `transform`, `box-shadow` | `box-shadow 150ms ease-out` | Card elevates, shadow expands, border illuminates with Indigo |
+| **Thread Drawer Open** | `transform: translateX` | `transform 200ms cubic-bezier(0.16, 1, 0.3, 1)` | Slides in cleanly from `+380px` to `0px` |
+| **Task Check Complete** | `opacity`, `height` | `opacity 180ms ease, height 220ms 100ms ease`| Green check flash → Row collapses smoothly |
+| **⌘K Modal Entrance** | `transform: scale`, `opacity`| `transform 140ms cubic-bezier(0.16, 1, 0.3, 1)` | Zooms from `scale(0.96)` to `1.0` while fading in |
+| **Navbar Scroll Compress**| `height`, `background` | `height 200ms ease, padding 200ms ease` | Compresses from `72px` to `58px` when `scrollY > 20px` |
+
+### 7.4 Reduced Motion Accessibility Standards (`prefers-reduced-motion`)
+When the operating system setting `prefers-reduced-motion: reduce` is detected:
+- All spatial movement transforms (`translateX`, `translateY`, `scale`) are immediately disabled.
+- Transitions degrade to simple, instant opacity cross-fades (`opacity 100ms linear`).
+- Infinite CSS marquee animation halts, displaying a clean static vector logo grid.
+- All spring physics simulations are bypassed.
+
+---
+
+## 8. Iconography & Graphic Asset Standards
+
+### 8.1 Core Icon Library: Lucide Enterprise Specification
+Ultrakin uses **Lucide React** (feather-derived open-source icon architecture) as its sole icon authority. Custom icon sets, miscellaneous FontAwesome classes, or random Google Material vectors are strictly prohibited.
+
+### 8.2 Optical Stroke Weights & Sizing Grid
+All icons align to an optical sizing matrix to ensure uniform visual weight alongside Inter typography:
+
+| Size Token | Pixel Grid | Stroke Width | Primary Application Context |
+|---|---|---|---|
+| `--uk-icon-xs` | `14px × 14px` | `1.75px` | Inside 11px category badges, inline code status chips |
+| `--uk-icon-sm` | `16px × 16px` | `1.50px` | Table action buttons, sidebar channel prefixes (`#`, `🔒`), dropdown items |
+| `--uk-icon-md` | `20px × 20px` | `1.50px` | Default button icons, search input prefix, modal dismiss triggers |
+| `--uk-icon-lg` | `24px × 24px` | `1.50px` | Left Activity Rail module anchors (Chat, Mail, Docs, Lists, Calendar) |
+| `--uk-icon-xl` | `32px × 32px` | `1.25px` | Bento Grid workflow loop headers, Empty state illustration accents |
+
+*Optical Centering Rule:* Lucide icons must always be enclosed in a flex container with `display: inline-flex; align-items: center; justify-content: center` to prevent baseline sub-pixel misalignment.
+
+### 8.3 Semantic Icon Mapping Catalog
+To guarantee consistency across all 40 platform engineers, specific Lucide icons are bound to specific domain concepts:
+
+- **Spaces & Chat:** `Hash` (Public Space), `Lock` (Private Space), `Megaphone` (Announcements), `MessageSquare` (Chat), `MessageCircleReply` (Thread Reply).
+- **Native Mail:** `Mail` (Inbox), `Send` (Sent Mail), `FileEdit` (Drafts), `Archive` (Archive), `AlertOctagon` (Spam), `ArrowUpRight` (Share to Space).
+- **Living Docs:** `FileText` (Doc), `BookOpen` (Wiki), `Highlighter` (Comment Anchor), `GitBranch` (Doc Revision), `CheckSquare` (Task Checklist).
+- **Execution & Tasks:** `Kanban` (Board View), `List` (Table View), `Calendar` (Calendar View), `CheckCircle2` (Done), `Circle` (Todo), `Clock` (In Progress).
+- **WebRTC & Media:** `Headphones` / `Radio` (Huddle), `Mic` / `MicOff` (Microphone), `Video` / `VideoOff` (Camera), `ScreenShare` (Share Screen), `FileAudio` (Transcript).
+- **Intelligence & AI:** `Sparkles` (Ukin Agent Daemon), `Bot` (Agent Worker), `Workflow` (Automation Node Graph), `Cpu` (Context Engine).
+- **Governance & Security:** `ShieldCheck` (SOC 2 / Trust), `Key` (CMEK / Encryption), `Fingerprint` (Passkey), `Server` (DNS / MX Records), `Database` (Data Residency).
+
+### 8.4 Pure-Code Asset Philosophy (Zero External Raster/Video Assets)
+- **No Video Dependencies:** The marketing hero application mockup and interactive sandboxes are rendered in **100% pure React/SVG code**. No external `.mp4`, `.webm`, or CDN video players.
+- **Zero Heavy Raster Bitmaps:** The entire application interface and marketing site uses pure SVG vectors, Lucide icons, CSS gradients, and SVG noise textures. No `2MB .png` feature illustrations.
+- **System Performance:** Zero external asset loading latency guarantees that the website and application shell reach First Contentful Paint in under **`600ms`** globally.
+
+---
+
+## 9. Component Anatomy & Master State Matrix
+
+### 9.1 The Universal 10-State Interaction Contract
+Every interactive component in the Ultrakin Design System must implement and test all **10 canonical states**:
+
+```
+1. DEFAULT      ──► Resting un-hovered state
+2. HOVER        ──► Pointer entered bounding box (+8% luminance shift)
+3. ACTIVE       ──► Pointer down / key pressed (scale: 0.98 mechanical compression)
+4. FOCUS        ──► Keyboard tab focus (visible 2px Electric Indigo focus ring with 2px offset)
+5. DISABLED     ──► Opacity 0.45, cursor: not-allowed, pointer-events: none
+6. LOADING      ──► Kinetic micro-spinner replaces icon; label stays stable
+7. ERROR        ──► 1px Crimson border highlight, aria-invalid="true"
+8. EMPTY        ──► Calm graphical empty state with single primary action CTA
+9. OFFLINE      ──► Amber clock badge indicates local cache queue
+10. SUCCESS     ──► Emerald check flash confirmation (lasts 1,800ms)
+```
+
+---
+
+### 9.2 Buttons & Action Triggers
+
+```
+┌────────────────────────────────────────────────────────┐
+│ PRIMARY ACTION BUTTON                                  │
+│ [ ⚡ Request Enterprise Demo                         ] │
+│ • Fill: #6366F1 (Electric Indigo)                      │
+│ • Text: #FFFFFF (Inter SemiBold 14px)                  │
+│ • Border: 1px solid rgba(255,255,255,0.20)             │
+│ • Shadow: 0 1px 2px rgba(0,0,0,0.3), 0 0 16px indigo   │
+└────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────┐
+│ SECONDARY GLASS BUTTON                                 │
+│ [ Launch Web App                                     ] │
+│ • Fill: rgba(15, 23, 42, 0.65) (Frosted Slate Glass)   │
+│ • Text: #F1F5F9 (Inter Medium 14px)                    │
+│ • Border: 1px solid rgba(255, 255, 255, 0.10)          │
+│ • Blur: backdrop-filter blur(12px)                     │
+└────────────────────────────────────────────────────────┘
+```
+
+#### Variants Specification
+1. **Primary (`variant="primary"`):**
+   - Height: 36px (Default), 44px (Large/Hero), 28px (Compact/Table).
+   - Resting: `bg-[#6366F1]`, text `#FFFFFF`, border `1px solid rgba(255,255,255,0.18)`, radius 6px.
+   - Hover: `bg-[#4F46E5]`, shadow `0 0 20px rgba(99, 102, 241, 0.35)`.
+   - Active: `bg-[#4338CA]`, scale `0.98`.
+   - Focus: `ring-2 ring-[#6366F1] ring-offset-2 ring-offset-[#07090E]`.
+2. **Secondary Glass (`variant="secondary"`):**
+   - Resting: `bg-[#0F172A]/70`, text `#E2E8F0`, border `1px solid rgba(255,255,255,0.08)`, backdrop blur `12px`.
+   - Hover: `bg-[#1E293B]/90`, border `rgba(255,255,255,0.15)`, text `#FFFFFF`.
+   - Active: `bg-[#334155]`, scale `0.98`.
+3. **Destructive (`variant="destructive"`):**
+   - Resting: `bg-[#F43F5E]/15`, text `#FB7185`, border `1px solid rgba(244,63,94,0.30)`.
+   - Hover: `bg-[#F43F5E]`, text `#FFFFFF`, shadow `0 0 16px rgba(244,63,94,0.35)`.
+4. **Ghost / Action Bar Icon (`variant="ghost"`):**
+   - Resting: `bg-transparent`, text `#94A3B8`, border `transparent`.
+   - Hover: `bg-[#1E293B]`, text `#F1F5F9`.
+   - Used inside: Chat message hover action bars, email triage strips.
+
+---
+
+### 9.3 Input Fields, Textareas & Search Inputs
+- **Base Geometry:** Height 38px, horizontal padding 12px, border-radius 6px.
+- **Resting:** Background `#0F172A/80`, text `#F8FAFC`, border `1px solid rgba(255, 255, 255, 0.08)`, placeholder `#64748B`.
+- **Hover:** Border `rgba(255, 255, 255, 0.16)`.
+- **Focus:** Border `#6366F1`, box-shadow `0 0 0 3px rgba(99, 102, 241, 0.20)`, background `#0F172A`.
+- **Error State:** Border `#F43F5E`, box-shadow `0 0 0 3px rgba(244, 63, 94, 0.20)`, caption below field in `#FB7185`.
+- **Keyboard Shortcut Affordance:** Input fields with global shortcuts (like ⌘K search) display a tactile `<kbd>` badge inside the right edge (`⌘K` in `JetBrains Mono`, 11px, background `#1E293B`, border `rgba(255,255,255,0.10)`).
+
+---
+
+### 9.4 Select, Dropdowns & Context Menus
+- **Trigger Element:** Displays current selection with subtle right-aligned chevron icon (`ChevronDown`, 14px, muted).
+- **Menu Container:** Fixed width or min-width matching trigger. Background `rgba(7, 9, 14, 0.94)`, backdrop blur `20px`, border `1px solid rgba(255, 255, 255, 0.12)`, shadow `--uk-shadow-menu`, border-radius 8px, padding 4px.
+- **Item Geometry:** Height 32px, horizontal padding 10px, radius 4px.
+- **Item Hover / Active:** `bg-[#6366F1]/15`, text `#FFFFFF`, icon switches from `#94A3B8` to `#818CF8`.
+- **Shortcut Label:** Right-aligned shortcut text in `JetBrains Mono 11px`, color `#64748B`.
+- **Separator:** `1px solid rgba(255, 255, 255, 0.06)`, margin `4px 0`.
+
+---
+
+### 9.5 Checkbox, Switch & Radio Controls
+- **Checkbox:**
+  - Box size: 16px × 16px, border-radius 4px.
+  - Unchecked: `bg-[#0F172A]`, border `1px solid rgba(255, 255, 255, 0.18)`.
+  - Hover: Border `#6366F1`.
+  - Checked: `bg-[#6366F1]`, border `#6366F1`, white SVG checkmark scales in with 120ms spring.
+- **Toggle Switch:**
+  - Track: Width 36px, height 20px, border-radius 9999px.
+  - Off: `bg-[#1E293B]`, border `1px solid rgba(255,255,255,0.08)`.
+  - On: `bg-[#6366F1]`, border `#6366F1`.
+  - Thumb: 16px diameter white circle, slides smoothly with `transform: translateX(16px)` (`120ms ease`).
+
+---
+
+### 9.6 Badges, Tag Pills & Status Dots
+- **Pill Geometry:** Height 22px, horizontal padding 8px, border-radius 9999px, font size 11px semi-bold, uppercase letter-spacing `+0.03em`.
+- **Variant Matrix:**
+  - **Live Emerald Pill:** `bg-[#10B981]/15`, text `#34D399`, border `rgba(16, 185, 129, 0.25)`, pulsing 6px dot.
+  - **AI Violet Pill:** `bg-[#8B5CF6]/15`, text `#A78BFA`, border `rgba(139, 92, 246, 0.30)`, Sparkles icon.
+  - **P0 Urgent Crimson Pill:** `bg-[#F43F5E]/15`, text `#FB7185`, border `rgba(244, 63, 94, 0.30)`.
+  - **Linked Entity Chip:** `bg-[#1E293B]`, text `#CBD5E1`, border `rgba(255,255,255,0.08)`, link icon.
+
+---
+
+### 9.7 Avatars, Team Presence & AI Daemon Indicators
+- **Sizes:** 20px (Micro/Table), 28px (Chat Timeline), 36px (Sidebar/Header), 64px (Profile Canvas).
+- **Border Treatment:** Sub-surface 1px border `rgba(255, 255, 255, 0.12)`.
+- **Presence Badge Indicator:** 8px circle pinned to bottom-right corner with 2px obsidian cutout border:
+  - Active: `#10B981` (Emerald solid).
+  - In a Huddle: `#8B5CF6` (Violet pulsing audio wave).
+  - Do Not Disturb: `#F59E0B` (Amber minus sign).
+  - Offline: `#64748B` (Slate ring).
+- **Ukin Agent Avatar:** Geometric violet hexagonal glyph with subtle continuous breathing glow (`0 0 12px rgba(139, 92, 246, 0.40)`).
+
+---
+
+### 9.8 Cards, Bento Tiles & Floating Hover Surfaces
+- **Geometry:** Border radius 12px, padding 24px, position relative, overflow hidden.
+- **Glassmorphic Fill:** `rgba(15, 23, 42, 0.65)`, `backdrop-filter: blur(14px)`.
+- **Specular Border:** `1px solid rgba(255, 255, 255, 0.07)`, top inset highlight `inset 0 1px 0 rgba(255,255,255,0.10)`.
+- **Kinetic Hover Effect:**
+  - When pointer moves over card, border illuminates radially around the cursor position using a CSS radial gradient mask: `radial-gradient(400px circle at var(--mouse-x) var(--mouse-y), rgba(99,102,241,0.18), transparent 40%)`.
+  - Card translates Y by `-2px` with `duration: 180ms`.
+
+---
+
+### 9.9 Modals, Sheets & Universal ⌘K Command Dialog
+- **Backdrop Scrim:** `position: fixed`, `inset: 0`, background `rgba(3, 7, 18, 0.75)`, `backdrop-filter: blur(8px)`, `z-index: 80`.
+- **Dialog Box:** Width 640px, centered horizontally and vertically at `top: 15vh`. Background `rgba(7, 9, 14, 0.94)`, backdrop blur `24px`, border `1px solid rgba(255, 255, 255, 0.14)`, shadow `--uk-shadow-modal`, radius 12px.
+- **Header:** Integrated search input with no border, auto-focused, 18px text, auto-complete prefix.
+- **Section Dividers:** Section headers in 11px uppercase `#64748B`, `letter-spacing: +0.05em`.
+- **Keyboard Dismiss:** `Escape` triggers immediate exit. Focus trapped strictly inside modal container via `focus-trap`.
+
+---
+
+### 9.10 Slide-out Inspector Drawers (380px Architecture)
+- **Width:** Exactly `380px` fixed.
+- **Mount Point:** Right edge of viewport (`right: 0`, `top: 0`, `bottom: 0`), `z-index: 60`.
+- **Border:** Left border `1px solid rgba(255, 255, 255, 0.08)`.
+- **Background:** `rgba(11, 15, 25, 0.92)`, `backdrop-filter: blur(20px)`.
+- **Header:** 48px height, displays entity title, close button (`X`), and action options.
+- **Scroll Container:** Independent virtualized scroll container; canvas beneath does not scroll when cursor is over inspector.
+
+---
+
+### 9.11 Tabs, Segmented Controls & Filter Bars
+- **Container:** Height 36px, background `#0B0F19`, border `1px solid rgba(255, 255, 255, 0.06)`, border-radius 8px, padding 3px.
+- **Tab Item:** Height 30px, horizontal padding 14px, font size 13px medium, text `#94A3B8`, border-radius 6px.
+- **Active Tab Pill:** `bg-[#1E293B]`, text `#FFFFFF`, shadow `0 1px 3px rgba(0, 0, 0, 0.40)`, border `1px solid rgba(255, 255, 255, 0.10)`.
+- **Motion:** When active tab switches, background pill slides smoothly with Framer Motion `layoutId="activeTabPill"` using `cubic-bezier(0.16, 1, 0.3, 1)`.
+
+---
+
+### 9.12 Data Tables, Virtualized Lists & Kanban Columns
+- **Table Container:** Border-radius 8px, border `1px solid rgba(255, 255, 255, 0.07)`, overflow hidden.
+- **Header Row:** Height 36px, background `#0F172A`, text `#64748B` (11px uppercase semi-bold), border-bottom `1px solid rgba(255, 255, 255, 0.08)`.
+- **Body Rows:** Height 40px (Compact) / 48px (Standard), alternating row background `rgba(15, 23, 42, 0.30)`.
+- **Row Hover:** `bg-[#6366F1]/06`, left border illuminates with 2px Indigo accent.
+- **Kanban Column:** Width 300px, background `rgba(15, 23, 42, 0.40)`, border `1px solid rgba(255, 255, 255, 0.05)`, radius 8px, vertical padding 12px.
+- **Kanban Task Card:** Margin bottom 8px, padding 12px, background `#0F172A`, border `1px solid rgba(255, 255, 255, 0.08)`, radius 6px, shadow `--uk-shadow-card`.
+
+---
+
+### 9.13 Toast Notifications, In-App Alerts & Banner System
+- **Toast Container:** Bottom-right viewport placement (`bottom: 24px`, `right: 24px`), stacked vertically with `8px` gap, `z-index: 100`.
+- **Card Geometry:** Width 360px, padding 14px 16px, radius 8px, background `rgba(15, 23, 42, 0.95)`, backdrop blur `16px`, border `1px solid rgba(255, 255, 255, 0.12)`, shadow `--uk-shadow-modal`.
+- **Undo Action:** Displays 5-second countdown progress bar along the bottom edge (`height: 2px`, `bg-[#6366F1]`) with clickable `Undo` link.
+- **System Maintenance Banner:** Full-width top banner (`bg-[#1E1B4B]`, text `#E0E7FF`, border-bottom `1px solid rgba(99,102,241,0.30)`, height 36px).
+
+---
+
+## 10. Module-Specific Specialized UI Pattern Specifications
+
+### 10.1 Matrix Chat Stream & Message Composer Pattern
+- **Timeline Layout:** Messages group sequentially by author within a 5-minute window. Author avatar and header appear only on first message; subsequent replies within window indent with compact timestamp on hover.
+- **Composer Anatomy:** Auto-expanding textarea (max height 240px before internal scroll). Bottom utility bar hosts: Markdown toggles (Bold, Italic, Code block), File Attachment trigger (`Paperclip`), Emoji Picker (`Smile`), and Right-docked `Send` button with keyboard hint `Enter ↵`.
+- **Hover Action Shelf:** Floating pill docked to top-right of hovered message item:
+  `[😀 React]  [💬 Reply in Thread]  [⚡ Convert to Task]  [🔖 Bookmark]  [••• More]`
+  Background `rgba(15, 23, 42, 0.95)`, border `rgba(255, 255, 255, 0.12)`, shadow `--uk-shadow-menu`.
+
+### 10.2 Domain Mail Split-Pane & Conversation Reader Pattern
+- **Split Ratio:** `340px` Thread List Pane + `flex-1` Reading Canvas.
+- **Thread List Item:** 72px height. Displays: Unread blue indicator dot, Sender avatar, Sender name (semi-bold), Timestamp, Subject line (truncated 1 line), Body preview (muted 1 line), Task Link Chip if converted.
+- **Reading Canvas:** Max measure 720px centered. Header displays verified domain chip: `[🛡️ DKIM Verified: acmetech.com]`. Action bar at top right provides 1-click `[Convert to Task #]` kinetic trigger.
+
+### 10.3 TipTap Prosemirror Living Doc & Inline Thread Pattern
+- **Canvas Focus:** Document header includes cover asset and editable H1 title.
+- **Floating Bubble Menu:** Appears instantly when user highlights text span:
+  `[B]  [I]  [Code]  [Link]  [💬 Comment]  [AI Summarize]`
+- **Inline Annotation Anchor:** Highlighted text with active Matrix thread rendered with background `rgba(99, 102, 241, 0.15)` and dotted bottom border `2px solid #818CF8`. Clicking the highlight opens the 380px `DocumentComments` drawer.
+
+### 10.4 Multi-View Kanban Drag-and-Drop & Task Drawer Pattern
+- **Drag Physics:** When user picks up card, card rotates by `+1.5deg`, scale increases to `1.02`, shadow elevates to `--uk-shadow-lifted`, and original position renders as a dashed translucent drop target zone (`border: 2px dashed rgba(99, 102, 241, 0.40)`).
+- **Task Drawer (380px):** Opens from right. Contains: Status dropdown, Priority selector (P0–P3), Assignee selector, Linked Mail thread chip, Linked Chat message quote, Subtasks checklist, and Audit activity stream.
+
+### 10.5 WebRTC Video Stage, Control Dock & Transcript Pattern
+- **Stage Grid:** 16:9 aspect ratio video tiles arranged in responsive CSS grid. Active speaker receives an animated 2px border in `#10B981` (Emerald).
+- **Floating Control Dock:** Centered at bottom of stage (`bottom: 24px`). Frosted glass pill (`rgba(7, 9, 14, 0.90)`, blur `20px`, radius `9999px`, border `rgba(255,255,255,0.14)`). Houses:
+  `[🎤 Mute]  [📹 Video]  [🖥️ Share]  [📝 Transcript]  [✋ Raise Hand]  [🔴 Leave Call]`
+- **Transcript Drawer (`CallTranscriptView`):** 340px right panel streaming real-time speech chunks with speaker badges.
+
+### 10.6 Autonomous Ukin Agent Interactive Action Proposal Cards
+The Ukin Agent never outputs plain conversational paragraphs for operational actions. It outputs **Interactive React Action Proposal Cards**:
+
+```
+┌────────────────────────────────────────────────────────┐
+│ 🤖 UKIN AGENT ACTION PROPOSAL                          │
+│ Source: Inbound email from client (checkout bug)       │
+├────────────────────────────────────────────────────────┤
+│ Proposed Mutation:                                     │
+│ • Create Task: "P0: Fix EU 3DS Webhook Timeout"        │
+│ • Destination: Sprint 43 Backlog                       │
+│ • Assignee: @marcus (Staff Payments Engineer)          │
+│ • Urgency: P0 - Urgent (Deployment Blocker)            │
+├────────────────────────────────────────────────────────┤
+│ Reasoning: Client reports 100% failure on 3DS webhook. │
+│ Last deploy PR #882 touched this payment gateway.      │
+├────────────────────────────────────────────────────────┤
+│ [ ✅ Approve & Execute ]        [ ❌ Reject Proposal ] │
+└────────────────────────────────────────────────────────┘
+```
+- Background: `rgba(139, 92, 246, 0.08)` (Kinetic Violet tint).
+- Border: `1px solid rgba(139, 92, 246, 0.30)`.
+- Primary Action: Emerald `Approve & Execute` button.
+
+### 10.7 Visual Automations Node Graph & Edge Connector Pattern
+- **Canvas:** Infinite pan-and-zoom grid with dot pattern (`#1E293B` dots on `#07090E` base).
+- **Nodes:** Width 260px, radius 8px, background `#0F172A`, border `1px solid rgba(255, 255, 255, 0.10)`. Header color indicates type: Trigger (Emerald), Condition (Amber), Action (Indigo).
+- **Edges:** SVG cubic bezier curves with animated stroke dash when active (`stroke: #6366F1`, `stroke-width: 2px`).
+
+---
+
+## 11. Accessibility, Inclusivity & Ergonomics Guidelines
+
+### 11.1 Keyboard Navigation & Visible Focus Architecture
+- **Tab Navigation Sweep:** 100% of all surfaces must be fully operable without mouse.
+- **Focus Rings:** Default browser outlines are removed (`outline: none`) and replaced by a mandatory high-contrast visible focus ring:
+  ```css
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #07090E, 0 0 0 4px #6366F1;
+  }
+  ```
+- **Keyboard Accelerator Standard:** Core actions maintain consistent keyboard triggers:
+  - `⌘+K`: Universal Search
+  - `⌘+/`: Keyboard shortcut cheatsheet
+  - `⌘+B`: Toggle sidebar
+  - `⌘+D`: Toggle microphone in Huddle
+  - `J` / `K`: Move selection down / up in email & task lists
+  - `Escape`: Close active modal, inspector drawer, or dropdown
+
+### 11.2 Screen Reader Announcements & ARIA Role Registry
+- Dynamic state updates use `aria-live="polite"` (task completed, message sent).
+- Critical security or error alerts use `aria-live="assertive"` with `role="alert"`.
+- Drag-and-drop lists implement accessible keyboard alternatives (`Space` to grab, `ArrowUp`/`ArrowDown` to reorder, `Enter` to drop).
+
+### 11.3 High Contrast Mode & Color-Blind Compensations
+- Priority indicators never rely solely on color:
+  - P0: Crimson color + **Double Up Arrow Icon `▲▲`** + text label `P0 - Urgent`.
+  - P1: Amber color + **Single Up Arrow Icon `▲`** + text label `P1 - High`.
+  - P2: Indigo color + **Equal Line Icon `=`** + text label `P2 - Normal`.
+  - P3: Slate color + **Down Arrow Icon `▼`** + text label `P3 - Low`.
+
+### 11.4 Touch Targets & Mobile Ergonomics
+On mobile and tablet viewports (< 1024px), all interactive buttons, icons, and list rows expand to a minimum touch bounding box of **`44px × 44px`** to satisfy Apple Human Interface and Android Material ergonomics guidelines.
+
+---
+
+## 12. Master Design Token Implementation Manifest
+
+### 12.1 CSS Custom Properties Master Registry (`:root`)
+The definitive CSS custom properties token block for injection into `src/styles/tokens.css`:
+
+```css
+:root {
+  /* ========================================================
+     CANVAS & SURFACE ELEVATION (Obsidian Kinetic Glass)
+     ======================================================== */
+  --uk-surface-obsidian-root: #07090e;
+  --uk-surface-canvas: #0b0f19;
+  --uk-surface-elevated-1: #0f172a;
+  --uk-surface-elevated-2: #1e293b;
+  --uk-surface-elevated-3: #334155;
+  --uk-surface-overlay-dim: rgba(3, 7, 18, 0.75);
+
+  /* Glassmorphic fills */
+  --uk-glass-resting: rgba(15, 23, 42, 0.65);
+  --uk-glass-hover: rgba(15, 23, 42, 0.85);
+  --uk-glass-floating: rgba(7, 9, 14, 0.92);
+  --uk-glass-navbar: rgba(7, 9, 14, 0.82);
+
+  /* Hairline Borders */
+  --uk-border-subtle: rgba(255, 255, 255, 0.06);
+  --uk-border-medium: rgba(255, 255, 255, 0.10);
+  --uk-border-high: rgba(255, 255, 255, 0.18);
+  --uk-border-top-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+
+  /* ========================================================
+     NEUTRAL & TEXT SCALE
+     ======================================================== */
+  --uk-neutral-50: #f8fafc;
+  --uk-neutral-100: #f1f5f9;
+  --uk-neutral-200: #e2e8f0;
+  --uk-neutral-300: #cbd5e1;
+  --uk-neutral-400: #94a3b8;
+  --uk-neutral-500: #64748b;
+  --uk-neutral-600: #475569;
+  --uk-neutral-700: #334155;
+  --uk-neutral-800: #1e293b;
+  --uk-neutral-900: #0f172a;
+
+  /* ========================================================
+     PRIMARY ACCENT: ELECTRIC INDIGO
+     ======================================================== */
+  --uk-indigo-50: #eef2ff;
+  --uk-indigo-100: #e0e7ff;
+  --uk-indigo-200: #c7d2fe;
+  --uk-indigo-300: #a5b4fc;
+  --uk-indigo-400: #818cf8;
+  --uk-indigo-500: #6366f1; /* Canonical Primary */
+  --uk-indigo-600: #4f46e5; /* Primary Hover */
+  --uk-indigo-700: #4338ca; /* Primary Active */
+  --uk-indigo-800: #3730a3;
+  --uk-indigo-900: #312e81;
+  --uk-indigo-surface: rgba(99, 102, 241, 0.10);
+  --uk-indigo-focus-ring: rgba(99, 102, 241, 0.45);
+
+  /* ========================================================
+     SEMANTIC STATUS SCALES
+     ======================================================== */
+  /* Live / Success: Emerald */
+  --uk-emerald-500: #10b981;
+  --uk-emerald-text: #34d399;
+  --uk-emerald-surface: rgba(16, 185, 129, 0.10);
+  --uk-emerald-border: rgba(16, 185, 129, 0.25);
+
+  /* AI Operations: Kinetic Violet */
+  --uk-violet-500: #8b5cf6;
+  --uk-violet-text: #a78bfa;
+  --uk-violet-surface: rgba(139, 92, 246, 0.12);
+  --uk-violet-border: rgba(139, 92, 246, 0.30);
+
+  /* Warning / Review: Amber */
+  --uk-amber-500: #f59e0b;
+  --uk-amber-text: #fbbf24;
+  --uk-amber-surface: rgba(245, 158, 11, 0.10);
+  --uk-amber-border: rgba(245, 158, 11, 0.28);
+
+  /* Destructive / Outage: Crimson */
+  --uk-crimson-500: #f43f5e;
+  --uk-crimson-text: #fb7185;
+  --uk-crimson-surface: rgba(244, 63, 94, 0.12);
+  --uk-crimson-border: rgba(244, 63, 94, 0.30);
+
+  /* Info / External: Sky Cyan */
+  --uk-sky-500: #0ea5e9;
+  --uk-sky-text: #38bdf8;
+  --uk-sky-surface: rgba(14, 165, 233, 0.10);
+  --uk-sky-border: rgba(14, 165, 233, 0.25);
+
+  /* ========================================================
+     TYPOGRAPHY
+     ======================================================== */
+  --uk-font-display: 'Inter Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  --uk-font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --uk-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+
+  /* ========================================================
+     SPATIAL GEOMETRY & SHELL
+     ======================================================== */
+  --uk-shell-activity-rail-width: 64px;
+  --uk-shell-sidebar-width: 240px;
+  --uk-shell-inspector-width: 380px;
+  --uk-shell-navbar-height: 72px;
+  --uk-shell-navbar-compressed: 58px;
+
+  /* ========================================================
+     BORDER RADIUS
+     ======================================================== */
+  --uk-radius-xs: 2px;
+  --uk-radius-sm: 4px;
+  --uk-radius-md: 6px;
+  --uk-radius-lg: 8px;
+  --uk-radius-xl: 12px;
+  --uk-radius-2xl: 16px;
+  --uk-radius-pill: 9999px;
+
+  /* ========================================================
+     COMPOSITE DARK-MODE SHADOWS
+     ======================================================== */
+  --uk-shadow-card: 0 1px 2px 0 rgba(0, 0, 0, 0.40), 0 4px 12px -2px rgba(0, 0, 0, 0.30);
+  --uk-shadow-menu: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 4px 6px -1px rgba(0, 0, 0, 0.50), 0 12px 24px -4px rgba(0, 0, 0, 0.60);
+  --uk-shadow-modal: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 24px 48px -12px rgba(0, 0, 0, 0.85), 0 48px 96px -24px rgba(0, 0, 0, 0.75);
+  --uk-shadow-lifted: 0 0 0 1px rgba(99, 102, 241, 0.35), 0 12px 28px -4px rgba(0, 0, 0, 0.75), 0 24px 48px -8px rgba(0, 0, 0, 0.65);
+  --uk-shadow-glow: 0 0 24px 0 rgba(99, 102, 241, 0.28);
+
+  /* ========================================================
+     KINETIC MOTION PHYSICS
+     ======================================================== */
+  --uk-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --uk-ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --uk-duration-micro: 80ms;
+  --uk-duration-fast: 140ms;
+  --uk-duration-standard: 200ms;
+  --uk-duration-macro: 280ms;
+}
+```
+
+### 12.2 Tailwind CSS v4 Theme Directives (`@theme`)
+The direct configuration mapping for Tailwind CSS v4 in `src/styles/theme.css`:
+
+```css
+@theme {
+  --color-obsidian-root: var(--uk-surface-obsidian-root);
+  --color-canvas: var(--uk-surface-canvas);
+  --color-elevated-1: var(--uk-surface-elevated-1);
+  --color-elevated-2: var(--uk-surface-elevated-2);
+  --color-elevated-3: var(--uk-surface-elevated-3);
+
+  --color-indigo-500: var(--uk-indigo-500);
+  --color-indigo-600: var(--uk-indigo-600);
+  --color-indigo-700: var(--uk-indigo-700);
+
+  --color-emerald-500: var(--uk-emerald-500);
+  --color-violet-500: var(--uk-violet-500);
+  --color-amber-500: var(--uk-amber-500);
+  --color-crimson-500: var(--uk-crimson-500);
+  --color-sky-500: var(--uk-sky-500);
+
+  --font-display: var(--uk-font-display);
+  --font-body: var(--uk-font-body);
+  --font-mono: var(--uk-font-mono);
+
+  --radius-xs: var(--uk-radius-xs);
+  --radius-sm: var(--uk-radius-sm);
+  --radius-md: var(--uk-radius-md);
+  --radius-lg: var(--uk-radius-lg);
+  --radius-xl: var(--uk-radius-xl);
+  --radius-2xl: var(--uk-radius-2xl);
+
+  --ease-kinetic: var(--uk-ease-out);
+}
+```
+
+### 12.3 Token Governance, Versioning & Contribution Protocol
+1. **Zero Hardcoded Hex Codes in Components:** No component PR may introduce raw hex codes (`#1e293b`, `#6366f1`) into JSX files. All styling must reference semantic CSS tokens or Tailwind utility classes.
+2. **Token Deprecation Lifecycle:** Deprecated tokens remain active for 2 full sprint cycles with an in-console build warning before removal.
+3. **Automated Token Audit:** CI pipeline runs an axe-core and Stylelint rule ensuring 100% of text and background combinations maintain ≥ 4.5:1 contrast ratios.
+
+---
+
+*End of Ultrakin Enterprise Design System Specification (`06_Ultrakin_Enterprise_Design_System_Specification.md`).*  
+*Document Version: `1.0.0-PROD` · Phase 6 Complete · Approved Single Source of Truth for Visual & Interaction Tokens.*
