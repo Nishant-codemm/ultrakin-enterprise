@@ -13,7 +13,7 @@ const LOGOS = [
 
 export default function TrustStrip() {
   return (
-    <div className="border-b border-border bg-surface/50 py-6">
+    <div className="border-b border-border bg-transparent py-6">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
 
         {/* Label */}
@@ -46,12 +46,12 @@ export default function TrustStrip() {
           {/* Left fade */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute left-0 top-0 z-10 h-full w-16 bg-gradient-to-r from-surface/50 to-transparent"
+            className="pointer-events-none absolute left-0 top-0 z-10 h-full w-16 bg-gradient-to-r from-page/80 to-transparent"
           />
           {/* Right fade */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute right-0 top-0 z-10 h-full w-16 bg-gradient-to-l from-surface/50 to-transparent"
+            className="pointer-events-none absolute right-0 top-0 z-10 h-full w-16 bg-gradient-to-l from-page/80 to-transparent"
           />
           <div className="animate-marquee" aria-hidden="true">
             {LOGOS.map((name, i) => (

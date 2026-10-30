@@ -21,7 +21,7 @@ export default function FAQSection() {
   const [openIdx, setOpenIdx] = useState(null);
 
   return (
-    <section id="faq" className="divider-hairline bg-surface-soft/55 py-20 md:py-24">
+    <section id="faq" className="divider-hairline bg-transparent py-20 md:py-24">
       <div className="mx-auto max-w-4xl px-5 lg:px-8">
         <div className="mb-9 max-w-2xl">
           <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.19em] text-brand-text">A few useful details</p>

@@ -88,7 +88,7 @@ export default function EvaluationSection() {
   };
 
   return (
-    <section ref={sectionRef} id="evaluation" className="divider-hairline bg-surface/65 py-20 md:py-28">
+    <section ref={sectionRef} id="evaluation" className="divider-hairline bg-transparent py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
 
         {/* Header with Scroll Entrance */}

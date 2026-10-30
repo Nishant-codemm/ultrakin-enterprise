@@ -8,7 +8,7 @@ export default function CTASection() {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section ref={sectionRef} id="cta" className="relative isolate overflow-hidden bg-surface/65 py-24 text-ink md:py-32">
+    <section ref={sectionRef} id="cta" className="relative isolate overflow-hidden bg-transparent py-24 text-ink md:py-32">
       {/* Left brand ambient glow — new depth anchor */}
       <div aria-hidden="true" className="pointer-events-none absolute -left-[10rem] top-1/2 h-[38rem] w-[38rem] -translate-y-1/2 rounded-full bg-brand/[0.045] blur-[110px]" />
       {/* Right decorative rings — existing */}

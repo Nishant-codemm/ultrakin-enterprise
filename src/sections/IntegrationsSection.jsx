@@ -328,7 +328,7 @@ export default function IntegrationsSection() {
   };
 
   return (
-    <section ref={sectionRef} id="integrations" className="relative overflow-hidden bg-surface/65 py-20 md:py-28 lg:py-32">
+    <section ref={sectionRef} id="integrations" className="relative overflow-hidden bg-transparent py-20 md:py-28 lg:py-32">
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#879088]/20 to-transparent" />
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
 

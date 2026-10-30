@@ -89,7 +89,7 @@ export default function SecuritySection() {
   ];
 
   return (
-    <section ref={sectionRef} id="security" className="relative overflow-hidden bg-surface-soft/65 py-20 text-ink md:py-28">
+    <section ref={sectionRef} id="security" className="relative overflow-hidden bg-transparent py-20 text-ink md:py-28">
 
       {/* Decorative ring */}
       <div aria-hidden="true" className="pointer-events-none absolute right-[-15rem] top-[-18rem] h-[42rem] w-[42rem] rounded-full border border-border/50" />

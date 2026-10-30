@@ -6,7 +6,7 @@ export default function Footer({ isHome = true }) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="divider-hairline border-t border-border bg-surface py-14 text-ink-muted sm:py-16">
+    <footer className="divider-hairline border-t border-border bg-transparent py-14 text-ink-muted sm:py-16">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
 
         {/* 4-Column Enterprise Navigation Grid */}

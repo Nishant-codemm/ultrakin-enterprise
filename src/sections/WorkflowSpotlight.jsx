@@ -164,7 +164,7 @@ export default function WorkflowSpotlight() {
   const SignalIcon = signal.icon;
 
   return (
-    <section ref={sectionRef} id="workflows" className="relative overflow-hidden bg-surface py-20 text-ink md:py-28">
+    <section ref={sectionRef} id="workflows" className="relative overflow-hidden bg-transparent py-20 text-ink md:py-28">
 
       {/* Ambient background blob for section depth */}
       <div
