@@ -385,6 +385,7 @@ function HeroWorkspaceContent() {
     channels,
     emails,
     kanbanTasks,
+    openSearchPalette,
   } = useWorkspace();
 
   const unreadEmailCount = emails.filter((e) => e.unread).length;
@@ -500,7 +501,7 @@ function HeroWorkspaceContent() {
               Chat, mail, docs, huddles, and tasks—connected by agents that carry context into what happens next.
             </p>
 
-            {/* ── CTA Buttons ── */}
+            {/* ── CTA Buttons + ⌘K Command Palette ── */}
             <div className="mt-7 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
               <Button
                 variant="primary"
@@ -520,6 +521,15 @@ function HeroWorkspaceContent() {
               >
                 See how it works
               </Button>
+              <button
+                type="button"
+                onClick={openSearchPalette}
+                className="group hidden sm:inline-flex h-12 items-center gap-2 rounded-xl border border-border bg-surface-raised px-4 text-xs font-mono text-ink-muted shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all hover:border-brand/40 hover:text-ink hover:shadow-[0_4px_12px_rgba(49,86,207,0.08)]"
+              >
+                <Sparkles className="h-3.5 w-3.5 text-brand-text transition-transform group-hover:scale-110" />
+                <span>Quick actions</span>
+                <kbd className="rounded border border-border bg-surface-soft px-1.5 py-0.5 text-[10px] text-ink-soft">⌘K</kbd>
+              </button>
             </div>
 
             {/* ── Trust badges ── */}

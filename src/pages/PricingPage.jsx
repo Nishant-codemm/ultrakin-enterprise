@@ -74,12 +74,19 @@ function Price({ plan, annual }) {
 
 export default function PricingPage() {
   const [annual, setAnnual] = useState(true);
+
+  const handleCardMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+    e.currentTarget.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+  };
+
   return (
     <div className="min-h-screen bg-page pb-24 pt-28 text-ink sm:pt-32">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <header className="mx-auto max-w-3xl text-center">
           <p className="mb-5 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-brand-text">Plans that grow with your team</p>
-          <h1 className="text-[clamp(2.8rem,5vw,4rem)] font-medium leading-[0.94] tracking-[-0.065em]">Start free.<br className="hidden sm:block" /> Scale when you’re ready.</h1>
+          <h1 className="font-display text-[clamp(2.8rem,5vw,4.25rem)] font-normal leading-[0.98] tracking-[-0.035em]">Start free.<br className="hidden sm:block" /> <span className="font-display italic text-brand-text">Scale when you’re ready.</span></h1>
           <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-ink-muted">Every plan brings the workday together. Add room for more people, customer operations, agents, and enterprise controls as your needs grow.</p>
           <div className="mt-7 inline-flex items-center gap-1 rounded-full border border-border bg-surface-soft p-1" role="group" aria-label="Billing period">
             <button type="button" aria-pressed={annual} onClick={() => setAnnual(true)} className={`rounded-full px-4 py-2 text-xs transition-colors ${annual ? 'bg-surface text-ink shadow-sm' : 'text-ink-muted hover:text-ink'}`}>Annual <span className="ml-1 text-[10px] opacity-70">Save up to 25%</span></button>
@@ -87,16 +94,20 @@ export default function PricingPage() {
           </div>
         </header>
 
-        <section aria-label="Pricing plans" className="mt-12 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <section aria-label="Pricing plans" className="mt-12 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {plans.map((plan) => (
-            <article key={plan.id} className={`relative flex flex-col rounded-3xl border p-6 shadow-elevated ${plan.popular ? 'border-brand/35 bg-brand-soft/70 shadow-[0_18px_48px_-38px_rgba(49,86,207,.32)]' : 'border-border bg-surface-raised'}`}>
+            <article
+              key={plan.id}
+              onMouseMove={handleCardMouseMove}
+              className={`spotlight-card relative flex flex-col rounded-3xl border p-6 transition-all duration-300 hover:-translate-y-1 ${plan.popular ? 'border-brand/40 bg-brand-soft/70 shadow-[0_20px_48px_-28px_rgba(49,86,207,.35)]' : 'border-border bg-surface-raised shadow-[0_10px_28px_-18px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_36px_-20px_rgba(49,86,207,0.15)]'}`}
+            >
               {plan.popular && <span className="absolute right-4 top-4 rounded-full bg-brand/10 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[.12em] text-brand-text">Most popular</span>}
               <p className="text-sm font-semibold text-ink">{plan.name}</p>
               <p className="mt-2 min-h-10 text-xs leading-5 text-ink-muted">{plan.note}</p>
               <div className="mt-5 min-h-10"><Price plan={plan} annual={annual} /></div>
               {!plan.custom && plan.price.annual > 0 && <p className="mt-1 text-[10px] text-ink-muted">Billed {annual ? 'annually' : 'monthly'}</p>}
               {plan.custom && <p className="mt-1 text-[10px] text-ink-muted">Deployment, scale, and support tailored to you</p>}
-              <a href={plan.href} target={plan.href.startsWith('mailto:') ? undefined : '_blank'} rel={plan.href.startsWith('mailto:') ? undefined : 'noreferrer'} className={`mt-5 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${plan.popular ? 'bg-brand text-white hover:bg-brand-hover' : 'border border-border bg-surface text-ink-soft hover:bg-surface-hover'}`}>{plan.button}<ArrowRight size={13} /></a>
+              <a href={plan.href} target={plan.href.startsWith('mailto:') ? undefined : '_blank'} rel={plan.href.startsWith('mailto:') ? undefined : 'noreferrer'} className={`mt-5 inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${plan.popular ? 'bg-brand text-white hover:bg-brand-hover shadow-[0_4px_12px_rgba(49,86,207,0.3)]' : 'border border-border bg-surface text-ink-soft hover:bg-surface-hover'}`}>{plan.button}<ArrowRight size={13} /></a>
               <ul className="mt-6 space-y-3 border-t border-border pt-5">
                 {plan.features.map((feature) => <li key={feature} className="flex items-start gap-2 text-[11px] leading-[1.55] text-ink-muted"><Check size={13} className="mt-0.5 shrink-0 text-brand-text" />{feature}</li>)}
               </ul>
@@ -106,7 +117,7 @@ export default function PricingPage() {
 
         <section className="mt-24" aria-labelledby="comparison-heading">
           <div className="mb-7 flex flex-wrap items-end justify-between gap-4 border-b border-border pb-5">
-            <div><p className="mb-3 font-mono text-[10px] uppercase tracking-[.18em] text-ink-subtle">Plan comparison</p><h2 id="comparison-heading" className="text-2xl font-medium tracking-[-.04em] sm:text-3xl">A clear view of what’s included.</h2></div>
+            <div><p className="mb-3 font-mono text-[10px] uppercase tracking-[.18em] text-ink-subtle">Plan comparison</p><h2 id="comparison-heading" className="font-display text-2xl font-normal tracking-[-.035em] sm:text-3xl">A clear view of what’s included.</h2></div>
             <p className="max-w-xs text-xs leading-5 text-ink-muted">All prices are USD per user, per month. Enterprise pricing is custom.</p>
           </div>
           <div className="overflow-x-auto rounded-2xl border border-border bg-surface-raised shadow-elevated">
@@ -120,7 +131,7 @@ export default function PricingPage() {
 
         <section className="mx-auto mt-24 max-w-3xl" aria-labelledby="pricing-faq-heading">
           <p className="mb-3 font-mono text-[10px] uppercase tracking-[.18em] text-ink-subtle">A few details</p>
-          <h2 id="pricing-faq-heading" className="mb-7 text-2xl font-medium tracking-[-.04em] sm:text-3xl">Pricing, answered.</h2>
+          <h2 id="pricing-faq-heading" className="mb-7 font-display text-2xl font-normal tracking-[-.035em] sm:text-3xl">Pricing, answered.</h2>
           <div className="divide-y divide-border border-y border-border">{faqs.map(([question, answer]) => <details key={question} className="group"><summary className="flex cursor-pointer list-none items-center justify-between gap-5 py-5 text-sm font-medium text-ink-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"><span>{question}</span><span className="text-brand-text transition-transform group-open:rotate-45">+</span></summary><p className="max-w-2xl pb-5 pr-8 text-xs leading-6 text-ink-muted">{answer}</p></details>)}</div>
         </section>
 

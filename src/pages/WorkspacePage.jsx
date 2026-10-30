@@ -45,7 +45,7 @@ export default function WorkspacePage() {
         <header className="mb-10 flex flex-col justify-between gap-5 border-b border-border pb-8 md:flex-row md:items-end">
           <div className="max-w-2xl">
             <p className="mb-4 font-mono text-[11px] font-medium uppercase tracking-[.2em] text-brand-text">Interactive workspace · sample data</p>
-            <h1 className="text-[clamp(2.5rem,4.5vw,3.5rem)] font-medium leading-[1] tracking-[-.055em]">One place to move<br className="hidden sm:block" /> the work forward.</h1>
+            <h1 className="font-display text-[clamp(2.5rem,4.5vw,3.75rem)] font-normal leading-[1.02] tracking-[-0.035em]">One place to move<br className="hidden sm:block" /> <span className="font-display italic text-brand-text">the work forward.</span></h1>
             <p className="mt-4 max-w-xl text-base leading-7 text-ink-muted">Switch between the surfaces your team uses. Conversations, decisions, and next steps stay connected in the same workspace.</p>
           </div>
           <a href="https://app.ultrakin.com" target="_blank" rel="noreferrer" className="inline-flex h-10 shrink-0 items-center justify-center gap-2 self-start rounded-lg bg-brand px-4 text-xs font-semibold text-white shadow-[0_6px_18px_-8px_rgba(49,86,207,.5)] transition-[background-color,box-shadow,transform] hover:-translate-y-px hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-page md:self-auto">Open Ultrakin<span aria-hidden="true">↗</span></a>

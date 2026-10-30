@@ -15,7 +15,7 @@ export default function SecurityPage() {
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <header className="max-w-3xl">
           <p className="mb-5 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[.2em] text-ink-subtle"><span className="h-px w-7 bg-brand" /> Security and trust</p>
-          <h1 className="text-[clamp(2.8rem,5vw,4rem)] font-medium leading-[.95] tracking-[-.065em]">Clear answers for<br className="hidden sm:block" /> careful teams.</h1>
+          <h1 className="font-display text-[clamp(2.8rem,5vw,4.25rem)] font-normal leading-[0.98] tracking-[-0.035em]">Clear answers for<br className="hidden sm:block" /> <span className="font-display italic text-brand-text">careful teams.</span></h1>
           <p className="mt-6 max-w-2xl text-sm leading-7 text-ink-muted">Security reviews depend on your policies and deployment requirements. Explore the areas teams typically review, then ask us for current product details and supporting materials.</p>
           <a href="mailto:sales@ultrakin.com?subject=Ultrakin%20security%20review" className="mt-7 inline-flex min-h-10 items-center gap-2 rounded-lg bg-brand px-4 text-xs font-semibold text-white transition-colors hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus">Talk with security<ArrowUpRight size={14} /></a>
         </header>

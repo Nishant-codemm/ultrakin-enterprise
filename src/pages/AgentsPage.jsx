@@ -77,7 +77,7 @@ export default function AgentsPage() {
         <header className="grid gap-7 border-b border-border pb-8 lg:grid-cols-[1fr_330px] lg:items-end">
           <div className="max-w-3xl">
             <p className="mb-5 flex items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-[.2em] text-brand-text"><Bot size={13} /> Ukin agents</p>
-            <h1 className="text-[clamp(2.5rem,4.5vw,3.5rem)] font-medium leading-[1] tracking-[-.055em]">Useful AI, in the flow of work.</h1>
+            <h1 className="font-display text-[clamp(2.5rem,4.5vw,3.75rem)] font-normal leading-[1.02] tracking-[-0.035em]">Useful AI, <span className="font-display italic text-brand-text">in the flow of work.</span></h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-ink-muted">Ukin agents can connect signals across chat, mail, docs, meetings, and tasks—then prepare work your team can review.</p>
           </div>
           <a
