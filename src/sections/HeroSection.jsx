@@ -141,45 +141,45 @@ const WORKFLOW_SIGNALS = [
 
 /* ── Conduit 1: 4 Curved Bezier Laser Lines connecting Left Buttons to Center Core ── */
 function LaserConduit1({ activeIndex, reduceMotion }) {
-  // Height: 184, Width: 56
-  // Left button anchor centers: y = [20, 68, 116, 164]
-  // Center Card entry center: (56, 92)
+  // Height: 168, Width: 36
+  // Left button anchor centers: y = [18, 62, 106, 150]
+  // Center Card entry center: (36, 84)
   const paths = [
-    'M 0 20 C 32 20, 24 92, 56 92',
-    'M 0 68 C 32 68, 24 92, 56 92',
-    'M 0 116 C 32 116, 24 92, 56 92',
-    'M 0 164 C 32 164, 24 92, 56 92',
+    'M 0 18 C 20 18, 16 84, 36 84',
+    'M 0 62 C 20 62, 16 84, 36 84',
+    'M 0 106 C 20 106, 16 84, 36 84',
+    'M 0 150 C 20 150, 16 84, 36 84',
   ];
 
   return (
     <svg
-      viewBox="0 0 56 184"
-      className="h-[184px] w-[56px] shrink-0 overflow-visible select-none pointer-events-none"
+      viewBox="0 0 36 168"
+      className="h-[168px] w-[36px] shrink-0 overflow-visible select-none pointer-events-none"
     >
       <defs>
         <filter id="conduit-laser-glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2.5" result="blur" />
+          <feGaussianBlur stdDeviation="2.2" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
         <linearGradient id="laser-grad-active" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#38bdf8" />
-          <stop offset="50%" stopColor="#818cf8" />
-          <stop offset="100%" stopColor="#c084fc" />
+          <stop offset="0%" stopColor="#0284c7" />
+          <stop offset="50%" stopColor="#2563eb" />
+          <stop offset="100%" stopColor="#6366f1" />
         </linearGradient>
       </defs>
 
-      {/* Inactive hairline guide traces */}
+      {/* Inactive guide paths */}
       {paths.map((d, i) => (
         <path
           key={`base-${i}`}
           d={d}
           fill="none"
-          stroke={i === activeIndex ? 'url(#laser-grad-active)' : '#94a3b8'}
+          stroke={i === activeIndex ? 'url(#laser-grad-active)' : '#93c5fd'}
           strokeWidth={i === activeIndex ? 2.2 : 1}
-          strokeOpacity={i === activeIndex ? 0.95 : 0.22}
+          strokeOpacity={i === activeIndex ? 0.95 : 0.35}
           strokeLinecap="round"
           className="transition-all duration-300"
         />
@@ -192,9 +192,9 @@ function LaserConduit1({ activeIndex, reduceMotion }) {
             key={`glow-${i}`}
             d={d}
             fill="none"
-            stroke="#818cf8"
+            stroke="#3b82f6"
             strokeWidth={4.5}
-            strokeOpacity={0.45}
+            strokeOpacity={0.4}
             strokeLinecap="round"
             filter="url(#conduit-laser-glow)"
           />
@@ -210,26 +210,26 @@ function LaserConduit1({ activeIndex, reduceMotion }) {
           stroke="#ffffff"
           strokeWidth={2.4}
           strokeLinecap="round"
-          strokeDasharray="16 170"
+          strokeDasharray="14 150"
           filter="url(#conduit-laser-glow)"
-          animate={{ strokeDashoffset: [186, -186] }}
-          transition={{ duration: 1.15, repeat: Infinity, ease: 'linear' }}
+          animate={{ strokeDashoffset: [164, -164] }}
+          transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}
         />
       )}
 
-      {/* Entry junction node at (56, 92) */}
-      <circle cx="56" cy="92" r="3.5" fill="#818cf8" />
+      {/* Entry junction node at (36, 84) */}
+      <circle cx="36" cy="84" r="3" fill="#2563eb" />
       {!reduceMotion && (
         <motion.circle
-          cx="56"
-          cy="92"
-          r="3.5"
+          cx="36"
+          cy="84"
+          r="3"
           fill="none"
-          stroke="#a5b4fc"
+          stroke="#60a5fa"
           strokeWidth="1.5"
           animate={{ scale: [1, 2.5], opacity: [0.9, 0] }}
           transition={{ duration: 1.4, repeat: Infinity, ease: 'easeOut' }}
-          style={{ transformOrigin: '56px 92px' }}
+          style={{ transformOrigin: '36px 84px' }}
         />
       )}
     </svg>
@@ -238,27 +238,27 @@ function LaserConduit1({ activeIndex, reduceMotion }) {
 
 /* ── Conduit 2: Direct Laser Bridge connecting Center Core to Right Workspace Card ── */
 function LaserConduit2({ reduceMotion }) {
-  // Height: 184, Width: 38
-  // Bridge from (0, 92) to (38, 92)
+  // Height: 168, Width: 26
+  // Bridge from (0, 84) to (26, 84)
   return (
     <svg
-      viewBox="0 0 38 184"
-      className="h-[184px] w-[38px] shrink-0 overflow-visible select-none pointer-events-none"
+      viewBox="0 0 26 168"
+      className="h-[168px] w-[26px] shrink-0 overflow-visible select-none pointer-events-none"
     >
       <defs>
         <linearGradient id="laser-grad-out" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#c084fc" />
-          <stop offset="50%" stopColor="#818cf8" />
-          <stop offset="100%" stopColor="#38bdf8" />
+          <stop offset="0%" stopColor="#6366f1" />
+          <stop offset="50%" stopColor="#2563eb" />
+          <stop offset="100%" stopColor="#0284c7" />
         </linearGradient>
       </defs>
 
       {/* Guide line */}
       <line
         x1="0"
-        y1="92"
-        x2="38"
-        y2="92"
+        y1="84"
+        x2="26"
+        y2="84"
         stroke="url(#laser-grad-out)"
         strokeWidth="2.2"
         strokeOpacity="0.85"
@@ -266,10 +266,10 @@ function LaserConduit2({ reduceMotion }) {
       />
       <line
         x1="0"
-        y1="92"
-        x2="38"
-        y2="92"
-        stroke="#818cf8"
+        y1="84"
+        x2="26"
+        y2="84"
+        stroke="#3b82f6"
         strokeWidth={4.5}
         strokeOpacity={0.35}
         filter="url(#conduit-laser-glow)"
@@ -279,21 +279,21 @@ function LaserConduit2({ reduceMotion }) {
       {!reduceMotion && (
         <motion.line
           x1="0"
-          y1="92"
-          x2="38"
-          y2="92"
+          y1="84"
+          x2="26"
+          y2="84"
           stroke="#ffffff"
-          strokeWidth={2.5}
+          strokeWidth={2.4}
           strokeLinecap="round"
-          strokeDasharray="12 40"
-          animate={{ strokeDashoffset: [52, -52] }}
-          transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
+          strokeDasharray="10 26"
+          animate={{ strokeDashoffset: [36, -36] }}
+          transition={{ duration: 0.85, repeat: Infinity, ease: 'linear' }}
         />
       )}
 
       {/* Exit & entry junction dots */}
-      <circle cx="0" cy="92" r="2.5" fill="#c084fc" />
-      <circle cx="38" cy="92" r="2.5" fill="#38bdf8" />
+      <circle cx="0" cy="84" r="2.5" fill="#6366f1" />
+      <circle cx="26" cy="84" r="2.5" fill="#0284c7" />
     </svg>
   );
 }
@@ -302,69 +302,67 @@ function LaserConduit2({ reduceMotion }) {
 function NeuralCoreCard({ activeSignal, reduceMotion }) {
   return (
     <div
-      className="relative flex h-[210px] w-[194px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl p-3.5 select-none"
+      className="relative flex h-[196px] w-[172px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl p-3 select-none"
       style={{
-        background: 'linear-gradient(155deg, rgba(13, 20, 38, 0.97) 0%, rgba(7, 10, 20, 0.99) 100%)',
-        border: '1px solid rgba(129, 140, 248, 0.35)',
-        boxShadow: '0 24px 50px -15px rgba(0, 0, 0, 0.5), 0 0 32px -4px rgba(99, 102, 241, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+        background: 'linear-gradient(155deg, #090e1d 0%, #060914 100%)',
+        border: '1px solid rgba(147, 197, 253, 0.35)',
+        boxShadow: '0 16px 36px -10px rgba(15, 23, 42, 0.4), 0 0 20px -4px rgba(56, 189, 248, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
       }}
     >
       {/* Top specular reflection rim */}
       <span className="pointer-events-none absolute inset-x-0 top-0 h-1/3 rounded-t-2xl bg-gradient-to-b from-white/[0.09] to-transparent" />
-      {/* Ambient center backlight */}
-      <span className="pointer-events-none absolute -left-6 top-1/2 h-20 w-20 rounded-full bg-indigo-500/20 blur-xl" />
+      <span className="pointer-events-none absolute -left-6 top-1/2 h-16 w-16 rounded-full bg-blue-500/20 blur-xl" />
 
       {/* Header: Chip badge + telemetry status */}
-      <div className="relative z-10 flex items-center justify-between border-b border-white/[0.08] pb-2">
+      <div className="relative z-10 flex items-center justify-between border-b border-white/[0.08] pb-1.5">
         <div className="flex items-center gap-1.5">
-          <span className="flex h-5 w-5 items-center justify-center rounded-md bg-indigo-500/25 ring-1 ring-indigo-400/40">
-            <Sparkles className="h-3 w-3 text-cyan-300" />
+          <span className="flex h-4.5 w-4.5 items-center justify-center rounded-md bg-blue-500/25 ring-1 ring-blue-400/40">
+            <Sparkles className="h-2.5 w-2.5 text-cyan-300" />
           </span>
-          <span className="text-[10px] font-semibold tracking-wide text-white">AI Core</span>
+          <span className="text-[9.5px] font-semibold tracking-wide text-white">AI Core</span>
         </div>
-        <div className="flex items-center gap-1 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-1.5 py-0.5 text-[8px] font-mono text-emerald-300">
+        <div className="flex items-center gap-1 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-1.5 py-0.5 text-[7.5px] font-mono text-emerald-300">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
           <span>LIVE</span>
         </div>
       </div>
 
       {/* Middle: Frequency Waveform Equalizer + Dynamic Context */}
-      <div className="relative z-10 space-y-2 py-1">
-        {/* Animated Frequency Bars */}
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-end gap-1 h-5">
+      <div className="relative z-10 space-y-1.5 py-0.5">
+        <div className="flex items-center justify-between px-0.5">
+          <div className="flex items-end gap-1 h-4">
             {[0.4, 0.9, 0.6, 1.0, 0.5, 0.8].map((scale, idx) => (
               <motion.span
                 key={idx}
-                className="w-1 rounded-full bg-gradient-to-t from-indigo-500 to-cyan-400"
+                className="w-1 rounded-full bg-gradient-to-t from-blue-500 to-cyan-400"
                 animate={reduceMotion ? undefined : {
-                  height: [6 * scale, 18 * scale, 9 * scale, 20 * scale, 6 * scale],
+                  height: [5 * scale, 16 * scale, 8 * scale, 18 * scale, 5 * scale],
                 }}
                 transition={reduceMotion ? undefined : {
                   duration: 1.1 + idx * 0.15,
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
-                style={{ height: 14 * scale }}
+                style={{ height: 12 * scale }}
               />
             ))}
           </div>
-          <span className="text-[8px] font-mono uppercase tracking-wider text-slate-400">Context Flow</span>
+          <span className="text-[7.5px] font-mono uppercase tracking-wider text-slate-400">Streaming</span>
         </div>
 
         {/* Dynamic Channel Tag */}
         <div className="flex items-center gap-1.5">
-          <span className={cn('rounded px-1.5 py-0.5 text-[8px] font-mono font-medium border truncate max-w-[150px]', activeSignal.pillBg)}>
+          <span className={cn('rounded px-1.5 py-0.5 text-[7.5px] font-mono font-medium border truncate max-w-[140px]', activeSignal.pillBg)}>
             {activeSignal.channel}
           </span>
         </div>
 
-        {/* Dynamic Title & Action */}
+        {/* Dynamic Title & Action (Super crisp high-contrast white text) */}
         <div className="min-w-0">
-          <p className="truncate text-[9.5px] font-medium text-slate-100">
+          <p className="truncate text-[9px] font-semibold text-slate-100 leading-snug">
             {activeSignal.title}
           </p>
-          <p className="mt-0.5 truncate text-[8px] text-indigo-300/80">
+          <p className="mt-0.5 truncate text-[7.5px] text-sky-200/90 leading-tight">
             {activeSignal.desc}
           </p>
         </div>
@@ -374,7 +372,7 @@ function NeuralCoreCard({ activeSignal, reduceMotion }) {
       <div className="relative z-10">
         <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/[0.08]">
           <motion.div
-            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-cyan-400 via-indigo-400 to-purple-400"
+            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400"
             animate={reduceMotion ? undefined : {
               width: ['40%', '85%', '55%', '95%'],
             }}
@@ -386,9 +384,9 @@ function NeuralCoreCard({ activeSignal, reduceMotion }) {
             style={{ width: '65%' }}
           />
         </div>
-        <div className="mt-1 flex items-center justify-between text-[7.5px] font-mono text-slate-400">
+        <div className="mt-1 flex items-center justify-between text-[7px] font-mono text-slate-400">
           <span>Synthesized</span>
-          <span className="text-cyan-300">12ms latency</span>
+          <span className="text-cyan-300 font-medium">12ms latency</span>
         </div>
       </div>
     </div>
@@ -399,35 +397,35 @@ function NeuralCoreCard({ activeSignal, reduceMotion }) {
 function WorkspaceOutcomeCard({ activeSignal }) {
   const rows = [
     { icon: MessageSquare, color: '#818cf8', label: 'Decision thread', sub: '4 replies linked' },
-    { icon: FileText,      color: '#34d399', label: 'Living brief',    sub: 'Auto-synced context' },
-    { icon: CheckSquare,   color: '#fbbf24', label: 'Assign next step', sub: 'Maya · Ready to run' },
+    { icon: FileText,      color: '#34d399', label: 'Living brief',    sub: 'Context synced' },
+    { icon: CheckSquare,   color: '#fbbf24', label: 'Assign next step', sub: 'Maya · Ready' },
   ];
 
   return (
     <div
-      className="relative flex h-[210px] w-[164px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl p-3.5 select-none"
+      className="relative flex h-[196px] w-[146px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl p-3 select-none"
       style={{
-        background: 'linear-gradient(155deg, rgba(15, 22, 40, 0.95) 0%, rgba(8, 12, 24, 0.98) 100%)',
-        border: '1px solid rgba(255, 255, 255, 0.12)',
-        boxShadow: '0 24px 50px -15px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
+        background: 'linear-gradient(155deg, #0a0f20 0%, #060914 100%)',
+        border: '1px solid rgba(255, 255, 255, 0.14)',
+        boxShadow: '0 16px 36px -10px rgba(15, 23, 42, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
       }}
     >
       {/* Top specular reflection rim */}
       <span className="pointer-events-none absolute inset-x-0 top-0 h-1/4 rounded-t-2xl bg-gradient-to-b from-white/[0.07] to-transparent" />
 
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between border-b border-white/[0.08] pb-2">
+      <div className="relative z-10 flex items-center justify-between border-b border-white/[0.08] pb-1.5">
         <div className="flex items-center gap-1.5">
-          <UltrakinLogo size={14} />
-          <span className="truncate text-[9.5px] font-semibold text-white/95">One workspace</span>
+          <UltrakinLogo size={13} />
+          <span className="truncate text-[9px] font-semibold text-white/95">One workspace</span>
         </div>
-        <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-1.5 py-0.5 text-[8px] font-mono text-emerald-300">
+        <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-1.5 py-0.5 text-[7.5px] font-mono text-emerald-300">
           3 active
         </span>
       </div>
 
       {/* Rows */}
-      <div className="relative z-10 space-y-1.5 py-1">
+      <div className="relative z-10 space-y-1 py-0.5">
         {rows.map(({ icon: Icon, color, label, sub }, idx) => {
           const isHighlighted = activeSignal.outcomeRow === idx;
           return (
@@ -436,19 +434,19 @@ function WorkspaceOutcomeCard({ activeSignal }) {
               className={cn(
                 'flex items-start gap-1.5 rounded-lg px-1.5 py-1 transition-all duration-300',
                 isHighlighted
-                  ? 'bg-white/[0.08] ring-1 ring-white/20 shadow-[0_2px_8px_rgba(0,0,0,0.3)]'
+                  ? 'bg-white/[0.12] ring-1 ring-sky-400/40 shadow-[0_2px_8px_rgba(0,0,0,0.3)]'
                   : 'opacity-70 hover:opacity-100'
               )}
             >
-              <Icon style={{ color }} className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <Icon style={{ color }} className="mt-0.5 h-3 w-3 shrink-0" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between">
-                  <p className="truncate text-[8.5px] font-medium text-white/95">{label}</p>
+                  <p className="truncate text-[8px] font-medium text-white/95">{label}</p>
                   {isHighlighted && (
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                   )}
                 </div>
-                <p className="truncate text-[7.5px] text-white/45">{sub}</p>
+                <p className="truncate text-[7px] text-white/50">{sub}</p>
               </div>
             </div>
           );
@@ -456,23 +454,23 @@ function WorkspaceOutcomeCard({ activeSignal }) {
       </div>
 
       {/* Bottom row */}
-      <div className="relative z-10 border-t border-white/[0.06] pt-1.5">
-        <div className="flex items-center justify-between text-[7.5px] text-white/50">
-          <span>Connected context</span>
-          <span className="font-mono text-brand-text text-[8px] font-medium">100% in sync</span>
+      <div className="relative z-10 border-t border-white/[0.06] pt-1">
+        <div className="flex items-center justify-between text-[7px] text-white/50">
+          <span>Connected</span>
+          <span className="font-mono text-sky-300 text-[7.5px] font-medium">100% in sync</span>
         </div>
       </div>
     </div>
   );
 }
 
-/* ── HeroInteractiveStage: Next-Level 3D Interactive Stage ── */
+/* ── HeroInteractiveStage: Next-Level 3D Interactive Stage in Celestial Sky Theme ── */
 function HeroInteractiveStage() {
   const reduceMotion = useReducedMotion();
   const [activeId, setActiveId] = useState('chat');
   const [isPaused, setIsPaused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 295, y: 170 });
+  const [mousePos, setMousePos] = useState({ x: 260, y: 150 });
   const cardRef = useRef(null);
 
   // Framer Motion physics springs for butter-smooth physical momentum
@@ -508,9 +506,9 @@ function HeroInteractiveStage() {
     const normX = x / rect.width - 0.5;
     const normY = y / rect.height - 0.5;
 
-    // Organic spring-driven 3D tilt (up to ±11 degrees)
-    rotateX.set(-normY * 11);
-    rotateY.set(normX * 11);
+    // Organic spring-driven 3D tilt
+    rotateX.set(-normY * 10);
+    rotateY.set(normX * 10);
     scale.set(1.02);
 
     setMousePos({ x, y });
@@ -530,11 +528,11 @@ function HeroInteractiveStage() {
   }, [rotateX, rotateY, scale]);
 
   return (
-    <div className="relative mx-auto w-full max-w-[600px] select-none py-3 flex justify-center frame-perspective-3d">
+    <div className="relative mx-auto w-full max-w-[560px] lg:max-w-[580px] select-none py-2 flex justify-center frame-perspective-3d">
 
-      {/* ── Layered Atmospheric Radiant Backglow ── */}
-      <div className="pointer-events-none absolute -inset-8 rounded-[36px] bg-[radial-gradient(ellipse_at_center,rgba(49,86,207,0.22),transparent_65%)] blur-2xl" />
-      <div className="pointer-events-none absolute left-[30%] top-[8%] h-[80%] w-[50%] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.18),transparent_60%)] blur-2xl" />
+      {/* ── Atmospheric Ambient Sky Radiant Backglow ── */}
+      <div className="pointer-events-none absolute -inset-6 rounded-[36px] bg-[radial-gradient(ellipse_at_center,rgba(56,189,248,0.22),transparent_65%)] blur-2xl" />
+      <div className="pointer-events-none absolute left-[25%] top-[10%] h-[80%] w-[50%] rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.16),transparent_60%)] blur-2xl" />
 
       {/* ── Framer Motion 3D Physics Magnetic Card Container ── */}
       <motion.div
@@ -557,80 +555,86 @@ function HeroInteractiveStage() {
           style={{
             opacity: isHovered ? 1 : 0.45,
             background: isHovered
-              ? `radial-gradient(420px circle at ${mousePos.x}px ${mousePos.y}px, rgba(99,102,241,0.7), rgba(49,86,207,0.35) 35%, transparent 70%)`
-              : 'linear-gradient(135deg, rgba(99,102,241,0.3) 0%, rgba(226,232,240,0.65) 50%, rgba(49,86,207,0.25) 100%)',
+              ? `radial-gradient(380px circle at ${mousePos.x}px ${mousePos.y}px, rgba(37,99,235,0.6), rgba(56,189,248,0.3) 35%, transparent 70%)`
+              : 'linear-gradient(135deg, rgba(147,197,253,0.5) 0%, rgba(191,219,254,0.6) 50%, rgba(96,165,250,0.4) 100%)',
           }}
         />
 
-        {/* Card Body Container with Dual-Border Elevation & Specular Rim */}
+        {/* Card Body Container with "Halka Asmani" (Soft Sky Azure) Palette */}
         <div
-          className="relative rounded-2xl bg-white/75 backdrop-blur-xl dark:bg-slate-900/75 p-1.5 shadow-[0_32px_70px_-20px_rgba(20,34,59,0.18),0_10px_28px_-8px_rgba(49,86,207,0.12),inset_0_1px_0_rgba(255,255,255,0.95)]"
-          style={{ transformStyle: 'preserve-3d' }}
+          className="relative rounded-2xl p-1 shadow-[0_24px_50px_-15px_rgba(37,99,235,0.14),0_8px_20px_-6px_rgba(59,130,246,0.1),inset_0_1px_0_rgba(255,255,255,0.98)]"
+          style={{
+            background: 'linear-gradient(150deg, rgba(240, 246, 255, 0.98) 0%, rgba(224, 240, 255, 0.94) 50%, rgba(235, 246, 255, 0.98) 100%)',
+            border: '1px solid rgba(186, 220, 255, 0.85)',
+            transformStyle: 'preserve-3d',
+          }}
         >
-          {/* ── Browser Window Header Bar (Traffic Lights + Domain + Live Status) ── */}
+          {/* ── Browser Window Header Bar (Crisp Frosted Sky White) ── */}
           <div
-            className="flex h-10 items-center justify-between rounded-t-xl border-b border-border/70 bg-surface-raised/90 px-3.5 backdrop-blur-md"
+            className="flex h-9 items-center justify-between rounded-t-xl border-b border-sky-100/90 bg-white/90 px-3 backdrop-blur-md"
             style={{ transform: 'translateZ(14px)' }}
           >
             {/* Traffic lights */}
-            <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full bg-rose-400/90 ring-1 ring-rose-500/40 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
-              <span className="h-3 w-3 rounded-full bg-amber-400/90 ring-1 ring-amber-500/40 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
-              <span className="h-3 w-3 rounded-full bg-emerald-400/90 ring-1 ring-emerald-500/40 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
-              <div className="ml-2.5 hidden sm:flex items-center gap-1.5 rounded-md border border-border/60 bg-surface/80 px-2.5 py-0.5 text-[10px] font-mono text-ink-muted shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)]">
+            <div className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-rose-400 ring-1 ring-rose-500/30 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400 ring-1 ring-amber-500/30 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 ring-1 ring-emerald-500/30 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
+              <div className="ml-2 hidden sm:flex items-center gap-1.5 rounded-md border border-sky-200/60 bg-sky-50/70 px-2 py-0.5 text-[9.5px] font-mono text-sky-900 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 <span>app.ultrakin.com · workflow engine</span>
               </div>
             </div>
 
             {/* Right: Active context badge */}
-            <div className="flex items-center gap-1.5 rounded-full border border-brand/25 bg-brand/[0.08] px-2.5 py-0.5 text-[9.5px] font-mono font-medium text-brand-text shadow-sm">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" />
+            <div className="flex items-center gap-1.5 rounded-full border border-sky-300/80 bg-sky-100/70 px-2.5 py-0.5 text-[9px] font-mono font-semibold text-blue-700 shadow-sm">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-600" />
               <span>Active context</span>
             </div>
           </div>
 
-          {/* ── Window Body: Interactive Workflow Pipeline ── */}
+          {/* ── Window Body: Interactive Workflow Pipeline on Luminous Soft Sky Canvas ── */}
           <div
-            className="relative overflow-hidden rounded-b-xl bg-surface/30 p-3 sm:p-4 backdrop-blur-sm"
-            style={{ transformStyle: 'preserve-3d' }}
+            className="relative overflow-hidden rounded-b-xl p-3 backdrop-blur-sm"
+            style={{
+              background: 'linear-gradient(160deg, rgba(244, 249, 255, 0.7) 0%, rgba(228, 241, 255, 0.85) 100%)',
+              transformStyle: 'preserve-3d',
+            }}
           >
-            {/* Cursor Specular Reflection Glare across the stage */}
+            {/* Soft Ambient Reflection Glare on the Sky Canvas (Kept in Background z-0 so text is NEVER washed out) */}
             {isHovered && !reduceMotion && (
               <div
-                className="pointer-events-none absolute inset-0 z-30 transition-opacity duration-300"
+                className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-300"
                 style={{
-                  background: `radial-gradient(450px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255,255,255,0.45) 0%, rgba(99,102,241,0.08) 40%, transparent 65%)`,
-                  mixBlendMode: 'overlay',
+                  background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255,255,255,0.4) 0%, rgba(186,230,253,0.15) 45%, transparent 70%)`,
                 }}
               />
             )}
 
-            {/* Stage Top Bar: Telemetry Header */}
+            {/* Stage Top Bar: Telemetry Header (High-contrast dark slate text) */}
             <div
-              className="mb-3 flex items-center justify-between px-1 text-[9px] font-mono uppercase tracking-wider text-ink-subtle"
+              className="relative z-10 mb-2.5 flex items-center justify-between px-1 text-[9px] font-mono uppercase tracking-wider"
               style={{ transform: 'translateZ(12px)' }}
             >
-              <div className="flex items-center gap-1.5 font-semibold text-ink-muted">
+              <div className="flex items-center gap-1.5 font-bold text-slate-800">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
                 <span>Signals Engine</span>
               </div>
               <div className="flex items-center gap-2">
-                <span>Relay active</span>
-                <span className="text-border-strong">·</span>
-                <span className="font-semibold text-brand-text">4 sources synced</span>
+                <span className="text-slate-500 font-medium">Relay active</span>
+                <span className="text-sky-300">·</span>
+                <span className="font-semibold text-blue-700">4 sources synced</span>
               </div>
             </div>
 
             {/* 5-Column Precision Pipeline Layout with Z-depth Parallax */}
             <div
-              className="flex items-center justify-between gap-0"
+              className="relative z-10 flex items-center justify-between gap-0 w-full"
               style={{ transform: 'translateZ(24px)', transformStyle: 'preserve-3d' }}
             >
 
-              {/* Column 1: Left Signals Column (4 Buttons perfectly spanning 184px) */}
+              {/* Column 1: Left Signals Column (4 Buttons spanning 168px) */}
               <div
-                className="flex h-[184px] w-[124px] shrink-0 flex-col justify-between"
+                className="flex h-[168px] w-[102px] shrink-0 flex-col justify-between"
                 style={{ transform: 'translateZ(10px)' }}
               >
                 {WORKFLOW_SIGNALS.map((signal) => {
@@ -646,18 +650,18 @@ function HeroInteractiveStage() {
                         setIsPaused(true);
                       }}
                       className={cn(
-                        'relative flex h-10 w-full items-center gap-2 rounded-xl border px-2.5 text-left transition-all duration-200 cursor-pointer',
+                        'relative flex h-9 w-full items-center gap-1.5 rounded-xl border px-2 text-left transition-all duration-200 cursor-pointer shadow-sm',
                         isActive
-                          ? 'border-brand/70 bg-white shadow-[0_4px_16px_rgba(49,86,207,0.18),inset_0_1px_0_rgba(255,255,255,0.9)] text-ink'
-                          : 'border-border/70 bg-surface/80 text-ink-muted hover:border-brand/40 hover:bg-surface hover:text-ink shadow-sm'
+                          ? 'border-blue-600 bg-white text-blue-700 font-semibold ring-2 ring-blue-500/20 shadow-[0_4px_14px_rgba(37,99,235,0.18)]'
+                          : 'border-sky-200/80 bg-white/90 text-slate-700 hover:border-blue-400 hover:bg-white hover:text-slate-900'
                       )}
                     >
                       <Icon
                         className={cn('h-3.5 w-3.5 shrink-0 transition-transform duration-200', isActive && 'scale-110')}
-                        style={{ color: isActive ? signal.accentColor : undefined }}
+                        style={{ color: isActive ? signal.accentColor : '#64748b' }}
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[10px] font-medium leading-none">{signal.label}</p>
+                        <p className="truncate text-[9.5px] leading-none">{signal.label}</p>
                       </div>
 
                       {/* Right-edge diode anchor port */}
@@ -665,8 +669,8 @@ function HeroInteractiveStage() {
                         className={cn(
                           'absolute -right-1 h-2 w-2 rounded-full border border-white transition-all duration-300',
                           isActive
-                            ? 'bg-brand shadow-[0_0_8px_#3156cf] scale-125 ring-2 ring-brand/40'
-                            : 'bg-border-strong opacity-40'
+                            ? 'bg-blue-600 shadow-[0_0_8px_#2563eb] scale-125 ring-2 ring-blue-400/50'
+                            : 'bg-slate-300 opacity-60'
                         )}
                       />
                     </button>
@@ -674,41 +678,41 @@ function HeroInteractiveStage() {
                 })}
               </div>
 
-              {/* Column 2: SVG Laser Conduit 1 (Height 184px) */}
+              {/* Column 2: SVG Laser Conduit 1 (Height 168px, Width 36px) */}
               <div style={{ transform: 'translateZ(16px)' }}>
                 <LaserConduit1 activeIndex={activeIndex} reduceMotion={reduceMotion} />
               </div>
 
-              {/* Column 3: Center Neural Core Card */}
+              {/* Column 3: Center Neural Core Card (Width 172px) */}
               <div style={{ transform: 'translateZ(28px)' }}>
                 <NeuralCoreCard activeSignal={activeSignal} reduceMotion={reduceMotion} />
               </div>
 
-              {/* Column 4: SVG Laser Conduit 2 (Height 184px) */}
+              {/* Column 4: SVG Laser Conduit 2 (Height 168px, Width 26px) */}
               <div style={{ transform: 'translateZ(16px)' }}>
                 <LaserConduit2 reduceMotion={reduceMotion} />
               </div>
 
-              {/* Column 5: Right One Workspace Card */}
+              {/* Column 5: Right One Workspace Card (Width 146px) */}
               <div style={{ transform: 'translateZ(22px)' }}>
                 <WorkspaceOutcomeCard activeSignal={activeSignal} />
               </div>
 
             </div>
 
-            {/* ── Bottom Telemetry Status Pill ── */}
+            {/* ── Bottom Telemetry Status Pill (Crisp high-contrast white glass) ── */}
             <div
-              className="mt-3.5 flex items-center justify-center"
+              className="relative z-10 mt-3 flex items-center justify-center"
               style={{ transform: 'translateZ(18px)' }}
             >
-              <div className="flex items-center gap-2 rounded-full border border-border/80 bg-surface/80 px-3 py-1 text-[8.5px] font-medium text-ink-muted shadow-[0_2px_8px_rgba(0,0,0,0.03)] backdrop-blur-sm">
+              <div className="flex items-center gap-2 rounded-full border border-sky-200/90 bg-white/95 px-3 py-1 text-[8.5px] font-semibold text-slate-800 shadow-[0_2px_8px_rgba(37,99,235,0.06)] backdrop-blur-sm">
                 <span className="flex h-2 w-2 items-center justify-center">
                   <span className="absolute h-2 w-2 animate-ping rounded-full bg-emerald-400 opacity-60" />
                   <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 </span>
                 <span>Autonomous context mesh active</span>
-                <span className="text-border-strong">·</span>
-                <span className="font-mono text-ink-soft">Zero context loss across 4 apps</span>
+                <span className="text-sky-300">·</span>
+                <span className="font-mono text-slate-500 font-normal">Zero context loss across 4 apps</span>
               </div>
             </div>
 
@@ -806,7 +810,7 @@ function HeroWorkspaceContent() {
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/25 to-transparent" />
 
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)] lg:gap-12 xl:gap-16">
+        <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(460px,1.08fr)] lg:gap-8 xl:gap-12">
           <div className="max-w-[700px]">
 
             {/* ── Badge ── */}
