@@ -530,9 +530,9 @@ function HeroInteractiveStage() {
   return (
     <div className="relative mx-auto w-full max-w-[560px] lg:max-w-[580px] select-none py-2 flex justify-center frame-perspective-3d">
 
-      {/* ── Atmospheric Ambient Sky Radiant Backglow ── */}
-      <div className="pointer-events-none absolute -inset-6 rounded-[36px] bg-[radial-gradient(ellipse_at_center,rgba(56,189,248,0.22),transparent_65%)] blur-2xl" />
-      <div className="pointer-events-none absolute left-[25%] top-[10%] h-[80%] w-[50%] rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.16),transparent_60%)] blur-2xl" />
+      {/* ── Atmospheric Ambient Brand Backglow (Soft & Elegant) ── */}
+      <div className="pointer-events-none absolute -inset-6 rounded-[36px] bg-[radial-gradient(ellipse_at_center,rgba(49,86,207,0.11),transparent_65%)] blur-2xl" />
+      <div className="pointer-events-none absolute left-[28%] top-[12%] h-[75%] w-[45%] rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.07),transparent_60%)] blur-2xl" />
 
       {/* ── Framer Motion 3D Physics Magnetic Card Container ── */}
       <motion.div
@@ -549,63 +549,63 @@ function HeroInteractiveStage() {
         }}
         className="relative w-full rounded-2xl p-[1px] transition-shadow duration-300"
       >
-        {/* Dynamic Cursor-Following Spotlight Border Glow */}
+        {/* Dynamic Cursor-Following Spotlight Border Glow (Senior Frontend Polish: Subtle & Crisp) */}
         <div
           className="pointer-events-none absolute -inset-[1px] rounded-2xl transition-opacity duration-300 z-10"
           style={{
-            opacity: isHovered ? 1 : 0.45,
+            opacity: isHovered ? 1 : 0.4,
             background: isHovered
-              ? `radial-gradient(380px circle at ${mousePos.x}px ${mousePos.y}px, rgba(37,99,235,0.6), rgba(56,189,248,0.3) 35%, transparent 70%)`
-              : 'linear-gradient(135deg, rgba(147,197,253,0.5) 0%, rgba(191,219,254,0.6) 50%, rgba(96,165,250,0.4) 100%)',
+              ? `radial-gradient(360px circle at ${mousePos.x}px ${mousePos.y}px, rgba(49,86,207,0.32), rgba(99,102,241,0.16) 40%, transparent 68%)`
+              : 'linear-gradient(135deg, rgba(226,232,240,0.8) 0%, rgba(203,213,225,0.5) 50%, rgba(226,232,240,0.8) 100%)',
           }}
         />
 
-        {/* Card Body Container with "Halka Asmani" (Soft Sky Azure) Palette */}
+        {/* Card Body Container: Luminous Pearl-Sky Frosted Surface */}
         <div
-          className="relative rounded-2xl p-1 shadow-[0_24px_50px_-15px_rgba(37,99,235,0.14),0_8px_20px_-6px_rgba(59,130,246,0.1),inset_0_1px_0_rgba(255,255,255,0.98)]"
+          className="relative rounded-2xl p-1 shadow-[0_20px_48px_-16px_rgba(15,23,42,0.08),0_4px_16px_-4px_rgba(49,86,207,0.05),inset_0_1px_0_rgba(255,255,255,1)]"
           style={{
-            background: 'linear-gradient(150deg, rgba(240, 246, 255, 0.98) 0%, rgba(224, 240, 255, 0.94) 50%, rgba(235, 246, 255, 0.98) 100%)',
-            border: '1px solid rgba(186, 220, 255, 0.85)',
+            background: 'linear-gradient(160deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 250, 254, 0.95) 50%, rgba(240, 246, 253, 0.98) 100%)',
+            border: '1px solid rgba(219, 234, 254, 0.75)',
             transformStyle: 'preserve-3d',
           }}
         >
-          {/* ── Browser Window Header Bar (Crisp Frosted Sky White) ── */}
+          {/* ── Browser Window Header Bar (Crisp Frosted Pearl-Sky) ── */}
           <div
-            className="flex h-9 items-center justify-between rounded-t-xl border-b border-sky-100/90 bg-white/90 px-3 backdrop-blur-md"
+            className="flex h-9 items-center justify-between rounded-t-xl border-b border-slate-200/70 bg-white/95 px-3 backdrop-blur-md"
             style={{ transform: 'translateZ(14px)' }}
           >
             {/* Traffic lights */}
             <div className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-rose-400 ring-1 ring-rose-500/30 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-400 ring-1 ring-amber-500/30 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 ring-1 ring-emerald-500/30 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
-              <div className="ml-2 hidden sm:flex items-center gap-1.5 rounded-md border border-sky-200/60 bg-sky-50/70 px-2 py-0.5 text-[9.5px] font-mono text-sky-900 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+              <span className="h-2.5 w-2.5 rounded-full bg-rose-400 ring-1 ring-rose-500/25 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
+              <span className="h-2.5 w-2.5 rounded-full bg-amber-400 ring-1 ring-amber-500/25 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 ring-1 ring-emerald-500/25 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
+              <div className="ml-2 hidden sm:flex items-center gap-1.5 rounded-md border border-slate-200/80 bg-slate-50/80 px-2 py-0.5 text-[9.5px] font-mono text-slate-600 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 <span>app.ultrakin.com · workflow engine</span>
               </div>
             </div>
 
             {/* Right: Active context badge */}
-            <div className="flex items-center gap-1.5 rounded-full border border-sky-300/80 bg-sky-100/70 px-2.5 py-0.5 text-[9px] font-mono font-semibold text-blue-700 shadow-sm">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-600" />
+            <div className="flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand/[0.07] px-2.5 py-0.5 text-[9px] font-mono font-medium text-brand-text shadow-sm">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" />
               <span>Active context</span>
             </div>
           </div>
 
-          {/* ── Window Body: Interactive Workflow Pipeline on Luminous Soft Sky Canvas ── */}
+          {/* ── Window Body: Interactive Workflow Pipeline ── */}
           <div
             className="relative overflow-hidden rounded-b-xl p-3 backdrop-blur-sm"
             style={{
-              background: 'linear-gradient(160deg, rgba(244, 249, 255, 0.7) 0%, rgba(228, 241, 255, 0.85) 100%)',
+              background: 'linear-gradient(165deg, rgba(255, 255, 255, 0.6) 0%, rgba(241, 246, 254, 0.75) 100%)',
               transformStyle: 'preserve-3d',
             }}
           >
-            {/* Soft Ambient Reflection Glare on the Sky Canvas (Kept in Background z-0 so text is NEVER washed out) */}
+            {/* Subtle, Organic Ambient Sheen (Low opacity: whisper of light, no harsh glare or washout) */}
             {isHovered && !reduceMotion && (
               <div
                 className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-300"
                 style={{
-                  background: `radial-gradient(350px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255,255,255,0.4) 0%, rgba(186,230,253,0.15) 45%, transparent 70%)`,
+                  background: `radial-gradient(320px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255, 255, 255, 0.14) 0%, rgba(56, 189, 248, 0.04) 40%, transparent 65%)`,
                 }}
               />
             )}
@@ -868,15 +868,6 @@ function HeroWorkspaceContent() {
               >
                 See how it works
               </Button>
-              <button
-                type="button"
-                onClick={openSearchPalette}
-                className="group hidden sm:inline-flex h-12 items-center gap-2 rounded-xl border border-border bg-surface-raised px-4 text-xs font-mono text-ink-muted shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all hover:border-brand/40 hover:text-ink hover:shadow-[0_4px_12px_rgba(49,86,207,0.08)]"
-              >
-                <Sparkles className="h-3.5 w-3.5 text-brand-text transition-transform group-hover:scale-110" />
-                <span>Quick actions</span>
-                <kbd className="rounded border border-border bg-surface-soft px-1.5 py-0.5 text-[10px] text-ink-soft">⌘K</kbd>
-              </button>
             </div>
 
             {/* ── Trust badges ── */}
