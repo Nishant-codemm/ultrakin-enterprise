@@ -471,8 +471,15 @@ function HeroInteractiveStage() {
   const reduceMotion = useReducedMotion();
   const [activeId, setActiveId] = useState('chat');
   const [isPaused, setIsPaused] = useState(false);
-  const [tilt, setTilt] = useState({ rx: 0, ry: 0, gx: 50, gy: 50, isHovered: false });
-  const stageRef = useRef(null);
+  const [isHovered, setIsHovered] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 295, y: 170 });
+  const cardRef = useRef(null);
+
+  // Framer Motion physics springs for butter-smooth physical momentum
+  const springConfig = { stiffness: 150, damping: 20, mass: 0.35 };
+  const rotateX = useSpring(0, springConfig);
+  const rotateY = useSpring(0, springConfig);
+  const scale = useSpring(1, springConfig);
 
   // Auto-cycle through signals every 3.2 seconds when not hovered
   useEffect(() => {
@@ -490,154 +497,224 @@ function HeroInteractiveStage() {
   const activeIndex = WORKFLOW_SIGNALS.findIndex((s) => s.id === activeId);
   const activeSignal = WORKFLOW_SIGNALS[activeIndex] || WORKFLOW_SIGNALS[0];
 
-  // Mousemove 3D perspective physics
+  // Mousemove 3D perspective physics with live spring interpolation
   const handleMouseMove = useCallback((e) => {
     if (reduceMotion) return;
-    const el = stageRef.current;
+    const el = cardRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    setTilt({
-      rx: -y * 8,
-      ry: x * 8,
-      gx: (x + 0.5) * 100,
-      gy: (y + 0.5) * 100,
-      isHovered: true,
-    });
-  }, [reduceMotion]);
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const normX = x / rect.width - 0.5;
+    const normY = y / rect.height - 0.5;
 
-  const handleMouseLeave = useCallback(() => {
-    setTilt({ rx: 0, ry: 0, gx: 50, gy: 50, isHovered: false });
-    setIsPaused(false);
+    // Organic spring-driven 3D tilt (up to ±11 degrees)
+    rotateX.set(-normY * 11);
+    rotateY.set(normX * 11);
+    scale.set(1.02);
+
+    setMousePos({ x, y });
+  }, [reduceMotion, rotateX, rotateY, scale]);
+
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true);
+    setIsPaused(true);
   }, []);
 
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false);
+    setIsPaused(false);
+    rotateX.set(0);
+    rotateY.set(0);
+    scale.set(1);
+  }, [rotateX, rotateY, scale]);
+
   return (
-    <div className="relative mx-auto w-full max-w-[590px] select-none py-2 flex justify-center">
+    <div className="relative mx-auto w-full max-w-[600px] select-none py-3 flex justify-center frame-perspective-3d">
 
       {/* ── Layered Atmospheric Radiant Backglow ── */}
-      <div className="pointer-events-none absolute -inset-6 rounded-3xl bg-[radial-gradient(ellipse_at_center,rgba(49,86,207,0.18),transparent_65%)] blur-2xl" />
-      <div className="pointer-events-none absolute left-[35%] top-[10%] h-[75%] w-[45%] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.14),transparent_60%)] blur-xl" />
+      <div className="pointer-events-none absolute -inset-8 rounded-[36px] bg-[radial-gradient(ellipse_at_center,rgba(49,86,207,0.22),transparent_65%)] blur-2xl" />
+      <div className="pointer-events-none absolute left-[30%] top-[8%] h-[80%] w-[50%] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.18),transparent_60%)] blur-2xl" />
 
-      {/* ── 3D Perspective Tilt Stage ── */}
-      <div
-        ref={stageRef}
+      {/* ── Framer Motion 3D Physics Magnetic Card Container ── */}
+      <motion.div
+        ref={cardRef}
         onMouseMove={handleMouseMove}
-        onMouseEnter={() => setIsPaused(true)}
+        onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        style={{ perspective: '1100px', perspectiveOrigin: '50% 50%' }}
-        className="relative w-full"
+        style={{
+          perspective: 1200,
+          rotateX,
+          rotateY,
+          scale,
+          transformStyle: 'preserve-3d',
+        }}
+        className="relative w-full rounded-2xl p-[1px] transition-shadow duration-300"
       >
+        {/* Dynamic Cursor-Following Spotlight Border Glow */}
         <div
+          className="pointer-events-none absolute -inset-[1px] rounded-2xl transition-opacity duration-300 z-10"
           style={{
-            transform: tilt.isHovered && !reduceMotion
-              ? `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) scale(1.015)`
-              : 'rotateX(0deg) rotateY(0deg) scale(1)',
-            transition: tilt.isHovered ? 'transform 100ms ease-out' : 'transform 600ms cubic-bezier(0.16,1,0.3,1)',
-            transformOrigin: '50% 50%',
-            willChange: 'transform',
+            opacity: isHovered ? 1 : 0.45,
+            background: isHovered
+              ? `radial-gradient(420px circle at ${mousePos.x}px ${mousePos.y}px, rgba(99,102,241,0.7), rgba(49,86,207,0.35) 35%, transparent 70%)`
+              : 'linear-gradient(135deg, rgba(99,102,241,0.3) 0%, rgba(226,232,240,0.65) 50%, rgba(49,86,207,0.25) 100%)',
           }}
-          className="relative rounded-3xl border border-border/80 bg-white/40 p-4 sm:p-5 shadow-[0_24px_50px_-20px_rgba(20,34,59,0.14),0_2px_8px_rgba(20,34,59,0.04)] backdrop-blur-md dark:bg-white/[0.02]"
+        />
+
+        {/* Card Body Container with Dual-Border Elevation & Specular Rim */}
+        <div
+          className="relative rounded-2xl bg-white/75 backdrop-blur-xl dark:bg-slate-900/75 p-1.5 shadow-[0_32px_70px_-20px_rgba(20,34,59,0.18),0_10px_28px_-8px_rgba(49,86,207,0.12),inset_0_1px_0_rgba(255,255,255,0.95)]"
+          style={{ transformStyle: 'preserve-3d' }}
         >
-          {/* Subtle cursor specular highlight sheen across the stage */}
-          {tilt.isHovered && !reduceMotion && (
-            <div
-              className="pointer-events-none absolute inset-0 z-20 rounded-3xl"
-              style={{
-                background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255,255,255,0.35) 0%, transparent 60%)`,
-                mixBlendMode: 'overlay',
-              }}
-            />
-          )}
-
-          {/* ── Stage Top Bar: Telemetry Header ── */}
-          <div className="mb-3 flex items-center justify-between px-1 text-[9px] font-mono uppercase tracking-wider text-ink-subtle">
-            <div className="flex items-center gap-1.5 font-semibold text-ink-muted">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-              <span>Context Engine</span>
-            </div>
+          {/* ── Browser Window Header Bar (Traffic Lights + Domain + Live Status) ── */}
+          <div
+            className="flex h-10 items-center justify-between rounded-t-xl border-b border-border/70 bg-surface-raised/90 px-3.5 backdrop-blur-md"
+            style={{ transform: 'translateZ(14px)' }}
+          >
+            {/* Traffic lights */}
             <div className="flex items-center gap-2">
-              <span>Relay active</span>
-              <span className="text-border-strong">·</span>
-              <span className="font-semibold text-brand-text">4 sources synced</span>
+              <span className="h-3 w-3 rounded-full bg-rose-400/90 ring-1 ring-rose-500/40 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
+              <span className="h-3 w-3 rounded-full bg-amber-400/90 ring-1 ring-amber-500/40 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
+              <span className="h-3 w-3 rounded-full bg-emerald-400/90 ring-1 ring-emerald-500/40 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
+              <div className="ml-2.5 hidden sm:flex items-center gap-1.5 rounded-md border border-border/60 bg-surface/80 px-2.5 py-0.5 text-[10px] font-mono text-ink-muted shadow-[inset_0_1px_2px_rgba(0,0,0,0.03)]">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                <span>app.ultrakin.com · workflow engine</span>
+              </div>
+            </div>
+
+            {/* Right: Active context badge */}
+            <div className="flex items-center gap-1.5 rounded-full border border-brand/25 bg-brand/[0.08] px-2.5 py-0.5 text-[9.5px] font-mono font-medium text-brand-text shadow-sm">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" />
+              <span>Active context</span>
             </div>
           </div>
 
-          {/* ── 5-Column Precision Pipeline Layout ── */}
-          <div className="flex items-center justify-between gap-0">
+          {/* ── Window Body: Interactive Workflow Pipeline ── */}
+          <div
+            className="relative overflow-hidden rounded-b-xl bg-surface/30 p-3 sm:p-4 backdrop-blur-sm"
+            style={{ transformStyle: 'preserve-3d' }}
+          >
+            {/* Cursor Specular Reflection Glare across the stage */}
+            {isHovered && !reduceMotion && (
+              <div
+                className="pointer-events-none absolute inset-0 z-30 transition-opacity duration-300"
+                style={{
+                  background: `radial-gradient(450px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255,255,255,0.45) 0%, rgba(99,102,241,0.08) 40%, transparent 65%)`,
+                  mixBlendMode: 'overlay',
+                }}
+              />
+            )}
 
-            {/* Column 1: Left Signals Column (4 Buttons perfectly spanning 184px) */}
-            <div className="flex h-[184px] w-[126px] shrink-0 flex-col justify-between">
-              {WORKFLOW_SIGNALS.map((signal) => {
-                const Icon = signal.icon;
-                const isActive = signal.id === activeId;
-                return (
-                  <button
-                    key={signal.id}
-                    type="button"
-                    onClick={() => setActiveId(signal.id)}
-                    onMouseEnter={() => {
-                      setActiveId(signal.id);
-                      setIsPaused(true);
-                    }}
-                    className={cn(
-                      'relative flex h-10 w-full items-center gap-2 rounded-xl border px-2.5 text-left transition-all duration-200 cursor-pointer',
-                      isActive
-                        ? 'border-brand/70 bg-white shadow-[0_4px_16px_rgba(49,86,207,0.18),inset_0_1px_0_rgba(255,255,255,0.9)] text-ink'
-                        : 'border-border/70 bg-surface/80 text-ink-muted hover:border-brand/40 hover:bg-surface hover:text-ink shadow-sm'
-                    )}
-                  >
-                    <Icon
-                      className={cn('h-3.5 w-3.5 shrink-0 transition-transform duration-200', isActive && 'scale-110')}
-                      style={{ color: isActive ? signal.accentColor : undefined }}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[10px] font-medium leading-none">{signal.label}</p>
-                    </div>
+            {/* Stage Top Bar: Telemetry Header */}
+            <div
+              className="mb-3 flex items-center justify-between px-1 text-[9px] font-mono uppercase tracking-wider text-ink-subtle"
+              style={{ transform: 'translateZ(12px)' }}
+            >
+              <div className="flex items-center gap-1.5 font-semibold text-ink-muted">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+                <span>Signals Engine</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span>Relay active</span>
+                <span className="text-border-strong">·</span>
+                <span className="font-semibold text-brand-text">4 sources synced</span>
+              </div>
+            </div>
 
-                    {/* Right-edge diode anchor port */}
-                    <span
+            {/* 5-Column Precision Pipeline Layout with Z-depth Parallax */}
+            <div
+              className="flex items-center justify-between gap-0"
+              style={{ transform: 'translateZ(24px)', transformStyle: 'preserve-3d' }}
+            >
+
+              {/* Column 1: Left Signals Column (4 Buttons perfectly spanning 184px) */}
+              <div
+                className="flex h-[184px] w-[124px] shrink-0 flex-col justify-between"
+                style={{ transform: 'translateZ(10px)' }}
+              >
+                {WORKFLOW_SIGNALS.map((signal) => {
+                  const Icon = signal.icon;
+                  const isActive = signal.id === activeId;
+                  return (
+                    <button
+                      key={signal.id}
+                      type="button"
+                      onClick={() => setActiveId(signal.id)}
+                      onMouseEnter={() => {
+                        setActiveId(signal.id);
+                        setIsPaused(true);
+                      }}
                       className={cn(
-                        'absolute -right-1 h-2 w-2 rounded-full border border-white transition-all duration-300',
+                        'relative flex h-10 w-full items-center gap-2 rounded-xl border px-2.5 text-left transition-all duration-200 cursor-pointer',
                         isActive
-                          ? 'bg-brand shadow-[0_0_8px_#3156cf] scale-125 ring-2 ring-brand/40'
-                          : 'bg-border-strong opacity-40'
+                          ? 'border-brand/70 bg-white shadow-[0_4px_16px_rgba(49,86,207,0.18),inset_0_1px_0_rgba(255,255,255,0.9)] text-ink'
+                          : 'border-border/70 bg-surface/80 text-ink-muted hover:border-brand/40 hover:bg-surface hover:text-ink shadow-sm'
                       )}
-                    />
-                  </button>
-                );
-              })}
+                    >
+                      <Icon
+                        className={cn('h-3.5 w-3.5 shrink-0 transition-transform duration-200', isActive && 'scale-110')}
+                        style={{ color: isActive ? signal.accentColor : undefined }}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[10px] font-medium leading-none">{signal.label}</p>
+                      </div>
+
+                      {/* Right-edge diode anchor port */}
+                      <span
+                        className={cn(
+                          'absolute -right-1 h-2 w-2 rounded-full border border-white transition-all duration-300',
+                          isActive
+                            ? 'bg-brand shadow-[0_0_8px_#3156cf] scale-125 ring-2 ring-brand/40'
+                            : 'bg-border-strong opacity-40'
+                        )}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Column 2: SVG Laser Conduit 1 (Height 184px) */}
+              <div style={{ transform: 'translateZ(16px)' }}>
+                <LaserConduit1 activeIndex={activeIndex} reduceMotion={reduceMotion} />
+              </div>
+
+              {/* Column 3: Center Neural Core Card */}
+              <div style={{ transform: 'translateZ(28px)' }}>
+                <NeuralCoreCard activeSignal={activeSignal} reduceMotion={reduceMotion} />
+              </div>
+
+              {/* Column 4: SVG Laser Conduit 2 (Height 184px) */}
+              <div style={{ transform: 'translateZ(16px)' }}>
+                <LaserConduit2 reduceMotion={reduceMotion} />
+              </div>
+
+              {/* Column 5: Right One Workspace Card */}
+              <div style={{ transform: 'translateZ(22px)' }}>
+                <WorkspaceOutcomeCard activeSignal={activeSignal} />
+              </div>
+
             </div>
 
-            {/* Column 2: SVG Laser Conduit 1 (Height 184px) */}
-            <LaserConduit1 activeIndex={activeIndex} reduceMotion={reduceMotion} />
-
-            {/* Column 3: Center Neural Core Card */}
-            <NeuralCoreCard activeSignal={activeSignal} reduceMotion={reduceMotion} />
-
-            {/* Column 4: SVG Laser Conduit 2 (Height 184px) */}
-            <LaserConduit2 reduceMotion={reduceMotion} />
-
-            {/* Column 5: Right One Workspace Card */}
-            <WorkspaceOutcomeCard activeSignal={activeSignal} />
-
-          </div>
-
-          {/* ── Bottom Telemetry Status Pill ── */}
-          <div className="mt-3.5 flex items-center justify-center">
-            <div className="flex items-center gap-2 rounded-full border border-border/80 bg-surface/80 px-3 py-1 text-[8.5px] font-medium text-ink-muted shadow-[0_2px_8px_rgba(0,0,0,0.03)] backdrop-blur-sm">
-              <span className="flex h-2 w-2 items-center justify-center">
-                <span className="absolute h-2 w-2 animate-ping rounded-full bg-emerald-400 opacity-60" />
-                <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              </span>
-              <span>Autonomous context mesh active</span>
-              <span className="text-border-strong">·</span>
-              <span className="font-mono text-ink-soft">Zero context loss across 4 apps</span>
+            {/* ── Bottom Telemetry Status Pill ── */}
+            <div
+              className="mt-3.5 flex items-center justify-center"
+              style={{ transform: 'translateZ(18px)' }}
+            >
+              <div className="flex items-center gap-2 rounded-full border border-border/80 bg-surface/80 px-3 py-1 text-[8.5px] font-medium text-ink-muted shadow-[0_2px_8px_rgba(0,0,0,0.03)] backdrop-blur-sm">
+                <span className="flex h-2 w-2 items-center justify-center">
+                  <span className="absolute h-2 w-2 animate-ping rounded-full bg-emerald-400 opacity-60" />
+                  <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                </span>
+                <span>Autonomous context mesh active</span>
+                <span className="text-border-strong">·</span>
+                <span className="font-mono text-ink-soft">Zero context loss across 4 apps</span>
+              </div>
             </div>
-          </div>
 
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
