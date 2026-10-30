@@ -9,12 +9,15 @@ import {
   FileText,
   FolderOpen,
   Headphones,
+  HelpCircle,
+  Layers,
   Mail,
   MessageSquare,
   MessagesSquare,
   Search,
   ShieldCheck,
   Sparkles,
+  Users,
   Video,
   Workflow,
   X,
@@ -26,51 +29,96 @@ import { useWorkspace } from '../context/useWorkspace';
 
 const APP_URL = 'https://app.ultrakin.com';
 
+function UltrakinIcon({ size = 18 }) {
+  return <UltrakinLogo size={size} className="shrink-0" />;
+}
+
 const productGroups = [
   {
     label: 'Everyday work',
     items: [
-      { title: 'Chat', description: 'Conversations with context built in.', icon: MessageSquare, module: 'chat' },
-      { title: 'Threads', description: 'Carry decisions forward, not just messages.', icon: MessagesSquare, module: 'threads' },
-      { title: 'Mail', description: 'Bring customer conversations into the flow.', icon: Mail, module: 'mail' },
-      { title: 'Huddles', description: 'Turn a quick conversation into next steps.', icon: Video, module: 'huddle' },
+      { title: 'Chat', description: 'Real-time discussions with context built in.', icon: MessageSquare, module: 'chat' },
+      { title: 'Threads', description: 'Carry decisions forward, not just loose messages.', icon: MessagesSquare, module: 'threads' },
+      { title: 'Mail', description: 'Bring customer inboxes directly into the flow.', icon: Mail, module: 'mail' },
+      { title: 'Huddles', description: 'Turn audio/video meetings into live action items.', icon: Video, module: 'huddle' },
     ],
   },
   {
     label: 'Shared context',
     items: [
-      { title: 'Docs', description: 'Keep decisions and working notes together.', icon: FileText, module: 'docs' },
-      { title: 'Files', description: 'Find the artifacts connected to the work.', icon: FolderOpen, module: 'files' },
-      { title: 'Tasks', description: 'Move commitments into clear ownership.', icon: CheckSquare, module: 'tasks' },
-      { title: 'Ukin agents', description: 'Let AI help while people stay in control.', icon: Bot, module: 'automations' },
+      { title: 'Docs', description: 'Living specs, meeting notes, and decision logs.', icon: FileText, module: 'docs' },
+      { title: 'Files', description: 'Instant artifact preview linked to project threads.', icon: FolderOpen, module: 'files' },
+      { title: 'Tasks', description: 'Kanban boards and sprints with clear owners.', icon: CheckSquare, module: 'tasks' },
+      { title: 'Ukin agents', description: 'Autonomous agents that automate routine follow-through.', icon: Bot, module: 'automations' },
     ],
   },
 ];
 
 const solutionGroups = [
   {
-    label: 'For the way teams work',
+    label: 'By Team Function',
     items: [
-      { title: 'Product & engineering', description: 'Keep technical decisions connected to delivery.', icon: Workflow, module: 'threads' },
-      { title: 'Customer operations', description: 'Carry customer context from inbox to action.', icon: Headphones, module: 'mail' },
-      { title: 'Distributed teams', description: 'Make async work easier to pick up and continue.', icon: MessagesSquare, module: 'docs' },
-      { title: 'Team operations', description: 'Make ownership and follow-through visible.', icon: CheckSquare, module: 'tasks' },
+      { title: 'Product & Engineering', description: 'Connect sprint specs and PR discussions to delivery.', icon: Workflow, module: 'threads' },
+      { title: 'Customer Operations', description: 'Carry customer tickets and SLA context from email to triage.', icon: Headphones, module: 'mail' },
+      { title: 'Executive & Leadership', description: 'Unified visibility across company decisions and async signoffs.', icon: Users, module: 'docs' },
+      { title: 'Team Operations', description: 'Keep cross-functional ownership and milestones aligned.', icon: CheckSquare, module: 'tasks' },
+    ],
+  },
+  {
+    label: 'By Enterprise Need',
+    items: [
+      { title: 'Incident Swarming', description: 'Audio/video huddle triage with auto-transcribed actions.', icon: Video, module: 'huddle' },
+      { title: 'Living Technical Specs', description: 'Synchronized collaborative documentation that never stales.', icon: FileText, module: 'docs' },
+      { title: 'Agent Automation', description: 'Background agents to route signals without human toil.', icon: Bot, module: 'automations' },
+      { title: 'Async Decision Mesh', description: 'Preserve team context across timezones and handoffs.', icon: MessageSquare, module: 'chat' },
     ],
   },
 ];
 
 const resourceGroups = [
   {
-    label: 'Explore Ultrakin',
+    label: 'Platform Architecture',
     items: [
-      { title: 'How it works', description: 'See a conversation become coordinated work.', icon: Workflow, href: '#workflows' },
-      { title: 'Platform', description: 'Explore the connected workspace.', icon: Sparkles, href: '#platform' },
-      { title: 'Integrations', description: 'Bring your team’s tools into the picture.', icon: FolderOpen, href: '#integrations' },
-      { title: 'Security', description: 'Learn how Ultrakin protects team context.', icon: ShieldCheck, href: '/security' },
-      { title: 'Pricing', description: 'Find the plan that fits your team.', icon: CheckSquare, href: '/pricing' },
+      { title: 'Core Workspace Engine', description: 'Explore the full connected enterprise workspace.', icon: UltrakinIcon, href: '#platform' },
+      { title: 'How it works', description: 'Watch an incoming signal turn into completed work.', icon: Workflow, href: '#workflows' },
+      { title: 'Integrations Matrix', description: 'Connect GitHub, Slack, Jira, Figma, and linear tools.', icon: FolderOpen, href: '#integrations' },
+      { title: 'Interactive Showcase', description: 'Hands-on browser frame with 8 working modules.', icon: Layers, href: '#workspace-showcase' },
+    ],
+  },
+  {
+    label: 'Trust & Evaluation',
+    items: [
+      { title: 'Security & Compliance', description: 'SOC 2 Type II, GDPR, AES-256 encryption & audit logs.', icon: ShieldCheck, href: '/security' },
+      { title: 'Transparent Pricing', description: 'Per-seat plans with clear enterprise licensing terms.', icon: CheckSquare, href: '/pricing' },
+      { title: 'Enterprise Consultation', description: 'Schedule an architecture review or security debrief.', icon: FileText, action: 'openDemoDrawer' },
+      { title: 'FAQ & Details', description: 'Detailed specs on security, permissions, and offline state.', icon: HelpCircle, href: '#faq' },
     ],
   },
 ];
+
+const asideContent = {
+  Product: {
+    tag: 'ONE CONNECTED WORKSPACE',
+    title: 'Keep the work moving forward.',
+    desc: 'From the first conversation to the next clear action, with your team in control.',
+    actionText: 'Explore the workspace',
+    action: (openShowcase) => openShowcase(),
+  },
+  Solutions: {
+    tag: 'ENTERPRISE WORKFLOWS',
+    title: 'Speed with built-in guardrails.',
+    desc: 'Connect chat, docs, and customer signals into one living thread without context loss.',
+    actionText: 'See workflows in action',
+    action: (_, scrollToSection) => scrollToSection('workflows'),
+  },
+  Resources: {
+    tag: 'SECURITY & COMPLIANCE',
+    title: 'Enterprise trust from day zero.',
+    desc: 'SOC 2 Type II audited, GDPR compliant, SSO/SAML enforced, and AES-256 encrypted.',
+    actionText: 'Review security posture',
+    action: () => { window.location.href = '/security'; },
+  },
+};
 
 const menuContent = { Product: productGroups, Solutions: solutionGroups, Resources: resourceGroups };
 const homeScrollSpySections = [
@@ -92,7 +140,7 @@ function MenuItem({ item, onSelect }) {
     <button
       type="button"
       onClick={() => onSelect(item)}
-      className="group flex w-full items-start gap-3 rounded-xl px-3 py-3 text-left transition-colors duration-150 hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70"
+      className="group flex w-full items-start gap-3 rounded-xl px-3 py-3 text-left transition-colors duration-150 hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 cursor-pointer"
     >
       <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-soft text-brand-text transition-colors group-hover:border-brand/25 group-hover:bg-brand-soft group-hover:text-brand-text">
         <Icon size={17} strokeWidth={1.7} />
@@ -225,19 +273,28 @@ export default function Navbar() {
   const selectItem = (item) => {
     setOpenMenu(null);
     closeMobileNavigation();
+    if (item.action === 'openDemoDrawer') {
+      openDemoDrawer();
+      return;
+    }
     if (item.module) {
       if (window.location.pathname !== '/') {
-        window.location.href = '/#hero';
+        window.location.href = '/#workspace-showcase';
         return;
       }
       setActiveModule(item.module);
-      if (!isHeroVisible) scrollToSection('hero');
+      scrollToSection('workspace-showcase');
       return;
     }
-    if (item.href?.startsWith('#') && window.location.pathname !== '/') window.location.href = `/${item.href}`;
-    else if (item.href?.startsWith('#')) scrollToSection(item.href.slice(1));
-    else if (item.href?.startsWith('/')) window.location.href = item.href;
-    else if (item.href) window.open(item.href, '_blank', 'noopener,noreferrer');
+    if (item.href?.startsWith('#') && window.location.pathname !== '/') {
+      window.location.href = `/${item.href}`;
+    } else if (item.href?.startsWith('#')) {
+      scrollToSection(item.href.slice(1));
+    } else if (item.href?.startsWith('/')) {
+      window.location.href = item.href;
+    } else if (item.href) {
+      window.open(item.href, '_blank', 'noopener,noreferrer');
+    }
   };
 
   const openShowcase = () => {
@@ -364,11 +421,11 @@ export default function Navbar() {
             key={openMenu}
             {...menuMotion}
             onMouseEnter={() => enterMenu(openMenu)}
-            className="absolute left-1/2 top-[calc(100%+8px)] hidden w-[min(960px,calc(100vw-48px))] -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_28px_90px_rgba(29,35,40,.1),0_2px_6px_rgba(29,35,40,.035)] backdrop-blur-2xl lg:block"
+            className="absolute left-1/2 top-[calc(100%+8px)] hidden w-[min(980px,calc(100vw-48px))] -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_28px_90px_rgba(29,35,40,.1),0_2px_6px_rgba(29,35,40,.035)] backdrop-blur-2xl lg:block"
           >
             <div
               className="grid gap-3 p-4"
-              style={{ gridTemplateColumns: menuContent[openMenu].length === 2 ? 'minmax(0,1fr) minmax(0,1fr) 260px' : 'minmax(0,1fr) 260px' }}
+              style={{ gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr) 270px' }}
             >
               {menuContent[openMenu].map((group) => (
                 <div key={group.label} className="px-1 py-1">
@@ -381,13 +438,29 @@ export default function Navbar() {
               <aside className="relative flex min-h-[300px] flex-col justify-between overflow-hidden rounded-xl border border-border bg-[radial-gradient(ellipse_at_85%_5%,rgba(49,86,207,.045),transparent_52%),linear-gradient(145deg,#fffefd,#f6f5f2_68%)] p-5 shadow-[0_12px_30px_-24px_rgba(39,34,25,.2)]">
                 <div aria-hidden="true" className="absolute -right-10 top-16 h-36 w-36 rounded-full border border-brand/10 shadow-[0_0_60px_rgba(49,86,207,.08)]" />
                 <div className="relative">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-brand/15 bg-brand-soft text-brand-text"><Sparkles size={16} /></span>
-                  <p className="mt-5 text-[10px] font-semibold uppercase tracking-[.16em] text-brand-text">One connected workspace</p>
-                  <h3 className="mt-2 max-w-[190px] text-lg font-semibold leading-[1.2] tracking-[-.035em] text-ink">Keep the work moving forward.</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-ink-muted">From the first conversation to the next clear action, with your team in control.</p>
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-brand/20 bg-brand-soft/70 p-1.5 shadow-[0_2px_8px_rgba(49,86,207,0.08)]">
+                    <UltrakinLogo size={20} />
+                  </span>
+                  <p className="mt-5 text-[10px] font-semibold uppercase tracking-[.16em] text-brand-text">
+                    {asideContent[openMenu]?.tag ?? 'One connected workspace'}
+                  </p>
+                  <h3 className="mt-2 max-w-[200px] text-lg font-semibold leading-[1.2] tracking-[-.035em] text-ink">
+                    {asideContent[openMenu]?.title ?? 'Keep the work moving forward.'}
+                  </h3>
+                  <p className="mt-2 text-xs leading-relaxed text-ink-muted">
+                    {asideContent[openMenu]?.desc ?? 'From the first conversation to the next clear action, with your team in control.'}
+                  </p>
                 </div>
-                <button type="button" onClick={openShowcase} className="group relative mt-6 inline-flex w-fit items-center gap-2 text-xs font-semibold text-brand-text hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">
-                  Explore the workspace<ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenMenu(null);
+                    asideContent[openMenu]?.action(openShowcase, scrollToSection, openDemoDrawer);
+                  }}
+                  className="group relative mt-6 inline-flex w-fit items-center gap-2 text-xs font-semibold text-brand-text hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 cursor-pointer"
+                >
+                  {asideContent[openMenu]?.actionText ?? 'Explore the workspace'}
+                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                 </button>
               </aside>
             </div>
