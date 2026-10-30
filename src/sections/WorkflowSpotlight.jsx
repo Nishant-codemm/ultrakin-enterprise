@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/cn';
 import BrowserFrame from '../components/BrowserFrame';
+import { useReveal } from '../lib/useReveal';
 
 const SIGNAL = {
   source: '#release-planning', icon: MessageSquareText,
@@ -158,20 +159,32 @@ function FlowConnector({ reduceMotion }) {
 export default function WorkflowSpotlight() {
   const [created, setCreated] = useState(false);
   const reduceMotion = useReducedMotion();
+  const [sectionRef, inView] = useReveal({ threshold: 0.12 });
   const signal = SIGNAL;
   const SignalIcon = signal.icon;
 
   return (
-    <section id="workflows" className="relative overflow-hidden bg-surface py-20 text-ink md:py-28">
+    <section ref={sectionRef} id="workflows" className="relative overflow-hidden bg-surface py-20 text-ink md:py-28">
+
+      {/* Ambient background blob for section depth */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-[8rem] top-1/2 h-[32rem] w-[32rem] -translate-y-1/2 rounded-full bg-brand/[0.04] blur-[120px]"
+      />
 
       <div className="relative mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[0.72fr_1.28fr] lg:items-center lg:gap-16 lg:px-8">
-        <div className="max-w-lg">
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-lg"
+        >
           <p className="mb-6 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle">
             <span className="h-px w-7 bg-brand" /> THE WORK, IN CONTEXT
           </p>
-          <h2 className="text-[clamp(2.5rem,4vw,3rem)] font-medium leading-[1] tracking-[-0.055em] text-ink">
+          <h2 className="font-display text-[clamp(2.5rem,4vw,3.25rem)] font-normal leading-[1.05] tracking-[-0.035em] text-ink">
             A signal comes in.
-            <span className="mt-1 block font-serif font-normal italic tracking-[-0.055em] text-brand-text">The work moves on.</span>
+            <span className="mt-1 block font-display italic text-brand-text">The work moves on.</span>
           </h2>
           <div className="mt-9 border-t border-border pt-5">
             <p className="mb-3 text-[10px] font-medium uppercase tracking-[0.15em] text-ink-subtle">One workflow · chat to task</p>
@@ -183,17 +196,22 @@ export default function WorkflowSpotlight() {
               <span role="listitem" className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-700" aria-hidden="true" />Tracked task</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* ── Right: Browser frame wraps both inner cards ── */}
-        <div className="relative min-w-0">
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.65, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          className="relative min-w-0"
+        >
           <TiltCard maxTilt={5}>
             <BrowserFrame address="app.ultrakin.com/workflows/release-planning">
-              <div className="relative overflow-hidden border border-[#303345] bg-[#12141e] p-3 shadow-[0_20px_42px_-32px_rgba(0,0,0,.72),inset_0_1px_0_rgba(220,224,255,.065)] sm:p-5">
-                <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-[#24243a]/45 to-transparent" />
-                <div className="flex items-center justify-between border-b border-[#2b2e40] px-2 pb-3 sm:px-3">
-                  <div className="flex items-center gap-2 text-[11px] font-medium text-[#d7dbea]">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[#24273a] text-[#aab3d5]"><SignalIcon className="h-3.5 w-3.5" aria-hidden="true" /></span>
+              <div className="relative overflow-hidden border border-obsidian-border bg-obsidian-canvas p-3 shadow-[0_20px_42px_-32px_rgba(0,0,0,.72),inset_0_1px_0_rgba(220,224,255,.065)] sm:p-5">
+                <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-obsidian-surface/45 to-transparent" />
+                <div className="flex items-center justify-between border-b border-obsidian-border-soft px-2 pb-3 sm:px-3">
+                  <div className="flex items-center gap-2 text-[11px] font-medium text-slate-200">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-md bg-obsidian-elevated text-indigo-200"><SignalIcon className="h-3.5 w-3.5" aria-hidden="true" /></span>
                     <span className="truncate">{signal.source}</span>
                   </div>
                   <span className="ml-3 shrink-0 font-mono text-[9px] text-ink-subtle">{signal.time}</span>
@@ -211,14 +229,14 @@ export default function WorkflowSpotlight() {
                       initial={reduceMotion ? false : { opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: reduceMotion ? 0.01 : 0.22 }}
-                      className="relative rounded-xl border border-[#303345] bg-[#191b28] px-4 py-4 shadow-[0_16px_32px_-24px_rgba(0,0,0,.88),inset_0_1px_0_rgba(220,224,255,.055)] sm:min-h-[190px] sm:p-5"
+                      className="relative rounded-xl border border-obsidian-border bg-obsidian-surface px-4 py-4 shadow-[0_16px_32px_-24px_rgba(0,0,0,.88),inset_0_1px_0_rgba(220,224,255,.055)] sm:min-h-[190px] sm:p-5"
                     >
                       <div className="mb-5 flex items-center gap-2.5">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#292c3b] text-[9px] font-semibold text-[#c0c7dc]">{signal.initials}</span>
-                        <span className="text-[11px] font-medium text-[#e0e3ed]">{signal.by}</span>
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-obsidian-elevated text-[9px] font-semibold text-indigo-200">{signal.initials}</span>
+                        <span className="text-[11px] font-medium text-slate-200">{signal.by}</span>
                       </div>
-                      <p className="text-[13px] leading-[1.75] text-[#c0c5d3]">"{signal.message}"</p>
-                      <div className="mt-5 flex items-center gap-2 border-t border-[#303345] pt-3 text-[10px] text-ink-subtle">
+                      <p className="text-[13px] leading-[1.75] text-obsidian-muted">"{signal.message}"</p>
+                      <div className="mt-5 flex items-center gap-2 border-t border-obsidian-border pt-3 text-[10px] text-ink-subtle">
                         <FileText className="h-3 w-3 shrink-0 text-brand-text" aria-hidden="true" />
                         <span className="truncate">{signal.context}</span>
                       </div>
@@ -234,24 +252,24 @@ export default function WorkflowSpotlight() {
                     className="relative rounded-xl"
                     style={{ borderRadius: '0.75rem' }}
                   >
-                    <div className="relative rounded-xl border border-[#36384d] bg-[#0d0f17] px-4 py-4 text-white shadow-[0_18px_38px_-25px_rgba(0,0,0,.72),inset_0_1px_0_rgba(220,224,255,.07)] sm:min-h-[190px] sm:px-5 sm:py-5">
+                    <div className="relative rounded-xl border border-obsidian-border-medium bg-obsidian-base px-4 py-4 text-white shadow-[0_18px_38px_-25px_rgba(0,0,0,.72),inset_0_1px_0_rgba(220,224,255,.07)] sm:min-h-[190px] sm:px-5 sm:py-5">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-[9px] font-medium uppercase tracking-[0.15em] text-[#aaaebe]">Ukin agent suggestion</span>
-                        <span className="rounded-full bg-white/[0.08] px-2 py-1 text-[9px] text-[#c6c8d2]">Review</span>
+                        <span className="text-[9px] font-medium uppercase tracking-[0.15em] text-obsidian-muted">Ukin agent suggestion</span>
+                        <span className="rounded-full bg-white/[0.08] px-2 py-1 text-[9px] text-slate-300">Review</span>
                       </div>
                       <motion.div initial={reduceMotion ? false : { opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduceMotion ? 0.01 : 0.18 }}>
                         <h3 className="mt-5 text-[16px] font-medium leading-6 tracking-[-0.02em] text-white">{signal.action}</h3>
                         <div className="mt-5 space-y-2.5 border-t border-white/[0.09] pt-4 text-[10px]">
-                          <div className="flex items-center justify-between gap-3"><span className="text-[#8c90a0]">Owner</span><span className="text-[#e1e2e9]">{signal.owner}</span></div>
-                          <div className="flex items-center justify-between gap-3"><span className="text-[#8c90a0]">Due</span><span className="text-[#e1e2e9]">{signal.due}</span></div>
+                          <div className="flex items-center justify-between gap-3"><span className="text-obsidian-muted">Owner</span><span className="text-slate-200">{signal.owner}</span></div>
+                          <div className="flex items-center justify-between gap-3"><span className="text-obsidian-muted">Due</span><span className="text-slate-200">{signal.due}</span></div>
                         </div>
                       </motion.div>
                       <button
                         type="button"
                         aria-pressed={created}
                         onClick={() => setCreated((v) => !v)}
-                        className={cn('mt-5 flex min-h-9 w-full items-center justify-center gap-2 rounded-md px-3 text-[11px] font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b5b8ff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0d0f17]',
-                          created ? 'bg-emerald-300/10 text-emerald-200 hover:bg-emerald-300/15' : 'bg-[#3156cf] text-white hover:bg-[#3e66e2]')}
+                        className={cn('mt-5 flex min-h-9 w-full items-center justify-center gap-2 rounded-md px-3 text-[11px] font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-obsidian-focus focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian-base',
+                          created ? 'bg-emerald-300/10 text-emerald-200 hover:bg-emerald-300/15' : 'bg-brand text-white hover:bg-brand-hover shadow-[0_4px_12px_rgba(49,86,207,0.3)]')}
                       >
                         {created ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Plus className="h-3.5 w-3.5" aria-hidden="true" />}
                         {created ? 'Added to the board · undo' : 'Create task'}
@@ -261,14 +279,14 @@ export default function WorkflowSpotlight() {
 
                 </div>
 
-                <div className="flex items-center justify-between border-t border-[#2b2e40] px-2 pt-3 text-[9px] text-ink-subtle sm:px-3">
-                  <span>Conversation <span className="px-1 text-[#8f94a6]">/</span> Context <span className="px-1 text-[#8f94a6]">/</span> Action</span>
+                <div className="flex items-center justify-between border-t border-obsidian-border-soft px-2 pt-3 text-[9px] text-ink-subtle sm:px-3">
+                  <span>Conversation <span className="px-1 text-obsidian-muted">/</span> Context <span className="px-1 text-obsidian-muted">/</span> Action</span>
                   <span>Interactive preview · sample data</span>
                 </div>
               </div>
             </BrowserFrame>
           </TiltCard>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

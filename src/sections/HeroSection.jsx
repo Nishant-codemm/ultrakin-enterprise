@@ -484,11 +484,11 @@ function HeroWorkspaceContent() {
             </motion.div>
 
             {/* ── Headline ── */}
-            <h1 className="max-w-[680px] font-display text-[clamp(3rem,5.5vw,5rem)] font-medium leading-[1.02] tracking-[-0.055em] text-ink">
+            <h1 className="max-w-[680px] font-display text-[clamp(3rem,5.5vw,5rem)] font-normal leading-[1.03] tracking-[-0.035em] text-ink">
               <span className="block">The autonomous</span>
               <span className="block">workspace for</span>
               <span
-                className="block bg-clip-text text-transparent"
+                className="block bg-clip-text text-transparent italic"
                 style={{ backgroundImage: 'linear-gradient(105deg, #3156cf 0%, #6366f1 40%, #818cf8 75%, #4f7bd9 100%)' }}
               >
                 fast teams.
@@ -542,7 +542,21 @@ function HeroWorkspaceContent() {
 
           </div>
 
-          <HeroWorkflowPreview />
+          {/* ── Hero Right: Workflow Preview inside Hardware-Accelerated Browser Frame ── */}
+          <div className="relative rounded-2xl border border-border/80 bg-surface/50 p-1.5 shadow-[0_24px_54px_-24px_rgba(20,34,59,0.18),0_4px_16px_rgba(20,34,59,0.04)] backdrop-blur-sm">
+            <div className="flex h-9 items-center justify-between rounded-t-xl border-b border-border/70 bg-surface-raised px-3.5">
+              <div className="flex items-center gap-1.5">
+                <span className="h-2.5 w-2.5 rounded-full bg-rose-400/70" />
+                <span className="h-2.5 w-2.5 rounded-full bg-amber-400/70" />
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/70" />
+                <span className="ml-2 font-mono text-[10px] text-ink-muted">app.ultrakin.com · workflow engine</span>
+              </div>
+              <span className="rounded-full border border-brand/20 bg-brand/5 px-2 py-0.5 text-[9px] font-mono text-brand-text">Active context</span>
+            </div>
+            <div className="relative overflow-hidden rounded-b-xl bg-surface/20 p-2 sm:p-3">
+              <HeroWorkflowPreview />
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -613,8 +627,11 @@ function HeroWorkspaceContent() {
                 </div>
 
                 <div className="hidden items-center gap-3 md:flex">
-                <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
+                <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-40 motion-reduce:hidden" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                  </span>
                   <span className="hidden md:inline">Workspace active</span>
                 </span>
               </div>

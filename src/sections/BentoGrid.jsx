@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/cn';
 import BrowserFrame from '../components/BrowserFrame';
+import { useReveal } from '../lib/useReveal';
 
 const LENSES = [
   { id: 'memory',     number: '01', label: 'Find past decisions',   hint: 'Search across conversations and docs', icon: Search },
@@ -246,6 +247,8 @@ function BoundariesView() {
 export default function BentoGrid() {
   const [active, setActive] = useState('memory');
   const tabRefs = useRef([]);
+  const [sectionRef, inView] = useReveal({ threshold: 0.12 });
+  const reduceMotion = useReducedMotion();
   const lens = LENSES.find((l) => l.id === active) ?? LENSES[0];
   const ActiveIcon = lens.icon;
   const content = active === 'memory' ? <MemoryView /> : active === 'control' ? <ControlView /> : <BoundariesView />;
@@ -263,30 +266,40 @@ export default function BentoGrid() {
   };
 
   return (
-    <section id="platform" className="relative overflow-hidden bg-transparent py-20 md:py-28">
+    <section ref={sectionRef} id="platform" className="relative overflow-hidden bg-transparent py-20 md:py-28">
       {/* Decorative circles */}
       <div aria-hidden="true" className="pointer-events-none absolute -left-[30rem] top-1/4 h-[48rem] w-[48rem] rounded-full border border-border/40" />
       <div aria-hidden="true" className="pointer-events-none absolute -left-[24rem] top-[30%] h-[36rem] w-[36rem] rounded-full border border-border/40" />
 
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
 
-        {/* ── Header ── */}
-        <div className="mb-16 grid gap-6 md:grid-cols-[1fr_auto] md:items-end">
+        {/* ── Header with Scroll Entrance ── */}
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-16 grid gap-6 md:grid-cols-[1fr_auto] md:items-end"
+        >
           <div>
             <p className="mb-5 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle">
               <span className="h-px w-7 bg-brand" /> Memory · review · boundaries
             </p>
-            <h2 className="max-w-2xl text-[clamp(2.5rem,4vw,3rem)] font-medium leading-[1] tracking-[-0.055em] text-ink">
+            <h2 className="max-w-2xl font-display text-[clamp(2.5rem,4vw,3.25rem)] font-normal leading-[1.05] tracking-[-0.035em] text-ink">
               Useful AI, with<br className="hidden sm:block" /> clear boundaries.
             </h2>
           </div>
           <p className="max-w-xs text-[13px] leading-6 text-ink-muted md:pb-1">
             Find past decisions, review suggested work, and keep agent access aligned to team policy.
           </p>
-        </div>
+        </motion.div>
 
         {/* ── Tabs + BrowserFrame ── */}
-        <div className="grid gap-10 border-t border-border pt-7 lg:grid-cols-[250px_1fr] lg:gap-16">
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 28 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.65, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          className="grid gap-10 border-t border-border pt-7 lg:grid-cols-[250px_1fr] lg:gap-16"
+        >
 
           {/* Sidebar tabs */}
           <div role="tablist" aria-label="Explore how the workspace connects" className="flex gap-3 overflow-x-auto lg:flex-col lg:gap-0 lg:overflow-visible">
@@ -352,7 +365,7 @@ export default function BentoGrid() {
               </div>
             </BrowserFrame>
           </TiltCard>
-        </div>
+        </motion.div>
 
         {/* Footer label */}
         <div className="mt-5 flex items-center justify-between text-[9px] uppercase tracking-[0.14em] text-ink-subtle">

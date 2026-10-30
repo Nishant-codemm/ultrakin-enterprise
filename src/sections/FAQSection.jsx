@@ -25,7 +25,7 @@ export default function FAQSection() {
       <div className="mx-auto max-w-4xl px-5 lg:px-8">
         <div className="mb-9 max-w-2xl">
           <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.19em] text-brand-text">A few useful details</p>
-          <h2 className="text-3xl font-semibold leading-[1.08] tracking-[-0.04em] text-ink sm:text-[2.65rem]">
+          <h2 className="font-display text-3xl font-normal leading-[1.08] tracking-[-0.035em] text-ink sm:text-[2.65rem]">
             Know what the preview does.
           </h2>
         </div>

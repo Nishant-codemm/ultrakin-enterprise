@@ -26,7 +26,7 @@ export default function Button({
 
   const variantStyles = {
     primary:
-      'bg-brand hover:bg-brand-hover active:bg-[#233fa4] text-white shadow-[0_6px_18px_-10px_rgba(49,86,207,.55)] hover:shadow-[0_10px_24px_-12px_rgba(49,86,207,.62)] border border-brand/20 hover:-translate-y-px active:translate-y-0',
+      'bg-brand hover:bg-brand-hover active:bg-[#233fa4] text-white shadow-[0_4px_14px_rgba(49,86,207,0.22),0_1px_2px_rgba(49,86,207,0.12)] hover:shadow-[0_8px_24px_rgba(49,86,207,0.32),0_2px_6px_rgba(49,86,207,0.18)] border border-brand/20 hover:-translate-y-px active:translate-y-0',
     secondary:
       'bg-surface hover:bg-surface-hover text-ink border border-border hover:border-border-strong shadow-[0_1px_2px_rgba(17,24,39,.04)] hover:shadow-[0_5px_14px_-8px_rgba(17,24,39,.18)] hover:-translate-y-px active:translate-y-0',
     ghost:

@@ -4,6 +4,7 @@ import { ArrowUpRight } from 'lucide-react';
 import { cn } from '../lib/cn';
 import BrowserFrame from '../components/BrowserFrame';
 import UltrakinLogo from '../components/primitives/UltrakinLogo';
+import { useReveal } from '../lib/useReveal';
 
 /* ─── Cursor-tracking 3D tilt wrapper for the whole orbit card ─── */
 function TiltCard({ children, className }) {
@@ -313,6 +314,7 @@ function SurfacePreview({ item }) {
 export default function IntegrationsSection() {
   const [selectedCat, setSelectedCat] = useState('Built in');
   const [selected, setSelected]       = useState('Spaces');
+  const [sectionRef, inView]          = useReveal({ threshold: 0.12 });
   const reduceMotion = useReducedMotion();
 
   const visible = INTEGRATIONS.filter((item) => item.category === selectedCat);
@@ -326,15 +328,20 @@ export default function IntegrationsSection() {
   };
 
   return (
-    <section id="integrations" className="relative overflow-hidden bg-surface/65 py-20 md:py-28 lg:py-32">
+    <section ref={sectionRef} id="integrations" className="relative overflow-hidden bg-surface/65 py-20 md:py-28 lg:py-32">
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#879088]/20 to-transparent" />
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
 
-        {/* Header */}
-        <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
+        {/* Header with Scroll Entrance */}
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-end"
+        >
           <div>
             <p className="mb-5 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle"><span className="h-px w-7 bg-brand" /> BUILT IN, THEN OPEN</p>
-            <h2 className="max-w-xl text-[clamp(2.5rem,4vw,3rem)] font-medium leading-[1] tracking-[-0.055em] text-ink">One workspace.<br /><span className="font-serif font-normal italic text-ink-muted">Room to extend.</span></h2>
+            <h2 className="max-w-xl font-display text-[clamp(2.5rem,4vw,3.25rem)] font-normal leading-[1.05] tracking-[-0.035em] text-ink">One workspace.<br /><span className="font-display italic text-ink-muted">Room to extend.</span></h2>
           </div>
           <div className="lg:justify-self-end lg:pb-1">
             <p className="max-w-sm text-[13px] leading-6 text-ink-muted">Chat, mail, meetings, calendar, tasks, docs, and Ukin are built into one workspace. External entries are illustrative examples.</p>
@@ -342,7 +349,7 @@ export default function IntegrationsSection() {
               Explore the workspace <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
             </a>
           </div>
-        </div>
+        </motion.div>
 
         {/* Filter tabs */}
         <div className="mt-12 border-y border-border py-4">

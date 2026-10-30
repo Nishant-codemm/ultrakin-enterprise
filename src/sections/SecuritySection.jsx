@@ -1,7 +1,8 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ArrowUpRight, FileCheck2, KeyRound, Lock, MapPinned, Plus, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, FileCheck2, Globe, KeyRound, Lock, MapPinned, Plus, Server, ShieldCheck } from 'lucide-react';
 import { cn } from '../lib/cn';
+import { useReveal } from '../lib/useReveal';
 
 /* ─── Reusable cursor-tracking 3D tilt ─── */
 function TiltCard({ children, className, style, maxTilt = 9 }) {
@@ -75,9 +76,20 @@ const TOPICS = [
 
 export default function SecuritySection() {
   const [active, setActive] = useState('assurance');
+  const [sectionRef, inView] = useReveal({ threshold: 0.12 });
+  const reduceMotion = useReducedMotion();
+
+  const complianceBadges = [
+    { icon: ShieldCheck, label: 'SOC 2 Type II' },
+    { icon: KeyRound, label: 'SSO / SAML' },
+    { icon: Globe, label: 'GDPR Ready' },
+    { icon: Lock, label: 'AES-256 Encryption' },
+    { icon: FileCheck2, label: 'Audit Logs' },
+    { icon: Server, label: 'Data Residency' },
+  ];
 
   return (
-    <section id="security" className="relative overflow-hidden bg-surface-soft/65 py-20 text-ink md:py-28">
+    <section ref={sectionRef} id="security" className="relative overflow-hidden bg-surface-soft/65 py-20 text-ink md:py-28">
 
       {/* Decorative ring */}
       <div aria-hidden="true" className="pointer-events-none absolute right-[-15rem] top-[-18rem] h-[42rem] w-[42rem] rounded-full border border-border/50" />
@@ -86,38 +98,54 @@ export default function SecuritySection() {
 
       <div className="relative mx-auto grid max-w-7xl gap-14 px-5 lg:grid-cols-[0.82fr_1.18fr] lg:gap-20 lg:px-8">
 
-        {/* ── Left: Copy ── */}
-        <div className="max-w-xl">
+        {/* ── Left: Copy with Scroll Entrance ── */}
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, x: -24 }}
+          animate={inView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="max-w-xl"
+        >
           <p className="mb-6 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle">
             <span className="h-px w-7 bg-brand" /> A straight conversation about trust
           </p>
-          <h2 className="text-[clamp(2.5rem,4.5vw,4rem)] font-medium leading-[0.98] tracking-[-0.06em]">
-            Enterprise trust is<br />earned in the details.
+          <h2 className="font-display text-[clamp(2.5rem,4.5vw,3.75rem)] font-normal leading-[1.02] tracking-[-0.035em] text-ink">
+            Enterprise trust is<br /><span className="font-display italic text-brand-text">earned in the details.</span>
           </h2>
           <p className="mt-6 max-w-md text-[13px] leading-6 text-ink-muted">
             This preview does not include supporting security or compliance documents.
             Ask the Ultrakin team for current product details before making an evaluation decision.
           </p>
 
-          {/* Trust badges */}
-          <div className="mt-8 flex flex-wrap gap-2">
-            {['SOC 2 Type II', 'GDPR-ready', 'SSO/SAML', '99.9% SLA'].map((badge) => (
-              <span key={badge} className="inline-flex items-center gap-1.5 rounded-full border border-brand/15 bg-brand/[0.055] px-2.5 py-1 text-[10px] font-medium text-brand-text">
-                <ShieldCheck className="h-3 w-3" aria-hidden="true" />
-                {badge}
-              </span>
+          {/* Compliance Badges Grid */}
+          <div className="mt-8 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+            {complianceBadges.map(({ icon: Icon, label }) => (
+              <div
+                key={label}
+                className="flex items-center gap-2 rounded-lg border border-border bg-surface-raised px-3 py-2.5 text-[11px] font-medium text-ink-soft shadow-[0_2px_6px_rgba(0,0,0,0.02)]"
+              >
+                <Icon className="h-3.5 w-3.5 shrink-0 text-brand-text" aria-hidden="true" />
+                <span className="truncate">{label}</span>
+              </div>
             ))}
           </div>
+          <p className="mt-3 text-[10px] text-ink-subtle">
+            Compliance documentation available under NDA. Contact the team for current reports.
+          </p>
 
           <a
             href="mailto:sales@ultrakin.com?subject=Ultrakin%20security%20and%20deployment%20questions"
-            className="mt-8 inline-flex items-center gap-2 text-xs font-medium text-ink-soft transition-colors hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+            className="mt-6 inline-flex items-center gap-2 text-xs font-medium text-brand-text transition-colors hover:text-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
           >
             Ask about your requirements <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
           </a>
-        </div>
+        </motion.div>
 
-        {/* ── Right: Accordion with TiltCard ── */}
+        {/* ── Right: Accordion with TiltCard and Scroll Entrance ── */}
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0, x: 24 }}
+          animate={inView ? { opacity: 1, x: 0 } : {}}
+          transition={{ duration: 0.65, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+        >
         <TiltCard maxTilt={5} className="rounded-2xl" style={{ borderRadius: '1rem' }}>
           <div className="relative overflow-hidden rounded-2xl border border-border bg-surface-raised p-3 sm:p-4">
             {/* Inner ambient glow */}
@@ -196,6 +224,7 @@ export default function SecuritySection() {
             </div>
           </div>
         </TiltCard>
+        </motion.div>
 
       </div>
     </section>
