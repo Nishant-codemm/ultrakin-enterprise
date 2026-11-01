@@ -35,21 +35,21 @@ function UltrakinIcon({ size = 18 }) {
 
 const productGroups = [
   {
-    label: 'Everyday work',
+    label: 'Work together',
     items: [
-      { title: 'Chat', description: 'Real-time discussions with context built in.', icon: MessageSquare, module: 'chat' },
-      { title: 'Threads', description: 'Carry decisions forward, not just loose messages.', icon: MessagesSquare, module: 'threads' },
-      { title: 'Mail', description: 'Bring customer inboxes directly into the flow.', icon: Mail, module: 'mail' },
-      { title: 'Huddles', description: 'Turn audio/video meetings into live action items.', icon: Video, module: 'huddle' },
+      { title: 'Chat', description: 'Spaces, threads and direct messages.', icon: MessageSquare, color: 'bg-[#5c5bd6]', module: 'chat' },
+      { title: 'Threads', description: 'Carry decisions forward, not just loose messages.', icon: MessagesSquare, color: 'bg-[#4f46e5]', module: 'threads' },
+      { title: 'Calls & Huddles', description: 'Huddles and video calls with summaries.', icon: Video, color: 'bg-[#059669]', module: 'huddle' },
+      { title: 'Mail', description: 'Shared and personal mail on your domain.', icon: Mail, color: 'bg-[#dc2626]', module: 'mail' },
     ],
   },
   {
-    label: 'Shared context',
+    label: 'Build & Automate',
     items: [
-      { title: 'Docs', description: 'Living specs, meeting notes, and decision logs.', icon: FileText, module: 'docs' },
-      { title: 'Files', description: 'Instant artifact preview linked to project threads.', icon: FolderOpen, module: 'files' },
-      { title: 'Tasks', description: 'Kanban boards and sprints with clear owners.', icon: CheckSquare, module: 'tasks' },
-      { title: 'Ukin agents', description: 'Autonomous agents that automate routine follow-through.', icon: Bot, module: 'automations' },
+      { title: 'Docs', description: 'Pages and living specs your team writes together.', icon: FileText, color: 'bg-[#2563eb]', module: 'docs' },
+      { title: 'Lists & Tasks', description: 'Records for requests, deals and defects.', icon: CheckSquare, color: 'bg-[#10b981]', module: 'tasks' },
+      { title: 'Files', description: 'Instant artifact preview linked to project threads.', icon: FolderOpen, color: 'bg-[#65a30d]', module: 'files' },
+      { title: 'Ukin & Agents', description: 'Automations and AI agents that work across tools.', icon: Bot, color: 'bg-[#c026d3]', module: 'automations' },
     ],
   },
 ];
@@ -58,19 +58,19 @@ const solutionGroups = [
   {
     label: 'By Team Function',
     items: [
-      { title: 'Product & Engineering', description: 'Connect sprint specs and PR discussions to delivery.', icon: Workflow, module: 'threads' },
-      { title: 'Customer Operations', description: 'Carry customer tickets and SLA context from email to triage.', icon: Headphones, module: 'mail' },
-      { title: 'Executive & Leadership', description: 'Unified visibility across company decisions and async signoffs.', icon: Users, module: 'docs' },
-      { title: 'Team Operations', description: 'Keep cross-functional ownership and milestones aligned.', icon: CheckSquare, module: 'tasks' },
+      { title: 'Product & Engineering', description: 'Connect sprint specs and PR discussions to delivery.', icon: Workflow, color: 'bg-[#5c5bd6]', module: 'threads' },
+      { title: 'Customer Operations', description: 'Carry customer tickets and SLA context from email to triage.', icon: Headphones, color: 'bg-[#dc2626]', module: 'mail' },
+      { title: 'Executive & Leadership', description: 'Unified visibility across company decisions and async signoffs.', icon: Users, color: 'bg-[#2563eb]', module: 'docs' },
+      { title: 'Team Operations', description: 'Keep cross-functional ownership and milestones aligned.', icon: CheckSquare, color: 'bg-[#10b981]', module: 'tasks' },
     ],
   },
   {
     label: 'By Enterprise Need',
     items: [
-      { title: 'Incident Swarming', description: 'Audio/video huddle triage with auto-transcribed actions.', icon: Video, module: 'huddle' },
-      { title: 'Living Technical Specs', description: 'Synchronized collaborative documentation that never stales.', icon: FileText, module: 'docs' },
-      { title: 'Agent Automation', description: 'Background agents to route signals without human toil.', icon: Bot, module: 'automations' },
-      { title: 'Async Decision Mesh', description: 'Preserve team context across timezones and handoffs.', icon: MessageSquare, module: 'chat' },
+      { title: 'Incident Swarming', description: 'Audio/video huddle triage with auto-transcribed actions.', icon: Video, color: 'bg-[#059669]', module: 'huddle' },
+      { title: 'Living Technical Specs', description: 'Synchronized collaborative documentation that never stales.', icon: FileText, color: 'bg-[#0284c7]', module: 'docs' },
+      { title: 'Agent Automation', description: 'Background agents to route signals without human toil.', icon: Bot, color: 'bg-[#c026d3]', module: 'automations' },
+      { title: 'Async Decision Mesh', description: 'Preserve team context across timezones and handoffs.', icon: MessageSquare, color: 'bg-[#7c3aed]', module: 'chat' },
     ],
   },
 ];
@@ -79,19 +79,19 @@ const resourceGroups = [
   {
     label: 'Platform Architecture',
     items: [
-      { title: 'Core Workspace Engine', description: 'Explore the full connected enterprise workspace.', icon: UltrakinIcon, href: '#platform' },
-      { title: 'How it works', description: 'Watch an incoming signal turn into completed work.', icon: Workflow, href: '#workflows' },
-      { title: 'Integrations Matrix', description: 'Connect GitHub, Slack, Jira, Figma, and linear tools.', icon: FolderOpen, href: '#integrations' },
-      { title: 'Interactive Showcase', description: 'Hands-on browser frame with 8 working modules.', icon: Layers, href: '#workspace-showcase' },
+      { title: 'Core Workspace Engine', description: 'Explore the full connected enterprise workspace.', icon: UltrakinIcon, color: 'bg-brand/10 border border-brand/20', href: '#platform' },
+      { title: 'How it works', description: 'Watch an incoming signal turn into completed work.', icon: Workflow, color: 'bg-[#c026d3]', href: '#workflows' },
+      { title: 'Integrations Matrix', description: 'Connect GitHub, Slack, Jira, Figma, and linear tools.', icon: FolderOpen, color: 'bg-[#64748b]', href: '#integrations' },
+      { title: 'Interactive Showcase', description: 'Hands-on browser frame with 8 working modules.', icon: Layers, color: 'bg-[#5c5bd6]', href: '#workspace-showcase' },
     ],
   },
   {
     label: 'Trust & Evaluation',
     items: [
-      { title: 'Security & Compliance', description: 'SOC 2 Type II, GDPR, AES-256 encryption & audit logs.', icon: ShieldCheck, href: '/security' },
-      { title: 'Transparent Pricing', description: 'Per-seat plans with clear enterprise licensing terms.', icon: CheckSquare, href: '/pricing' },
-      { title: 'Enterprise Consultation', description: 'Schedule an architecture review or security debrief.', icon: FileText, action: 'openDemoDrawer' },
-      { title: 'FAQ & Details', description: 'Detailed specs on security, permissions, and offline state.', icon: HelpCircle, href: '#faq' },
+      { title: 'Security & Compliance', description: 'SOC 2 Type II, GDPR, AES-256 encryption & audit logs.', icon: ShieldCheck, color: 'bg-[#059669]', href: '/security' },
+      { title: 'Transparent Pricing', description: 'Per-seat plans with clear enterprise licensing terms.', icon: CheckSquare, color: 'bg-[#d97706]', href: '/pricing' },
+      { title: 'Enterprise Consultation', description: 'Schedule an architecture review or security debrief.', icon: FileText, color: 'bg-[#2563eb]', action: 'openDemoDrawer' },
+      { title: 'FAQ & Details', description: 'Detailed specs on security, permissions, and offline state.', icon: HelpCircle, color: 'bg-[#475569]', href: '#faq' },
     ],
   },
 ];
@@ -136,21 +136,26 @@ const homeScrollSpySections = [
 
 function MenuItem({ item, onSelect }) {
   const Icon = item.icon;
+  const isCustomLogo = item.icon === UltrakinIcon;
   return (
     <button
       type="button"
       onClick={() => onSelect(item)}
-      className="group flex w-full items-start gap-3 rounded-xl px-3 py-3 text-left transition-colors duration-150 hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 cursor-pointer"
+      className="group flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left transition-colors duration-150 hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 cursor-pointer"
     >
-      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-surface-soft text-brand-text transition-colors group-hover:border-brand/25 group-hover:bg-brand-soft group-hover:text-brand-text">
-        <Icon size={17} strokeWidth={1.7} />
+      <span
+        className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] shadow-[0_1px_3px_rgba(0,0,0,0.12)] transition-transform duration-150 group-hover:scale-105 ${
+          item.color || 'bg-brand text-white'
+        }`}
+      >
+        <Icon size={16} strokeWidth={2} className={isCustomLogo ? '' : 'text-white'} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="flex items-center gap-2 text-[13px] font-medium text-ink">
+        <span className="flex items-center gap-1.5 text-[13px] font-semibold text-ink leading-tight">
           {item.title}
-          <ArrowDownRight size={13} className="opacity-0 transition-all group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:opacity-70" />
+          <ArrowDownRight size={12} className="opacity-0 transition-all group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:opacity-70 text-ink-muted" />
         </span>
-        <span className="mt-1 block max-w-[230px] text-xs leading-[1.55] text-ink-muted">{item.description}</span>
+        <span className="mt-1 block max-w-[240px] text-xs leading-[1.45] text-ink-muted">{item.description}</span>
       </span>
     </button>
   );
