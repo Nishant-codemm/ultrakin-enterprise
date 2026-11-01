@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { CheckCircle2, Plus, ExternalLink } from 'lucide-react';
+import { CheckCircle2, ExternalLink } from 'lucide-react';
 
 export default function SystemRecordBadge({
   recordId = 'SR-28',
