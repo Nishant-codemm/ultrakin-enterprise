@@ -41,6 +41,7 @@ const SOLUTION_ICONS = {
 // ─── Lazy-load all 11 solution demo components ──────────────────────────────
 const SupportAgentShowcaseCard = lazy(() => import('./solutions/SupportAgentShowcaseCard'));
 const SalesAgentShowcaseCard = lazy(() => import('./solutions/SalesAgentShowcaseCard'));
+const EngineeringAgentShowcaseCard = lazy(() => import('./solutions/EngineeringAgentShowcaseCard'));
 
 const DEMO_MAP = {
   'customer-support': lazy(() => import('./solutions/CustomerSupportSolutionDemo')),
@@ -238,6 +239,15 @@ export default function SolutionPage() {
         <section className="mx-auto max-w-7xl px-5 lg:px-8 mt-2">
           <Suspense fallback={<div className="h-24 bg-slate-100 rounded-2xl animate-pulse" />}>
             <SalesAgentShowcaseCard />
+          </Suspense>
+        </section>
+      )}
+
+      {/* Secondary Stacked Showcase Card for Engineering */}
+      {slug === 'engineering' && (
+        <section className="mx-auto max-w-7xl px-5 lg:px-8 mt-2">
+          <Suspense fallback={<div className="h-24 bg-slate-100 rounded-2xl animate-pulse" />}>
+            <EngineeringAgentShowcaseCard />
           </Suspense>
         </section>
       )}
