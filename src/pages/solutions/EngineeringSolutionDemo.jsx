@@ -5,7 +5,7 @@
  * Sentry Alert Ingestion -> Audio War Room Huddle -> Collaborative Postmortem -> Pull Request Closure.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Code,
   AlertTriangle,
@@ -22,6 +22,7 @@ import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
 
 export default function EngineeringSolutionDemo() {
+  const reduceMotion = useReducedMotion();
   const [resolved, setResolved] = useState(false);
   const [inHuddle, setInHuddle] = useState(true);
 
@@ -66,9 +67,9 @@ export default function EngineeringSolutionDemo() {
       </div>
 
       {/* ─── Two-Column War Room Layout ──────────────────────────────────────── */}
-      <div className="flex flex-1 overflow-hidden divide-x divide-slate-800">
+      <div className="flex flex-col sm:flex-row flex-1 overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-slate-800">
         {/* Left: Live Huddle War Room & Log Stream */}
-        <div className="flex w-1/2 flex-col p-3 space-y-3 overflow-y-auto bg-[#0b1120]">
+        <div className="flex w-full sm:w-1/2 flex-col p-3 space-y-3 overflow-y-auto bg-[#0b1120]">
           {/* Active Audio Huddle Bar */}
           <div className="rounded-xl border border-indigo-500/30 bg-indigo-950/40 p-3 space-y-2">
             <div className="flex items-center justify-between">
@@ -131,7 +132,7 @@ export default function EngineeringSolutionDemo() {
         </div>
 
         {/* Right: Living Postmortem & PR Integration */}
-        <div className="flex w-1/2 flex-col p-3 space-y-3 overflow-y-auto bg-[#131b2e]">
+        <div className="flex w-full sm:w-1/2 flex-col p-3 space-y-3 overflow-y-auto bg-[#131b2e]">
           <div className="flex items-center justify-between">
             <span className="font-semibold text-white text-[11px] flex items-center gap-1.5">
               <FileText size={13} className="text-indigo-400" />

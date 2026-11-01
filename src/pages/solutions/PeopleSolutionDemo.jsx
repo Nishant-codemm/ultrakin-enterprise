@@ -5,7 +5,7 @@
  * Offer Accepted -> Automated IT Tasks -> Welcome Hub -> 30-Day Check-in Pulse.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Users,
   CheckCircle2,
@@ -20,6 +20,7 @@ import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
 
 export default function PeopleSolutionDemo() {
+  const reduceMotion = useReducedMotion();
   const [tasks, setTasks] = useState([
     { id: 1, title: 'MacBook Pro M3 provisioned & MDM enrolled', done: true, icon: Laptop },
     { id: 2, title: 'Google Workspace & GitHub SSO accounts created', done: true, icon: Mail },
@@ -58,7 +59,7 @@ export default function PeopleSolutionDemo() {
             <motion.div
               className="bg-[#8b5cf6] h-full rounded-full"
               animate={{ width: `${progressPercent}%` }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: reduceMotion ? 0 : 0.3 }}
             />
           </div>
           <span className="font-mono text-[11px] font-semibold text-[#8b5cf6]">{completedCount}/4</span>
@@ -66,7 +67,7 @@ export default function PeopleSolutionDemo() {
       </div>
 
       {/* ─── Two-Column Onboarding Hub ────────────────────────────────────────── */}
-      <div className="flex flex-1 overflow-hidden divide-x divide-[#e5e2dc]">
+      <div className="flex flex-col sm:flex-row flex-1 overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-[#e5e2dc]">
         {/* Left: Provisioning Checklist */}
         <div className="flex-1 p-4 space-y-3 overflow-y-auto bg-white">
           <p className="text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">Automated IT & Team Tasks</p>

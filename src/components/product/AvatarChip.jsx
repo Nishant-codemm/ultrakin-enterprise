@@ -1,6 +1,7 @@
 /**
  * AvatarChip.jsx
- * Colored circle with initials — shared across all product demos.
+ * Colored circle with initials — shared across all product and solution demos.
+ * Unified prop signature: supports both person object and direct name/color/initials props.
  */
 import React from 'react';
 import { cn } from '../../lib/cn';
@@ -13,22 +14,44 @@ const SIZE_MAP = {
   xl: 'h-12 w-12 text-[17px]',
 };
 
-export default function AvatarChip({ person, size = 'md', className = '', showRing = false, online = false }) {
-  if (!person) return null;
+function getInitials(name = '') {
+  if (!name) return '?';
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+}
+
+export default function AvatarChip({
+  person,
+  name,
+  color,
+  initials,
+  size = 'md',
+  className = '',
+  showRing = false,
+  online = false,
+}) {
+  const resolvedName = person?.name || name || 'User';
+  const resolvedColor = person?.color || color || '#3156cf';
+  const resolvedInitials = person?.initials || initials || getInitials(resolvedName);
+  const isOnline = person?.online !== undefined ? person.online : online;
+
   return (
     <span
       className={cn(
         'relative inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white select-none',
-        SIZE_MAP[size],
+        SIZE_MAP[size] || SIZE_MAP.md,
         showRing && 'ring-2 ring-white',
         className
       )}
-      style={{ backgroundColor: person.color }}
-      title={person.name}
-      aria-label={person.name}
+      style={{ backgroundColor: resolvedColor }}
+      title={resolvedName}
+      aria-label={resolvedName}
     >
-      {person.initials}
-      {online && (
+      {resolvedInitials}
+      {isOnline && (
         <span className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-emerald-500 ring-1 ring-white" />
       )}
     </span>

@@ -5,7 +5,7 @@
  * Branded Client Guest Channel -> Design Deliverable Review -> Scope Guard Change Order Approval.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Palette,
   CheckCircle2,
@@ -19,6 +19,7 @@ import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
 
 export default function AgenciesSolutionDemo() {
+  const reduceMotion = useReducedMotion();
   const [scopeApproved, setScopeApproved] = useState(false);
 
   return (
@@ -54,7 +55,7 @@ export default function AgenciesSolutionDemo() {
       </div>
 
       {/* ─── Two-Column Channel & Scope Guard ───────────────────────────────── */}
-      <div className="flex flex-1 overflow-hidden divide-x divide-[#e5e2dc]">
+      <div className="flex flex-col sm:flex-row flex-1 overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-[#e5e2dc]">
         {/* Left: Client Conversation & Deliverables */}
         <div className="flex-1 p-4 space-y-3 overflow-y-auto bg-white">
           <div className="rounded-xl border border-[#e5e2dc] bg-[#faf9f7] p-3 space-y-2">

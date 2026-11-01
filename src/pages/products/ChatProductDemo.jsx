@@ -12,6 +12,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Hash, Send, Smile, Paperclip, CheckCircle2, Bookmark, ArrowRight, Plus } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
+import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
 import { CHAT_DATA, PERSONAS } from '../../data/productPageData';
 
 const EMOJI_PALETTE = ['👍', '❤️', '🚀', '👀', '🎉'];
@@ -74,8 +75,11 @@ export default function ChatProductDemo() {
 
   return (
     <div className="flex h-full w-full overflow-hidden bg-[#0B0F19] text-slate-200 select-none">
+      {/* ── Unified Workspace App Rail ── */}
+      <WorkspaceAppRail activeApp="chat" theme="dark" />
+
       {/* ── Left Sidebar (Channels & DMs) ── */}
-      <div className="w-[170px] sm:w-[190px] shrink-0 border-r border-white/[0.08] bg-[#07090E] flex flex-col justify-between p-3">
+      <div className="hidden xs:flex w-[140px] sm:w-[190px] shrink-0 border-r border-white/[0.08] bg-[#07090E] flex flex-col justify-between p-3">
         <div className="space-y-4">
           <div>
             <div className="flex items-center justify-between px-2 mb-1.5">

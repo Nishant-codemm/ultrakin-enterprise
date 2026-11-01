@@ -12,6 +12,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Mic, MicOff, Video, VideoOff, PhoneOff, PhoneCall, Sparkles, CheckSquare, Share2, Users } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
+import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
 import TypewriterText from '../../components/product/TypewriterText';
 import { CALLS_DATA } from '../../data/productPageData';
 
@@ -52,8 +53,13 @@ export default function CallsProductDemo() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#07090E] text-slate-100 select-none overflow-hidden relative">
-      {/* Top Bar */}
+    <div className="flex h-full w-full bg-[#07090E] text-slate-100 select-none overflow-hidden relative">
+      {/* ── Unified Workspace App Rail ── */}
+      <WorkspaceAppRail activeApp="calls" theme="dark" />
+
+      {/* ── Main Call Viewport ── */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+        {/* Top Bar */}
       <div className="h-10 shrink-0 border-b border-white/[0.08] flex items-center justify-between px-4 bg-[#0B0F19]">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
@@ -252,6 +258,7 @@ export default function CallsProductDemo() {
             <PhoneCall size={13} /> Start New Call
           </button>
         )}
+      </div>
       </div>
     </div>
   );

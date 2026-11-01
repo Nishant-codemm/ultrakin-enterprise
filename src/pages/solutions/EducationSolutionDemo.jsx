@@ -5,7 +5,7 @@
  * Class Event RSVP card in #ap-physics channel -> Live Video Lecture -> AI Recording & Class Notes.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Calendar,
   Video,
@@ -17,19 +17,18 @@ import {
   MessageSquare,
   Sparkles,
   Clock,
-  ChevronRight,
   Share2,
-  FileText,
   Volume2,
 } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
-import StatusBadge from '../../components/product/StatusBadge';
+import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
 
 export default function EducationSolutionDemo() {
+  const reduceMotion = useReducedMotion();
   const [activeChannel, setActiveChannel] = useState('ap-physics');
   const [rsvpState, setRsvpState] = useState('going'); // 'going', 'maybe', 'none'
   const [isPlaying, setIsPlaying] = useState(false);
-  const [playProgress, setPlayProgress] = useState(38);
+  const [playProgress] = useState(38);
   const [copiedLink, setCopiedLink] = useState(false);
 
   const channels = [
@@ -54,28 +53,11 @@ export default function EducationSolutionDemo() {
 
   return (
     <div className="flex h-full w-full overflow-hidden bg-white text-xs select-none font-sans">
-      {/* ─── Far Left Workspace Rail ─────────────────────────────────────────── */}
-      <div className="flex w-12 flex-col items-center border-r border-[#e5e2dc] bg-[#1a1d21] py-3 gap-2 shrink-0">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#3b82f6] text-white font-bold text-xs shadow-sm">
-          U
-        </div>
-        <div className="h-px w-6 bg-white/10 my-1" />
-        <div className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:text-white hover:bg-white/10 cursor-pointer">
-          <MessageSquare size={14} />
-        </div>
-        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-white/15 text-white cursor-pointer shadow-inner">
-          <Calendar size={14} />
-        </div>
-        <div className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:text-white hover:bg-white/10 cursor-pointer">
-          <Video size={14} />
-        </div>
-        <div className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:text-white hover:bg-white/10 cursor-pointer">
-          <FileText size={14} />
-        </div>
-      </div>
+      {/* ─── Unified Workspace App Rail ─── */}
+      <WorkspaceAppRail activeApp="calls" theme="dark" />
 
-      {/* ─── Channel & Class Sidebar ─────────────────────────────────────────── */}
-      <div className="flex w-44 flex-col border-r border-[#e5e2dc] bg-[#f8f7f5] py-3 px-2 shrink-0">
+      {/* ─── Channel & Class Sidebar ─── */}
+      <div className="hidden sm:flex w-40 flex-col border-r border-[#e5e2dc] bg-[#f8f7f5] py-3 px-2 shrink-0">
         <div className="px-2 mb-3">
           <p className="text-[10px] font-semibold tracking-wider text-[#9ca3af] uppercase">Academy Workspace</p>
           <p className="text-xs font-semibold text-[#111827] truncate">STEM Prep Academy</p>
@@ -147,7 +129,7 @@ export default function EducationSolutionDemo() {
         <div className="p-4 space-y-3.5">
           {/* 1. Host Event Card */}
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             className="rounded-xl border border-[#dbeafe] bg-white p-3.5 shadow-xs"
           >
@@ -209,9 +191,9 @@ export default function EducationSolutionDemo() {
 
           {/* 2. Recording & AI Class Notes Package (Verified from Ultrakin Workflow) */}
           <motion.div
-            initial={{ opacity: 0, y: 8 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.08 }}
+            transition={{ delay: reduceMotion ? 0 : 0.08 }}
             className="rounded-xl border border-[#e5e2dc] bg-white p-3.5 shadow-xs space-y-3"
           >
             <div className="flex items-center justify-between">

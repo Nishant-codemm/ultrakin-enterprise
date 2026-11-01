@@ -12,6 +12,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, CheckSquare, Square, MessageSquare, Sparkles, Clock, MoreHorizontal } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
+import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
 import { DOCS_DATA, PERSONAS } from '../../data/productPageData';
 
 export default function DocsProductDemo() {
@@ -30,6 +31,9 @@ export default function DocsProductDemo() {
 
   return (
     <div className="flex h-full w-full bg-[#fbfaf8] text-[#111827] overflow-hidden select-none">
+      {/* ── Unified Workspace App Rail ── */}
+      <WorkspaceAppRail activeApp="docs" />
+
       {/* ── Main Document Area ── */}
       <div className="flex-1 flex flex-col overflow-y-auto border-r border-[#e7e4de] p-5">
         {/* Doc Header */}

@@ -5,7 +5,7 @@
  * Encrypted Client Vault -> Zero-Data-Retention AI Analysis -> Cryptographic Audit Trail.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Scale,
   ShieldCheck,
@@ -20,6 +20,7 @@ import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
 
 export default function ProfessionalServicesSolutionDemo() {
+  const reduceMotion = useReducedMotion();
   const [showAuditModal, setShowAuditModal] = useState(false);
 
   return (
@@ -52,7 +53,7 @@ export default function ProfessionalServicesSolutionDemo() {
       </div>
 
       {/* ─── Vault Documents & Private AI Review ────────────────────────────── */}
-      <div className="flex flex-1 overflow-hidden divide-x divide-[#e5e2dc]">
+      <div className="flex flex-col sm:flex-row flex-1 overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-[#e5e2dc]">
         {/* Left: Confidential Document Records */}
         <div className="flex-1 p-4 space-y-3 overflow-y-auto bg-white">
           <p className="text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">Privileged Files Vault</p>

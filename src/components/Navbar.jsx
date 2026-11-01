@@ -16,7 +16,6 @@ import {
   Mail,
   Megaphone,
   MessageSquare,
-  MessagesSquare,
   Palette,
   Scale,
   Search,

@@ -5,7 +5,7 @@
  * Inbound Enterprise Lead -> Ukin Deal Enrichment -> Collaborative Proposal -> Closed-Won Milestone.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   TrendingUp,
   DollarSign,
@@ -23,6 +23,7 @@ import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
 
 export default function SalesSolutionDemo() {
+  const reduceMotion = useReducedMotion();
   const [stage, setStage] = useState('proposal'); // 'discovery', 'proposal', 'closed'
   const [showNotification, setShowNotification] = useState(false);
 
@@ -80,9 +81,9 @@ export default function SalesSolutionDemo() {
       </div>
 
       {/* ─── Pipeline Board & Active Deal Room ───────────────────────────────── */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col sm:flex-row flex-1 overflow-hidden">
         {/* Left: Kanban Pipeline Stages */}
-        <div className="flex w-3/5 border-r border-[#e5e2dc] divide-x divide-[#f0ede8] overflow-x-auto p-3 gap-2">
+        <div className="flex w-full sm:w-3/5 border-b sm:border-b-0 sm:border-r border-[#e5e2dc] divide-x divide-[#f0ede8] overflow-x-auto p-3 gap-2 shrink-0">
           {/* Stage 1: Discovery */}
           <div className="flex-1 min-w-[120px] space-y-2">
             <div className="flex items-center justify-between px-1">
@@ -228,9 +229,9 @@ export default function SalesSolutionDemo() {
       <AnimatePresence>
         {showNotification && (
           <motion.div
-            initial={{ opacity: 0, y: 12, scale: 0.95 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 12, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 8 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
             className="absolute bottom-3 right-3 z-30 flex items-center gap-2 rounded-lg border border-emerald-300 bg-[#ecfdf5] px-3.5 py-2.5 text-xs font-semibold text-emerald-900 shadow-lg"
           >
             <CheckCircle2 size={16} className="text-emerald-600" />

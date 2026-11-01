@@ -5,7 +5,7 @@
  * Inbound Support Email -> Collision Detection -> Team Escalation -> Logged as SR-14 Record.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Mail,
   MessageSquare,
@@ -21,8 +21,10 @@ import {
 } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
+import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
 
 export default function CustomerSupportSolutionDemo() {
+  const reduceMotion = useReducedMotion();
   const [isLogged, setIsLogged] = useState(true);
   const [replyText, setReplyText] = useState('');
   const [messages, setMessages] = useState([
@@ -69,25 +71,11 @@ export default function CustomerSupportSolutionDemo() {
 
   return (
     <div className="flex h-full w-full overflow-hidden bg-white text-xs select-none font-sans relative">
-      {/* ─── Workspace App Rail ─────────────────────────────────────────── */}
-      <div className="flex w-12 flex-col items-center border-r border-[#e5e2dc] bg-[#1a1d21] py-3 gap-2 shrink-0">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ef4444] text-white font-bold text-xs shadow-sm">
-          U
-        </div>
-        <div className="h-px w-6 bg-white/10 my-1" />
-        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-white/15 text-white cursor-pointer shadow-inner">
-          <Mail size={14} />
-        </div>
-        <div className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:text-white hover:bg-white/10 cursor-pointer">
-          <MessageSquare size={14} />
-        </div>
-        <div className="flex h-7 w-7 items-center justify-center rounded-md text-white/50 hover:text-white hover:bg-white/10 cursor-pointer">
-          <AlertCircle size={14} />
-        </div>
-      </div>
+      {/* ─── Unified Workspace App Rail ─── */}
+      <WorkspaceAppRail activeApp="mail" />
 
-      {/* ─── Inbox List ──────────────────────────────────────────────────────── */}
-      <div className="flex w-48 flex-col border-r border-[#e5e2dc] bg-[#faf9f7] shrink-0">
+      {/* ─── Inbox List ─── */}
+      <div className="flex w-36 sm:w-48 flex-col border-r border-[#e5e2dc] bg-[#faf9f7] shrink-0">
         <div className="border-b border-[#e5e2dc] px-3 py-2.5 bg-white">
           <p className="text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">Shared Mailbox</p>
           <p className="text-xs font-semibold text-[#111827] truncate">support@northwind.shop</p>
@@ -220,9 +208,9 @@ export default function CustomerSupportSolutionDemo() {
       <AnimatePresence>
         {showToast && (
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
+            initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
+            exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
             className="absolute bottom-4 right-4 z-20 flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-800 shadow-md"
           >
             <CheckCircle2 size={14} className="text-emerald-600" />

@@ -94,7 +94,8 @@ function HeroH1({ lines = [], accentColor }) {
 // ─── Main ProductPage ─────────────────────────────────────────────────────────
 export default function ProductPage() {
   const reduceMotion = useReducedMotion();
-  const slug = window.location.pathname.replace('/products/', '').replace(/\/$/, '');
+  const rawSlug = window.location.pathname.replace('/products/', '').replace('/products', '').replace(/\/$/, '');
+  const slug = rawSlug || 'chat';
   const meta = PRODUCT_META[slug];
 
   // Update page title

@@ -11,6 +11,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Plus, ArrowRight, Tag, CheckCircle2, AlertCircle, CornerDownLeft } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
+import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
 import { LISTS_DATA, PERSONAS } from '../../data/productPageData';
 
 export default function ListsProductDemo() {
@@ -55,8 +56,13 @@ export default function ListsProductDemo() {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#f6f5f2] text-[#111827] select-none overflow-hidden">
-      {/* Top Header */}
+    <div className="flex h-full w-full bg-[#f6f5f2] text-[#111827] select-none overflow-hidden">
+      {/* ── Unified Workspace App Rail ── */}
+      <WorkspaceAppRail activeApp="lists" />
+
+      {/* ── Main Kanban Board Area ── */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Top Header */}
       <div className="h-10 shrink-0 border-b border-[#e7e4de] bg-[#fffefd] px-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-[#10b981]" />
@@ -164,6 +170,7 @@ export default function ListsProductDemo() {
       <div className="h-8 shrink-0 border-t border-[#e7e4de] bg-[#fffefd] px-4 flex items-center justify-between text-[10.5px] text-[#667085]">
         <span>Click any card to advance stage</span>
         <span className="font-mono text-emerald-600 font-medium">Synced with workspace</span>
+      </div>
       </div>
     </div>
   );

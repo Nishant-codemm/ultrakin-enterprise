@@ -5,7 +5,7 @@
  * Inbound Customer Exchange Email -> Real-Time Shopify Sync -> 1-Click Return Slip & Inventory Hold.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   ShoppingBag,
   CheckCircle2,
@@ -19,6 +19,7 @@ import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
 
 export default function EcommerceSolutionDemo() {
+  const reduceMotion = useReducedMotion();
   const [returnIssued, setReturnIssued] = useState(false);
 
   return (
@@ -52,7 +53,7 @@ export default function EcommerceSolutionDemo() {
       </div>
 
       {/* ─── Two-Column Message & Shopify Sync ───────────────────────────────── */}
-      <div className="flex flex-1 overflow-hidden divide-x divide-[#e5e2dc]">
+      <div className="flex flex-col sm:flex-row flex-1 overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-[#e5e2dc]">
         {/* Left: Customer Email */}
         <div className="flex-1 p-4 space-y-3 overflow-y-auto bg-white">
           <div className="rounded-xl border border-[#e5e2dc] bg-[#faf9f7] p-3 space-y-2">

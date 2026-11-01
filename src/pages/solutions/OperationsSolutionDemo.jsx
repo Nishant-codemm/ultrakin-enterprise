@@ -5,7 +5,7 @@
  * Procurement Request -> Automated Threshold Branching -> Executive Signoff -> Immutable Asset Ledger.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Workflow,
   CheckCircle2,
@@ -21,6 +21,7 @@ import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
 
 export default function OperationsSolutionDemo() {
+  const reduceMotion = useReducedMotion();
   const [approved, setApproved] = useState(false);
 
   return (
@@ -54,7 +55,7 @@ export default function OperationsSolutionDemo() {
       </div>
 
       {/* ─── Visual Pipeline Canvas ─────────────────────────────────────────── */}
-      <div className="flex flex-1 p-4 gap-4 overflow-y-auto">
+      <div className="flex flex-col sm:flex-row flex-1 p-4 gap-4 overflow-y-auto">
         {/* Step 1: Request Card */}
         <div className="flex-1 flex flex-col justify-between rounded-xl border border-[#e5e2dc] bg-white p-3.5 shadow-2xs">
           <div className="space-y-2">

@@ -5,7 +5,7 @@
  * Inbound Emergency Service Call -> Smart Dispatcher Assignment -> Live GPS Status -> Mobile Signoff.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Truck,
   CheckCircle2,
@@ -20,6 +20,7 @@ import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
 
 export default function FieldServicesSolutionDemo() {
+  const reduceMotion = useReducedMotion();
   const [jobStatus, setJobStatus] = useState('in_route'); // 'unassigned', 'in_route', 'on_site', 'completed'
 
   const handleNextStatus = () => {
@@ -70,7 +71,7 @@ export default function FieldServicesSolutionDemo() {
       </div>
 
       {/* ─── Two-Column Dispatch Kanban & Mobile Ticket ──────────────────────── */}
-      <div className="flex flex-1 overflow-hidden divide-x divide-[#e5e2dc]">
+      <div className="flex flex-col sm:flex-row flex-1 overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-[#e5e2dc]">
         {/* Left: Dispatch Board */}
         <div className="flex-1 p-3.5 space-y-3 overflow-y-auto bg-white">
           <p className="text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wider">Live Fleet Dispatch Board</p>

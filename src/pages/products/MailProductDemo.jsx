@@ -32,6 +32,7 @@ import {
   Clock,
 } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
+import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
 import { PERSONAS } from '../../data/productPageData';
 
 // ─── Workspace App Rail Roundels ─────────────────────────────────────────────
@@ -212,38 +213,8 @@ export default function MailProductDemo() {
       aria-label="Interactive shared mail workspace"
       className="flex h-full w-full bg-white select-none overflow-hidden relative focus:outline-none"
     >
-      {/* ── 1. The Left Workspace App Rail ── */}
-      <div className="w-11 shrink-0 bg-[#f8f7f5] border-r border-[#e7e4de] flex flex-col items-center py-2.5 justify-between">
-        <div className="flex flex-col items-center gap-2.5">
-          {/* Ultrakin Brand Roundel */}
-          <div className="h-7 w-7 rounded-lg bg-[#2563eb] text-white flex items-center justify-center font-bold text-[11px] shadow-xs cursor-default">
-            U
-          </div>
-
-          <div className="w-5 h-px bg-[#e7e4de] my-0.5" />
-
-          {/* Connected Workspace Capability Roundels */}
-          {WORKSPACE_RAIL_ITEMS.map((item) => {
-            const Icon = item.icon;
-            return (
-              <div
-                key={item.id}
-                title={item.label}
-                className={`h-7 w-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${
-                  item.active
-                    ? 'bg-[#dc2626] text-white shadow-xs ring-2 ring-red-200'
-                    : 'text-[#667085] hover:text-[#111827] hover:bg-[#eeece7]'
-                }`}
-              >
-                <Icon size={13} strokeWidth={item.active ? 2.5 : 2} />
-              </div>
-            );
-          })}
-        </div>
-
-        {/* User Presence Avatar in Rail */}
-        <AvatarChip person={PERSONAS.priya} size="xs" online showRing />
-      </div>
+      {/* ── 1. Unified Workspace App Rail ── */}
+      <WorkspaceAppRail activeApp="mail" />
 
       {/* ── 2. The Main Email Application Surface ── */}
       <div className="flex-1 flex flex-col min-w-0 bg-white">

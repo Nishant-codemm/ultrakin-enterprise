@@ -5,7 +5,7 @@
  * Product Launch Brief -> Real-Time Reviewer Comments -> Multi-Stakeholder Signoff -> Scheduled Campaign.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Megaphone,
   CheckCircle2,
@@ -20,6 +20,7 @@ import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
 
 export default function MarketingSolutionDemo() {
+  const reduceMotion = useReducedMotion();
   const [approvedByLegal, setApprovedByLegal] = useState(true);
   const [approvedByProduct, setApprovedByProduct] = useState(false);
 
@@ -63,7 +64,7 @@ export default function MarketingSolutionDemo() {
       </div>
 
       {/* ─── Two-Column Collaborative Doc & Comments ─────────────────────────── */}
-      <div className="flex flex-1 overflow-hidden divide-x divide-[#e5e2dc]">
+      <div className="flex flex-col sm:flex-row flex-1 overflow-hidden divide-y sm:divide-y-0 sm:divide-x divide-[#e5e2dc]">
         {/* Left: Living Document Content */}
         <div className="flex-1 p-4 space-y-3 overflow-y-auto bg-white">
           <div className="space-y-1">

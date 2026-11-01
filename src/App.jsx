@@ -62,6 +62,7 @@ const ROUTE_PAGES = {
   '/agents':    lazy(() => import('./pages/AgentsPage')),
   '/security':  lazy(() => import('./pages/SecurityPage')),
   '/solutions': SolutionsOverviewPage,
+  '/products':  UniversalProductPage,
   ...Object.fromEntries(
     PRODUCT_SLUGS.map(slug => [
       `/products/${slug}`,
