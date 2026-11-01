@@ -5,11 +5,42 @@
  */
 import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import {
+  Mail,
+  MessageSquare,
+  Video,
+  FileText,
+  CheckSquare,
+  Layers,
+  Workflow,
+  Bot,
+  FolderOpen,
+  Sparkles,
+  Search,
+} from 'lucide-react';
 import { PRODUCT_META } from '../data/productPageData';
 import ProductBreadcrumb from '../components/product/ProductBreadcrumb';
 import ProductCTARow from '../components/product/ProductCTARow';
 import ProductFeatureGrid from '../components/product/ProductFeatureGrid';
 import DemoWindowFrame from '../components/product/DemoWindowFrame';
+
+const PRODUCT_ICONS = {
+  chat: MessageSquare,
+  calls: Video,
+  mail: Mail,
+  docs: FileText,
+  lists: CheckSquare,
+  events: Layers,
+  forms: CheckSquare,
+  automations: Workflow,
+  agents: Bot,
+  connectors: FolderOpen,
+  templates: Layers,
+  ukin: Sparkles,
+  search: Search,
+};
+
+const MailAgentShowcaseCard = lazy(() => import('./products/MailAgentShowcaseCard'));
 
 // ─── Lazy-load all demo components ───────────────────────────────────────────
 const DEMO_MAP = {
@@ -113,7 +144,11 @@ export default function ProductPage() {
         >
           {/* Breadcrumb */}
           <motion.div variants={leftVariants}>
-            <ProductBreadcrumb productName={meta.name} productColor={meta.color} />
+            <ProductBreadcrumb
+              productName={meta.name}
+              productColor={meta.color}
+              icon={PRODUCT_ICONS[slug]}
+            />
           </motion.div>
 
           {/* Two-column hero */}
@@ -161,8 +196,7 @@ export default function ProductPage() {
                 style={{ background: `radial-gradient(ellipse at 50% 50%, ${meta.color}22, transparent 70%)` }}
               />
               <DemoWindowFrame
-                url={`app.ultrakin.com/workspace/${slug}`}
-                height="h-[440px]"
+                height="h-[430px]"
                 className="relative"
               >
                 {Demo ? (
@@ -188,6 +222,15 @@ export default function ProductPage() {
           </div>
         </motion.div>
       </section>
+
+      {/* Secondary Stacked Showcase Card for Mail */}
+      {slug === 'mail' && (
+        <section className="mx-auto max-w-7xl px-5 lg:px-8 mt-4">
+          <Suspense fallback={<div className="h-24 bg-slate-100 rounded-2xl animate-pulse" />}>
+            <MailAgentShowcaseCard />
+          </Suspense>
+        </section>
+      )}
 
       {/* Feature grid */}
       <ProductFeatureGrid features={meta.features} productColor={meta.color} />

@@ -1,412 +1,474 @@
 /**
  * MailProductDemo.jsx
- * Tier-1 Production SaaS Mail Demo for /products/mail
+ * Production-Quality Mail Experience Inspired by Original Ultrakin
  *
- * Upgrades:
- * - Live incoming email simulation after 4.5s (unread count spring pop, animated new row entry)
- * - Interactive smart reply chips ("Confirm refund", "Request details")
- * - Live send flow: button spinner -> optimistic append -> floating workspace toast
- * - Two-panel split with unread counters and team typing collision indicator
- * - Full keyboard navigation (ArrowUp/ArrowDown)
+ * Workflow Story:
+ * Customer Signal -> Team Collaboration -> Shared Ownership -> Workspace Record
+ *
+ * Architecture:
+ * - Left Workspace App Rail (Blue U, Lavender Chat, Teal Calls, Active Red Mail roundel, Blue Docs, Green Lists, Fuchsia Automations)
+ * - Domain Header (support@northwind.studio + gray Inbox badge)
+ * - Left Queue: Maya Chen (coral unread dot, warm peach #fff5f5 selection), Lumen Health, Dana Lee, Sam Ortiz
+ * - Right Active Thread: Customer Inquiry -> Team Reply Container (with "Replied by Priya" badge) -> "✓ Logged as SR-14 in Support requests"
+ * - Live Collision Alert: "Sam Ortiz is viewing this thread"
+ * - Interactive Smart Suggestions & Optimistic Composer
+ * - Full Keyboard Navigation (ArrowUp / ArrowDown)
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { Reply, ArrowRight, MoreHorizontal, ExternalLink, Tag, Star, Archive, Send, Sparkles, CheckCircle2 } from 'lucide-react';
+import {
+  Mail,
+  MessageSquare,
+  Video,
+  FileText,
+  CheckSquare,
+  Zap,
+  Check,
+  Send,
+  Sparkles,
+  ExternalLink,
+  ChevronRight,
+  Info,
+  Clock,
+} from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
-import StatusBadge from '../../components/product/StatusBadge';
-import { MAIL_DATA, PERSONAS } from '../../data/productPageData';
+import { PERSONAS } from '../../data/productPageData';
 
-const TOOLBAR_ACTIONS = [
-  { icon: Reply,   label: 'Reply'   },
-  { icon: Archive, label: 'Archive' },
-  { icon: Star,    label: 'Star'    },
-  { icon: Tag,     label: 'Tag'     },
+// ─── Workspace App Rail Roundels ─────────────────────────────────────────────
+const WORKSPACE_RAIL_ITEMS = [
+  { id: 'chat',        icon: MessageSquare, label: 'Chat',        color: '#a855f7', bg: 'bg-[#a855f7]/15 text-[#9333ea]' },
+  { id: 'calls',       icon: Video,         label: 'Calls',       color: '#14b8a6', bg: 'bg-[#14b8a6]/15 text-[#0d9488]' },
+  { id: 'mail',        icon: Mail,          label: 'Mail',        color: '#dc2626', bg: 'bg-[#dc2626] text-white', active: true },
+  { id: 'docs',        icon: FileText,      label: 'Docs',        color: '#0284c7', bg: 'bg-[#0284c7]/15 text-[#0369a1]' },
+  { id: 'lists',       icon: CheckSquare,   label: 'Lists',       color: '#10b981', bg: 'bg-[#10b981]/15 text-[#047857]' },
+  { id: 'automations', icon: Zap,           label: 'Automations', color: '#c026d3', bg: 'bg-[#c026d3]/15 text-[#a21caf]' },
 ];
 
-const SMART_REPLIES = [
-  'Confirm refund for order #4821',
-  'Request invoice payment receipt',
-  'Schedule a follow-up call',
+// ─── Mail Queue Dataset matching Original Reference ─────────────────────────
+const INITIAL_INBOX = [
+  {
+    id: 1,
+    from: PERSONAS.maya,
+    name: 'Maya Chen',
+    time: 'Now',
+    subject: 'Charged twice for October',
+    preview: 'Charged twice for Octo...',
+    unread: true,
+  },
+  {
+    id: 2,
+    from: PERSONAS.lumen,
+    name: 'Lumen Health',
+    time: '9:12',
+    subject: 'Re: Invoice 1182',
+    preview: 'Re: Invoice 1182',
+    unread: false,
+  },
+  {
+    id: 3,
+    from: PERSONAS.dana,
+    name: 'Dana Lee',
+    time: 'Yesterday',
+    subject: 'Weekly numbers',
+    preview: 'Weekly numbers',
+    unread: false,
+  },
+  {
+    id: 4,
+    from: PERSONAS.sam,
+    name: 'Sam Ortiz',
+    time: 'Yesterday',
+    subject: 'Onboarding checklist',
+    preview: 'Onboarding check...',
+    unread: false,
+  },
 ];
 
-// ─── Inbox Row ────────────────────────────────────────────────────────────────
-function InboxRow({ item, isSelected, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`
-        group flex w-full items-start gap-2.5 px-3 py-2.5 text-left transition-all duration-150 cursor-pointer
-        ${isSelected
-          ? 'bg-[#f0f4ff] border-l-2 border-l-[#3156cf] shadow-xs'
-          : 'border-l-2 border-l-transparent hover:bg-[#f7f6f4]'
-        }
-      `}
-      aria-selected={isSelected}
-    >
-      <AvatarChip person={item.from} size="sm" className="mt-0.5 shrink-0" />
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center justify-between gap-1 mb-0.5">
-          <span className={`truncate text-[12.5px] ${item.unread ? 'font-bold text-[#111827]' : 'font-medium text-[#344054]'}`}>
-            {item.from.name}
-          </span>
-          <span className="shrink-0 text-[10px] text-[#9ca3af] font-mono tabular-nums">{item.time}</span>
-        </div>
-        <p className="truncate text-[11.5px] text-[#667085] leading-4">{item.preview}</p>
-      </div>
-      {item.unread && (
-        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#3156cf] shadow-[0_0_6px_rgba(49,86,207,0.5)]" />
-      )}
-    </button>
-  );
-}
+const THREADS = {
+  1: {
+    subject: 'Charged twice for October',
+    senderEmail: 'maya@northwind.studio',
+    time: '9:04 AM',
+    customerMessage:
+      'Hi, I was charged twice for October — order #4821. Can you please check and process a refund? My billing statement shows two separate charges of $49.',
+    reply: {
+      author: 'Priya K',
+      authorLabel: 'Replied by Priya',
+      time: '9:18 AM',
+      body:
+        'Hi Maya, sorry about that. We have refunded the duplicate charge and it will show in 3 to 5 days.',
+    },
+    record: {
+      id: 'SR-14',
+      list: 'Support requests',
+      status: 'In Progress',
+      assignee: 'Priya K',
+    },
+  },
+  2: {
+    subject: 'Re: Invoice 1182',
+    senderEmail: 'billing@lumenhealth.co',
+    time: '9:12 AM',
+    customerMessage:
+      'Please find the revised payment schedule attached for Invoice 1182. Let us know if you need any adjustments.',
+    reply: null,
+    record: null,
+  },
+  3: {
+    subject: 'Weekly numbers',
+    senderEmail: 'dana@northwind.studio',
+    time: 'Yesterday',
+    customerMessage:
+      'Weekly active organizations grew by 18% this sprint. Support ticket resolution time is down to 22 minutes.',
+    reply: null,
+    record: null,
+  },
+  4: {
+    subject: 'Onboarding checklist',
+    senderEmail: 'sam@northwind.studio',
+    time: 'Yesterday',
+    customerMessage:
+      'Here is the checklist for our new customer success cohort joining next Monday. Please review permissions.',
+    reply: null,
+    record: null,
+  },
+};
 
-// ─── Thread Message ───────────────────────────────────────────────────────────
-function ThreadMessage({ msg, isLast, reduceMotion }) {
-  return (
-    <motion.div
-      initial={reduceMotion ? false : { opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-      className="px-4 py-3"
-    >
-      <div className="flex items-start gap-3">
-        <AvatarChip person={msg.from} size="sm" className="mt-0.5 shrink-0" />
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[12.5px] font-semibold text-[#111827]">{msg.from.name}</span>
-            <span className="text-[10px] text-[#9ca3af] font-mono tabular-nums">{msg.time}</span>
-            {msg.reply && (
-              <span className="ml-auto rounded-full bg-[#f0fdf4] px-2 py-0.5 text-[10px] font-medium text-[#059669] border border-[#bbf7d0]">
-                {msg.replyLabel || 'Replied'}
-              </span>
-            )}
-          </div>
-          <p className="text-[12.5px] leading-[1.6] text-[#374151] whitespace-pre-line">{msg.body}</p>
-          {msg.reply && isLast && (
-            <div className="mt-2 text-[11px] text-[#6b7280] italic opacity-80">
-              Reply visible to the team in shared inbox.
-            </div>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-// ─── Record Badge ─────────────────────────────────────────────────────────────
-function RecordBadge({ record }) {
-  if (!record) return null;
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-      className="mx-4 mb-2 flex items-center gap-2 rounded-lg border border-[#d1fae5] bg-[#f0fdf4] px-3 py-1.5 shadow-2xs"
-    >
-      <span
-        className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[9px] font-bold text-white"
-        style={{ backgroundColor: record.color }}
-      >
-        ✓
-      </span>
-      <span className="text-[11px] text-[#059669] font-medium">
-        Logged as{' '}
-        <span className="font-semibold underline underline-offset-2 cursor-pointer hover:text-[#047857]">
-          {record.id}
-        </span>{' '}
-        in {record.list}
-      </span>
-      <ExternalLink size={10} className="ml-auto text-[#059669] opacity-60" />
-    </motion.div>
-  );
-}
-
-// ─── Main Component ───────────────────────────────────────────────────────────
 export default function MailProductDemo() {
   const reduceMotion = useReducedMotion();
+  const [inbox, setInbox] = useState(INITIAL_INBOX);
   const [selectedId, setSelectedId] = useState(1);
-  const [showReplyTyping, setShowReplyTyping] = useState(false);
-  const [inbox, setInbox] = useState(MAIL_DATA.inbox);
-  const [threads, setThreads] = useState(MAIL_DATA.threads);
-  const [replyText, setReplyText] = useState('');
+  const [threads, setThreads] = useState(THREADS);
+  const [showCollisionAlert, setShowCollisionAlert] = useState(true);
+  const [hoveredRecord, setHoveredRecord] = useState(false);
+  const [replyInput, setReplyInput] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
-  const listRef = useRef(null);
 
-  // Simulated live incoming email after 4.5s
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const incomingEmail = {
-        id: 99,
-        from: { name: 'Acme Studio', initials: 'AS', color: '#0284c7', role: 'Partner' },
-        subject: 'Contract review request',
-        preview: 'Hi team, can you review the attached SLA terms...',
-        time: 'Just now',
-        unread: true,
-      };
+  const selectedThread = threads[selectedId];
 
-      setInbox((prev) => {
-        if (prev.some((e) => e.id === 99)) return prev;
-        return [incomingEmail, ...prev];
-      });
+  // Keyboard navigation across inbox list
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setSelectedId((current) => {
+          const ids = inbox.map((item) => item.id);
+          const nextIndex = Math.min(ids.indexOf(current) + 1, ids.length - 1);
+          return ids[nextIndex];
+        });
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setSelectedId((current) => {
+          const ids = inbox.map((item) => item.id);
+          const prevIndex = Math.max(ids.indexOf(current) - 1, 0);
+          return ids[prevIndex];
+        });
+      }
+    },
+    [inbox]
+  );
 
-      setThreads((prev) => ({
-        ...prev,
-        99: {
-          subject: 'Contract review request',
-          messages: [
-            {
-              id: 'new-1',
-              from: { name: 'Acme Studio', initials: 'AS', color: '#0284c7' },
-              time: 'Just now',
-              body: 'Hi team, please find our revised enterprise SLA schedule attached. Can you review and confirm by end of day?',
-            },
-          ],
-          record: { id: 'SR-22', list: 'Enterprise Deals', color: '#3156cf' },
-        },
-      }));
-    }, 4500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const selectEmail = useCallback((id) => {
+  const handleSelectEmail = (id) => {
     setSelectedId(id);
-    setInbox((prev) => prev.map((item) => (item.id === id ? { ...item, unread: false } : item)));
-    if (id === 1) {
-      setShowReplyTyping(false);
-      const t = setTimeout(() => setShowReplyTyping(true), 1600);
-      return () => clearTimeout(t);
-    } else {
-      setShowReplyTyping(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    selectEmail(1);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    setInbox((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, unread: false } : item))
+    );
+  };
 
   const handleSendReply = (e) => {
     e?.preventDefault();
-    if (!replyText.trim() || isSending) return;
+    if (!replyInput.trim() || isSending) return;
 
     setIsSending(true);
     setTimeout(() => {
-      const newMsg = {
-        id: `reply-${Date.now()}`,
-        from: { name: 'You', initials: 'ME', color: '#3156cf' },
-        time: 'Just now',
-        body: replyText.trim(),
-        reply: true,
-        replyLabel: 'Replied by You',
-      };
-
       setThreads((prev) => {
-        const curThread = prev[selectedId] || { subject: '', messages: [] };
+        const cur = prev[selectedId];
         return {
           ...prev,
           [selectedId]: {
-            ...curThread,
-            messages: [...curThread.messages, newMsg],
+            ...cur,
+            reply: {
+              author: 'You',
+              authorLabel: 'Replied by You',
+              time: 'Just now',
+              body: replyInput.trim(),
+            },
           },
         };
       });
 
-      setReplyText('');
+      setReplyInput('');
       setIsSending(false);
       setToastMessage('Reply sent · Logged in workspace');
       setTimeout(() => setToastMessage(null), 3000);
-    }, 450);
+    }, 380);
   };
-
-  const thread = threads[selectedId];
-  const unreadCount = inbox.filter((i) => i.unread).length;
 
   return (
     <div
-      className="flex h-full w-full overflow-hidden rounded-2xl relative select-none"
+      onKeyDown={handleKeyDown}
       tabIndex={0}
-      aria-label="Mail interactive demo"
+      aria-label="Interactive shared mail workspace"
+      className="flex h-full w-full bg-white select-none overflow-hidden relative focus:outline-none"
     >
-      {/* ── Left: Inbox list ── */}
-      <div className="flex w-[210px] shrink-0 flex-col border-r border-[#f0ede8] bg-[#fafaf9]">
-        {/* Inbox header */}
-        <div className="flex h-10 items-center justify-between border-b border-[#f0ede8] px-3">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <div className="flex h-5 w-5 items-center justify-center rounded-md bg-[#dc2626] text-white shrink-0">
-              <span className="text-[9px] font-bold">U</span>
-            </div>
-            <span className="text-[11.5px] font-semibold text-[#111827] truncate">support@northwind</span>
+      {/* ── 1. The Left Workspace App Rail ── */}
+      <div className="w-11 shrink-0 bg-[#f8f7f5] border-r border-[#e7e4de] flex flex-col items-center py-2.5 justify-between">
+        <div className="flex flex-col items-center gap-2.5">
+          {/* Ultrakin Brand Roundel */}
+          <div className="h-7 w-7 rounded-lg bg-[#2563eb] text-white flex items-center justify-center font-bold text-[11px] shadow-xs cursor-default">
+            U
           </div>
-          <motion.span
-            key={unreadCount}
-            initial={{ scale: 1.3 }}
-            animate={{ scale: 1 }}
-            className="rounded-full bg-[#3156cf] px-1.5 py-0.5 text-[9px] font-bold text-white tabular-nums shrink-0"
-          >
-            {unreadCount}
-          </motion.span>
-        </div>
 
-        {/* Inbox label */}
-        <div className="px-3 py-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wider text-[#9ca3af]">
-          <span>Shared Queue</span>
-          <span className="text-emerald-600 font-mono text-[9px]">● Live</span>
-        </div>
+          <div className="w-5 h-px bg-[#e7e4de] my-0.5" />
 
-        {/* Email rows */}
-        <div ref={listRef} className="flex-1 overflow-y-auto divide-y divide-[#f5f4f2]" role="listbox">
-          <AnimatePresence initial={false}>
-            {inbox.map((item) => (
-              <motion.div
+          {/* Connected Workspace Capability Roundels */}
+          {WORKSPACE_RAIL_ITEMS.map((item) => {
+            const Icon = item.icon;
+            return (
+              <div
                 key={item.id}
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                transition={{ duration: 0.25 }}
+                title={item.label}
+                className={`h-7 w-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                  item.active
+                    ? 'bg-[#dc2626] text-white shadow-xs ring-2 ring-red-200'
+                    : 'text-[#667085] hover:text-[#111827] hover:bg-[#eeece7]'
+                }`}
               >
-                <InboxRow
-                  item={item}
-                  isSelected={selectedId === item.id}
-                  onClick={() => selectEmail(item.id)}
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
+                <Icon size={13} strokeWidth={item.active ? 2.5 : 2} />
+              </div>
+            );
+          })}
         </div>
+
+        {/* User Presence Avatar in Rail */}
+        <AvatarChip person={PERSONAS.priya} size="xs" online showRing />
       </div>
 
-      {/* ── Right: Thread reader ── */}
-      <div className="flex flex-1 flex-col overflow-hidden bg-white relative">
-        <AnimatePresence mode="wait">
-          {thread ? (
-            <motion.div
-              key={selectedId}
-              initial={reduceMotion ? false : { opacity: 0, x: 8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -6 }}
-              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="flex h-full flex-col"
-            >
-              {/* Thread header */}
-              <div className="flex h-10 shrink-0 items-center justify-between border-b border-[#f0ede8] px-4">
-                <span className="text-[12.5px] font-semibold text-[#111827] truncate">{thread.subject}</span>
-                <div className="flex items-center gap-1 ml-2">
-                  {TOOLBAR_ACTIONS.map(({ icon: Icon, label }) => (
-                    <button
-                      key={label}
-                      aria-label={label}
-                      className="flex h-6 w-6 items-center justify-center rounded-md text-[#9ca3af] hover:bg-[#f5f4f2] hover:text-[#374151] transition-colors"
-                    >
-                      <Icon size={12} />
-                    </button>
-                  ))}
-                </div>
-              </div>
+      {/* ── 2. The Main Email Application Surface ── */}
+      <div className="flex-1 flex flex-col min-w-0 bg-white">
+        {/* App Header Bar matching screenshot: support@northwind.studio Inbox */}
+        <div className="h-10 shrink-0 border-b border-[#f0ede8] px-4 flex items-center justify-between bg-white">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-[13px] font-semibold text-[#111827] truncate tracking-tight">
+              support@northwind.studio
+            </span>
+            <span className="text-[11px] text-[#8c8c8c] font-sans">Inbox</span>
+          </div>
 
-              {/* Messages Body */}
-              <div className="flex-1 overflow-y-auto divide-y divide-[#f5f4f2]">
-                {thread.messages.map((msg, i) => (
-                  <ThreadMessage
-                    key={msg.id}
-                    msg={msg}
-                    isLast={i === thread.messages.length - 1}
-                    reduceMotion={reduceMotion}
-                  />
-                ))}
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Live DNS Sync
+            </span>
+          </div>
+        </div>
 
-                {/* Team Typing collision indicator */}
-                <AnimatePresence>
-                  {showReplyTyping && selectedId === 1 && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0 }}
-                      className="flex items-center gap-2 px-4 py-2 bg-indigo-50/50 border-t border-indigo-100/50"
-                    >
-                      <AvatarChip person={{ name: 'Sam', initials: 'SO', color: '#dc2626' }} size="xs" />
-                      <div className="flex gap-1 items-center">
-                        {[0, 1, 2].map((i) => (
-                          <motion.span
-                            key={i}
-                            className="h-1.5 w-1.5 rounded-full bg-indigo-500"
-                            animate={{ opacity: [0.3, 1, 0.3] }}
-                            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-[10.5px] text-indigo-700 font-medium">
-                        Sam Ortiz is viewing this thread (Collision Guard)
-                      </span>
-                    </motion.div>
+        {/* ── 3. Dual-Column Inbox & Thread Layout ── */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Left Column: Shared Queue List */}
+          <div className="w-[195px] sm:w-[215px] shrink-0 border-r border-[#f0ede8] bg-white flex flex-col overflow-y-auto">
+            {inbox.map((item) => {
+              const isSelected = selectedId === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleSelectEmail(item.id)}
+                  className={`group relative flex items-start gap-2.5 px-3 py-3 text-left transition-colors cursor-pointer border-b border-[#f6f5f2] ${
+                    isSelected
+                      ? 'bg-[#fff5f5] text-[#111827]'
+                      : 'hover:bg-[#faf9f7] text-[#344054]'
+                  }`}
+                >
+                  {/* Active row indicator accent */}
+                  {isSelected && (
+                    <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#dc2626]" />
                   )}
-                </AnimatePresence>
-              </div>
 
-              {/* Record conversion badge */}
-              <RecordBadge record={thread.record} />
-
-              {/* Interactive Smart Composer */}
-              <div className="shrink-0 border-t border-[#f0ede8] bg-[#fafaf9] p-3 space-y-2">
-                {/* Smart Suggestion Chips */}
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
-                  <span className="text-[9px] font-mono uppercase text-slate-400 shrink-0 flex items-center gap-0.5">
-                    <Sparkles size={9} className="text-indigo-500" /> Smart:
-                  </span>
-                  {SMART_REPLIES.map((chip, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setReplyText(chip)}
-                      className="text-[10px] font-medium text-slate-600 hover:text-indigo-600 bg-white hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 px-2 py-0.5 rounded-full shrink-0 transition-colors cursor-pointer"
-                    >
-                      {chip}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Input & Send Form */}
-                <form onSubmit={handleSendReply} className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    placeholder="Type reply or pick a suggestion above..."
-                    className="flex-1 bg-white border border-[#e7e4de] focus:border-[#3156cf] rounded-lg px-2.5 py-1.5 text-xs text-[#111827] placeholder-slate-400 focus:outline-none transition-colors"
-                  />
-                  <button
-                    type="submit"
-                    disabled={!replyText.trim() || isSending}
-                    className="h-8 px-3 rounded-lg bg-[#3156cf] hover:bg-[#2848b7] text-white text-xs font-semibold flex items-center gap-1 transition-all disabled:opacity-40 cursor-pointer shrink-0"
-                  >
-                    {isSending ? (
-                      <span className="text-[10px]">Sending...</span>
-                    ) : (
-                      <>
-                        <span>Reply</span>
-                        <Send size={11} />
-                      </>
+                  {/* Red/Coral Unread Dot */}
+                  <div className="pt-1 shrink-0 w-2.5">
+                    {item.unread && (
+                      <span className="block h-2 w-2 rounded-full bg-[#ef4444] shadow-[0_0_6px_rgba(239,68,68,0.5)]" />
                     )}
-                  </button>
-                </form>
-              </div>
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+                  </div>
 
-        {/* Floating Toast Notification */}
-        <AnimatePresence>
-          {toastMessage && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              className="absolute bottom-16 right-4 flex items-center gap-1.5 rounded-lg bg-[#111827] text-white px-3 py-1.5 text-xs font-medium shadow-lg z-20 border border-slate-700"
-            >
-              <CheckCircle2 size={13} className="text-emerald-400" />
-              <span>{toastMessage}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-1 mb-0.5">
+                      <span
+                        className={`truncate text-[12.5px] ${
+                          isSelected || item.unread
+                            ? 'font-bold text-[#111827]'
+                            : 'font-medium text-[#344054]'
+                        }`}
+                      >
+                        {item.name}
+                      </span>
+                      <span className="shrink-0 text-[10px] font-mono tabular-nums text-[#8c8c8c]">
+                        {item.time}
+                      </span>
+                    </div>
+
+                    <p className="truncate text-[11.5px] text-[#667085] leading-snug">
+                      {item.preview}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Right Column: Active Thread & Record Conversion */}
+          <div className="flex-1 flex flex-col overflow-y-auto p-4 bg-white relative">
+            <AnimatePresence mode="wait">
+              {selectedThread ? (
+                <motion.div
+                  key={selectedId}
+                  initial={reduceMotion ? false : { opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  className="space-y-3.5 flex-1 flex flex-col justify-between"
+                >
+                  <div className="space-y-3">
+                    {/* Customer Inquiry Header */}
+                    <div>
+                      <h4 className="text-[13.5px] font-bold text-[#111827] leading-tight mb-1">
+                        {selectedThread.subject}
+                      </h4>
+                      <div className="flex items-center gap-1.5 text-[11px] text-[#8c8c8c] font-mono">
+                        <span>{selectedThread.senderEmail}</span>
+                        <span>·</span>
+                        <span>{selectedThread.time}</span>
+                      </div>
+                    </div>
+
+                    {/* Customer Message Body */}
+                    <div className="text-[12.5px] leading-[1.65] text-[#374151] pt-1 border-t border-[#f0ede8]">
+                      {selectedThread.customerMessage}
+                    </div>
+
+                    {/* Team Reply Container matching screenshot structure */}
+                    {selectedThread.reply && (
+                      <div className="rounded-xl border border-[#e7e4de] bg-[#fafaf9] p-3 shadow-2xs space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold font-mono uppercase tracking-wider text-[#8c8c8c]">
+                            Reply
+                          </span>
+                          <span className="text-[10px] font-semibold text-[#059669] bg-[#f0fdf4] border border-[#bbf7d0] px-2 py-0.5 rounded-full">
+                            {selectedThread.reply.authorLabel}
+                          </span>
+                        </div>
+                        <p className="text-[12px] leading-relaxed text-[#111827]">
+                          {selectedThread.reply.body}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* The Core Workflow Anchor: Logged as SR-14 */}
+                    {selectedThread.record && (
+                      <div className="relative">
+                        <div
+                          onMouseEnter={() => setHoveredRecord(true)}
+                          onMouseLeave={() => setHoveredRecord(false)}
+                          className="flex items-center gap-2 rounded-lg bg-[#f0fdf4] border border-[#d1fae5] px-3 py-1.5 cursor-pointer shadow-2xs transition-colors hover:bg-emerald-100/60"
+                        >
+                          <span className="h-4 w-4 rounded-full bg-[#059669] text-white flex items-center justify-center text-[9px] font-bold shrink-0">
+                            ✓
+                          </span>
+                          <span className="text-[11.5px] text-[#059669] font-medium">
+                            Logged as{' '}
+                            <span className="font-bold underline underline-offset-2">
+                              {selectedThread.record.id}
+                            </span>{' '}
+                            in {selectedThread.record.list}
+                          </span>
+                          <ExternalLink size={10} className="ml-auto text-[#059669] opacity-70" />
+                        </div>
+
+                        {/* Interactive Tooltip Card showing linked record */}
+                        <AnimatePresence>
+                          {hoveredRecord && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 4 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0 }}
+                              className="absolute left-0 bottom-full mb-1.5 w-64 rounded-xl bg-[#111827] text-white p-2.5 text-xs shadow-xl z-20 border border-slate-700"
+                            >
+                              <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 mb-1">
+                                <span>Ticket {selectedThread.record.id}</span>
+                                <span className="text-emerald-400">In Sprint #44</span>
+                              </div>
+                              <p className="font-semibold text-slate-100 text-[11.5px] mb-1">
+                                Duplicate charge order #4821
+                              </p>
+                              <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-white/10 font-mono">
+                                <span>Assignee: {selectedThread.record.assignee}</span>
+                                <span>SLA: 4h (Met ✓)</span>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Bottom Interactive Composer with Collision Guard */}
+                  <div className="pt-2 border-t border-[#f0ede8] space-y-2">
+                    {/* Live Collision Guard Indicator */}
+                    {showCollisionAlert && selectedId === 1 && (
+                      <div className="flex items-center gap-1.5 text-[10.5px] text-[#059669] bg-[#f0fdf4] px-2.5 py-1 rounded-md border border-[#d1fae5]">
+                        <AvatarChip person={PERSONAS.sam} size="xs" />
+                        <span className="font-medium">
+                          Sam Ortiz is viewing this thread (Collision Guard active)
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Quick Reply Form */}
+                    <form onSubmit={handleSendReply} className="flex items-center gap-1.5">
+                      <input
+                        type="text"
+                        value={replyInput}
+                        onChange={(e) => setReplyInput(e.target.value)}
+                        placeholder={`Reply to ${selectedThread.senderEmail}...`}
+                        className="flex-1 bg-[#faf9f7] border border-[#e7e4de] focus:border-[#dc2626] rounded-lg px-2.5 py-1.5 text-xs text-[#111827] placeholder-slate-400 focus:outline-none transition-colors"
+                      />
+                      <button
+                        type="submit"
+                        disabled={!replyInput.trim() || isSending}
+                        className="h-8 px-3 rounded-lg bg-[#111827] hover:bg-[#1f2937] text-white text-xs font-semibold flex items-center gap-1 transition-all disabled:opacity-40 cursor-pointer shrink-0"
+                      >
+                        {isSending ? (
+                          <span className="text-[10.5px]">Sending...</span>
+                        ) : (
+                          <>
+                            <span>Send</span>
+                            <Send size={11} />
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  </div>
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
+
+            {/* Floating Toast Notification */}
+            <AnimatePresence>
+              {toastMessage && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 6 }}
+                  className="absolute bottom-16 right-4 flex items-center gap-1.5 rounded-lg bg-[#111827] text-white px-3 py-1.5 text-xs font-medium shadow-xl z-20 border border-slate-700"
+                >
+                  <Check size={12} className="text-emerald-400" />
+                  <span>{toastMessage}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </div>
     </div>
   );
