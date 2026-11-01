@@ -1,9 +1,13 @@
 /**
  * DemoWindowFrame.jsx
- * Floating app-window wrapper for product demo widgets.
- * White card with optional browser chrome bar.
+ * Tier-1 Production SaaS App Window Wrapper
+ * Features:
+ * - Multi-layer ambient occlusion shadows with inner specular hairline
+ * - Interactive Chrome bar with clickable URL that triggers "Copied" feedback
+ * - Strict Retina hairline border
  */
-import React from 'react';
+import React, { useState } from 'react';
+import { Check, Copy } from 'lucide-react';
 import { cn } from '../../lib/cn';
 
 export default function DemoWindowFrame({
@@ -14,31 +18,56 @@ export default function DemoWindowFrame({
   height = 'h-[440px]',
   noPad = false,
 }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyUrl = () => {
+    if (!url) return;
+    navigator.clipboard?.writeText(`https://${url}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div
       className={cn(
-        'w-full overflow-hidden rounded-2xl border border-[#e7e4de] bg-white',
-        'shadow-[0_4px_6px_-1px_rgba(0,0,0,0.06),0_24px_48px_-12px_rgba(0,0,0,0.1)]',
+        'w-full overflow-hidden rounded-2xl border border-[rgba(17,24,39,0.08)] bg-white',
+        'shadow-[0_0_0_1px_rgba(17,24,39,0.04),0_2px_4px_rgba(17,24,39,0.03),0_12px_24px_-4px_rgba(17,24,39,0.07),0_32px_64px_-12px_rgba(17,24,39,0.1)]',
+        'shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]',
         height,
         className
       )}
     >
-      {/* Optional browser chrome */}
+      {/* Interactive macOS-grade browser chrome */}
       {url && (
-        <div className="flex h-9 shrink-0 items-center gap-3 border-b border-[#f0ede8] bg-[#faf9f7] px-3">
-          <div className="flex gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#ffbc2e]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+        <div className="flex h-9 shrink-0 items-center justify-between border-b border-[#f0ede8] bg-[#faf9f7] px-3.5 select-none">
+          <div className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57] border border-[#e0443e]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#ffbc2e] border border-[#dea123]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#28c840] border border-[#1ca32e]" />
           </div>
-          <div className="flex flex-1 items-center justify-center">
-            <span className="rounded-md bg-white px-3 py-0.5 text-[11px] text-[#8c8c8c] font-mono border border-[#e7e4de] select-none max-w-[260px] truncate">
-              {url}
-            </span>
-          </div>
+
+          <button
+            type="button"
+            onClick={handleCopyUrl}
+            title="Click to copy demo URL"
+            className="group flex items-center gap-1.5 rounded-md bg-white px-2.5 py-0.5 text-[11px] text-[#667085] hover:text-[#111827] font-mono border border-[#e7e4de] hover:border-[#d0cdc7] transition-all cursor-pointer shadow-2xs max-w-[280px] truncate"
+          >
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="truncate">{url}</span>
+            {copied ? (
+              <span className="flex items-center gap-0.5 text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded">
+                <Check size={9} /> Copied
+              </span>
+            ) : (
+              <Copy size={9} className="opacity-0 group-hover:opacity-70 transition-opacity ml-0.5" />
+            )}
+          </button>
+
+          <div className="w-10" />
         </div>
       )}
-      {/* Content */}
+
+      {/* Content Canvas */}
       <div className={cn('flex h-full flex-col overflow-hidden', !noPad && !url && 'p-0', innerClassName)}>
         {children}
       </div>

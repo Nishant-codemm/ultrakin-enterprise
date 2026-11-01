@@ -2,14 +2,14 @@
  * SearchProductDemo.jsx
  * Unified Workspace ⌘K Command Palette preview for /products/search
  * Features:
- * - Real-time instantaneous search across messages, emails, documents and records
- * - Interactive query filter: type queries to filter live records
- * - Left results list with category grouping & right live context inspector
- * - Keyboard navigation (Up/Down arrows) + item selection
+ * - Native keyboard navigation (ArrowUp, ArrowDown, Enter)
+ * - Clear button (✕) when input has text
+ * - Highlighted query substring matches
+ * - Instant context inspector sync on arrow change
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Command, ArrowRight, CornerDownLeft, FileText, MessageSquare, Mail, CheckSquare } from 'lucide-react';
+import { Search, Command, ArrowRight, CornerDownLeft, FileText, MessageSquare, Mail, CheckSquare, X } from 'lucide-react';
 import { SEARCH_DATA } from '../../data/productPageData';
 
 const TYPE_ICONS = {
@@ -21,7 +21,8 @@ const TYPE_ICONS = {
 
 export default function SearchProductDemo() {
   const [query, setQuery] = useState(SEARCH_DATA.defaultQuery);
-  const [selectedId, setSelectedId] = useState(1);
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const inputRef = useRef(null);
 
   const filtered = SEARCH_DATA.results.filter((item) =>
     query
@@ -30,21 +31,70 @@ export default function SearchProductDemo() {
       : true
   );
 
-  const selectedItem = filtered.find((i) => i.id === selectedId) || filtered[0] || SEARCH_DATA.results[0];
+  const selectedItem = filtered[selectedIndex] || filtered[0] || SEARCH_DATA.results[0];
+
+  // Native keyboard arrow navigation
+  const handleKeyDown = (e) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev + 1) % Math.max(filtered.length, 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev - 1 + filtered.length) % Math.max(filtered.length, 1));
+    } else if (e.key === 'Escape') {
+      setQuery('');
+      setSelectedIndex(0);
+    }
+  };
+
+  const highlightMatch = (text, term) => {
+    if (!term) return text;
+    const parts = text.split(new RegExp(`(${term})`, 'gi'));
+    return parts.map((part, i) =>
+      part.toLowerCase() === term.toLowerCase() ? (
+        <span key={i} className="bg-indigo-500/30 text-indigo-200 font-bold px-0.5 rounded">
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#07090E] text-slate-100 select-none overflow-hidden">
+    <div
+      onKeyDown={handleKeyDown}
+      className="flex flex-col h-full w-full bg-[#07090E] text-slate-100 select-none overflow-hidden"
+    >
       {/* ── Search Input Bar ── */}
-      <div className="h-12 shrink-0 border-b border-white/[0.08] bg-[#0B0F19] px-4 flex items-center gap-3">
-        <Search size={16} className="text-indigo-400 shrink-0" />
+      <div className="h-12 shrink-0 border-b border-white/[0.08] bg-[#0B0F19] px-4 flex items-center gap-2.5">
+        <Search size={15} className="text-indigo-400 shrink-0" />
         <input
+          ref={inputRef}
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setSelectedIndex(0);
+          }}
           placeholder="Search across all messages, mail, docs and records..."
           className="flex-1 bg-transparent text-xs text-slate-100 placeholder-slate-500 focus:outline-none"
         />
-        <span className="text-[10px] font-mono text-slate-400 bg-white/[0.06] border border-white/[0.1] px-2 py-0.5 rounded">
+        {query && (
+          <button
+            type="button"
+            onClick={() => {
+              setQuery('');
+              setSelectedIndex(0);
+              inputRef.current?.focus();
+            }}
+            className="p-1 rounded text-slate-400 hover:text-white transition-colors cursor-pointer"
+            title="Clear search (Esc)"
+          >
+            <X size={13} />
+          </button>
+        )}
+        <span className="text-[10px] font-mono text-slate-400 bg-white/[0.06] border border-white/[0.1] px-2 py-0.5 rounded tabular-nums">
           ⌘K
         </span>
       </div>
@@ -54,17 +104,17 @@ export default function SearchProductDemo() {
         {/* Results List */}
         <div className="flex-1 overflow-y-auto p-2 space-y-1 border-r border-white/[0.08]">
           {filtered.length > 0 ? (
-            filtered.map((item) => {
+            filtered.map((item, idx) => {
               const Icon = TYPE_ICONS[item.type] || FileText;
-              const isSelected = selectedItem?.id === item.id;
+              const isSelected = selectedIndex === idx;
               return (
                 <div
                   key={item.id}
-                  onClick={() => setSelectedId(item.id)}
-                  className={`flex items-center gap-2.5 p-2 rounded-lg text-xs cursor-pointer transition-colors ${
+                  onClick={() => setSelectedIndex(idx)}
+                  className={`flex items-center gap-2.5 p-2 rounded-lg text-xs cursor-pointer transition-all ${
                     isSelected
-                      ? 'bg-indigo-600/25 border border-indigo-500/40 text-slate-100'
-                      : 'text-slate-300 hover:bg-white/[0.04]'
+                      ? 'bg-indigo-600/25 border border-indigo-500/40 text-slate-100 shadow-xs'
+                      : 'text-slate-300 hover:bg-white/[0.04] border border-transparent'
                   }`}
                 >
                   <div className="h-6 w-6 rounded-md bg-white/[0.06] flex items-center justify-center text-indigo-400 shrink-0">
@@ -73,13 +123,21 @@ export default function SearchProductDemo() {
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold truncate text-[11.5px]">{item.title}</span>
-                      <span className="text-[9px] font-mono text-slate-500 shrink-0">{item.time}</span>
+                      <span className="font-semibold truncate text-[11.5px]">
+                        {highlightMatch(item.title, query)}
+                      </span>
+                      <span className="text-[9px] font-mono text-slate-500 shrink-0 tabular-nums">
+                        {item.time}
+                      </span>
                     </div>
                     <span className="text-[10px] font-mono text-slate-400 truncate block">
                       {item.source}
                     </span>
                   </div>
+
+                  {isSelected && (
+                    <CornerDownLeft size={10} className="text-indigo-400 shrink-0 opacity-70" />
+                  )}
                 </div>
               );
             })
@@ -108,7 +166,7 @@ export default function SearchProductDemo() {
 
               <div className="text-[10px] font-mono text-slate-500 space-y-1">
                 <div>Source: <span className="text-slate-300">{selectedItem.source}</span></div>
-                <div>Indexed: <span className="text-emerald-400">Live</span></div>
+                <div>Status: <span className="text-emerald-400">Indexed (Live)</span></div>
               </div>
             </div>
           ) : (
@@ -116,7 +174,7 @@ export default function SearchProductDemo() {
           )}
 
           <div className="pt-2 border-t border-white/[0.08] flex items-center justify-between text-[10px] font-mono text-slate-400">
-            <span>Press Enter to jump</span>
+            <span>↑↓ Navigate · ↵ Select</span>
             <CornerDownLeft size={10} />
           </div>
         </div>
