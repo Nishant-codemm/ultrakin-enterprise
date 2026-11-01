@@ -41,6 +41,10 @@ const PAGE_METADATA = {
     title: 'Solutions — Ultrakin',
     description: 'Explore Ultrakin solutions tailored for Customer Support, Sales, Engineering, Operations, Marketing, Education, Agencies, and more.',
   },
+  '/resources': {
+    title: 'Resources & Architecture — Ultrakin',
+    description: 'Explore architectural whitepapers, operational playbooks, hands-on tutorials, and case studies for Ultrakin.',
+  },
 };
 
 // Product page slugs
@@ -55,6 +59,7 @@ const SOLUTION_SLUGS = [
 const UniversalProductPage = lazy(() => import('./pages/ProductPage'));
 const UniversalSolutionPage = lazy(() => import('./pages/SolutionPage'));
 const SolutionsOverviewPage = lazy(() => import('./pages/SolutionsOverviewPage'));
+const ResourcesPage = lazy(() => import('./pages/ResourcesPage'));
 
 const ROUTE_PAGES = {
   '/pricing':   lazy(() => import('./pages/PricingPage')),
@@ -62,6 +67,7 @@ const ROUTE_PAGES = {
   '/agents':    lazy(() => import('./pages/AgentsPage')),
   '/security':  lazy(() => import('./pages/SecurityPage')),
   '/solutions': SolutionsOverviewPage,
+  '/resources': ResourcesPage,
   '/products':  UniversalProductPage,
   ...Object.fromEntries(
     PRODUCT_SLUGS.map(slug => [

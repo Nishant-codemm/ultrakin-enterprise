@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowDownRight,
   ArrowRight,
+  BookOpen,
   Bot,
   CheckSquare,
   ChevronDown,
@@ -96,12 +97,12 @@ const solutionGroups = [
 
 const resourceGroups = [
   {
-    label: 'Platform Architecture',
+    label: 'Knowledge & Architecture',
     items: [
+      { title: 'Resources & Knowledge Hub', description: 'Architectural whitepapers, guides, tutorials, and case studies.', icon: BookOpen, color: 'bg-[#2563eb]', href: '/resources' },
       { title: 'Core Workspace Engine', description: 'Explore the full connected enterprise workspace.', icon: UltrakinIcon, color: 'bg-brand/10 border border-brand/20', href: '#platform' },
       { title: 'How it works', description: 'Watch an incoming signal turn into completed work.', icon: Workflow, color: 'bg-[#c026d3]', href: '#workflows' },
       { title: 'Integrations Matrix', description: 'Connect GitHub, Slack, Jira, Figma, and linear tools.', icon: FolderOpen, color: 'bg-[#64748b]', href: '#integrations' },
-      { title: 'Interactive Showcase', description: 'Hands-on browser frame with 8 working modules.', icon: Layers, color: 'bg-[#5c5bd6]', href: '#workspace-showcase' },
     ],
   },
   {
@@ -135,11 +136,15 @@ const asideContent = {
     },
   },
   Resources: {
-    tag: 'SECURITY & COMPLIANCE',
-    title: 'Enterprise trust from day zero.',
-    desc: 'SOC 2 Type II audited, GDPR compliant, SSO/SAML enforced, and AES-256 encrypted.',
-    actionText: 'Review security posture',
-    action: () => { window.location.href = '/security'; },
+    tag: 'ARCHITECTURE & GUIDES',
+    title: 'Knowledge, docs & playbooks.',
+    desc: 'Deep architecture whitepapers, MCP tutorials, migration guides, and case studies.',
+    actionText: 'Browse all resources',
+    action: () => {
+      window.history.pushState({}, '', '/resources');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
   },
 };
 
@@ -305,8 +310,8 @@ export default function Navbar() {
       openDemoDrawer();
       return;
     }
-    // Product and Solution page navigation — href takes priority
-    if (item.href?.startsWith('/products/') || item.href?.startsWith('/solutions')) {
+    // Product, Solution, and Resource page navigation — href takes priority
+    if (item.href?.startsWith('/products/') || item.href?.startsWith('/solutions') || item.href?.startsWith('/resources')) {
       window.history.pushState({}, '', item.href);
       window.dispatchEvent(new PopStateEvent('popstate'));
       window.scrollTo({ top: 0, behavior: 'smooth' });

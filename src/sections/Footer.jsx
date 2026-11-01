@@ -91,6 +91,7 @@ export default function Footer({ isHome = true }) {
           <div>
             <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">Platform</p>
             <ul className="mt-4 space-y-2.5 text-[13px]">
+              <li><a href="/resources" className="transition-colors hover:text-brand-text">Resources & Architecture</a></li>
               <li><a href="/workspace" className="transition-colors hover:text-brand-text">Workspace OS</a></li>
               <li><a href="/agents" className="transition-colors hover:text-brand-text">Agent Architecture</a></li>
               <li><a href="/security" className="transition-colors hover:text-brand-text">Trust & Compliance</a></li>
