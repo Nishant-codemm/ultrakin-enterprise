@@ -37,23 +37,41 @@ const PAGE_METADATA = {
     title: 'Security — Ultrakin',
     description: 'Review Ultrakin security and trust information for privacy, access, infrastructure, and enterprise evaluation.',
   },
+  '/solutions': {
+    title: 'Solutions — Ultrakin',
+    description: 'Explore Ultrakin solutions tailored for Customer Support, Sales, Engineering, Operations, Marketing, Education, Agencies, and more.',
+  },
 };
 
 // Product page slugs
 const PRODUCT_SLUGS = ['chat','calls','mail','docs','lists','events','forms',
                        'automations','agents','connectors','templates','ukin','search'];
 
+const SOLUTION_SLUGS = [
+  'customer-support', 'sales', 'engineering', 'operations', 'marketing', 'people',
+  'agencies', 'education', 'ecommerce', 'professional-services', 'field-services'
+];
+
 const UniversalProductPage = lazy(() => import('./pages/ProductPage'));
+const UniversalSolutionPage = lazy(() => import('./pages/SolutionPage'));
+const SolutionsOverviewPage = lazy(() => import('./pages/SolutionsOverviewPage'));
 
 const ROUTE_PAGES = {
   '/pricing':   lazy(() => import('./pages/PricingPage')),
   '/workspace': lazy(() => import('./pages/WorkspacePage')),
   '/agents':    lazy(() => import('./pages/AgentsPage')),
   '/security':  lazy(() => import('./pages/SecurityPage')),
+  '/solutions': SolutionsOverviewPage,
   ...Object.fromEntries(
     PRODUCT_SLUGS.map(slug => [
       `/products/${slug}`,
       UniversalProductPage,
+    ])
+  ),
+  ...Object.fromEntries(
+    SOLUTION_SLUGS.map(slug => [
+      `/solutions/${slug}`,
+      UniversalSolutionPage,
     ])
   ),
 };
@@ -79,8 +97,10 @@ export default function App() {
     document.documentElement.dataset.theme = 'marketing';
   }, []);
 
-  // Support both exact routes and /products/* dynamic routes
-  const RoutePage = ROUTE_PAGES[pathname] || (pathname.startsWith('/products/') ? UniversalProductPage : null);
+  // Support both exact routes and /products/* and /solutions/* dynamic routes
+  const RoutePage = ROUTE_PAGES[pathname] || 
+    (pathname.startsWith('/products/') ? UniversalProductPage : 
+    (pathname.startsWith('/solutions/') ? UniversalSolutionPage : null));
 
   useEffect(() => {
     const metadata = PAGE_METADATA[pathname] || PAGE_METADATA['/'];

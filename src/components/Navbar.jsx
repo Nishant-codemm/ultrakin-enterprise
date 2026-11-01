@@ -6,17 +6,25 @@ import {
   Bot,
   CheckSquare,
   ChevronDown,
+  Code,
   FileText,
   FolderOpen,
+  GraduationCap,
   Headphones,
   HelpCircle,
   Layers,
   Mail,
+  Megaphone,
   MessageSquare,
   MessagesSquare,
+  Palette,
+  Scale,
   Search,
   ShieldCheck,
+  ShoppingBag,
   Sparkles,
+  TrendingUp,
+  Truck,
   Users,
   Video,
   Workflow,
@@ -65,21 +73,24 @@ const productGroups = [
 
 const solutionGroups = [
   {
-    label: 'By Team Function',
+    label: 'By team',
     items: [
-      { title: 'Product & Engineering', description: 'Connect sprint specs and PR discussions to delivery.', icon: Workflow, color: 'bg-[#5c5bd6]', module: 'threads' },
-      { title: 'Customer Operations', description: 'Carry customer tickets and SLA context from email to triage.', icon: Headphones, color: 'bg-[#dc2626]', module: 'mail' },
-      { title: 'Executive & Leadership', description: 'Unified visibility across company decisions and async signoffs.', icon: Users, color: 'bg-[#2563eb]', module: 'docs' },
-      { title: 'Team Operations', description: 'Keep cross-functional ownership and milestones aligned.', icon: CheckSquare, color: 'bg-[#10b981]', module: 'tasks' },
+      { title: 'Customer support', description: 'Carry customer tickets and SLA context from email to triage.', icon: Headphones, color: 'bg-[#ef4444]', href: '/solutions/customer-support' },
+      { title: 'Sales', description: 'Connect leads to pipeline and automate deal velocity.', icon: TrendingUp, color: 'bg-[#059669]', href: '/solutions/sales' },
+      { title: 'Engineering', description: 'Connect sprint specs and PR discussions to delivery.', icon: Code, color: 'bg-[#6366f1]', href: '/solutions/engineering' },
+      { title: 'Operations', description: 'Coordinate cross-functional approvals and workflows.', icon: Layers, color: 'bg-[#d97706]', href: '/solutions/operations' },
+      { title: 'Marketing', description: 'Align launches, campaigns, and creative reviews.', icon: Megaphone, color: 'bg-[#ec4899]', href: '/solutions/marketing' },
+      { title: 'People', description: 'Streamline hiring, onboarding, and team operations.', icon: Users, color: 'bg-[#8b5cf6]', href: '/solutions/people' },
     ],
   },
   {
-    label: 'By Enterprise Need',
+    label: 'By industry',
     items: [
-      { title: 'Incident Swarming', description: 'Audio/video huddle triage with auto-transcribed actions.', icon: Video, color: 'bg-[#059669]', module: 'huddle' },
-      { title: 'Living Technical Specs', description: 'Synchronized collaborative documentation that never stales.', icon: FileText, color: 'bg-[#0284c7]', module: 'docs' },
-      { title: 'Agent Automation', description: 'Background agents to route signals without human toil.', icon: Bot, color: 'bg-[#c026d3]', module: 'automations' },
-      { title: 'Async Decision Mesh', description: 'Preserve team context across timezones and handoffs.', icon: MessageSquare, color: 'bg-[#7c3aed]', module: 'chat' },
+      { title: 'Agencies and studios', description: 'Run client projects and creative reviews in shared spaces.', icon: Palette, color: 'bg-[#0284c7]', href: '/solutions/agencies' },
+      { title: 'Schools and tutoring', description: 'Teach classes, host live huddles, and share notes automatically.', icon: GraduationCap, color: 'bg-[#3b82f6]', href: '/solutions/education' },
+      { title: 'Online stores', description: 'Resolve customer orders, returns, and inventory escalations.', icon: ShoppingBag, color: 'bg-[#f59e0b]', href: '/solutions/ecommerce' },
+      { title: 'Law and accounting firms', description: 'Confidential document vaults, audit trails, and client reviews.', icon: Scale, color: 'bg-[#475569]', href: '/solutions/professional-services' },
+      { title: 'Field services', description: 'Dispatch field technicians and update job statuses in real time.', icon: Truck, color: 'bg-[#10b981]', href: '/solutions/field-services' },
     ],
   },
 ];
@@ -114,11 +125,15 @@ const asideContent = {
     action: (openShowcase) => openShowcase(),
   },
   Solutions: {
-    tag: 'ENTERPRISE WORKFLOWS',
-    title: 'Speed with built-in guardrails.',
-    desc: 'Connect chat, docs, and customer signals into one living thread without context loss.',
-    actionText: 'See workflows in action',
-    action: (_, scrollToSection) => scrollToSection('workflows'),
+    tag: 'TEMPLATES',
+    title: 'Templates to start from.',
+    desc: 'Website lead → qualified deal · Inbound mail → support request · New hire onboarding',
+    actionText: 'Browse all templates',
+    action: () => {
+      window.history.pushState({}, '', '/products/templates');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
   },
   Resources: {
     tag: 'SECURITY & COMPLIANCE',
@@ -291,8 +306,8 @@ export default function Navbar() {
       openDemoDrawer();
       return;
     }
-    // Product page navigation — href takes priority
-    if (item.href?.startsWith('/products/')) {
+    // Product and Solution page navigation — href takes priority
+    if (item.href?.startsWith('/products/') || item.href?.startsWith('/solutions')) {
       window.history.pushState({}, '', item.href);
       window.dispatchEvent(new PopStateEvent('popstate'));
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -516,8 +531,45 @@ export default function Navbar() {
               </aside>
             </div>
             <div className="flex items-center justify-between border-t border-border px-6 py-3 text-[11px] text-ink-subtle">
-              <span>People, tools, and agents in one app.</span>
-              <button type="button" onClick={() => { setOpenMenu(null); scrollToSection('workflows'); }} className="font-medium text-ink-muted transition-colors hover:text-ink">See how it works <span aria-hidden="true">→</span></button>
+              {openMenu === 'Solutions' ? (
+                <>
+                  <div className="flex items-center gap-2 text-ink-muted">
+                    <button
+                      type="button"
+                      onClick={() => { setOpenMenu(null); scrollToSection('faq'); }}
+                      className="font-medium hover:text-ink transition-colors cursor-pointer"
+                    >
+                      Guides
+                    </button>
+                    <span className="text-border">·</span>
+                    <button
+                      type="button"
+                      onClick={() => { setOpenMenu(null); openDemoDrawer(); }}
+                      className="font-medium hover:text-ink transition-colors cursor-pointer"
+                    >
+                      Talk to us
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenMenu(null);
+                      window.history.pushState({}, '', '/solutions');
+                      window.dispatchEvent(new PopStateEvent('popstate'));
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="font-medium text-brand hover:underline transition-colors flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>See all solutions</span>
+                    <span aria-hidden="true">→</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <span>People, tools, and agents in one app.</span>
+                  <button type="button" onClick={() => { setOpenMenu(null); scrollToSection('workflows'); }} className="font-medium text-ink-muted transition-colors hover:text-ink">See how it works <span aria-hidden="true">→</span></button>
+                </>
+              )}
             </div>
           </motion.div>
         )}
