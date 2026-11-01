@@ -125,10 +125,10 @@ export const SOLUTION_META = {
     persona: SOLUTION_PERSONAS.cxElena,
     badgeText: 'Live Support Desk',
     workflow: [
-      { step: 1, title: 'Customer Email', desc: 'Inbound ticket lands in support@northwind.shop with duplicate payment query.' },
-      { step: 2, title: 'Collision Guard', desc: 'Real-time indicator shows Elena is drafting; prevents double replies.' },
+      { step: 1, title: 'Customer Email', desc: 'Inbound ticket lands in support@northwind.shop with webhook 504 timeout query.' },
+      { step: 2, title: 'Collision Guard', desc: 'Real-time indicator shows Priya is drafting; prevents double replies.' },
       { step: 3, title: 'Contextual Escalation', desc: 'Direct mention of @Dana in Engineering without leaving the customer thread.' },
-      { step: 4, title: 'Permanent Record', desc: 'Auto-logs as ticket SR-14 on the Engineering Sprint Board with audit trail.' },
+      { step: 4, title: 'Permanent Record', desc: 'Auto-logs as ticket SR-28 on the Engineering Sprint Board with audit trail.' },
     ],
     features: [
       { problem: 'Support tickets are trapped in external silos', solution: 'Emails live in the same workspace where engineering builds solutions.' },

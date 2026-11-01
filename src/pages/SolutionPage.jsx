@@ -39,6 +39,8 @@ const SOLUTION_ICONS = {
 };
 
 // ─── Lazy-load all 11 solution demo components ──────────────────────────────
+const SupportAgentShowcaseCard = lazy(() => import('./solutions/SupportAgentShowcaseCard'));
+
 const DEMO_MAP = {
   'customer-support': lazy(() => import('./solutions/CustomerSupportSolutionDemo')),
   sales: lazy(() => import('./solutions/SalesSolutionDemo')),
@@ -220,6 +222,15 @@ export default function SolutionPage() {
           </div>
         </motion.div>
       </section>
+
+      {/* Secondary Stacked Showcase Card for Customer Support */}
+      {slug === 'customer-support' && (
+        <section className="mx-auto max-w-7xl px-5 lg:px-8 mt-2">
+          <Suspense fallback={<div className="h-24 bg-slate-100 rounded-2xl animate-pulse" />}>
+            <SupportAgentShowcaseCard />
+          </Suspense>
+        </section>
+      )}
 
       {/* Feature grid: "What gets in the way, and what changes" */}
       <ProductFeatureGrid features={meta.features} productColor={meta.color} />
