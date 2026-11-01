@@ -885,9 +885,12 @@ Director of IT Operations, UberLogistics DE`,
       const scrollY = window.scrollY;
       const heroEl = document.getElementById('hero');
       // Keep the full navigation until the Hero section has completely left view.
-      const isHeroInView = heroEl
-        ? heroEl.getBoundingClientRect().bottom > 0
-        : false;
+      const isNonHomePage = window.location.pathname !== '/';
+      const isHeroInView = isNonHomePage
+        ? true
+        : heroEl
+          ? heroEl.getBoundingClientRect().bottom > 0
+          : true;
       setIsHeroVisible(isHeroInView);
 
       const sectionIds = ['hero', 'workflows', 'features', 'platform', 'security', 'evaluation', 'faq'];

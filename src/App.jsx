@@ -39,11 +39,23 @@ const PAGE_METADATA = {
   },
 };
 
+// Product page slugs
+const PRODUCT_SLUGS = ['chat','calls','mail','docs','lists','events','forms',
+                       'automations','agents','connectors','templates','ukin','search'];
+
+const UniversalProductPage = lazy(() => import('./pages/ProductPage'));
+
 const ROUTE_PAGES = {
-  '/pricing': lazy(() => import('./pages/PricingPage')),
+  '/pricing':   lazy(() => import('./pages/PricingPage')),
   '/workspace': lazy(() => import('./pages/WorkspacePage')),
-  '/agents': lazy(() => import('./pages/AgentsPage')),
-  '/security': lazy(() => import('./pages/SecurityPage')),
+  '/agents':    lazy(() => import('./pages/AgentsPage')),
+  '/security':  lazy(() => import('./pages/SecurityPage')),
+  ...Object.fromEntries(
+    PRODUCT_SLUGS.map(slug => [
+      `/products/${slug}`,
+      UniversalProductPage,
+    ])
+  ),
 };
 
 export default function App() {
@@ -67,7 +79,8 @@ export default function App() {
     document.documentElement.dataset.theme = 'marketing';
   }, []);
 
-  const RoutePage = ROUTE_PAGES[pathname];
+  // Support both exact routes and /products/* dynamic routes
+  const RoutePage = ROUTE_PAGES[pathname] || (pathname.startsWith('/products/') ? UniversalProductPage : null);
 
   useEffect(() => {
     const metadata = PAGE_METADATA[pathname] || PAGE_METADATA['/'];
@@ -222,7 +235,7 @@ export default function App() {
             )}
           </div>
         </main>}
-        <div className="relative z-10 bg-transparent"><Footer isHome={pathname !== '/pricing' && pathname !== '/workspace' && pathname !== '/agents' && pathname !== '/security'} /></div>
+        <div className="relative z-10 bg-transparent"><Footer isHome={pathname === '/'} /></div>
         <EnterpriseDemoDrawer />
         <CommandPaletteModal />
         <KeyboardShortcutsModal />

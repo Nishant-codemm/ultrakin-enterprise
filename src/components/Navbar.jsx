@@ -37,19 +37,28 @@ const productGroups = [
   {
     label: 'Work together',
     items: [
-      { title: 'Chat', description: 'Spaces, threads and direct messages.', icon: MessageSquare, color: 'bg-[#5c5bd6]', module: 'chat' },
-      { title: 'Threads', description: 'Carry decisions forward, not just loose messages.', icon: MessagesSquare, color: 'bg-[#4f46e5]', module: 'threads' },
-      { title: 'Calls & Huddles', description: 'Huddles and video calls with summaries.', icon: Video, color: 'bg-[#059669]', module: 'huddle' },
-      { title: 'Mail', description: 'Shared and personal mail on your domain.', icon: Mail, color: 'bg-[#dc2626]', module: 'mail' },
+      { title: 'Chat',          description: 'Spaces, threads and direct messages.',         icon: MessageSquare, color: 'bg-[#5c5bd6]', href: '/products/chat'   },
+      { title: 'Calls & Huddles', description: 'Audio and video calls with auto summaries.', icon: Video,         color: 'bg-[#059669]', href: '/products/calls'  },
+      { title: 'Mail',          description: 'Shared and personal mail on your domain.',     icon: Mail,          color: 'bg-[#dc2626]', href: '/products/mail'   },
+      { title: 'Docs',          description: 'Pages and living specs your team writes together.', icon: FileText,  color: 'bg-[#2563eb]', href: '/products/docs'   },
     ],
   },
   {
     label: 'Build & Automate',
     items: [
-      { title: 'Docs', description: 'Pages and living specs your team writes together.', icon: FileText, color: 'bg-[#2563eb]', module: 'docs' },
-      { title: 'Lists & Tasks', description: 'Records for requests, deals and defects.', icon: CheckSquare, color: 'bg-[#10b981]', module: 'tasks' },
-      { title: 'Files', description: 'Instant artifact preview linked to project threads.', icon: FolderOpen, color: 'bg-[#65a30d]', module: 'files' },
-      { title: 'Ukin & Agents', description: 'Automations and AI agents that work across tools.', icon: Bot, color: 'bg-[#c026d3]', module: 'automations' },
+      { title: 'Lists',         description: 'Records for requests, deals and defects.',     icon: CheckSquare,   color: 'bg-[#10b981]', href: '/products/lists'       },
+      { title: 'Events',        description: 'Meetings, classes and webinars.',               icon: Layers,        color: 'bg-[#d97706]', href: '/products/events'      },
+      { title: 'Automations',   description: 'Steps across every tool, with approvals.',      icon: Workflow,      color: 'bg-[#c026d3]', href: '/products/automations' },
+      { title: 'Agents',        description: 'Agents with a job, tools and limits.',          icon: Bot,           color: 'bg-[#6366f1]', href: '/products/agents'      },
+    ],
+  },
+  {
+    label: 'Ukin & Search',
+    items: [
+      { title: 'Ukin',          description: 'The agent that works across every tool.',       icon: Sparkles,      color: 'bg-[#8b5cf6]', href: '/products/ukin'        },
+      { title: 'Connectors',    description: 'HubSpot, Stripe, GitHub, MCP and any API.',    icon: FolderOpen,    color: 'bg-[#0284c7]', href: '/products/connectors'  },
+      { title: 'Templates',     description: 'Ready-made automations and agents to start from.', icon: Layers,    color: 'bg-[#059669]', href: '/products/templates'   },
+      { title: 'Search',        description: '⌘K across messages, mail, docs and records.', icon: Search,        color: 'bg-[#374151]', href: '/products/search'      },
     ],
   },
 ];
@@ -282,6 +291,13 @@ export default function Navbar() {
       openDemoDrawer();
       return;
     }
+    // Product page navigation — href takes priority
+    if (item.href?.startsWith('/products/')) {
+      window.history.pushState({}, '', item.href);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     if (item.module) {
       if (window.location.pathname !== '/') {
         window.location.href = '/#workspace-showcase';
@@ -296,7 +312,9 @@ export default function Navbar() {
     } else if (item.href?.startsWith('#')) {
       scrollToSection(item.href.slice(1));
     } else if (item.href?.startsWith('/')) {
-      window.location.href = item.href;
+      window.history.pushState({}, '', item.href);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else if (item.href) {
       window.open(item.href, '_blank', 'noopener,noreferrer');
     }
@@ -333,7 +351,21 @@ export default function Navbar() {
       <AnimatePresence mode="wait" initial={false}>
       {isHeroVisible ? (
       <motion.div key="full-navigation" {...compactTransition} className="mx-auto flex h-[68px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
-        <a href="#hero" aria-label="Ultrakin home" className="group inline-flex shrink-0 items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70" onClick={(event) => { event.preventDefault(); scrollToSection('hero'); }}>
+        <a
+          href="/"
+          aria-label="Ultrakin home"
+          className="group inline-flex shrink-0 items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70"
+          onClick={(event) => {
+            event.preventDefault();
+            if (window.location.pathname !== '/') {
+              window.history.pushState({}, '', '/');
+              window.dispatchEvent(new PopStateEvent('popstate'));
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+              scrollToSection('hero');
+            }
+          }}
+        >
           <UltrakinLogo size={30} />
           <span className="text-[17px] font-semibold tracking-[-0.045em] text-ink">Ultrakin</span>
         </a>
@@ -377,7 +409,21 @@ export default function Navbar() {
       </motion.div>
       ) : (
         <motion.div key="compact-navigation" {...compactTransition} className="relative mx-auto flex h-[58px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
-          <a href="#hero" aria-label="Ultrakin home" onClick={(event) => { event.preventDefault(); scrollToSection('hero'); }} className="inline-flex shrink-0 items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">
+          <a
+            href="/"
+            aria-label="Ultrakin home"
+            onClick={(event) => {
+              event.preventDefault();
+              if (window.location.pathname !== '/') {
+                window.history.pushState({}, '', '/');
+                window.dispatchEvent(new PopStateEvent('popstate'));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              } else {
+                scrollToSection('hero');
+              }
+            }}
+            className="inline-flex shrink-0 items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70"
+          >
             <UltrakinLogo size={27} />
             <span className="text-[15px] font-semibold tracking-[-0.045em] text-ink">Ultrakin</span>
           </a>
@@ -426,11 +472,11 @@ export default function Navbar() {
             key={openMenu}
             {...menuMotion}
             onMouseEnter={() => enterMenu(openMenu)}
-            className="absolute left-1/2 top-[calc(100%+8px)] hidden w-[min(980px,calc(100vw-48px))] -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_28px_90px_rgba(29,35,40,.1),0_2px_6px_rgba(29,35,40,.035)] backdrop-blur-2xl lg:block"
+            className="absolute left-1/2 top-[calc(100%+8px)] hidden w-[min(1100px,calc(100vw-48px))] -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_28px_90px_rgba(29,35,40,.1),0_2px_6px_rgba(29,35,40,.035)] backdrop-blur-2xl lg:block"
           >
             <div
               className="grid gap-3 p-4"
-              style={{ gridTemplateColumns: 'minmax(0,1fr) minmax(0,1fr) 270px' }}
+              style={{ gridTemplateColumns: `repeat(${menuContent[openMenu]?.length ?? 2}, minmax(0,1fr)) 260px` }}
             >
               {menuContent[openMenu].map((group) => (
                 <div key={group.label} className="px-1 py-1">
