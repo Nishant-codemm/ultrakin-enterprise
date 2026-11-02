@@ -166,8 +166,8 @@ export default function App() {
             <CTASection />
           </div>
 
-          {/* ── Continuous Luminous Story Thread & Traveling Photon Node (Floats OVER Cards & Elements at z-20) ── */}
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
+          {/* ── Continuous Luminous Story Thread & Traveling Photon Node (Floats gracefully behind cards at z-0) ── */}
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
             {/* Desktop Continuous Story Thread — Delicate Luminous Ray */}
             <svg viewBox="0 0 100 1000" preserveAspectRatio="none" className="absolute inset-0 hidden h-full w-full md:block">
               <defs>
