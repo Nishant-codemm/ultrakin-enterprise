@@ -7,6 +7,8 @@ import {
   Calendar,
   FileText,
   Sparkles,
+  MessageSquare,
+  Video,
   GitPullRequest,
   BarChart3,
   Cpu,
@@ -100,6 +102,23 @@ function TiltCard({ children, className }) {
 
 const CATEGORIES = ['Built in', 'Extension examples'];
 
+/* ─── Product Icon & Badge Mapping matching the Navigation Mega-Menu ─── */
+const PRODUCT_ICON_CONFIG = {
+  Spaces:      { icon: MessageSquare, bg: 'bg-[#5c5bd6]', glow: '#5c5bd6' },
+  Mail:        { icon: Mail,          bg: 'bg-[#dc2626]', glow: '#dc2626' },
+  Meetings:    { icon: Video,         bg: 'bg-[#059669]', glow: '#059669' },
+  Tasks:       { icon: CheckSquare,   bg: 'bg-[#10b981]', glow: '#10b981' },
+  Calendar:    { icon: Calendar,      bg: 'bg-[#d97706]', glow: '#d97706' },
+  Docs:        { icon: FileText,      bg: 'bg-[#2563eb]', glow: '#2563eb' },
+  'Ukin agent':{ icon: Sparkles,      bg: 'bg-[#8b5cf6]', glow: '#8b5cf6' },
+  GitHub:      { icon: GitPullRequest,bg: 'bg-[#24292f]', glow: '#64748b' },
+  PostHog:     { icon: BarChart3,     bg: 'bg-[#ea580c]', glow: '#ea580c' },
+  'MCP tools': { icon: Cpu,           bg: 'bg-[#0284c7]', glow: '#0284c7' },
+  Journeys:    { icon: Route,         bg: 'bg-[#c026d3]', glow: '#c026d3' },
+  Forms:       { icon: ClipboardList, bg: 'bg-[#2563eb]', glow: '#2563eb' },
+  Lists:       { icon: ListTodo,      bg: 'bg-[#10b981]', glow: '#10b981' },
+};
+
 const INTEGRATIONS = [
   { name: 'Spaces',     category: 'Built in',          badge: 'Conversations',                      desc: 'Spaces, direct messages, and huddles are where team signals arrive.',                        color: '#b9bbff', iconLetter: 'SP',  point: [112, 78]  },
   { name: 'Mail',       category: 'Built in',          badge: 'Business · shared mailbox',          desc: 'Route customer email into owned work and connected threads.',                               color: '#c6c9ff', iconLetter: 'ML',  point: [310, 50]  },
@@ -121,7 +140,6 @@ const CENTER = [310, 210];
 /* ─── Mathematically Constructed Convergent Cubic Splines ─── */
 /* Curves tighten naturally near the center hub [310, 210] and spread smoothly outward */
 function getConvergentSpline(x, y) {
-  // Cubic Bézier control points engineered for natural logarithmic convergence
   const dx = x - CENTER[0];
   const dy = y - CENTER[1];
   const cx1 = x - dx * 0.42 + (dy > 0 ? -12 : 12);
@@ -132,7 +150,6 @@ function getConvergentSpline(x, y) {
 }
 
 function getHarmonicGuideSpline(x, y) {
-  // Secondary companion spline offset for layered network depth
   const dx = x - CENTER[0];
   const dy = y - CENTER[1];
   const cx1 = x - dx * 0.48 + (dy > 0 ? 14 : -14);
@@ -207,380 +224,18 @@ function ConcentricOrbitalRing({ rx, ry, strokeDasharray, opacity }) {
   );
 }
 
-/* ─── Authentic Miniature Product Previews (Cropped from real products) ─── */
-function MiniatureProductPreview({ item }) {
-  const name = item.name;
-
-  // 1. Spaces (Real Chat / Spaces UI Preview)
-  if (name === 'Spaces') {
-    return (
-      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-          <div className="flex min-w-0 items-center gap-1">
-            <span className="font-mono text-[8px] font-bold text-[#b9bbff]">#</span>
-            <span className="truncate text-[7.5px] font-semibold text-slate-200">launch-planning</span>
-          </div>
-          <span className="flex items-center gap-0.5 rounded-full bg-emerald-500/20 px-1 py-0.2 text-[5.5px] font-mono text-emerald-300">
-            <span className="h-1 w-1 rounded-full bg-emerald-400" />
-            <span>3 active</span>
-          </span>
-        </div>
-        {/* Message body */}
-        <div className="my-auto flex items-start gap-1">
-          <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-[#5c5bd6] text-[6px] font-bold text-white">
-            MC
-          </span>
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-[7px] font-semibold text-slate-200">Maya Chen</div>
-            <div className="truncate text-[6px] text-slate-300 leading-tight">Launch checklist is ready</div>
-          </div>
-        </div>
-        {/* Decision & reaction footer */}
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px]">
-          <span className="rounded bg-white/[0.06] px-1 text-slate-300">🚀 5 reactions</span>
-          <span className="font-mono text-[#b9bbff]">⚡ Decision linked</span>
-        </div>
-      </div>
-    );
-  }
-
-  // 2. Mail (Real Shared Inbox UI Preview)
-  if (name === 'Mail') {
-    return (
-      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-          <div className="flex min-w-0 items-center gap-1">
-            <Mail className="h-2 w-2 shrink-0 text-[#c6c9ff]" />
-            <span className="truncate font-mono text-[7px] text-slate-300">support@northwind</span>
-          </div>
-          <span className="rounded bg-indigo-500/30 px-1 font-mono text-[5.5px] font-medium text-indigo-200">1 new</span>
-        </div>
-        {/* Thread item */}
-        <div className="my-auto min-w-0">
-          <div className="truncate text-[7px] font-semibold text-slate-100">Duplicate charge #4821</div>
-          <div className="truncate text-[6px] text-slate-400">Maya Chen · Billing refund</div>
-        </div>
-        {/* Connected ticket */}
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px]">
-          <span className="rounded border border-emerald-500/30 bg-emerald-950/70 px-1 font-mono text-emerald-300">SR-14</span>
-          <span className="font-medium text-amber-300">Refund initiated</span>
-        </div>
-      </div>
-    );
-  }
-
-  // 3. Meetings (Real Huddle / Call UI Preview)
-  if (name === 'Meetings') {
-    return (
-      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-          <div className="flex items-center gap-1">
-            <span className="h-1 w-1 rounded-full bg-emerald-400 ring-2 ring-emerald-400/20" />
-            <span className="font-mono text-[6px] font-bold tracking-wider text-emerald-300 uppercase">LIVE</span>
-          </div>
-          <span className="font-mono text-[6.5px] text-slate-400">12:44</span>
-        </div>
-        {/* Video tiles + audio waveform */}
-        <div className="my-auto flex items-center justify-between gap-1">
-          <div className="flex items-center gap-1">
-            <div className="flex h-4 w-4 items-center justify-center rounded border border-emerald-400/50 bg-[#059669]/30 text-[6px] font-bold text-emerald-200 shadow-[0_0_4px_rgba(52,211,153,0.3)]">
-              DL
-            </div>
-            <div className="flex h-4 w-4 items-center justify-center rounded border border-white/10 bg-[#dc2626]/20 text-[6px] font-bold text-slate-300">
-              SO
-            </div>
-          </div>
-          <div className="flex h-2.5 items-end gap-0.5">
-            <span className="h-1.5 w-0.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="h-2.5 w-0.5 rounded-full bg-emerald-400 animate-pulse [animation-delay:150ms]" />
-            <span className="h-1 w-0.5 rounded-full bg-emerald-400 animate-pulse [animation-delay:300ms]" />
-          </div>
-        </div>
-        {/* Live transcript note */}
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-300">
-          <span className="truncate">Dana: 20% rollout confirmed</span>
-          <span className="font-mono text-slate-500">4 in call</span>
-        </div>
-      </div>
-    );
-  }
-
-  // 4. Tasks (Real Lists / Kanban UI Preview)
-  if (name === 'Tasks') {
-    return (
-      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-          <span className="rounded border border-emerald-500/30 bg-emerald-950/70 px-1 py-0.2 font-mono text-[5.5px] font-semibold text-emerald-300">
-            IN PROGRESS
-          </span>
-          <span className="font-mono text-[6.5px] text-slate-400">2 active</span>
-        </div>
-        {/* Task row */}
-        <div className="my-auto min-w-0">
-          <div className="flex items-center gap-1">
-            <CheckSquare className="h-2 w-2 shrink-0 text-emerald-400" />
-            <span className="truncate text-[7px] font-medium text-slate-200">Process refund #4821</span>
-          </div>
-          <div className="mt-0.5 flex items-center gap-1 text-[5.5px] text-slate-400">
-            <span>SR-14</span> · <span>Billing</span>
-          </div>
-        </div>
-        {/* Assignee & priority */}
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px]">
-          <span className="rounded bg-amber-950/70 px-1 font-bold text-amber-300">P0 High</span>
-          <span className="flex h-3 w-3 items-center justify-center rounded-full bg-[#dc2626] text-[5.5px] font-bold text-white">
-            SO
-          </span>
-        </div>
-      </div>
-    );
-  }
-
-  // 5. Calendar (Real Calendar & Day Schedule UI Preview)
-  if (name === 'Calendar') {
-    return (
-      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-          <div className="flex items-center gap-1">
-            <Calendar className="h-2 w-2 text-[#e1c38b]" />
-            <span className="font-mono text-[6.5px] font-bold text-amber-200 uppercase">THU, OCT 24</span>
-          </div>
-          <span className="font-mono text-[6px] text-slate-400">3:00 PM</span>
-        </div>
-        {/* Event item */}
-        <div className="my-auto rounded-r border-l-2 border-amber-400/80 bg-amber-500/[0.08] py-0.5 pl-1.5">
-          <div className="truncate text-[7px] font-semibold text-slate-100">Quarterly client review</div>
-          <div className="truncate text-[5.5px] text-slate-400">Northwind Studio</div>
-        </div>
-        {/* Attendee stack */}
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px]">
-          <div className="flex -space-x-1">
-            <span className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#059669] text-[5px] font-bold text-white">D</span>
-            <span className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#dc2626] text-[5px] font-bold text-white">S</span>
-            <span className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#5c5bd6] text-[5px] font-bold text-white">M</span>
-          </div>
-          <span className="font-mono text-slate-400">4 attending</span>
-        </div>
-      </div>
-    );
-  }
-
-  // 6. Docs (Real Living Docs Editor UI Preview)
-  if (name === 'Docs') {
-    return (
-      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-          <div className="flex min-w-0 items-center gap-1">
-            <FileText className="h-2 w-2 shrink-0 text-[#c4b6ff]" />
-            <span className="truncate text-[7px] font-medium text-slate-200">Q4 Launch Plan.doc</span>
-          </div>
-          <span className="rounded bg-violet-950/60 px-1 font-mono text-[5.5px] text-violet-300">Live</span>
-        </div>
-        {/* Document body + live cursor */}
-        <div className="my-auto space-y-0.5">
-          <div className="flex items-center gap-1">
-            <span className="h-1 w-10 rounded bg-slate-300/80" />
-            <span className="inline-flex items-center gap-0.5 rounded bg-emerald-500/20 px-0.5 text-[5px] font-mono text-emerald-200">
-              <span className="h-0.5 w-0.5 rounded-full bg-emerald-400" /> Dana
-            </span>
-          </div>
-          <div className="h-0.5 w-14 rounded bg-slate-600/60" />
-          <div className="rounded border-l border-violet-400 bg-violet-500/[0.1] pl-1 text-[5.5px] text-violet-200 truncate">
-            Decision: 20% rollout first
-          </div>
-        </div>
-        {/* Footer */}
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
-          <span className="font-mono text-violet-300">3 decisions linked</span>
-          <span className="text-slate-500">v2.4</span>
-        </div>
-      </div>
-    );
-  }
-
-  // 7. Ukin Agent (Real Autonomous Agent Preview)
-  if (name === 'Ukin agent') {
-    return (
-      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-          <div className="flex items-center gap-1">
-            <Sparkles className="h-2 w-2 shrink-0 text-indigo-300" />
-            <span className="text-[7px] font-semibold text-indigo-200">Support Triage</span>
-          </div>
-          <span className="flex items-center gap-0.5 font-mono text-[5.5px] text-emerald-400">
-            <span className="h-1 w-1 rounded-full bg-emerald-400" /> Active
-          </span>
-        </div>
-        {/* Agent signal & execution */}
-        <div className="my-auto rounded border border-indigo-400/20 bg-indigo-500/[0.08] p-0.5">
-          <div className="truncate font-mono text-[5.5px] text-indigo-300">Signal: Support Mail</div>
-          <div className="truncate text-[6.5px] font-medium text-slate-100">Created SR-14 & Refund Draft</div>
-        </div>
-        {/* Status */}
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px]">
-          <span className="rounded bg-indigo-950/80 px-1 font-mono text-indigo-200">Autonomous</span>
-          <span className="font-mono text-slate-400">MCP tools</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Extension Examples
-  if (name === 'GitHub') {
-    return (
-      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-          <div className="flex items-center gap-1">
-            <GitPullRequest className="h-2 w-2 text-slate-300" />
-            <span className="truncate font-mono text-[7px] text-slate-200">acme / core</span>
-          </div>
-          <span className="rounded border border-emerald-500/30 bg-emerald-950/70 px-1 font-mono text-[5.5px] text-emerald-300">
-            Merged
-          </span>
-        </div>
-        <div className="my-auto min-w-0">
-          <div className="truncate text-[7px] font-semibold text-slate-100">PR #412: Live Telemetry</div>
-          <div className="truncate text-[6px] text-slate-400">✓ 14 checks passed</div>
-        </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
-          <span className="font-mono text-slate-300">main branch</span>
-          <span className="font-mono text-emerald-400">Synced</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (name === 'PostHog') {
-    return (
-      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-          <div className="flex items-center gap-1">
-            <BarChart3 className="h-2 w-2 text-amber-300" />
-            <span className="truncate text-[7px] font-medium text-slate-200">PostHog Analytics</span>
-          </div>
-          <span className="h-1 w-1 rounded-full bg-amber-400" />
-        </div>
-        <div className="my-auto flex items-end justify-between">
-          <div>
-            <div className="font-mono text-[7.5px] font-bold text-slate-100">14.2k req/s</div>
-            <div className="font-mono text-[5.5px] text-emerald-400">+18.4% velocity</div>
-          </div>
-          <div className="flex h-2.5 items-end gap-0.5">
-            <span className="h-1 w-1 rounded-sm bg-amber-400/50" />
-            <span className="h-2 w-1 rounded-sm bg-amber-400/70" />
-            <span className="h-2.5 w-1 rounded-sm bg-amber-400" />
-          </div>
-        </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
-          <span>Enterprise cohort</span>
-          <span className="font-mono text-slate-300">Live</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (name === 'MCP tools') {
-    return (
-      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-          <div className="flex items-center gap-1">
-            <Cpu className="h-2 w-2 text-teal-300" />
-            <span className="truncate font-mono text-[7px] text-teal-200">MCP Gateway</span>
-          </div>
-          <span className="rounded border border-teal-500/30 bg-teal-950/70 px-1 font-mono text-[5.5px] text-teal-300">
-            4 tools
-          </span>
-        </div>
-        <div className="my-auto min-w-0">
-          <div className="truncate text-[7px] font-medium text-slate-200">Acme CRM · Postgres</div>
-          <div className="truncate text-[5.5px] text-slate-400">Vector tool connected</div>
-        </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
-          <span className="font-mono text-teal-300">12ms latency</span>
-          <span className="font-mono text-emerald-400">Active</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (name === 'Journeys') {
-    return (
-      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-          <div className="flex items-center gap-1">
-            <Route className="h-2 w-2 text-purple-300" />
-            <span className="truncate text-[7px] font-medium text-slate-200">Journeys App</span>
-          </div>
-          <span className="rounded bg-purple-950/70 px-1 font-mono text-[5.5px] text-purple-300">Step 2/4</span>
-        </div>
-        <div className="my-auto min-w-0">
-          <div className="truncate text-[7px] font-semibold text-slate-100">Enterprise Onboarding</div>
-          <div className="truncate text-[5.5px] text-slate-400">Trigger → Slack → Kickoff</div>
-        </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
-          <span className="font-mono text-purple-300">94% complete</span>
-          <span className="text-slate-400">18 active</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (name === 'Forms') {
-    return (
-      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
-        <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-          <div className="flex items-center gap-1">
-            <ClipboardList className="h-2 w-2 text-blue-300" />
-            <span className="truncate text-[7px] font-medium text-slate-200">Intake Form</span>
-          </div>
-          <span className="font-mono text-[5.5px] text-blue-300">SR-88</span>
-        </div>
-        <div className="my-auto min-w-0">
-          <div className="truncate text-[7px] font-semibold text-slate-100">Security Architecture</div>
-          <div className="truncate text-[5.5px] text-slate-400">Northwind Traders RFP</div>
-        </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
-          <span className="font-medium text-amber-300">Pending triage</span>
-          <span className="font-mono text-slate-500">3 new</span>
-        </div>
-      </div>
-    );
-  }
-
-  // Lists default
-  return (
-    <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
-      <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-        <div className="flex items-center gap-1">
-          <ListTodo className="h-2 w-2 text-emerald-300" />
-          <span className="truncate text-[7px] font-medium text-slate-200">Lists Board</span>
-        </div>
-        <span className="font-mono text-[6px] text-slate-400">12 items</span>
-      </div>
-      <div className="my-auto min-w-0">
-        <div className="truncate text-[7px] font-medium text-slate-100">SOC2 Evidence Ledger</div>
-        <div className="truncate text-[5.5px] text-slate-400">Updated today by security</div>
-      </div>
-      <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
-        <span className="font-mono text-emerald-300">100% verified</span>
-        <span className="text-slate-400">Q4 audit</span>
-      </div>
-    </div>
-  );
-}
-
-/* ─── 3D Subtle Node Button Component (Linear / Raycast feel) ─── */
+/* ─── 3D Magnetic Node Button with Authentic Product Icon Badge ─── */
 function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) {
   const nodeRef = useRef(null);
   const reduceMotion = useReducedMotion();
   const [magneticTilt, setMagneticTilt] = useState({ rx: 0, ry: 0, gx: 50, gy: 50 });
+
+  const iconConfig = PRODUCT_ICON_CONFIG[item.name] || {
+    icon: Sparkles,
+    bg: 'bg-indigo-600',
+    glow: '#6366f1',
+  };
+  const Icon = iconConfig.icon;
 
   const handleMouseMove = useCallback((e) => {
     if (reduceMotion) return;
@@ -610,16 +265,16 @@ function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) 
   return (
     <motion.div
       key={item.name}
-      initial={{ opacity: 0, scale: 0.94 }}
+      initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.94 }}
+      exit={{ opacity: 0, scale: 0.92 }}
       transition={{ duration: 0.2 }}
       style={{
         position: 'absolute',
         left: `${(x / 620) * 100}%`,
         top: `${(y / 420) * 100}%`,
         translateX: '-50%',
-        translateY: '-36px', // Pins center of 72px card precisely on (x, y)
+        translateY: '-24px', // Pins center of 48px icon box precisely on (x, y)
         zIndex: isSelected ? 30 : isHovered ? 25 : 20,
       }}
     >
@@ -638,7 +293,7 @@ function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) 
           onMouseEnter={onHover}
           onMouseLeave={handleMouseLeave}
           animate={{
-            scale: isHovered ? 1.025 : isSelected ? 1.015 : 1,
+            scale: isHovered ? 1.05 : isSelected ? 1.03 : 1,
             y: isHovered ? -3 : isSelected ? -1 : 0,
           }}
           transition={{
@@ -648,45 +303,49 @@ function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) 
             mass: 0.9,
           }}
           className={cn(
-            'group relative flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400',
+            'group flex flex-col items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 cursor-pointer',
             isSelected ? 'text-white' : 'text-slate-300 hover:text-white',
           )}
         >
-          {/* Miniature Product Window Card (116px x 72px) */}
+          {/* The Outer Node Box (48px x 48px) with Specular Rim & Glow */}
           <div
             className={cn(
-              'relative h-[72px] w-[116px] rounded-xl border text-[10px] overflow-hidden transition-all duration-200',
+              'relative flex h-[48px] w-[48px] items-center justify-center rounded-[14px] border transition-all duration-200 overflow-hidden',
               isSelected
-                ? 'border-indigo-400/40 bg-[#0e1220]'
+                ? 'border-white/35 bg-[#141b2b]'
                 : isHovered
-                ? 'border-white/25 bg-[#0c101c]'
-                : 'border-white/[0.08] bg-[#090d16]/95 hover:border-white/18',
+                ? 'border-white/25 bg-[#101524]'
+                : 'border-white/[0.09] bg-[#0c1018]/90 hover:border-white/20',
             )}
             style={{
               boxShadow: isSelected
-                ? `0 0 0 1px ${item.color}33, 0 8px 24px -4px ${item.color}44, inset 0 1px 0 rgba(255,255,255,0.12)`
+                ? `0 0 0 1px ${iconConfig.glow}44, 0 8px 24px -4px ${iconConfig.glow}66, inset 0 1px 0 rgba(255,255,255,0.18)`
                 : isHovered
-                ? `0 0 0 1px ${item.color}22, 0 6px 18px -4px ${item.color}33, inset 0 1px 0 rgba(255,255,255,0.1)`
-                : '0 4px 14px -3px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.04)',
+                ? `0 0 0 1px ${iconConfig.glow}33, 0 6px 18px -4px ${iconConfig.glow}44, inset 0 1px 0 rgba(255,255,255,0.12)`
+                : '0 4px 12px -3px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)',
             }}
           >
-            {/* Specular gloss */}
-            <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-xl bg-gradient-to-b from-white/[0.05] to-transparent" />
+            {/* Inner Product Icon Badge — exact style from the navigation menu */}
+            <div
+              className={cn(
+                'flex h-[32px] w-[32px] items-center justify-center rounded-[9px] shadow-[0_1px_3px_rgba(0,0,0,0.35)] transition-transform duration-150 group-hover:scale-105',
+                iconConfig.bg,
+              )}
+            >
+              <Icon size={17} strokeWidth={2} className="text-white shrink-0" />
+            </div>
 
-            {/* Live miniature product preview */}
-            <MiniatureProductPreview item={item} />
+            {/* Specular gloss top sheen */}
+            <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-[14px] bg-gradient-to-b from-white/[0.08] to-transparent" />
           </div>
 
-          {/* Micro label underneath with status dot */}
+          {/* Node Label */}
           <span
             className={cn(
-              'mt-1 flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[8.5px] font-medium tracking-wide drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] transition-colors',
-              isSelected
-                ? 'bg-indigo-950/80 text-white ring-1 ring-indigo-400/30'
-                : 'bg-[#0a0d16]/85 text-slate-300 group-hover:text-white',
+              'whitespace-nowrap text-[9.5px] font-medium tracking-wide drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] transition-colors',
+              isSelected ? 'text-white font-semibold' : 'text-slate-300 group-hover:text-white',
             )}
           >
-            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: item.color }} />
             {item.name}
           </span>
         </motion.button>
@@ -1011,21 +670,27 @@ export default function IntegrationsSection() {
 
             {/* Mobile node list (accessible fallback) */}
             <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-0 border-t border-border sm:hidden">
-              {visible.map((item) => (
-                <button
-                  key={item.name}
-                  type="button"
-                  aria-pressed={item.name === current.name}
-                  onClick={() => setSelected(item.name)}
-                  className={cn(
-                    'flex min-h-11 items-center gap-2 border-b border-border text-left text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
-                    item.name === current.name ? 'text-brand-text font-medium' : 'text-ink-subtle hover:text-ink-soft',
-                  )}
-                >
-                  <span className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
-                  {item.name}
-                </button>
-              ))}
+              {visible.map((item) => {
+                const conf = PRODUCT_ICON_CONFIG[item.name];
+                const ItemIcon = conf?.icon || Sparkles;
+                return (
+                  <button
+                    key={item.name}
+                    type="button"
+                    aria-pressed={item.name === current.name}
+                    onClick={() => setSelected(item.name)}
+                    className={cn(
+                      'flex min-h-11 items-center gap-2 border-b border-border text-left text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+                      item.name === current.name ? 'text-brand-text font-medium' : 'text-ink-subtle hover:text-ink-soft',
+                    )}
+                  >
+                    <span className={cn('flex h-5 w-5 items-center justify-center rounded-md text-white', conf?.bg || 'bg-brand')}>
+                      <ItemIcon size={11} />
+                    </span>
+                    {item.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
