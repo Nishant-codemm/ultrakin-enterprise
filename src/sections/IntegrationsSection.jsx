@@ -137,27 +137,55 @@ const INTEGRATIONS = [
 
 const CENTER = [310, 210];
 
-/* ─── Mathematically Constructed Convergent Cubic Splines ─── */
-/* Curves tighten naturally near the center hub [310, 210] and spread smoothly outward */
-function getConvergentSpline(x, y) {
-  const dx = x - CENTER[0];
-  const dy = y - CENTER[1];
-  const cx1 = x - dx * 0.42 + (dy > 0 ? -12 : 12);
-  const cy1 = y - dy * 0.32 + (dx > 0 ? 10 : -10);
-  const cx2 = CENTER[0] + dx * 0.22;
-  const cy2 = CENTER[1] + dy * 0.22;
-  return `M ${x} ${y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${CENTER[0]} ${CENTER[1]}`;
-}
+/* ─── CONVERGING VECTOR TOPOLOGY SYSTEM ─── */
+/* Mathematically engineered cubic Béziers that merge gracefully into shared conduits
+   before reaching the central hub [310, 210], avoiding X-crossings and radiating spikes */
 
-function getHarmonicGuideSpline(x, y) {
-  const dx = x - CENTER[0];
-  const dy = y - CENTER[1];
-  const cx1 = x - dx * 0.48 + (dy > 0 ? 14 : -14);
-  const cy1 = y - dy * 0.28 + (dx > 0 ? -12 : 12);
-  const cx2 = CENTER[0] + dx * 0.18;
-  const cy2 = CENTER[1] + dy * 0.18;
-  return `M ${x} ${y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${CENTER[0]} ${CENTER[1]}`;
-}
+// Artery 1: Spaces branch into West Merge Junction [242, 192]
+const PATH_SPACES_TO_WEST_MERGE = "M 112 78 C 160 110, 195 155, 242 192";
+const PATH_SPACES_GUIDE = "M 112 78 C 152 118, 188 162, 236 198";
+
+// Artery 2: Ukin Agent branch into West Merge Junction [242, 192]
+const PATH_UKIN_TO_WEST_MERGE = "M 112 340 C 160 308, 195 245, 242 192";
+const PATH_UKIN_GUIDE = "M 112 340 C 152 300, 188 238, 236 186";
+
+// Artery 3: Mail branch converging into West Trunk [258, 198]
+const PATH_MAIL_TO_WEST_TRUNK = "M 310 50 C 300 108, 275 160, 258 198";
+const PATH_MAIL_GUIDE = "M 310 50 C 318 108, 290 160, 268 202";
+
+// Consolidated Western Trunk (from West Junction [242, 192] into Hub Core [310, 210])
+const PATH_WEST_TRUNK_INTO_HUB = "M 242 192 C 265 204, 288 209, 310 210";
+const PATH_WEST_TRUNK_GUIDE = "M 236 198 C 260 208, 285 212, 310 210";
+
+// Consolidated Eastern Trunk (from Hub Core [310, 210] to East Divergence Fork [415, 258])
+const PATH_HUB_INTO_EAST_FORK = "M 310 210 C 335 212, 375 228, 415 258";
+const PATH_HUB_EAST_GUIDE = "M 310 210 C 340 216, 380 234, 420 264";
+
+// Artery 4: East Divergence Fork [415, 258] smoothly flowing into Calendar [505, 340]
+const PATH_EAST_FORK_TO_CALENDAR = "M 415 258 C 445 285, 475 315, 505 340";
+const PATH_CALENDAR_GUIDE = "M 420 264 C 450 292, 480 320, 505 340";
+
+// Artery 5: Docs branch converging into East Fork [415, 258]
+const PATH_DOCS_TO_EAST_FORK = "M 310 362 C 325 315, 365 275, 415 258";
+const PATH_DOCS_GUIDE = "M 310 362 C 318 315, 355 275, 410 254";
+
+// Artery 6: Hub [310, 210] branching rightward into Tasks [548, 210]
+const PATH_HUB_TO_TASKS = "M 310 210 C 365 210, 450 210, 548 210";
+const PATH_TASKS_GUIDE = "M 310 210 C 365 216, 450 216, 548 210";
+
+// Artery 7: Hub [310, 210] branching northeast into Meetings [510, 78]
+const PATH_HUB_TO_MEETINGS = "M 310 210 C 345 190, 420 145, 510 78";
+const PATH_MEETINGS_GUIDE = "M 310 210 C 352 195, 428 152, 510 78";
+
+// Inter-Panel Converging Bridge 1 (Calendar [505, 340] toward right detail panel edge [620, 390])
+const PATH_CALENDAR_TO_BRIDGE_EDGE = "M 505 340 C 545 358, 580 375, 620 390";
+
+// Inter-Panel Converging Bridge 2 (Tasks lower contour [548, 230] converging into Bridge Edge [620, 390])
+const PATH_TASKS_TO_BRIDGE_EDGE = "M 548 230 C 575 285, 598 345, 620 390";
+
+/* ─── The Master Traveling Artery (Spaces → Hub → Calendar → Bridge) ─── */
+/* The continuous topological spine traced in the reference illustration */
+const PATH_MASTER_CONVERGENCE_SPINE = "M 112 78 C 160 110, 195 155, 242 192 C 265 204, 288 209, 310 210 C 335 212, 375 228, 415 258 C 445 285, 475 315, 505 340 C 545 358, 580 375, 620 390";
 
 const PREVIEWS = {
   Spaces:      { surface: 'launch-planning',       actor: 'Maya Chen',       message: 'The handoff is ready for review. I linked the launch checklist here.',          outcome: 'Decision captured in the launch brief',     icon: 'SC' },
@@ -175,32 +203,28 @@ const PREVIEWS = {
   Lists:       { surface: 'asset-tracker',          actor: 'Operations team', message: 'SOC2 Type II compliance evidence checklist updated for Q4.',                    outcome: '12 items verified · audit ready',           icon: 'LS' },
 };
 
-/* ─── Ultra-thin Travelling Particle Node along Vector Spline ─── */
-function ConvergingParticle({ d, color, delay, isHighlighted }) {
+/* ─── Ultra-thin Travelling Photon Bead along Master Topological Spine ─── */
+function ConvergingPhotonNode({ d, color, duration = 6.8 }) {
   const reduceMotion = useReducedMotion();
   if (reduceMotion) return null;
-
-  const dashLen = isHighlighted ? 6 : 4;
-  const gapLen  = isHighlighted ? 180 : 260;
-  const total   = dashLen + gapLen;
 
   return (
     <motion.path
       d={d}
       fill="none"
       stroke={color}
-      strokeWidth={isHighlighted ? 1.6 : 1.1}
+      strokeWidth={1.8}
       strokeLinecap="round"
-      strokeDasharray={`${dashLen} ${gapLen}`}
+      strokeDasharray="6 380"
       filter="url(#subtle-particle-glow)"
-      initial={{ strokeDashoffset: total, opacity: 0 }}
+      initial={{ strokeDashoffset: 386, opacity: 0 }}
       animate={{
-        strokeDashoffset: [total, -total * 0.1],
-        opacity: [0, isHighlighted ? 0.9 : 0.6, isHighlighted ? 0.9 : 0.6, 0],
+        strokeDashoffset: [386, -38],
+        opacity: [0, 0.95, 0.95, 0],
       }}
       transition={{
-        strokeDashoffset: { duration: isHighlighted ? 4.2 : 5.8, delay, repeat: Infinity, ease: 'linear', repeatDelay: 0.4 },
-        opacity: { duration: isHighlighted ? 4.2 : 5.8, delay, repeat: Infinity, ease: 'easeInOut', repeatDelay: 0.4, times: [0, 0.12, 0.88, 1] },
+        strokeDashoffset: { duration, repeat: Infinity, ease: 'linear', repeatDelay: 0.6 },
+        opacity: { duration, repeat: Infinity, ease: 'easeInOut', repeatDelay: 0.6, times: [0, 0.1, 0.9, 1] },
       }}
     />
   );
@@ -246,10 +270,9 @@ function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) 
     const cy = rect.top + rect.height / 2;
     const dx = (e.clientX - cx) / (rect.width / 2);
     const dy = (e.clientY - cy) / (rect.height / 2);
-    // Subtle magnetic response (max ±6deg)
     setMagneticTilt({
-      rx: -dy * 6,
-      ry: dx * 6,
+      rx: -dy * 5,
+      ry: dx * 5,
       gx: ((e.clientX - rect.left) / rect.width) * 100,
       gy: ((e.clientY - rect.top) / rect.height) * 100,
     });
@@ -325,7 +348,7 @@ function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) 
                 : '0 4px 12px -3px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)',
             }}
           >
-            {/* Inner Product Icon Badge — exact style from the navigation menu */}
+            {/* Inner Product Icon Badge — exact style from navigation menu */}
             <div
               className={cn(
                 'flex h-[32px] w-[32px] items-center justify-center rounded-[9px] shadow-[0_1px_3px_rgba(0,0,0,0.35)] transition-transform duration-150 group-hover:scale-105',
@@ -395,7 +418,7 @@ function SurfacePreview({ item }) {
 /* ─── Main Integrations Section Component ─── */
 export default function IntegrationsSection() {
   const [selectedCat, setSelectedCat] = useState('Built in');
-  const [selected, setSelected]       = useState('Spaces');
+  const [selected, setSelected]       = useState('Calendar');
   const [hoveredNode, setHoveredNode] = useState(null);
   const [sectionRef, inView]          = useReveal({ threshold: 0.12 });
   const reduceMotion = useReducedMotion();
@@ -403,7 +426,7 @@ export default function IntegrationsSection() {
 
   const visible = INTEGRATIONS.filter((item) => item.category === selectedCat);
   const current = visible.find((item) => item.name === selected) ?? visible[0];
-  const hoveredItem = visible.find((item) => item.name === hoveredNode);
+  const activeNode = hoveredNode || selected;
 
   const selectCategory = (category) => {
     setSelectedCat(category);
@@ -411,6 +434,18 @@ export default function IntegrationsSection() {
       setSelected(INTEGRATIONS.find((item) => item.category === category)?.name ?? 'Spaces');
     }
   };
+
+  // Determine which topological arteries are highlighted based on active selection
+  const isSpacesActive   = activeNode === 'Spaces';
+  const isUkinActive     = activeNode === 'Ukin agent';
+  const isMailActive     = activeNode === 'Mail';
+  const isCalendarActive = activeNode === 'Calendar';
+  const isTasksActive    = activeNode === 'Tasks';
+  const isMeetingsActive = activeNode === 'Meetings';
+  const isDocsActive     = activeNode === 'Docs';
+
+  // Master artery lights up when connected nodes are active
+  const isMasterSpineActive = isSpacesActive || isCalendarActive || isUkinActive;
 
   return (
     <section ref={sectionRef} id="integrations" className="relative overflow-hidden bg-transparent py-20 md:py-28 lg:py-32">
@@ -464,7 +499,42 @@ export default function IntegrationsSection() {
         </div>
 
         {/* Orbit map + detail */}
-        <div className="grid gap-8 pt-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(250px,.8fr)] lg:items-center lg:gap-12">
+        <div className="grid gap-8 pt-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(250px,.8fr)] lg:items-center lg:gap-12 relative">
+
+          {/* ── Inter-Panel Converging Vector Extension (Desktop) ── */}
+          {/* Bridge splines seamlessly travel from Calendar / Tasks across to the right detail panel */}
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 hidden lg:block z-10 overflow-visible">
+            <svg viewBox="0 0 1000 480" className="absolute inset-0 h-full w-full overflow-visible">
+              <defs>
+                <linearGradient id="bridge-spline-gradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#818cf8" stopOpacity="0.35" />
+                  <stop offset="45%" stopColor="#a5b4fc" stopOpacity="0.45" />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity="0.08" />
+                </linearGradient>
+                <linearGradient id="bridge-guide-gradient" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stopColor="#818cf8" stopOpacity="0.15" />
+                  <stop offset="100%" stopColor="#a5b4fc" stopOpacity="0.02" />
+                </linearGradient>
+              </defs>
+
+              {/* Primary Bridge Spline sweeping out from Calendar toward Right Panel */}
+              <path
+                d="M 520 405 C 570 422, 610 435, 660 442 C 720 450, 790 445, 870 435"
+                fill="none"
+                stroke="url(#bridge-spline-gradient)"
+                strokeWidth={isCalendarActive ? 0.95 : 0.65}
+                className="transition-all duration-300"
+              />
+              {/* Secondary Guide Spline converging into the Bridge */}
+              <path
+                d="M 548 300 C 585 365, 625 418, 660 442 C 720 450, 785 448, 860 440"
+                fill="none"
+                stroke="url(#bridge-guide-gradient)"
+                strokeWidth="0.5"
+                strokeDasharray="2 6"
+              />
+            </svg>
+          </div>
 
           {/* ── Orbit Map — wrapped in cursor-tracking TiltCard ── */}
           <TiltCard>
@@ -480,25 +550,25 @@ export default function IntegrationsSection() {
                 aria-label="Connected tools map"
               >
 
-                {/* ── SVG layer: Layered Convergent Vector Splines & Subtle Particles ── */}
+                {/* ── SVG layer: CONVERGING VECTOR TOPOLOGY SYSTEM ── */}
                 <svg
                   viewBox="0 0 620 420"
                   preserveAspectRatio="none"
                   className="absolute inset-0 h-full w-full"
                   role="img"
-                  aria-label={`Connections from Ultrakin to ${selectedCat.toLowerCase()}`}
+                  aria-label={`Connected vector topology for ${selectedCat.toLowerCase()}`}
                 >
                   <defs>
-                    {/* Base subtle converging gradient */}
-                    <linearGradient id="spline-base" x1="0" y1="0" x2="1" y2="1">
-                      <stop stopColor="#818cf8" stopOpacity=".22" />
-                      <stop offset="1" stopColor="#a5b4fc" stopOpacity=".08" />
+                    {/* Subtle base spline gradient */}
+                    <linearGradient id="topo-spline-base" x1="0" y1="0" x2="1" y2="1">
+                      <stop stopColor="#818cf8" stopOpacity=".28" />
+                      <stop offset="1" stopColor="#a5b4fc" stopOpacity=".12" />
                     </linearGradient>
 
-                    {/* Active brightened spline gradient (subtle, 0.75-0.85px) */}
-                    <linearGradient id="spline-active" x1="0" y1="0" x2="1" y2="1">
-                      <stop stopColor="#c7d2fe" stopOpacity=".85" />
-                      <stop offset="1" stopColor="#818cf8" stopOpacity=".45" />
+                    {/* Active highlighted topology gradient */}
+                    <linearGradient id="topo-spline-active" x1="0" y1="0" x2="1" y2="1">
+                      <stop stopColor="#c7d2fe" stopOpacity=".95" />
+                      <stop offset="1" stopColor="#818cf8" stopOpacity=".55" />
                     </linearGradient>
 
                     {/* Core radial soft field */}
@@ -507,7 +577,7 @@ export default function IntegrationsSection() {
                       <stop offset="1" stopColor="#6366f1" stopOpacity="0" />
                     </radialGradient>
 
-                    {/* Subtly reduced particle glow filter (~70% reduction) */}
+                    {/* Subtle particle glow */}
                     <filter id="subtle-particle-glow" x="-100%" y="-100%" width="300%" height="300%">
                       <feGaussianBlur stdDeviation="0.7" result="blur" />
                       <feMerge>
@@ -517,76 +587,124 @@ export default function IntegrationsSection() {
                     </filter>
                   </defs>
 
-                  {/* ── LAYER 1: Background Concentric Orbital Rings (0.5px - 0.65px) ── */}
-                  <ConcentricOrbitalRing rx="236" ry="148" strokeDasharray="1 10" opacity={0.35} />
-                  <ConcentricOrbitalRing rx="160" ry="98"  strokeDasharray="none" opacity={0.3} />
-                  <ConcentricOrbitalRing rx="86"  ry="54"  strokeDasharray="2 6"  opacity={0.4} />
+                  {/* ── LAYER 1: Background Concentric Orbital Rings ── */}
+                  <ConcentricOrbitalRing rx="236" ry="148" strokeDasharray="1 10" opacity={0.3} />
+                  <ConcentricOrbitalRing rx="160" ry="98"  strokeDasharray="none" opacity={0.25} />
+                  <ConcentricOrbitalRing rx="86"  ry="54"  strokeDasharray="2 6"  opacity={0.35} />
                   <circle cx={CENTER[0]} cy={CENTER[1]} r="78" fill="url(#orbit-core)" />
 
-                  {/* ── LAYER 2: Middle Secondary Harmonic Splines (0.5px guide splines) ── */}
-                  {visible.map((item) => {
-                    const guideD = getHarmonicGuideSpline(item.point[0], item.point[1]);
-                    return (
-                      <path
-                        key={`guide-${item.name}`}
-                        d={guideD}
-                        fill="none"
-                        stroke="rgba(140,148,255,0.08)"
-                        strokeWidth="0.5"
-                        strokeDasharray="1.5 5"
-                      />
-                    );
-                  })}
+                  {/* ── LAYER 2: Harmonic Parallel Flowlines (Multi-track rail corridor) ── */}
+                  <g opacity={0.55}>
+                    <path d={PATH_SPACES_GUIDE} fill="none" stroke="rgba(140,148,255,0.12)" strokeWidth="0.5" strokeDasharray="2 6" />
+                    <path d={PATH_UKIN_GUIDE} fill="none" stroke="rgba(140,148,255,0.12)" strokeWidth="0.5" strokeDasharray="2 6" />
+                    <path d={PATH_MAIL_GUIDE} fill="none" stroke="rgba(140,148,255,0.12)" strokeWidth="0.5" strokeDasharray="2 6" />
+                    <path d={PATH_WEST_TRUNK_GUIDE} fill="none" stroke="rgba(140,148,255,0.14)" strokeWidth="0.5" strokeDasharray="2 6" />
+                    <path d={PATH_HUB_EAST_GUIDE} fill="none" stroke="rgba(140,148,255,0.14)" strokeWidth="0.5" strokeDasharray="2 6" />
+                    <path d={PATH_CALENDAR_GUIDE} fill="none" stroke="rgba(140,148,255,0.12)" strokeWidth="0.5" strokeDasharray="2 6" />
+                    <path d={PATH_DOCS_GUIDE} fill="none" stroke="rgba(140,148,255,0.12)" strokeWidth="0.5" strokeDasharray="2 6" />
+                    <path d={PATH_TASKS_GUIDE} fill="none" stroke="rgba(140,148,255,0.12)" strokeWidth="0.5" strokeDasharray="2 6" />
+                    <path d={PATH_MEETINGS_GUIDE} fill="none" stroke="rgba(140,148,255,0.12)" strokeWidth="0.5" strokeDasharray="2 6" />
+                  </g>
 
-                  {/* ── LAYER 3: Foreground Primary Convergent Splines (0.65px - 0.85px) ── */}
-                  <AnimatePresence>
-                    {visible.map((item) => {
-                      const d = getConvergentSpline(item.point[0], item.point[1]);
-                      const isHovered = item.name === hoveredNode;
-                      const isSelected = item.name === current.name;
-                      const isHighlighted = isHovered || isSelected;
+                  {/* ── LAYER 3: Primary Converging Topology Artery Network ── */}
+                  {/* Western Convergence: Spaces + Ukin + Mail merge into West Trunk */}
+                  <path
+                    d={PATH_SPACES_TO_WEST_MERGE}
+                    fill="none"
+                    stroke={isSpacesActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
+                    strokeWidth={isSpacesActive ? 0.95 : 0.65}
+                    className="transition-all duration-300"
+                  />
+                  <path
+                    d={PATH_UKIN_TO_WEST_MERGE}
+                    fill="none"
+                    stroke={isUkinActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
+                    strokeWidth={isUkinActive ? 0.95 : 0.65}
+                    className="transition-all duration-300"
+                  />
+                  <path
+                    d={PATH_MAIL_TO_WEST_TRUNK}
+                    fill="none"
+                    stroke={isMailActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
+                    strokeWidth={isMailActive ? 0.95 : 0.65}
+                    className="transition-all duration-300"
+                  />
+                  <path
+                    d={PATH_WEST_TRUNK_INTO_HUB}
+                    fill="none"
+                    stroke={isMasterSpineActive || isMailActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
+                    strokeWidth={isMasterSpineActive || isMailActive ? 0.95 : 0.75}
+                    className="transition-all duration-300"
+                  />
 
-                      return (
-                        <motion.path
-                          key={`spline-${item.name}`}
-                          d={d}
-                          fill="none"
-                          stroke={isHighlighted ? 'url(#spline-active)' : 'url(#spline-base)'}
-                          strokeWidth={isHovered ? 0.85 : isSelected ? 0.75 : 0.65}
-                          initial={{ opacity: 0 }}
-                          animate={{
-                            opacity: isHovered ? 0.9 : isSelected ? 0.75 : (hoveredNode ? 0.16 : 0.4),
-                          }}
-                          exit={{ opacity: 0 }}
-                          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                        />
-                      );
-                    })}
-                  </AnimatePresence>
+                  {/* Eastern Divergence: Hub splits smoothly into Tasks, Meetings, Docs, Calendar */}
+                  <path
+                    d={PATH_HUB_INTO_EAST_FORK}
+                    fill="none"
+                    stroke={isMasterSpineActive || isDocsActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
+                    strokeWidth={isMasterSpineActive || isDocsActive ? 0.95 : 0.75}
+                    className="transition-all duration-300"
+                  />
+                  <path
+                    d={PATH_EAST_FORK_TO_CALENDAR}
+                    fill="none"
+                    stroke={isCalendarActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
+                    strokeWidth={isCalendarActive ? 0.95 : 0.65}
+                    className="transition-all duration-300"
+                  />
+                  <path
+                    d={PATH_DOCS_TO_EAST_FORK}
+                    fill="none"
+                    stroke={isDocsActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
+                    strokeWidth={isDocsActive ? 0.95 : 0.65}
+                    className="transition-all duration-300"
+                  />
+                  <path
+                    d={PATH_HUB_TO_TASKS}
+                    fill="none"
+                    stroke={isTasksActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
+                    strokeWidth={isTasksActive ? 0.95 : 0.65}
+                    className="transition-all duration-300"
+                  />
+                  <path
+                    d={PATH_HUB_TO_MEETINGS}
+                    fill="none"
+                    stroke={isMeetingsActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
+                    strokeWidth={isMeetingsActive ? 0.95 : 0.65}
+                    className="transition-all duration-300"
+                  />
 
-                  {/* Flowing particle beads along convergent splines */}
+                  {/* Inter-Panel Converging Bridge toward Right Edge */}
+                  <path
+                    d={PATH_CALENDAR_TO_BRIDGE_EDGE}
+                    fill="none"
+                    stroke={isCalendarActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
+                    strokeWidth={isCalendarActive ? 0.95 : 0.65}
+                    className="transition-all duration-300"
+                  />
+                  <path
+                    d={PATH_TASKS_TO_BRIDGE_EDGE}
+                    fill="none"
+                    stroke={isTasksActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
+                    strokeWidth={isTasksActive ? 0.85 : 0.55}
+                    className="transition-all duration-300"
+                  />
+
+                  {/* ── Continuous Travelling Photon Bead across the Converged Topological Spine ── */}
                   {!reduceMotion && (
-                    <AnimatePresence>
-                      {visible.map((item, i) => {
-                        const d = getConvergentSpline(item.point[0], item.point[1]);
-                        const isHovered = item.name === hoveredNode;
-                        const isSelected = item.name === current.name;
-                        const isHighlighted = isHovered || isSelected;
-
-                        return (
-                          <ConvergingParticle
-                            key={`particle-${item.name}`}
-                            d={d}
-                            color={isHighlighted ? '#c7d2fe' : item.color}
-                            delay={i * 0.45}
-                            isHighlighted={isHighlighted}
-                          />
-                        );
-                      })}
-                    </AnimatePresence>
+                    <ConvergingPhotonNode
+                      d={PATH_MASTER_CONVERGENCE_SPINE}
+                      color="#c7d2fe"
+                      duration={6.8}
+                    />
                   )}
 
-                  {/* Connection Endpoint dots */}
+                  {/* Topological Merge Junction Dots (Engineering nodes where tracks fuse) */}
+                  <circle cx="242" cy="192" r="2.2" fill="#818cf8" fillOpacity="0.8" />
+                  <circle cx="415" cy="258" r="2.2" fill="#818cf8" fillOpacity="0.8" />
+                  <circle cx="620" cy="390" r="2.4" fill="#a5b4fc" fillOpacity="0.9" />
+
+                  {/* Connection Endpoint dots under node centers */}
                   {visible.map((item) => {
                     const isHovered = item.name === hoveredNode;
                     const isSelected = item.name === current.name;
@@ -610,11 +728,11 @@ export default function IntegrationsSection() {
                 <motion.div
                   className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
                   animate={{
-                    scale: hoveredItem ? 1.018 : 1,
+                    scale: hoveredNode ? 1.018 : 1,
                   }}
                   transition={{ type: 'spring', stiffness: 350, damping: 28 }}
                   style={{
-                    filter: hoveredItem
+                    filter: hoveredNode
                       ? 'drop-shadow(0 0 28px rgba(120,122,255,0.45))'
                       : 'drop-shadow(0 0 20px rgba(120,122,255,0.25))',
                     transition: 'filter 350ms ease',
