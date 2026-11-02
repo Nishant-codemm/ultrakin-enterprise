@@ -33,12 +33,12 @@ function TiltCard({ children, className }) {
     const el = cardRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    const dx = (e.clientX - rect.left) / rect.width;   // 0→1 left→right
-    const dy = (e.clientY - rect.top)  / rect.height;  // 0→1 top→bottom
-    // Subtle, organic tilt (max ±4deg)
+    const dx = (e.clientX - rect.left) / rect.width;
+    const dy = (e.clientY - rect.top) / rect.height;
+    // Ultra subtle, premium tilt (max ±3deg)
     setTilt({
-      rx: (0.5 - dy) * 5.5,
-      ry: (dx - 0.5) * 6.5,
+      rx: (0.5 - dy) * 3.5,
+      ry: (dx - 0.5) * 4.5,
       gx: dx * 100,
       gy: dy * 100,
       active: true,
@@ -64,10 +64,10 @@ function TiltCard({ children, className }) {
         <div
           style={{
             transform: tilt.active
-              ? `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) scale(1.008)`
-              : 'rotateX(1deg) rotateY(-1.5deg) scale(1)',
+              ? `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) scale(1.006)`
+              : 'rotateX(0.8deg) rotateY(-1deg) scale(1)',
             transition: tilt.active
-              ? 'transform 100ms ease-out'
+              ? 'transform 120ms ease-out'
               : 'transform 600ms cubic-bezier(0.16,1,0.3,1)',
             transformOrigin: '50% 50%',
             willChange: 'transform',
@@ -76,7 +76,7 @@ function TiltCard({ children, className }) {
         >
           {children}
 
-          {/* Edge spotlight — follows cursor along card border */}
+          {/* Soft edge spotlight */}
           {tilt.active && !reduceMotion && (
             <span
               aria-hidden="true"
@@ -85,8 +85,8 @@ function TiltCard({ children, className }) {
                 opacity: tilt.active ? 1 : 0,
                 background: `radial-gradient(
                   circle at ${tilt.gx}% ${tilt.gy}%,
-                  rgba(140,148,255,0.14) 0%,
-                  transparent 55%
+                  rgba(140,148,255,0.08) 0%,
+                  transparent 50%
                 )`,
                 mixBlendMode: 'screen',
               }}
@@ -118,6 +118,30 @@ const INTEGRATIONS = [
 
 const CENTER = [310, 210];
 
+/* ─── Mathematically Constructed Convergent Cubic Splines ─── */
+/* Curves tighten naturally near the center hub [310, 210] and spread smoothly outward */
+function getConvergentSpline(x, y) {
+  // Cubic Bézier control points engineered for natural logarithmic convergence
+  const dx = x - CENTER[0];
+  const dy = y - CENTER[1];
+  const cx1 = x - dx * 0.42 + (dy > 0 ? -12 : 12);
+  const cy1 = y - dy * 0.32 + (dx > 0 ? 10 : -10);
+  const cx2 = CENTER[0] + dx * 0.22;
+  const cy2 = CENTER[1] + dy * 0.22;
+  return `M ${x} ${y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${CENTER[0]} ${CENTER[1]}`;
+}
+
+function getHarmonicGuideSpline(x, y) {
+  // Secondary companion spline offset for layered network depth
+  const dx = x - CENTER[0];
+  const dy = y - CENTER[1];
+  const cx1 = x - dx * 0.48 + (dy > 0 ? 14 : -14);
+  const cy1 = y - dy * 0.28 + (dx > 0 ? -12 : 12);
+  const cx2 = CENTER[0] + dx * 0.18;
+  const cy2 = CENTER[1] + dy * 0.18;
+  return `M ${x} ${y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${CENTER[0]} ${CENTER[1]}`;
+}
+
 const PREVIEWS = {
   Spaces:      { surface: 'launch-planning',       actor: 'Maya Chen',       message: 'The handoff is ready for review. I linked the launch checklist here.',          outcome: 'Decision captured in the launch brief',     icon: 'SC' },
   Mail:        { surface: 'shared inbox',           actor: 'Customer success',message: 'We need to move our onboarding session to Thursday.',                           outcome: 'Reply drafted · follow-up assigned',        icon: 'ML' },
@@ -134,20 +158,13 @@ const PREVIEWS = {
   Lists:       { surface: 'asset-tracker',          actor: 'Operations team', message: 'SOC2 Type II compliance evidence checklist updated for Q4.',                    outcome: '12 items verified · audit ready',           icon: 'LS' },
 };
 
-/* ─── Quadratic bezier path helper ─── */
-function qPath(x1, y1, x2, y2) {
-  const mx = (x1 + x2) / 2;
-  const my = (y1 + y2) / 2 - 20;
-  return `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`;
-}
-
-/* ─── Animated particle dots flowing along connection lines ─── */
-function FlowingParticle({ d, color, delay, duration, isHighlighted }) {
+/* ─── Ultra-thin Travelling Particle Node along Vector Spline ─── */
+function ConvergingParticle({ d, color, delay, isHighlighted }) {
   const reduceMotion = useReducedMotion();
   if (reduceMotion) return null;
 
-  const dashLen = isHighlighted ? 10 : 5;
-  const gapLen  = isHighlighted ? 150 : 220;
+  const dashLen = isHighlighted ? 6 : 4;
+  const gapLen  = isHighlighted ? 180 : 260;
   const total   = dashLen + gapLen;
 
   return (
@@ -155,266 +172,286 @@ function FlowingParticle({ d, color, delay, duration, isHighlighted }) {
       d={d}
       fill="none"
       stroke={color}
-      strokeWidth={isHighlighted ? 2.8 : 1.8}
+      strokeWidth={isHighlighted ? 1.6 : 1.1}
       strokeLinecap="round"
       strokeDasharray={`${dashLen} ${gapLen}`}
-      filter={isHighlighted ? 'url(#particle-glow)' : 'url(#particle-blur)'}
+      filter="url(#subtle-particle-glow)"
       initial={{ strokeDashoffset: total, opacity: 0 }}
       animate={{
-        strokeDashoffset: [total, -total * 0.15],
-        opacity: [0, isHighlighted ? 1 : 0.7, isHighlighted ? 1 : 0.7, 0],
+        strokeDashoffset: [total, -total * 0.1],
+        opacity: [0, isHighlighted ? 0.9 : 0.6, isHighlighted ? 0.9 : 0.6, 0],
       }}
       transition={{
-        strokeDashoffset: { duration, delay, repeat: Infinity, ease: 'linear', repeatDelay: 0.2 },
-        opacity: { duration, delay, repeat: Infinity, ease: 'easeInOut', repeatDelay: 0.2, times: [0, 0.1, 0.9, 1] },
+        strokeDashoffset: { duration: isHighlighted ? 4.2 : 5.8, delay, repeat: Infinity, ease: 'linear', repeatDelay: 0.4 },
+        opacity: { duration: isHighlighted ? 4.2 : 5.8, delay, repeat: Infinity, ease: 'easeInOut', repeatDelay: 0.4, times: [0, 0.12, 0.88, 1] },
       }}
     />
   );
 }
 
-/* ─── Pulsing ring from center core ─── */
-function PulsingRing({ r, delay, isActive }) {
-  const reduceMotion = useReducedMotion();
-  if (reduceMotion) return null;
+/* ─── Delicate Concentric Orbital Ring ─── */
+function ConcentricOrbitalRing({ rx, ry, strokeDasharray, opacity }) {
+  const tilt = useContext(TiltContext);
   return (
-    <motion.circle
-      cx={CENTER[0]}
-      cy={CENTER[1]}
-      r={r}
+    <ellipse
+      cx={CENTER[0] + (tilt.active ? (tilt.gx - 50) * 0.05 : 0)}
+      cy={CENTER[1] + (tilt.active ? (tilt.gy - 50) * 0.04 : 0)}
+      rx={rx}
+      ry={ry}
       fill="none"
-      stroke={isActive ? 'rgba(165,180,252,0.35)' : 'rgba(120,122,255,0.18)'}
-      strokeWidth={isActive ? 1.5 : 1}
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: [0.85, 1.28], opacity: [isActive ? 0.7 : 0.5, 0] }}
-      transition={{ duration: isActive ? 2.2 : 2.8, delay, repeat: Infinity, ease: 'easeOut' }}
-      style={{ transformOrigin: `${CENTER[0]}px ${CENTER[1]}px` }}
+      stroke="rgba(165,180,252,0.15)"
+      strokeWidth="0.65"
+      strokeDasharray={strokeDasharray}
+      style={{ opacity, transition: 'stroke 300ms ease' }}
     />
   );
 }
 
-/* ─── Miniature Live Product UI Cards ─── */
-function MiniatureProductCard({ item }) {
+/* ─── Authentic Miniature Product Previews (Cropped from real products) ─── */
+function MiniatureProductPreview({ item }) {
   const name = item.name;
 
+  // 1. Spaces (Real Chat / Spaces UI Preview)
   if (name === 'Spaces') {
     return (
-      <div className="flex h-full flex-col justify-between p-1.5 text-left select-none">
+      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
+        {/* Header */}
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
           <div className="flex min-w-0 items-center gap-1">
-            <span className="font-mono text-[9px] font-bold text-[#b9bbff]">#</span>
-            <span className="truncate text-[8px] font-semibold text-slate-200">launch-plan</span>
+            <span className="font-mono text-[8px] font-bold text-[#b9bbff]">#</span>
+            <span className="truncate text-[7.5px] font-semibold text-slate-200">launch-planning</span>
           </div>
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 ring-2 ring-emerald-400/20" />
+          <span className="flex items-center gap-0.5 rounded-full bg-emerald-500/20 px-1 py-0.2 text-[5.5px] font-mono text-emerald-300">
+            <span className="h-1 w-1 rounded-full bg-emerald-400" />
+            <span>3 active</span>
+          </span>
         </div>
-        <div className="my-auto flex items-center gap-1.5">
-          <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-indigo-500/25 text-[7px] font-bold text-indigo-200 ring-1 ring-indigo-400/30">
+        {/* Message body */}
+        <div className="my-auto flex items-start gap-1">
+          <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-[#5c5bd6] text-[6px] font-bold text-white">
             MC
           </span>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-[7.5px] font-medium text-slate-200">Maya Chen</div>
-            <div className="truncate text-[6.5px] leading-tight text-slate-400">Handoff ready for review</div>
+            <div className="truncate text-[7px] font-semibold text-slate-200">Maya Chen</div>
+            <div className="truncate text-[6px] text-slate-300 leading-tight">Launch checklist is ready</div>
           </div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[6.5px] text-slate-400">
-          <span className="flex items-center gap-1 font-mono text-indigo-300/90">
-            <span className="h-1 w-1 rounded-full bg-indigo-400" /> 2 replies
-          </span>
-          <span className="rounded bg-white/[0.06] px-1 text-[6px] text-slate-300">⚡ Brief</span>
+        {/* Decision & reaction footer */}
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px]">
+          <span className="rounded bg-white/[0.06] px-1 text-slate-300">🚀 5 reactions</span>
+          <span className="font-mono text-[#b9bbff]">⚡ Decision linked</span>
         </div>
       </div>
     );
   }
 
+  // 2. Mail (Real Shared Inbox UI Preview)
   if (name === 'Mail') {
     return (
-      <div className="flex h-full flex-col justify-between p-1.5 text-left select-none">
+      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
+        {/* Header */}
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
           <div className="flex min-w-0 items-center gap-1">
-            <Mail className="h-2.5 w-2.5 shrink-0 text-[#c6c9ff]" />
+            <Mail className="h-2 w-2 shrink-0 text-[#c6c9ff]" />
             <span className="truncate font-mono text-[7px] text-slate-300">support@northwind</span>
           </div>
-          <span className="flex h-3 items-center rounded-full bg-indigo-500/30 px-1 font-mono text-[6.5px] font-semibold text-indigo-200">
-            1 new
-          </span>
+          <span className="rounded bg-indigo-500/30 px-1 font-mono text-[5.5px] font-medium text-indigo-200">1 new</span>
         </div>
+        {/* Thread item */}
         <div className="my-auto min-w-0">
-          <div className="truncate text-[7.5px] font-semibold text-slate-100">Move onboarding to Thu</div>
-          <div className="truncate text-[6.5px] text-slate-400">Customer Success · 12m ago</div>
+          <div className="truncate text-[7px] font-semibold text-slate-100">Duplicate charge #4821</div>
+          <div className="truncate text-[6px] text-slate-400">Maya Chen · Billing refund</div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[6.5px]">
-          <span className="rounded border border-indigo-500/30 bg-indigo-950/70 px-1 py-0.2 font-mono text-indigo-300">
-            SR-28
-          </span>
-          <span className="font-medium text-amber-300/90">Drafting reply</span>
+        {/* Connected ticket */}
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px]">
+          <span className="rounded border border-emerald-500/30 bg-emerald-950/70 px-1 font-mono text-emerald-300">SR-14</span>
+          <span className="font-medium text-amber-300">Refund initiated</span>
         </div>
       </div>
     );
   }
 
+  // 3. Meetings (Real Huddle / Call UI Preview)
   if (name === 'Meetings') {
     return (
-      <div className="flex h-full flex-col justify-between p-1.5 text-left select-none">
+      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
+        {/* Header */}
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
           <div className="flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 ring-2 ring-emerald-400/30" />
-            <span className="font-mono text-[7px] font-bold tracking-wider text-emerald-300 uppercase">LIVE</span>
+            <span className="h-1 w-1 rounded-full bg-emerald-400 ring-2 ring-emerald-400/20" />
+            <span className="font-mono text-[6px] font-bold tracking-wider text-emerald-300 uppercase">LIVE</span>
           </div>
-          <span className="font-mono text-[7px] text-slate-400">08:42</span>
+          <span className="font-mono text-[6.5px] text-slate-400">12:44</span>
         </div>
+        {/* Video tiles + audio waveform */}
         <div className="my-auto flex items-center justify-between gap-1">
           <div className="flex items-center gap-1">
-            <div className="flex h-4 w-4 items-center justify-center rounded-md border border-emerald-400/50 bg-[#141b2c] text-[6.5px] font-bold text-emerald-300 shadow-[0_0_6px_rgba(52,211,153,0.35)]">
-              JB
+            <div className="flex h-4 w-4 items-center justify-center rounded border border-emerald-400/50 bg-[#059669]/30 text-[6px] font-bold text-emerald-200 shadow-[0_0_4px_rgba(52,211,153,0.3)]">
+              DL
             </div>
-            <div className="flex h-4 w-4 items-center justify-center rounded-md border border-white/10 bg-[#10141f] text-[6.5px] font-bold text-slate-400">
-              MC
+            <div className="flex h-4 w-4 items-center justify-center rounded border border-white/10 bg-[#dc2626]/20 text-[6px] font-bold text-slate-300">
+              SO
             </div>
           </div>
-          <div className="flex h-3 items-end gap-0.5">
-            <span className="h-2 w-0.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="h-3 w-0.5 rounded-full bg-emerald-400 animate-pulse [animation-delay:150ms]" />
-            <span className="h-1.5 w-0.5 rounded-full bg-emerald-400 animate-pulse [animation-delay:300ms]" />
-            <span className="h-2.5 w-0.5 rounded-full bg-emerald-400 animate-pulse [animation-delay:75ms]" />
+          <div className="flex h-2.5 items-end gap-0.5">
+            <span className="h-1.5 w-0.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="h-2.5 w-0.5 rounded-full bg-emerald-400 animate-pulse [animation-delay:150ms]" />
+            <span className="h-1 w-0.5 rounded-full bg-emerald-400 animate-pulse [animation-delay:300ms]" />
           </div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[6.5px] text-slate-300">
-          <span className="truncate">Beta readiness sync</span>
-          <span className="font-mono text-slate-400">4 in call</span>
+        {/* Live transcript note */}
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-300">
+          <span className="truncate">Dana: 20% rollout confirmed</span>
+          <span className="font-mono text-slate-500">4 in call</span>
         </div>
       </div>
     );
   }
 
+  // 4. Tasks (Real Lists / Kanban UI Preview)
   if (name === 'Tasks') {
     return (
-      <div className="flex h-full flex-col justify-between p-1.5 text-left select-none">
+      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
+        {/* Header */}
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
-          <span className="rounded border border-emerald-500/30 bg-emerald-950/70 px-1 py-0.2 font-mono text-[6.5px] font-semibold text-emerald-300">
+          <span className="rounded border border-emerald-500/30 bg-emerald-950/70 px-1 py-0.2 font-mono text-[5.5px] font-semibold text-emerald-300">
             IN PROGRESS
           </span>
-          <span className="font-mono text-[7px] text-slate-400">3 tasks</span>
+          <span className="font-mono text-[6.5px] text-slate-400">2 active</span>
         </div>
-        <div className="my-auto flex min-w-0 items-start gap-1">
-          <CheckSquare className="mt-0.5 h-2.5 w-2.5 shrink-0 text-emerald-400" />
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-[7.5px] font-medium text-slate-200">Review beta flow</div>
-            <div className="truncate text-[6.5px] text-slate-400">Launch checklist</div>
+        {/* Task row */}
+        <div className="my-auto min-w-0">
+          <div className="flex items-center gap-1">
+            <CheckSquare className="h-2 w-2 shrink-0 text-emerald-400" />
+            <span className="truncate text-[7px] font-medium text-slate-200">Process refund #4821</span>
+          </div>
+          <div className="mt-0.5 flex items-center gap-1 text-[5.5px] text-slate-400">
+            <span>SR-14</span> · <span>Billing</span>
           </div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[6.5px]">
-          <span className="rounded border border-amber-500/30 bg-amber-950/70 px-1 font-bold text-amber-300">
-            P0 · Today
-          </span>
-          <span className="flex h-3 w-3 items-center justify-center rounded-full bg-slate-700 text-[6px] font-bold text-slate-200">
-            JB
+        {/* Assignee & priority */}
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px]">
+          <span className="rounded bg-amber-950/70 px-1 font-bold text-amber-300">P0 High</span>
+          <span className="flex h-3 w-3 items-center justify-center rounded-full bg-[#dc2626] text-[5.5px] font-bold text-white">
+            SO
           </span>
         </div>
       </div>
     );
   }
 
+  // 5. Calendar (Real Calendar & Day Schedule UI Preview)
   if (name === 'Calendar') {
     return (
-      <div className="flex h-full flex-col justify-between p-1.5 text-left select-none">
+      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
+        {/* Header */}
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
           <div className="flex items-center gap-1">
-            <Calendar className="h-2.5 w-2.5 text-[#e1c38b]" />
-            <span className="font-mono text-[7px] font-bold text-amber-200 uppercase">OCT 24</span>
+            <Calendar className="h-2 w-2 text-[#e1c38b]" />
+            <span className="font-mono text-[6.5px] font-bold text-amber-200 uppercase">THU, OCT 24</span>
           </div>
-          <span className="font-mono text-[7px] text-slate-400">2:30 PM</span>
+          <span className="font-mono text-[6px] text-slate-400">3:00 PM</span>
         </div>
+        {/* Event item */}
         <div className="my-auto rounded-r border-l-2 border-amber-400/80 bg-amber-500/[0.08] py-0.5 pl-1.5">
-          <div className="truncate text-[7.5px] font-semibold text-slate-100">Readiness Review</div>
-          <div className="truncate text-[6.5px] text-slate-400">Room 4 · Video link</div>
+          <div className="truncate text-[7px] font-semibold text-slate-100">Quarterly client review</div>
+          <div className="truncate text-[5.5px] text-slate-400">Northwind Studio</div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[6.5px]">
+        {/* Attendee stack */}
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px]">
           <div className="flex -space-x-1">
-            <span className="flex h-3 w-3 items-center justify-center rounded-full border border-[#0d1118] bg-indigo-500/80 text-[6px] font-bold text-white">M</span>
-            <span className="flex h-3 w-3 items-center justify-center rounded-full border border-[#0d1118] bg-emerald-500/80 text-[6px] font-bold text-white">J</span>
-            <span className="flex h-3 w-3 items-center justify-center rounded-full border border-[#0d1118] bg-violet-500/80 text-[6px] font-bold text-white">A</span>
+            <span className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#059669] text-[5px] font-bold text-white">D</span>
+            <span className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#dc2626] text-[5px] font-bold text-white">S</span>
+            <span className="flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#5c5bd6] text-[5px] font-bold text-white">M</span>
           </div>
-          <span className="font-mono text-slate-400">+1 attending</span>
+          <span className="font-mono text-slate-400">4 attending</span>
         </div>
       </div>
     );
   }
 
+  // 6. Docs (Real Living Docs Editor UI Preview)
   if (name === 'Docs') {
     return (
-      <div className="flex h-full flex-col justify-between p-1.5 text-left select-none">
+      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
+        {/* Header */}
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
           <div className="flex min-w-0 items-center gap-1">
-            <FileText className="h-2.5 w-2.5 shrink-0 text-[#c4b6ff]" />
-            <span className="truncate text-[7.5px] font-medium text-slate-200">launch-brief.md</span>
+            <FileText className="h-2 w-2 shrink-0 text-[#c4b6ff]" />
+            <span className="truncate text-[7px] font-medium text-slate-200">Q4 Launch Plan.doc</span>
           </div>
-          <span className="rounded border border-violet-500/30 bg-violet-950/60 px-1 font-mono text-[6px] text-violet-300">
-            Live
-          </span>
+          <span className="rounded bg-violet-950/60 px-1 font-mono text-[5.5px] text-violet-300">Live</span>
         </div>
-        <div className="my-auto space-y-1">
+        {/* Document body + live cursor */}
+        <div className="my-auto space-y-0.5">
           <div className="flex items-center gap-1">
-            <span className="h-1.5 w-12 rounded bg-slate-300/80" />
-            <span className="inline-flex items-center gap-0.5 rounded bg-violet-500/20 px-1 font-mono text-[6px] text-violet-200">
-              <span className="h-1 w-1 rounded-full bg-violet-400" /> Priya
+            <span className="h-1 w-10 rounded bg-slate-300/80" />
+            <span className="inline-flex items-center gap-0.5 rounded bg-emerald-500/20 px-0.5 text-[5px] font-mono text-emerald-200">
+              <span className="h-0.5 w-0.5 rounded-full bg-emerald-400" /> Dana
             </span>
           </div>
-          <div className="h-1 w-16 rounded bg-slate-600/60" />
-          <div className="h-1 w-11 rounded bg-slate-600/40" />
+          <div className="h-0.5 w-14 rounded bg-slate-600/60" />
+          <div className="rounded border-l border-violet-400 bg-violet-500/[0.1] pl-1 text-[5.5px] text-violet-200 truncate">
+            Decision: 20% rollout first
+          </div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[6.5px] text-slate-400">
-          <span className="font-mono text-violet-300/90">3 decisions linked</span>
-          <span className="text-slate-500">v2.1</span>
+        {/* Footer */}
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
+          <span className="font-mono text-violet-300">3 decisions linked</span>
+          <span className="text-slate-500">v2.4</span>
         </div>
       </div>
     );
   }
 
+  // 7. Ukin Agent (Real Autonomous Agent Preview)
   if (name === 'Ukin agent') {
     return (
-      <div className="flex h-full flex-col justify-between p-1.5 text-left select-none">
+      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
+        {/* Header */}
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
           <div className="flex items-center gap-1">
-            <Sparkles className="h-2.5 w-2.5 shrink-0 text-indigo-300" />
-            <span className="text-[7.5px] font-semibold text-indigo-200">Ukin Agent</span>
+            <Sparkles className="h-2 w-2 shrink-0 text-indigo-300" />
+            <span className="text-[7px] font-semibold text-indigo-200">Support Triage</span>
           </div>
-          <span className="flex items-center gap-1 font-mono text-[6.5px] text-emerald-400">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 ring-2 ring-emerald-400/20" /> Active
+          <span className="flex items-center gap-0.5 font-mono text-[5.5px] text-emerald-400">
+            <span className="h-1 w-1 rounded-full bg-emerald-400" /> Active
           </span>
         </div>
-        <div className="my-auto rounded border border-indigo-400/20 bg-indigo-500/[0.09] p-1">
-          <div className="truncate font-mono text-[6.5px] text-indigo-300">Signal: recurring intake</div>
-          <div className="truncate text-[7.5px] font-medium text-slate-100">Drafted onboarding spec</div>
+        {/* Agent signal & execution */}
+        <div className="my-auto rounded border border-indigo-400/20 bg-indigo-500/[0.08] p-0.5">
+          <div className="truncate font-mono text-[5.5px] text-indigo-300">Signal: Support Mail</div>
+          <div className="truncate text-[6.5px] font-medium text-slate-100">Created SR-14 & Refund Draft</div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[6.5px]">
-          <span className="rounded border border-indigo-400/30 bg-indigo-950/80 px-1 font-mono text-indigo-200">
-            Autonomous
-          </span>
-          <span className="font-mono text-slate-400">0.4s exec</span>
+        {/* Status */}
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px]">
+          <span className="rounded bg-indigo-950/80 px-1 font-mono text-indigo-200">Autonomous</span>
+          <span className="font-mono text-slate-400">MCP tools</span>
         </div>
       </div>
     );
   }
 
-  /* Extension Examples */
+  // Extension Examples
   if (name === 'GitHub') {
     return (
-      <div className="flex h-full flex-col justify-between p-1.5 text-left select-none">
+      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
           <div className="flex items-center gap-1">
-            <GitPullRequest className="h-2.5 w-2.5 text-slate-300" />
-            <span className="truncate font-mono text-[7.5px] text-slate-200">acme / core</span>
+            <GitPullRequest className="h-2 w-2 text-slate-300" />
+            <span className="truncate font-mono text-[7px] text-slate-200">acme / core</span>
           </div>
-          <span className="rounded border border-emerald-500/30 bg-emerald-950/70 px-1 font-mono text-[6px] text-emerald-300">
+          <span className="rounded border border-emerald-500/30 bg-emerald-950/70 px-1 font-mono text-[5.5px] text-emerald-300">
             Merged
           </span>
         </div>
         <div className="my-auto min-w-0">
-          <div className="truncate text-[7.5px] font-semibold text-slate-100">PR #412: Live Telemetry</div>
-          <div className="truncate text-[6.5px] text-slate-400">✓ 14 checks passed</div>
+          <div className="truncate text-[7px] font-semibold text-slate-100">PR #412: Live Telemetry</div>
+          <div className="truncate text-[6px] text-slate-400">✓ 14 checks passed</div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[6.5px] text-slate-400">
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
           <span className="font-mono text-slate-300">main branch</span>
-          <span className="text-emerald-400 font-mono">Synced</span>
+          <span className="font-mono text-emerald-400">Synced</span>
         </div>
       </div>
     );
@@ -422,26 +459,26 @@ function MiniatureProductCard({ item }) {
 
   if (name === 'PostHog') {
     return (
-      <div className="flex h-full flex-col justify-between p-1.5 text-left select-none">
+      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
           <div className="flex items-center gap-1">
-            <BarChart3 className="h-2.5 w-2.5 text-amber-300" />
-            <span className="truncate text-[7.5px] font-medium text-slate-200">PostHog Analytics</span>
+            <BarChart3 className="h-2 w-2 text-amber-300" />
+            <span className="truncate text-[7px] font-medium text-slate-200">PostHog Analytics</span>
           </div>
-          <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+          <span className="h-1 w-1 rounded-full bg-amber-400" />
         </div>
         <div className="my-auto flex items-end justify-between">
           <div>
-            <div className="font-mono text-[8px] font-bold text-slate-100">14.2k req/s</div>
-            <div className="text-[6.5px] text-emerald-400 font-mono">+18.4% velocity</div>
+            <div className="font-mono text-[7.5px] font-bold text-slate-100">14.2k req/s</div>
+            <div className="font-mono text-[5.5px] text-emerald-400">+18.4% velocity</div>
           </div>
-          <div className="flex items-end gap-0.5 h-3">
-            <span className="h-1.5 w-1 rounded-sm bg-amber-400/50" />
-            <span className="h-2.5 w-1 rounded-sm bg-amber-400/70" />
-            <span className="h-3 w-1 rounded-sm bg-amber-400" />
+          <div className="flex h-2.5 items-end gap-0.5">
+            <span className="h-1 w-1 rounded-sm bg-amber-400/50" />
+            <span className="h-2 w-1 rounded-sm bg-amber-400/70" />
+            <span className="h-2.5 w-1 rounded-sm bg-amber-400" />
           </div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[6.5px] text-slate-400">
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
           <span>Enterprise cohort</span>
           <span className="font-mono text-slate-300">Live</span>
         </div>
@@ -451,23 +488,23 @@ function MiniatureProductCard({ item }) {
 
   if (name === 'MCP tools') {
     return (
-      <div className="flex h-full flex-col justify-between p-1.5 text-left select-none">
+      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
           <div className="flex items-center gap-1">
-            <Cpu className="h-2.5 w-2.5 text-teal-300" />
-            <span className="truncate font-mono text-[7.5px] text-teal-200">MCP Gateway</span>
+            <Cpu className="h-2 w-2 text-teal-300" />
+            <span className="truncate font-mono text-[7px] text-teal-200">MCP Gateway</span>
           </div>
-          <span className="rounded bg-teal-950/70 px-1 font-mono text-[6px] text-teal-300 border border-teal-500/30">
+          <span className="rounded border border-teal-500/30 bg-teal-950/70 px-1 font-mono text-[5.5px] text-teal-300">
             4 tools
           </span>
         </div>
         <div className="my-auto min-w-0">
-          <div className="truncate text-[7.5px] font-medium text-slate-200">Acme CRM · Postgres</div>
-          <div className="truncate text-[6.5px] text-slate-400">Vector tool connected</div>
+          <div className="truncate text-[7px] font-medium text-slate-200">Acme CRM · Postgres</div>
+          <div className="truncate text-[5.5px] text-slate-400">Vector tool connected</div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[6.5px] text-slate-400">
-          <span className="text-teal-300 font-mono">12ms latency</span>
-          <span className="text-emerald-400 font-mono">Active</span>
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
+          <span className="font-mono text-teal-300">12ms latency</span>
+          <span className="font-mono text-emerald-400">Active</span>
         </div>
       </div>
     );
@@ -475,20 +512,20 @@ function MiniatureProductCard({ item }) {
 
   if (name === 'Journeys') {
     return (
-      <div className="flex h-full flex-col justify-between p-1.5 text-left select-none">
+      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
           <div className="flex items-center gap-1">
-            <Route className="h-2.5 w-2.5 text-purple-300" />
-            <span className="truncate text-[7.5px] font-medium text-slate-200">Journeys App</span>
+            <Route className="h-2 w-2 text-purple-300" />
+            <span className="truncate text-[7px] font-medium text-slate-200">Journeys App</span>
           </div>
-          <span className="rounded bg-purple-950/70 px-1 font-mono text-[6px] text-purple-300">Step 2/4</span>
+          <span className="rounded bg-purple-950/70 px-1 font-mono text-[5.5px] text-purple-300">Step 2/4</span>
         </div>
         <div className="my-auto min-w-0">
-          <div className="truncate text-[7.5px] font-semibold text-slate-100">Enterprise Onboarding</div>
-          <div className="truncate text-[6.5px] text-slate-400">Trigger → Slack → Kickoff</div>
+          <div className="truncate text-[7px] font-semibold text-slate-100">Enterprise Onboarding</div>
+          <div className="truncate text-[5.5px] text-slate-400">Trigger → Slack → Kickoff</div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[6.5px] text-slate-400">
-          <span className="text-purple-300 font-mono">94% complete</span>
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
+          <span className="font-mono text-purple-300">94% complete</span>
           <span className="text-slate-400">18 active</span>
         </div>
       </div>
@@ -497,21 +534,21 @@ function MiniatureProductCard({ item }) {
 
   if (name === 'Forms') {
     return (
-      <div className="flex h-full flex-col justify-between p-1.5 text-left select-none">
+      <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
         <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
           <div className="flex items-center gap-1">
-            <ClipboardList className="h-2.5 w-2.5 text-blue-300" />
-            <span className="truncate text-[7.5px] font-medium text-slate-200">Intake Form</span>
+            <ClipboardList className="h-2 w-2 text-blue-300" />
+            <span className="truncate text-[7px] font-medium text-slate-200">Intake Form</span>
           </div>
-          <span className="font-mono text-[6.5px] text-blue-300">SR-88</span>
+          <span className="font-mono text-[5.5px] text-blue-300">SR-88</span>
         </div>
         <div className="my-auto min-w-0">
-          <div className="truncate text-[7.5px] font-semibold text-slate-100">Security Architecture</div>
-          <div className="truncate text-[6.5px] text-slate-400">Northwind Traders RFP</div>
+          <div className="truncate text-[7px] font-semibold text-slate-100">Security Architecture</div>
+          <div className="truncate text-[5.5px] text-slate-400">Northwind Traders RFP</div>
         </div>
-        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[6.5px] text-slate-400">
-          <span className="text-amber-300 font-medium">Pending triage</span>
-          <span className="text-slate-500 font-mono">3 new</span>
+        <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
+          <span className="font-medium text-amber-300">Pending triage</span>
+          <span className="font-mono text-slate-500">3 new</span>
         </div>
       </div>
     );
@@ -519,27 +556,27 @@ function MiniatureProductCard({ item }) {
 
   // Lists default
   return (
-    <div className="flex h-full flex-col justify-between p-1.5 text-left select-none">
+    <div className="flex h-full flex-col justify-between overflow-hidden rounded-[9px] bg-[#0b0e17] p-1.5 text-left select-none">
       <div className="flex items-center justify-between border-b border-white/[0.08] pb-1">
         <div className="flex items-center gap-1">
-          <ListTodo className="h-2.5 w-2.5 text-emerald-300" />
-          <span className="truncate text-[7.5px] font-medium text-slate-200">Lists Board</span>
+          <ListTodo className="h-2 w-2 text-emerald-300" />
+          <span className="truncate text-[7px] font-medium text-slate-200">Lists Board</span>
         </div>
-        <span className="font-mono text-[6.5px] text-slate-400">12 items</span>
+        <span className="font-mono text-[6px] text-slate-400">12 items</span>
       </div>
       <div className="my-auto min-w-0">
-        <div className="truncate text-[7.5px] font-medium text-slate-100">SOC2 Evidence Ledger</div>
-        <div className="truncate text-[6.5px] text-slate-400">Updated today by security</div>
+        <div className="truncate text-[7px] font-medium text-slate-100">SOC2 Evidence Ledger</div>
+        <div className="truncate text-[5.5px] text-slate-400">Updated today by security</div>
       </div>
-      <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[6.5px] text-slate-400">
-        <span className="text-emerald-300 font-mono">100% verified</span>
+      <div className="flex items-center justify-between border-t border-white/[0.06] pt-0.5 text-[5.5px] text-slate-400">
+        <span className="font-mono text-emerald-300">100% verified</span>
         <span className="text-slate-400">Q4 audit</span>
       </div>
     </div>
   );
 }
 
-/* ─── 3D Magnetic Miniature Node Component ─── */
+/* ─── 3D Subtle Node Button Component (Linear / Raycast feel) ─── */
 function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) {
   const nodeRef = useRef(null);
   const reduceMotion = useReducedMotion();
@@ -554,9 +591,10 @@ function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) 
     const cy = rect.top + rect.height / 2;
     const dx = (e.clientX - cx) / (rect.width / 2);
     const dy = (e.clientY - cy) / (rect.height / 2);
+    // Subtle magnetic response (max ±6deg)
     setMagneticTilt({
-      rx: -dy * 12,
-      ry: dx * 12,
+      rx: -dy * 6,
+      ry: dx * 6,
       gx: ((e.clientX - rect.left) / rect.width) * 100,
       gy: ((e.clientY - rect.top) / rect.height) * 100,
     });
@@ -572,24 +610,24 @@ function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) 
   return (
     <motion.div
       key={item.name}
-      initial={{ opacity: 0, scale: 0.88 }}
+      initial={{ opacity: 0, scale: 0.94 }}
       animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.88 }}
-      transition={{ duration: 0.22 }}
+      exit={{ opacity: 0, scale: 0.94 }}
+      transition={{ duration: 0.2 }}
       style={{
         position: 'absolute',
         left: `${(x / 620) * 100}%`,
         top: `${(y / 420) * 100}%`,
         translateX: '-50%',
-        translateY: '-33px', // Centers the 66px card precisely on (x, y)
+        translateY: '-36px', // Pins center of 72px card precisely on (x, y)
         zIndex: isSelected ? 30 : isHovered ? 25 : 20,
       }}
     >
       <div
         ref={nodeRef}
         style={{
-          transform: `perspective(320px) rotateX(${magneticTilt.rx}deg) rotateY(${magneticTilt.ry}deg)`,
-          transition: isHovered ? 'transform 80ms ease-out' : 'transform 400ms cubic-bezier(0.16,1,0.3,1)',
+          transform: `perspective(360px) rotateX(${magneticTilt.rx}deg) rotateY(${magneticTilt.ry}deg)`,
+          transition: isHovered ? 'transform 100ms ease-out' : 'transform 450ms cubic-bezier(0.16,1,0.3,1)',
         }}
       >
         <motion.button
@@ -600,86 +638,57 @@ function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) 
           onMouseEnter={onHover}
           onMouseLeave={handleMouseLeave}
           animate={{
-            scale: isHovered ? 1.055 : isSelected ? 1.03 : 1,
-            y: isHovered ? -5 : isSelected ? -2 : 0,
+            scale: isHovered ? 1.025 : isSelected ? 1.015 : 1,
+            y: isHovered ? -3 : isSelected ? -1 : 0,
           }}
           transition={{
             type: 'spring',
-            stiffness: 420,
-            damping: 24,
-            mass: 0.8,
+            stiffness: 380,
+            damping: 28,
+            mass: 0.9,
           }}
           className={cn(
             'group relative flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400',
             isSelected ? 'text-white' : 'text-slate-300 hover:text-white',
           )}
         >
-          {/* Miniature Product Window Card (108px x 66px) */}
+          {/* Miniature Product Window Card (116px x 72px) */}
           <div
             className={cn(
-              'relative h-[66px] w-[108px] rounded-xl border text-[10px] overflow-hidden transition-colors duration-200',
+              'relative h-[72px] w-[116px] rounded-xl border text-[10px] overflow-hidden transition-all duration-200',
               isSelected
-                ? 'border-indigo-400/50 bg-[#101524]'
+                ? 'border-indigo-400/40 bg-[#0e1220]'
                 : isHovered
-                ? 'border-white/35 bg-[#0e1320]'
-                : 'border-white/[0.09] bg-[#090d16]/95 hover:border-white/20',
+                ? 'border-white/25 bg-[#0c101c]'
+                : 'border-white/[0.08] bg-[#090d16]/95 hover:border-white/18',
             )}
             style={{
               boxShadow: isSelected
-                ? `0 0 0 1px ${item.color}44, 0 12px 32px -6px ${item.color}66, inset 0 1px 0 rgba(255,255,255,0.18)`
+                ? `0 0 0 1px ${item.color}33, 0 8px 24px -4px ${item.color}44, inset 0 1px 0 rgba(255,255,255,0.12)`
                 : isHovered
-                ? `0 0 0 1px ${item.color}33, 0 8px 24px -4px ${item.color}44, inset 0 1px 0 rgba(255,255,255,0.15)`
-                : '0 6px 18px -4px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)',
+                ? `0 0 0 1px ${item.color}22, 0 6px 18px -4px ${item.color}33, inset 0 1px 0 rgba(255,255,255,0.1)`
+                : '0 4px 14px -3px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.04)',
             }}
           >
-            {/* Inner dynamic spotlight when hovered */}
-            {isHovered && !reduceMotion && (
-              <span
-                className="pointer-events-none absolute inset-0 rounded-xl"
-                style={{
-                  background: `radial-gradient(circle at ${magneticTilt.gx}% ${magneticTilt.gy}%, ${item.color}33 0%, transparent 68%)`,
-                }}
-              />
-            )}
+            {/* Specular gloss */}
+            <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-xl bg-gradient-to-b from-white/[0.05] to-transparent" />
 
-            {/* Top specular reflection sheen */}
-            <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-xl bg-gradient-to-b from-white/[0.08] to-transparent" />
-
-            {/* Live miniature product UI */}
-            <MiniatureProductCard item={item} isSelected={isSelected} isHovered={isHovered} />
+            {/* Live miniature product preview */}
+            <MiniatureProductPreview item={item} />
           </div>
 
-          {/* Micro label pill underneath */}
+          {/* Micro label underneath with status dot */}
           <span
             className={cn(
-              'mt-1 flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-medium tracking-wide drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] transition-colors',
+              'mt-1 flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[8.5px] font-medium tracking-wide drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] transition-colors',
               isSelected
-                ? 'bg-indigo-950/80 text-white ring-1 ring-indigo-400/40'
-                : 'bg-[#0b0f19]/80 text-slate-300 group-hover:text-white',
+                ? 'bg-indigo-950/80 text-white ring-1 ring-indigo-400/30'
+                : 'bg-[#0a0d16]/85 text-slate-300 group-hover:text-white',
             )}
           >
             <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: item.color }} />
             {item.name}
           </span>
-
-          {/* Smooth floating tooltip on hover */}
-          <AnimatePresence>
-            {isHovered && !reduceMotion && (
-              <motion.div
-                initial={{ opacity: 0, y: 6, scale: 0.92 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 4, scale: 0.94 }}
-                transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-                className="pointer-events-none absolute -top-8 left-1/2 z-40 -translate-x-1/2 whitespace-nowrap rounded-md border border-white/15 bg-[#141824]/95 px-2.5 py-1 text-[8px] font-medium text-slate-100 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.85)] backdrop-blur-md"
-              >
-                <span className="flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span>Click to inspect {item.name}</span>
-                </span>
-                <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 border-b border-r border-white/15 bg-[#141824]" />
-              </motion.div>
-            )}
-          </AnimatePresence>
         </motion.button>
       </div>
     </motion.div>
@@ -805,14 +814,14 @@ export default function IntegrationsSection() {
                 className="relative h-[430px] overflow-hidden select-none"
                 style={{
                   background: tilt.active
-                    ? `radial-gradient(ellipse 85% 75% at ${tilt.gx}% ${tilt.gy}%, rgba(68,75,175,0.22) 0%, rgba(15,19,28,0.92) 55%, #080b12 100%)`
-                    : 'radial-gradient(ellipse 80% 70% at 50% 48%, rgba(62,68,160,0.18) 0%, rgba(15,19,28,0.92) 55%, #080b12 100%)',
+                    ? `radial-gradient(ellipse 85% 75% at ${tilt.gx}% ${tilt.gy}%, rgba(55,62,150,0.16) 0%, rgba(15,19,28,0.94) 55%, #080b12 100%)`
+                    : 'radial-gradient(ellipse 80% 70% at 50% 48%, rgba(50,56,140,0.14) 0%, rgba(15,19,28,0.94) 55%, #080b12 100%)',
                   transition: tilt.active ? 'none' : 'background 600ms ease',
                 }}
                 aria-label="Connected tools map"
               >
 
-                {/* ── SVG layer: static paths + animated particles ── */}
+                {/* ── SVG layer: Layered Convergent Vector Splines & Subtle Particles ── */}
                 <svg
                   viewBox="0 0 620 420"
                   preserveAspectRatio="none"
@@ -821,101 +830,96 @@ export default function IntegrationsSection() {
                   aria-label={`Connections from Ultrakin to ${selectedCat.toLowerCase()}`}
                 >
                   <defs>
-                    <linearGradient id="orbit-line" x1="0" x2="1" y1="0" y2="1">
-                      <stop stopColor="#9295f8" stopOpacity=".32" />
-                      <stop offset="1" stopColor="#a9afbd" stopOpacity=".08" />
+                    {/* Base subtle converging gradient */}
+                    <linearGradient id="spline-base" x1="0" y1="0" x2="1" y2="1">
+                      <stop stopColor="#818cf8" stopOpacity=".22" />
+                      <stop offset="1" stopColor="#a5b4fc" stopOpacity=".08" />
                     </linearGradient>
-                    <linearGradient id="orbit-line-active" x1="0" x2="1" y1="0" y2="1">
-                      <stop stopColor="#c7d2fe" stopOpacity="1" />
-                      <stop offset="1" stopColor="#818cf8" stopOpacity="0.55" />
+
+                    {/* Active brightened spline gradient (subtle, 0.75-0.85px) */}
+                    <linearGradient id="spline-active" x1="0" y1="0" x2="1" y2="1">
+                      <stop stopColor="#c7d2fe" stopOpacity=".85" />
+                      <stop offset="1" stopColor="#818cf8" stopOpacity=".45" />
                     </linearGradient>
+
+                    {/* Core radial soft field */}
                     <radialGradient id="orbit-core">
-                      <stop stopColor="#7779ee" stopOpacity=".25" />
-                      <stop offset="1" stopColor="#7779ee" stopOpacity="0" />
+                      <stop stopColor="#6366f1" stopOpacity=".16" />
+                      <stop offset="1" stopColor="#6366f1" stopOpacity="0" />
                     </radialGradient>
-                    <filter id="particle-blur" x="-100%" y="-100%" width="300%" height="300%">
-                      <feGaussianBlur stdDeviation="1.5" />
-                    </filter>
-                    <filter id="particle-glow" x="-200%" y="-200%" width="500%" height="500%">
-                      <feGaussianBlur stdDeviation="2.5" result="blur" />
-                      <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+
+                    {/* Subtly reduced particle glow filter (~70% reduction) */}
+                    <filter id="subtle-particle-glow" x="-100%" y="-100%" width="300%" height="300%">
+                      <feGaussianBlur stdDeviation="0.7" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
                     </filter>
                   </defs>
 
-                  {/* Subtle orbit ellipses with slight perspective parallax */}
-                  <ellipse
-                    cx={CENTER[0] + (tilt.active ? (tilt.gx - 50) * 0.08 : 0)}
-                    cy={CENTER[1] + (tilt.active ? (tilt.gy - 50) * 0.06 : 0)}
-                    rx="236"
-                    ry="152"
-                    fill="none"
-                    stroke="rgba(255,255,255,0.04)"
-                    strokeDasharray="1 10"
-                  />
-                  <ellipse
-                    cx={CENTER[0] + (tilt.active ? (tilt.gx - 50) * 0.05 : 0)}
-                    cy={CENTER[1] + (tilt.active ? (tilt.gy - 50) * 0.04 : 0)}
-                    rx="160"
-                    ry="100"
-                    fill="none"
-                    stroke="rgba(255,255,255,0.05)"
-                  />
-                  <circle cx={CENTER[0]} cy={CENTER[1]} r="82" fill="url(#orbit-core)" />
+                  {/* ── LAYER 1: Background Concentric Orbital Rings (0.5px - 0.65px) ── */}
+                  <ConcentricOrbitalRing rx="236" ry="148" strokeDasharray="1 10" opacity={0.35} />
+                  <ConcentricOrbitalRing rx="160" ry="98"  strokeDasharray="none" opacity={0.3} />
+                  <ConcentricOrbitalRing rx="86"  ry="54"  strokeDasharray="2 6"  opacity={0.4} />
+                  <circle cx={CENTER[0]} cy={CENTER[1]} r="78" fill="url(#orbit-core)" />
 
-                  {/* Pulsing rings from center */}
-                  {!reduceMotion && (
-                    <>
-                      <PulsingRing r={52} delay={0} isActive={!!hoveredItem} />
-                      <PulsingRing r={52} delay={1.4} isActive={!!hoveredItem} />
-                    </>
-                  )}
+                  {/* ── LAYER 2: Middle Secondary Harmonic Splines (0.5px guide splines) ── */}
+                  {visible.map((item) => {
+                    const guideD = getHarmonicGuideSpline(item.point[0], item.point[1]);
+                    return (
+                      <path
+                        key={`guide-${item.name}`}
+                        d={guideD}
+                        fill="none"
+                        stroke="rgba(140,148,255,0.08)"
+                        strokeWidth="0.5"
+                        strokeDasharray="1.5 5"
+                      />
+                    );
+                  })}
 
-                  {/* Connection lines to nodes */}
+                  {/* ── LAYER 3: Foreground Primary Convergent Splines (0.65px - 0.85px) ── */}
                   <AnimatePresence>
                     {visible.map((item) => {
-                      const d = qPath(CENTER[0], CENTER[1], item.point[0], item.point[1]);
+                      const d = getConvergentSpline(item.point[0], item.point[1]);
                       const isHovered = item.name === hoveredNode;
                       const isSelected = item.name === current.name;
                       const isHighlighted = isHovered || isSelected;
 
                       return (
                         <motion.path
-                          key={item.name}
+                          key={`spline-${item.name}`}
                           d={d}
                           fill="none"
-                          stroke={isHighlighted ? 'url(#orbit-line-active)' : 'url(#orbit-line)'}
-                          strokeWidth={isHovered ? 2.4 : isSelected ? 1.8 : 0.8}
-                          initial={{ pathLength: 0, opacity: 0 }}
+                          stroke={isHighlighted ? 'url(#spline-active)' : 'url(#spline-base)'}
+                          strokeWidth={isHovered ? 0.85 : isSelected ? 0.75 : 0.65}
+                          initial={{ opacity: 0 }}
                           animate={{
-                            pathLength: 1,
-                            opacity: isHovered ? 1 : isSelected ? 0.9 : (hoveredNode ? 0.25 : 0.5),
+                            opacity: isHovered ? 0.9 : isSelected ? 0.75 : (hoveredNode ? 0.16 : 0.4),
                           }}
                           exit={{ opacity: 0 }}
-                          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                          style={{
-                            filter: isHovered ? `drop-shadow(0 0 6px ${item.color})` : 'none',
-                          }}
+                          transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                         />
                       );
                     })}
                   </AnimatePresence>
 
-                  {/* Flowing particle dots along lines */}
+                  {/* Flowing particle beads along convergent splines */}
                   {!reduceMotion && (
                     <AnimatePresence>
                       {visible.map((item, i) => {
-                        const d = qPath(CENTER[0], CENTER[1], item.point[0], item.point[1]);
+                        const d = getConvergentSpline(item.point[0], item.point[1]);
                         const isHovered = item.name === hoveredNode;
                         const isSelected = item.name === current.name;
                         const isHighlighted = isHovered || isSelected;
 
                         return (
-                          <FlowingParticle
+                          <ConvergingParticle
                             key={`particle-${item.name}`}
                             d={d}
                             color={isHighlighted ? '#c7d2fe' : item.color}
-                            delay={i * 0.28}
-                            duration={isHovered ? 1.2 : isSelected ? 1.6 : 2.4}
+                            delay={i * 0.45}
                             isHighlighted={isHighlighted}
                           />
                         );
@@ -932,11 +936,10 @@ export default function IntegrationsSection() {
                         key={`dot-${item.name}`}
                         cx={item.point[0]}
                         cy={item.point[1]}
-                        r={isHovered ? 4.5 : isSelected ? 3.5 : 2}
+                        r={isHovered ? 3.5 : isSelected ? 2.8 : 1.8}
                         fill={item.color}
-                        fillOpacity={isHovered ? 1 : isSelected ? 0.95 : 0.65}
+                        fillOpacity={isHovered ? 0.95 : isSelected ? 0.85 : 0.55}
                         style={{
-                          filter: isHovered || isSelected ? `drop-shadow(0 0 6px ${item.color})` : 'none',
                           transition: 'r 200ms ease, fill-opacity 200ms ease',
                         }}
                       />
@@ -948,14 +951,14 @@ export default function IntegrationsSection() {
                 <motion.div
                   className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
                   animate={{
-                    scale: hoveredItem ? 1.025 : 1,
+                    scale: hoveredItem ? 1.018 : 1,
                   }}
-                  transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 28 }}
                   style={{
                     filter: hoveredItem
-                      ? `drop-shadow(0 0 36px ${hoveredItem.color}66)`
-                      : 'drop-shadow(0 0 24px rgba(120,122,255,0.35))',
-                    transition: 'filter 300ms ease',
+                      ? 'drop-shadow(0 0 28px rgba(120,122,255,0.45))'
+                      : 'drop-shadow(0 0 20px rgba(120,122,255,0.25))',
+                    transition: 'filter 350ms ease',
                   }}
                 >
                   <div className="flex h-[88px] w-[88px] items-center justify-center rounded-[1.7rem] border border-white/[0.16] bg-[linear-gradient(145deg,#1e2540,#0d1118_68%)] shadow-[0_30px_60px_-20px_rgba(0,0,0,.95),inset_0_1px_0_rgba(255,255,255,.16),inset_0_-1px_0_rgba(144,148,255,.15)]">

@@ -172,20 +172,20 @@ export default function App() {
             <svg viewBox="0 0 100 1000" preserveAspectRatio="none" className="absolute inset-0 hidden h-full w-full md:block">
               <defs>
                 <linearGradient id="ultrakin-story-thread" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#818cf8" stopOpacity="0.14" />
-                  <stop offset="25%" stopColor="#6366f1" stopOpacity="0.26" />
-                  <stop offset="50%" stopColor="#818cf8" stopOpacity="0.2" />
-                  <stop offset="75%" stopColor="#6366f1" stopOpacity="0.26" />
-                  <stop offset="100%" stopColor="#818cf8" stopOpacity="0.14" />
+                  <stop offset="0%" stopColor="#818cf8" stopOpacity="0.08" />
+                  <stop offset="25%" stopColor="#6366f1" stopOpacity="0.16" />
+                  <stop offset="50%" stopColor="#818cf8" stopOpacity="0.12" />
+                  <stop offset="75%" stopColor="#6366f1" stopOpacity="0.16" />
+                  <stop offset="100%" stopColor="#818cf8" stopOpacity="0.08" />
                 </linearGradient>
                 <linearGradient id="ultrakin-thread-active" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.6" />
-                  <stop offset="40%" stopColor="#6366f1" stopOpacity="0.85" />
-                  <stop offset="75%" stopColor="#818cf8" stopOpacity="0.95" />
-                  <stop offset="100%" stopColor="#c7d2fe" stopOpacity="1" />
+                  <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.35" />
+                  <stop offset="40%" stopColor="#6366f1" stopOpacity="0.6" />
+                  <stop offset="75%" stopColor="#818cf8" stopOpacity="0.75" />
+                  <stop offset="100%" stopColor="#c7d2fe" stopOpacity="0.85" />
                 </linearGradient>
                 <filter id="thread-glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="1.5" result="blur" />
+                  <feGaussianBlur stdDeviation="0.4" result="blur" />
                   <feMerge>
                     <feMergeNode in="blur" />
                     <feMergeNode in="SourceGraphic" />
@@ -193,22 +193,22 @@ export default function App() {
                 </filter>
               </defs>
 
-              {/* Base guide track — delicate, hair-thin optical filament */}
+              {/* Base guide track — delicate, ultra-thin optical filament (0.65px) */}
               <path
                 ref={routePathRef}
                 d="M96 0 C96 50 97 72 84 90 C68 111 15 112 8 143 C1 176 40 184 59 200 C80 217 97 233 93 263 C87 299 31 300 8 326 C-10 348 10 383 39 393 C74 406 99 423 91 460 C82 497 29 504 8 537 C-11 568 11 598 42 609 C75 622 96 646 90 679 C82 720 34 725 11 754 C-11 782 10 819 48 831 C83 842 99 872 82 902 C69 927 55 945 52 1000"
                 fill="none"
                 stroke="url(#ultrakin-story-thread)"
-                strokeWidth="1"
+                strokeWidth="0.65"
                 vectorEffect="non-scaling-stroke"
               />
 
-              {/* Active scroll progression light ray */}
+              {/* Active scroll progression light ray — ultra-thin (0.75px) */}
               <motion.path
                 d="M96 0 C96 50 97 72 84 90 C68 111 15 112 8 143 C1 176 40 184 59 200 C80 217 97 233 93 263 C87 299 31 300 8 326 C-10 348 10 383 39 393 C74 406 99 423 91 460 C82 497 29 504 8 537 C-11 568 11 598 42 609 C75 622 96 646 90 679 C82 720 34 725 11 754 C-11 782 10 819 48 831 C83 842 99 872 82 902 C69 927 55 945 52 1000"
                 fill="none"
                 stroke="url(#ultrakin-thread-active)"
-                strokeWidth="1.35"
+                strokeWidth="0.75"
                 strokeLinecap="round"
                 vectorEffect="non-scaling-stroke"
                 filter="url(#thread-glow)"
@@ -216,7 +216,7 @@ export default function App() {
               />
             </svg>
 
-            {/* Traveling Luminous Pearl Photon Bead (Glides effortlessly OVER cards) */}
+            {/* Traveling Luminous Pearl Photon Bead — refined 2px pearl node */}
             {!reduceMotion && (
               <motion.div
                 aria-hidden="true"
@@ -224,9 +224,9 @@ export default function App() {
                 className="absolute z-20 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center md:flex pointer-events-none"
               >
                 {/* Subtle soft luminous aura */}
-                <span className="absolute h-6 w-6 rounded-full bg-indigo-400/20 blur-[2px]" />
+                <span className="absolute h-4 w-4 rounded-full bg-indigo-400/15 blur-[1.5px]" />
                 {/* Pearl white photon bead matching reference screenshot */}
-                <span className="relative h-2.5 w-2.5 rounded-full bg-white ring-1 ring-white/90 shadow-[0_0_8px_rgba(255,255,255,0.95),0_0_16px_rgba(99,102,241,0.55),0_1px_3px_rgba(0,0,0,0.2)]" />
+                <span className="relative h-2 w-2 rounded-full bg-white ring-1 ring-white/80 shadow-[0_0_6px_rgba(255,255,255,0.9),0_0_10px_rgba(99,102,241,0.4)]" />
               </motion.div>
             )}
 
