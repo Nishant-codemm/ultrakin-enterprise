@@ -152,7 +152,7 @@ export default function EvaluationSection() {
                       href={href}
                       target={external ? '_blank' : undefined}
                       rel={external ? 'noreferrer' : undefined}
-                      className="mt-7 inline-flex min-h-10 w-fit items-center gap-2 rounded-md text-sm font-medium text-ink-soft transition-all duration-200 hover:gap-3 hover:text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                      className="mt-7 inline-flex min-h-10 w-fit items-center gap-2 rounded-lg text-sm font-medium text-ink-soft transition-all duration-200 hover:gap-3 hover:text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
                     >
                       {action}
                       <motion.span

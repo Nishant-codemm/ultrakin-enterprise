@@ -803,7 +803,7 @@ function HeroWorkspaceContent() {
         className="pointer-events-none absolute inset-0 opacity-[0.025]"
         style={{
           backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
-          backgroundSize: '28px 28px',
+          backgroundSize: '32px 32px',
         }}
       />
       {/* Top edge hairline glow */}
@@ -815,7 +815,7 @@ function HeroWorkspaceContent() {
 
             {/* ── Badge ── */}
             <motion.div
-              className="mb-6"
+              className="mb-5"
               initial={false}
               animate={{ opacity: 1, y: 0 }}
             >
@@ -823,7 +823,7 @@ function HeroWorkspaceContent() {
                 variant="indigo"
                 size="md"
                 dot
-                className="max-w-full flex-wrap gap-y-1 border-brand/20 bg-brand/[0.07] px-3 py-1 text-[11px] shadow-[0_2px_8px_rgba(49,86,207,0.12)] sm:text-xs"
+                className="max-w-full flex-wrap gap-y-1 border-brand/20 bg-brand/[0.07] px-3 py-1 text-[11px] shadow-[0_2px_8px_rgba(49,86,207,0.12)]"
               >
                 <span className="font-semibold tracking-wider text-brand-text">ULTRAKIN</span>
                 <span className="mx-1.5 text-ink-subtle/40">|</span>
@@ -832,7 +832,7 @@ function HeroWorkspaceContent() {
             </motion.div>
 
             {/* ── Headline ── */}
-            <h1 className="max-w-[680px] font-display text-[clamp(3rem,5.5vw,5rem)] font-normal leading-[1.03] tracking-[-0.035em] text-ink">
+            <h1 className="max-w-[680px] font-display text-[clamp(3rem,5.5vw,5rem)] font-normal leading-[1.04] tracking-[-0.035em] text-ink">
               <span className="block">The autonomous</span>
               <span className="block">workspace for</span>
               <span
@@ -844,17 +844,17 @@ function HeroWorkspaceContent() {
             </h1>
 
             {/* ── Subheadline ── */}
-            <p className="mt-5 max-w-[540px] text-[17px] leading-7 tracking-[-0.01em] text-ink-muted sm:text-[18px]">
+            <p className="mt-5 max-w-[560px] text-[17px] leading-7 tracking-[-0.005em] text-ink-muted sm:text-[18px]">
               Chat, mail, docs, huddles, and tasks—connected by agents that carry context into what happens next.
             </p>
 
             {/* ── CTA Buttons + ⌘K Command Palette ── */}
-            <div className="mt-7 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+            <div className="mt-7 flex flex-col items-start gap-2.5 sm:flex-row sm:items-center">
               <Button
                 variant="primary"
                 size="lg"
                 iconRight={ArrowRight}
-                className="w-full sm:w-auto text-[15px] px-7 h-12 shadow-[0_6px_20px_rgba(49,86,207,0.32),0_2px_8px_rgba(49,86,207,0.18)] hover:shadow-[0_8px_24px_rgba(49,86,207,0.45)] transition-shadow"
+                className="w-full sm:w-auto text-[15px] px-7 h-12 hover:shadow-[0_8px_24px_rgba(49,86,207,0.45)] transition-shadow"
                 onClick={() => window.open('https://app.ultrakin.com/auth', '_blank', 'noopener,noreferrer')}
               >
                 Start free
@@ -871,7 +871,7 @@ function HeroWorkspaceContent() {
             </div>
 
             {/* ── Trust badges ── */}
-            <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] font-medium text-ink-subtle select-none">
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-medium text-ink-subtle select-none">
               {[
                 'SOC 2 Type II',
                 'GDPR-ready',

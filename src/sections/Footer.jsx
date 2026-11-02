@@ -26,7 +26,7 @@ export default function Footer({ isHome = true }) {
             </p>
 
             {/* Live Infrastructure Status Beacon */}
-            <div className="mt-6 flex items-center gap-2.5 rounded-lg border border-border bg-surface-raised px-3 py-2 text-[11px] font-mono text-ink-soft w-fit">
+            <a href="/security" className="group mt-6 flex items-center gap-2.5 rounded-lg border border-border bg-surface-raised px-3 py-2 text-[11px] font-mono text-ink-soft transition-all hover:border-brand/30 hover:bg-surface-hover w-fit focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus" title="View infrastructure reliability, compliance and SLA metrics">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 motion-reduce:hidden" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -34,7 +34,7 @@ export default function Footer({ isHome = true }) {
               <span>All Systems Operational</span>
               <span className="text-ink-subtle">·</span>
               <span className="text-ink-subtle">99.98% SLA</span>
-            </div>
+            </a>
 
             <div className="mt-6 flex items-center gap-3 text-ink-subtle">
               <a

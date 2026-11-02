@@ -266,7 +266,7 @@ export default function BentoGrid() {
   };
 
   return (
-    <section ref={sectionRef} id="platform" className="relative overflow-hidden bg-transparent py-20 md:py-28">
+    <section ref={sectionRef} id="platform" className="divider-hairline relative overflow-hidden bg-transparent py-20 md:py-28">
       {/* Decorative circles */}
       <div aria-hidden="true" className="pointer-events-none absolute -left-[30rem] top-1/4 h-[48rem] w-[48rem] rounded-full border border-border/40" />
       <div aria-hidden="true" className="pointer-events-none absolute -left-[24rem] top-[30%] h-[36rem] w-[36rem] rounded-full border border-border/40" />

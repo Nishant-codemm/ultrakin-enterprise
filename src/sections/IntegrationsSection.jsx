@@ -37,7 +37,7 @@ function TiltCard({ children, className }) {
     const rect = el.getBoundingClientRect();
     const dx = (e.clientX - rect.left) / rect.width;
     const dy = (e.clientY - rect.top) / rect.height;
-    // Ultra subtle, premium tilt (max ±3deg)
+    // Ultra subtle, premium tilt (max ±3.5deg)
     setTilt({
       rx: (0.5 - dy) * 3.5,
       ry: (dx - 0.5) * 4.5,
@@ -102,7 +102,7 @@ function TiltCard({ children, className }) {
 
 const CATEGORIES = ['Built in', 'Extension examples'];
 
-/* ─── Product Icon & Badge Mapping matching the Navigation Mega-Menu ─── */
+/* ─── Product Icon & Badge Mapping matching Navigation Mega-Menu ─── */
 const PRODUCT_ICON_CONFIG = {
   Spaces:      { icon: MessageSquare, bg: 'bg-[#5c5bd6]', glow: '#5c5bd6' },
   Mail:        { icon: Mail,          bg: 'bg-[#dc2626]', glow: '#dc2626' },
@@ -144,17 +144,26 @@ const CENTER = [310, 210];
    and exits toward the right information panel at [660, 238]. */
 
 // 1. Signature Hero Cross-Sectional Arc (Spaces → Hub Crest → Tasks → Right Panel)
-const PATH_HERO_CROSS_SECTION = "M -30 40 C 40 55, 80 68, 112 78 C 165 94, 230 148, 310 168 C 390 188, 475 204, 548 210 C 585 214, 620 224, 660 238";
+const PATH_HERO_CROSS_SECTION = 'M -30 40 C 40 55, 80 68, 112 78 C 165 94, 230 148, 310 168 C 390 188, 475 204, 548 210 C 585 214, 620 224, 660 238';
 
 // 2. Harmonic Parallel Guide Spline (converges alongside Hero Arc)
-const PATH_HERO_GUIDE = "M -20 46 C 45 60, 84 72, 112 78 C 168 98, 235 152, 310 174 C 385 192, 470 208, 548 210 C 585 218, 620 228, 660 242";
+const PATH_HERO_GUIDE = 'M -20 46 C 45 60, 84 72, 112 78 C 168 98, 235 152, 310 174 C 385 192, 470 208, 548 210 C 585 218, 620 228, 660 242';
 
-// 3. Converging Feeder Branches from Perimeter Nodes to Hub
-const PATH_MAIL_CONVERGE     = "M 310 50 C 310 95, 310 135, 310 168";
-const PATH_MEETINGS_CONVERGE = "M 510 78 C 450 110, 380 145, 310 168";
-const PATH_CALENDAR_CONVERGE = "M 505 340 C 450 310, 380 270, 310 252";
-const PATH_DOCS_CONVERGE     = "M 310 362 C 310 325, 310 285, 310 252";
-const PATH_UKIN_CONVERGE     = "M 112 340 C 165 310, 235 270, 310 252";
+// 3. Converging Feeder Branches for Built-In Nodes
+const FEEDER_PATHS = {
+  Mail:         'M 310 50 C 310 95, 310 135, 310 168',
+  Meetings:     'M 510 78 C 450 110, 380 145, 310 168',
+  Calendar:     'M 505 340 C 450 310, 380 270, 310 252',
+  Docs:         'M 310 362 C 310 325, 310 285, 310 252',
+  'Ukin agent': 'M 112 340 C 165 310, 235 270, 310 252',
+  // Extension Examples Feeder Branches
+  GitHub:       'M 126 82 C 175 105, 240 150, 310 168',
+  PostHog:      'M 494 70 C 440 105, 380 145, 310 168',
+  'MCP tools':  'M 550 206 C 480 208, 410 210, 354 210',
+  Journeys:     'M 490 344 C 440 310, 380 270, 310 252',
+  Forms:        'M 142 348 C 190 315, 250 270, 310 252',
+  Lists:        'M 98 212 C 160 212, 220 210, 266 210',
+};
 
 const PREVIEWS = {
   Spaces:      { surface: 'launch-planning',       actor: 'Maya Chen',       message: 'The handoff is ready for review. I linked the launch checklist here.',          outcome: 'Decision captured in the launch brief',     icon: 'SC' },
@@ -182,7 +191,7 @@ function ConvergingPhotonNode({ d, color, duration = 6.8 }) {
       d={d}
       fill="none"
       stroke={color}
-      strokeWidth={1.8}
+      strokeWidth={1.7}
       strokeLinecap="round"
       strokeDasharray="6 380"
       filter="url(#subtle-particle-glow)"
@@ -199,7 +208,7 @@ function ConvergingPhotonNode({ d, color, duration = 6.8 }) {
   );
 }
 
-/* ─── Delicate Concentric Orbital Ring ─── */
+/* ─── Reusable Concentric Orbital Ring Component ─── */
 function ConcentricOrbitalRing({ rx, ry, strokeDasharray, opacity }) {
   const tilt = useContext(TiltContext);
   return (
@@ -213,6 +222,36 @@ function ConcentricOrbitalRing({ rx, ry, strokeDasharray, opacity }) {
       strokeWidth="0.65"
       strokeDasharray={strokeDasharray}
       style={{ opacity, transition: 'stroke 300ms ease' }}
+    />
+  );
+}
+
+/* ─── Reusable Topology Spline Branch Component ─── */
+function TopologySpline({ d, isActive, isGuide = false }) {
+  return (
+    <path
+      d={d}
+      fill="none"
+      stroke={isActive ? 'url(#topo-spline-active)' : isGuide ? 'rgba(140,148,255,0.10)' : 'rgba(140,148,255,0.14)'}
+      strokeWidth={isActive ? 0.85 : 0.52}
+      strokeDasharray={isActive ? 'none' : isGuide ? '2 6' : '2 5'}
+      className="transition-all duration-300"
+    />
+  );
+}
+
+/* ─── Reusable Hub Spoke Line Component ─── */
+function HubSpoke({ x2, y2, isActive }) {
+  return (
+    <line
+      x1={CENTER[0]}
+      y1={CENTER[1]}
+      x2={x2}
+      y2={y2}
+      stroke={isActive ? 'url(#topo-spline-active)' : 'rgba(140,148,255,0.11)'}
+      strokeWidth={isActive ? 0.85 : 0.52}
+      strokeDasharray={isActive ? 'none' : '3 6'}
+      className="transition-all duration-300"
     />
   );
 }
@@ -299,7 +338,7 @@ function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) 
             isSelected ? 'text-white' : 'text-slate-300 hover:text-white',
           )}
         >
-          {/* The Outer Node Box (48px x 48px) with Specular Rim & Glow */}
+          {/* Outer Node Box (48px x 48px) with Specular Rim & Glow */}
           <div
             className={cn(
               'relative flex h-[48px] w-[48px] items-center justify-center rounded-[14px] border transition-all duration-200 overflow-hidden',
@@ -317,7 +356,7 @@ function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) 
                 : '0 4px 12px -3px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.06)',
             }}
           >
-            {/* Inner Product Icon Badge — exact style from navigation menu */}
+            {/* Inner Product Icon Badge */}
             <div
               className={cn(
                 'flex h-[32px] w-[32px] items-center justify-center rounded-[9px] shadow-[0_1px_3px_rgba(0,0,0,0.35)] transition-transform duration-150 group-hover:scale-105',
@@ -359,6 +398,7 @@ function SurfacePreview({ item }) {
   return (
     <BrowserFrame address={`app.ultrakin.com/workspace/${item.name.toLowerCase().replaceAll(' ', '-')}`} className="mt-6 max-w-md">
       <div className="overflow-hidden bg-[#0d1118]/90 shadow-[0_18px_44px_-34px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.035)]">
+        {/* Surface Header */}
         <div className="flex items-center justify-between border-b border-obsidian-border-soft px-3.5 py-2.5">
           <div className="flex min-w-0 items-center gap-2">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-obsidian-border bg-white/[0.04] font-mono text-[8px] text-indigo-200">
@@ -371,11 +411,17 @@ function SurfacePreview({ item }) {
             {item.category === 'Built in' ? 'Sample view' : 'Example only'}
           </span>
         </div>
-        <div className="px-3.5 py-3">
-          <p className="text-[9px] text-obsidian-muted">{preview.actor}</p>
-          <p className="mt-1.5 text-[11px] leading-[1.55] text-slate-300">{preview.message}</p>
-          <div className="mt-3 flex items-center gap-2 border-t border-obsidian-border-soft pt-2.5 text-[9px] text-indigo-100/75">
-            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-indigo-300/10 text-[9px] text-indigo-200">↗</span>
+
+        {/* Content Body */}
+        <div className="px-3.5 py-3.5">
+          <div className="flex items-center gap-1.5 text-[8.5px] uppercase tracking-[0.14em] text-obsidian-muted">
+            <span>Context</span>
+            <span className="text-obsidian-border">·</span>
+            <span className="text-slate-400">{preview.actor}</span>
+          </div>
+          <p className="mt-1.5 text-[11.5px] leading-[1.6] text-slate-200">{preview.message}</p>
+          <div className="mt-3.5 flex items-center gap-2 border-t border-obsidian-border-soft pt-2.5 text-[9.5px] text-indigo-100/85">
+            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-indigo-300/10 text-[9px] text-indigo-200">↗</span>
             <span className="truncate">{preview.outcome}</span>
           </div>
         </div>
@@ -404,16 +450,9 @@ export default function IntegrationsSection() {
     }
   };
 
-  // Determine which topological arteries are highlighted based on active selection
-  const isSpacesActive   = activeNode === 'Spaces';
-  const isUkinActive     = activeNode === 'Ukin agent';
-  const isMailActive     = activeNode === 'Mail';
-  const isCalendarActive = activeNode === 'Calendar';
-  const isTasksActive    = activeNode === 'Tasks';
-  const isMeetingsActive = activeNode === 'Meetings';
-  const isDocsActive     = activeNode === 'Docs';
-
   // Master Hero Arc illuminates when Spaces or Tasks is hovered/selected
+  const isSpacesActive   = activeNode === 'Spaces';
+  const isTasksActive    = activeNode === 'Tasks';
   const isMasterSpineActive = isSpacesActive || isTasksActive;
 
   return (
@@ -529,36 +568,33 @@ export default function IntegrationsSection() {
 
                   {/* ── LAYER 2: Delicate Radial Spokes from Hub to Nodes ── */}
                   <g>
-                    {visible.map((item) => {
-                      const isHovered = item.name === hoveredNode;
-                      const isSelected = item.name === current.name;
-                      const isActive = isHovered || isSelected;
-                      return (
-                        <line
-                          key={`spoke-${item.name}`}
-                          x1={CENTER[0]}
-                          y1={CENTER[1]}
-                          x2={item.point[0]}
-                          y2={item.point[1]}
-                          stroke={isActive ? 'url(#topo-spline-active)' : 'rgba(140,148,255,0.12)'}
-                          strokeWidth={isActive ? 0.85 : 0.55}
-                          strokeDasharray={isActive ? 'none' : '3 6'}
-                          className="transition-all duration-300"
-                        />
-                      );
-                    })}
+                    {visible.map((item) => (
+                      <HubSpoke
+                        key={`spoke-${item.name}`}
+                        x2={item.point[0]}
+                        y2={item.point[1]}
+                        isActive={item.name === activeNode}
+                      />
+                    ))}
                   </g>
 
                   {/* ── LAYER 3: Harmonic Converging Guide Splines ── */}
                   <g opacity={0.45}>
                     {/* Parallel companion along Hero Arc */}
-                    <path d={PATH_HERO_GUIDE} fill="none" stroke="rgba(140,148,255,0.12)" strokeWidth="0.55" strokeDasharray="2 6" />
+                    <TopologySpline d={PATH_HERO_GUIDE} isActive={false} isGuide={true} />
                     {/* Converging feeder branches from perimeter nodes toward central hub crest/root */}
-                    <path d={PATH_MAIL_CONVERGE} fill="none" stroke="rgba(140,148,255,0.12)" strokeWidth="0.5" strokeDasharray="2 5" />
-                    <path d={PATH_MEETINGS_CONVERGE} fill="none" stroke="rgba(140,148,255,0.12)" strokeWidth="0.5" strokeDasharray="2 5" />
-                    <path d={PATH_CALENDAR_CONVERGE} fill="none" stroke="rgba(140,148,255,0.12)" strokeWidth="0.5" strokeDasharray="2 5" />
-                    <path d={PATH_DOCS_CONVERGE} fill="none" stroke="rgba(140,148,255,0.12)" strokeWidth="0.5" strokeDasharray="2 5" />
-                    <path d={PATH_UKIN_CONVERGE} fill="none" stroke="rgba(140,148,255,0.12)" strokeWidth="0.5" strokeDasharray="2 5" />
+                    {visible.map((item) => {
+                      const feederD = FEEDER_PATHS[item.name];
+                      if (!feederD) return null;
+                      return (
+                        <TopologySpline
+                          key={`feeder-guide-${item.name}`}
+                          d={feederD}
+                          isActive={false}
+                          isGuide={true}
+                        />
+                      );
+                    })}
                   </g>
 
                   {/* ── LAYER 4: The Hero Cross-Sectional Vector Arc (Spaces → Hub Crest → Tasks → Right) ── */}
@@ -570,22 +606,22 @@ export default function IntegrationsSection() {
                     className="transition-all duration-300"
                   />
 
-                  {/* Active highlight for perimeter node feeder splines */}
-                  {isMailActive && (
-                    <path d={PATH_MAIL_CONVERGE} fill="none" stroke="url(#topo-spline-active)" strokeWidth={0.85} className="transition-all duration-300" />
-                  )}
-                  {isMeetingsActive && (
-                    <path d={PATH_MEETINGS_CONVERGE} fill="none" stroke="url(#topo-spline-active)" strokeWidth={0.85} className="transition-all duration-300" />
-                  )}
-                  {isCalendarActive && (
-                    <path d={PATH_CALENDAR_CONVERGE} fill="none" stroke="url(#topo-spline-active)" strokeWidth={0.85} className="transition-all duration-300" />
-                  )}
-                  {isDocsActive && (
-                    <path d={PATH_DOCS_CONVERGE} fill="none" stroke="url(#topo-spline-active)" strokeWidth={0.85} className="transition-all duration-300" />
-                  )}
-                  {isUkinActive && (
-                    <path d={PATH_UKIN_CONVERGE} fill="none" stroke="url(#topo-spline-active)" strokeWidth={0.85} className="transition-all duration-300" />
-                  )}
+                  {/* Active highlight for currently hovered / selected perimeter feeder spline */}
+                  {visible.map((item) => {
+                    const feederD = FEEDER_PATHS[item.name];
+                    const isActive = item.name === activeNode;
+                    if (!feederD || !isActive) return null;
+                    return (
+                      <path
+                        key={`active-feeder-${item.name}`}
+                        d={feederD}
+                        fill="none"
+                        stroke="url(#topo-spline-active)"
+                        strokeWidth={0.88}
+                        className="transition-all duration-300"
+                      />
+                    );
+                  })}
 
                   {/* ── LAYER 5: Continuous Travelling Photon Bead along Hero Cross-Sectional Arc ── */}
                   {!reduceMotion && (
@@ -658,7 +694,15 @@ export default function IntegrationsSection() {
 
           {/* ── Detail panel ── */}
           <div className="relative min-h-[250px] border-l border-border pl-6 sm:pl-8 lg:min-h-[290px] lg:pl-10">
+            {/* Top border hairline accent */}
             <div aria-hidden="true" className="absolute -left-px top-0 h-8 w-px bg-brand/70" />
+
+            {/* Optical receiver bead aligned with incoming trajectory from vector diagram */}
+            <div
+              aria-hidden="true"
+              className="hidden lg:block absolute -left-[3px] top-[148px] h-1.5 w-1.5 rounded-full bg-brand/60 ring-2 ring-page transition-all duration-300"
+            />
+
             <AnimatePresence mode="wait">
               <motion.div
                 key={current.name}

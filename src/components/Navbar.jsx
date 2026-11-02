@@ -364,12 +364,12 @@ export default function Navbar() {
     <nav
       ref={navRef}
       aria-label="Main navigation"
-      className={`fixed inset-x-0 top-0 z-[100] border-b transition-[background-color,border-color,box-shadow] duration-300 ${scrolled || openMenu ? 'border-border bg-surface-glass/90 shadow-[0_10px_35px_rgba(30,35,45,.09)] backdrop-blur-xl' : 'border-transparent bg-surface-glass/78 backdrop-blur-md'}`}
+      className={`fixed inset-x-0 top-0 z-[100] border-b transition-[background-color,border-color,box-shadow] duration-300 ${scrolled || openMenu ? 'border-border bg-surface-glass/90 shadow-[0_10px_35px_rgba(30,35,45,.09)] backdrop-blur-xl' : 'border-transparent bg-surface-glass/80 backdrop-blur-md'}`}
       onMouseLeave={leaveMenu}
     >
       <AnimatePresence mode="wait" initial={false}>
       {isHeroVisible ? (
-      <motion.div key="full-navigation" {...compactTransition} className="mx-auto flex h-[68px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
+      <motion.div key="full-navigation" {...compactTransition} className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-10">
         <a
           href="/"
           aria-label="Ultrakin home"
@@ -400,7 +400,7 @@ export default function Navbar() {
               onMouseEnter={() => enterMenu(name)}
               onFocus={() => enterMenu(name)}
               onClick={() => setOpenMenu((current) => current === name ? null : name)}
-              className={`inline-flex h-10 items-center gap-1.5 rounded-lg px-3.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 ${openMenu === name ? 'bg-surface-soft text-ink' : 'text-ink-muted hover:bg-surface-soft hover:text-ink'}`}
+              className={`inline-flex h-10 items-center gap-1.5 rounded-lg px-3.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 ${openMenu === name ? 'text-ink' : 'text-ink-muted hover:bg-surface-soft hover:text-ink'}`}
             >
               {name}<ChevronDown size={14} className={`text-ink-subtle transition-transform duration-200 ${openMenu === name ? 'rotate-180' : ''}`} />
             </button>
@@ -413,7 +413,7 @@ export default function Navbar() {
           <button type="button" onClick={openSearchPalette} aria-label="Search Ultrakin" className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">
             <Search size={17} strokeWidth={1.8} />
           </button>
-          <button type="button" onClick={openDemoDrawer} className="rounded-lg px-3.5 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">Talk with us</button>
+          <button type="button" onClick={openDemoDrawer} className="rounded-lg border border-transparent px-3.5 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:border-border hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">Talk with us</button>
           <a href={APP_URL} target="_blank" rel="noreferrer" className="group inline-flex h-10 items-center gap-2 rounded-lg border border-brand/20 bg-brand px-4 text-[13px] font-semibold text-white shadow-[0_4px_14px_rgba(49,86,207,.18)] transition-[background-color,box-shadow,transform] hover:-translate-y-px hover:bg-brand-hover hover:shadow-[0_7px_18px_rgba(49,86,207,.24)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-page">
             Open Ultrakin<ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
           </a>
@@ -427,7 +427,7 @@ export default function Navbar() {
         </div>
       </motion.div>
       ) : (
-        <motion.div key="compact-navigation" {...compactTransition} className="relative mx-auto flex h-[58px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
+        <motion.div key="compact-navigation" {...compactTransition} className="relative mx-auto flex h-14 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-10">
           <a
             href="/"
             aria-label="Ultrakin home"
@@ -491,7 +491,7 @@ export default function Navbar() {
             key={openMenu}
             {...menuMotion}
             onMouseEnter={() => enterMenu(openMenu)}
-            className="absolute left-1/2 top-[calc(100%+8px)] hidden w-[min(1100px,calc(100vw-48px))] -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_28px_90px_rgba(29,35,40,.1),0_2px_6px_rgba(29,35,40,.035)] backdrop-blur-2xl lg:block"
+            className="absolute left-1/2 top-[calc(100%+8px)] hidden w-[min(1100px,calc(100vw-48px))] -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_32px_96px_rgba(29,35,40,.11),0_2px_6px_rgba(29,35,40,.04)] backdrop-blur-2xl lg:block"
           >
             <div
               className="grid gap-3 p-4"
@@ -514,7 +514,7 @@ export default function Navbar() {
                   <p className="mt-5 text-[10px] font-semibold uppercase tracking-[.16em] text-brand-text">
                     {asideContent[openMenu]?.tag ?? 'One connected workspace'}
                   </p>
-                  <h3 className="mt-2 max-w-[200px] text-lg font-semibold leading-[1.2] tracking-[-.035em] text-ink">
+                  <h3 className="mt-2 max-w-[220px] text-lg font-semibold leading-[1.2] tracking-[-.035em] text-ink">
                     {asideContent[openMenu]?.title ?? 'Keep the work moving forward.'}
                   </h3>
                   <p className="mt-2 text-xs leading-relaxed text-ink-muted">
@@ -584,7 +584,7 @@ export default function Navbar() {
           <motion.div
             {...menuMotion}
             id="full-mobile-navigation"
-            className="absolute inset-x-0 top-full max-h-[calc(100dvh-68px)] overflow-y-auto border-b border-border bg-surface-raised/[.98] px-5 pb-6 pt-3 shadow-[0_24px_60px_rgba(29,35,40,.085)] backdrop-blur-2xl lg:hidden"
+            className="absolute inset-x-0 top-full max-h-[calc(100dvh-64px)] overflow-y-auto border-b border-border bg-surface-raised/[.98] px-5 pb-6 pt-3 shadow-[0_24px_60px_rgba(29,35,40,.085)] backdrop-blur-2xl lg:hidden"
           >
             {Object.entries(menuContent).map(([name, groups]) => (
               <section key={name} className="border-b border-border">
