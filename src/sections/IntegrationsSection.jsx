@@ -141,7 +141,7 @@ const CENTER = [310, 210];
 /* The cross-section cable follows the workspace flow through Spaces [112, 78] into Tasks [548, 210]. */
 
 // One continuous work cable: enter from the left, pass through Spaces, then bend once into Tasks.
-const PATH_HERO_CROSS_SECTION = 'M -30 52 C 20 55, 70 70, 112 78 C 180 91, 390 210, 548 210';
+const PATH_HERO_CROSS_SECTION = 'M -30 52 C 20 55, 70 70, 112 78 C 154 86, 440 160, 548 210';
 
 // 3. Converging Feeder Branches for Built-In Nodes
 const FEEDER_PATHS = {
