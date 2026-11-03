@@ -16,7 +16,24 @@ import CommandPaletteModal from './components/CommandPaletteModal';
 import KeyboardShortcutsModal from './components/KeyboardShortcutsModal';
 import { WorkspaceProvider } from './context/WorkspaceContext';
 
-const STORY_THREAD_FALLBACK = 'M1.25 0 C1.25 330 2 670 1.7 1000';
+// Keep the same broad, organic page-wide sweep used by the original experience
+// while the measured workspace anchors are being resolved.
+const STORY_THREAD_FALLBACK = 'M96 0 C96 50 97 72 84 90 C68 111 15 112 8 143 C1 176 40 184 59 200 C80 217 97 233 93 263 C87 299 31 300 8 326 C4 350 8 380 18 405 C30 430 62 448 91 460 C82 497 29 504 8 537 C-11 568 11 598 42 609 C75 622 96 646 90 679 C82 720 34 725 11 754 C-11 782 10 819 48 831 C83 842 99 872 82 902 C69 927 55 945 52 1000';
+
+// These anchors preserve the original page-thread's wide, unhurried curves.
+// The path is reconnected to the measured Integrations spine between them.
+const STORY_THREAD_APPROACH = [
+  [96, 0], [96, 50], [97, 72], [84, 90], [68, 111], [15, 112], [8, 143],
+  [1, 176], [40, 184], [59, 200], [80, 217], [97, 233], [93, 263],
+  [87, 299], [31, 300], [8, 326],
+];
+
+const STORY_THREAD_DEPARTURE = [
+  [91, 460], [82, 497], [29, 504], [8, 537], [-11, 568], [11, 598],
+  [42, 609], [75, 622], [96, 646], [90, 679], [82, 720], [34, 725],
+  [11, 754], [-11, 782], [10, 819], [48, 831], [83, 842], [99, 872],
+  [82, 902], [69, 927], [55, 945], [52, 1000],
+];
 
 function splineThrough(points) {
   if (points.length < 2) return STORY_THREAD_FALLBACK;
@@ -109,7 +126,7 @@ export default function App() {
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: storyRef, offset: ['start start', 'end end'] });
   const storyProgress = reduceMotion ? 0 : scrollYProgress;
-  const threadX = useMotionValue('1.25%');
+  const threadX = useMotionValue('96%');
   const threadY = useMotionValue('0%');
 
   useEffect(() => {
@@ -141,26 +158,33 @@ export default function App() {
 
       const length = integrationSpine.getTotalLength();
       const sampleCount = 36;
-      const points = [
-        { x: 1.25, y: 0 },
-      ];
       const toStoryPoint = (point) => {
         const screenPoint = new DOMPoint(point.x, point.y).matrixTransform(spineMatrix);
         const storyPoint = screenPoint.matrixTransform(inverseStoryMatrix);
         return { x: storyPoint.x, y: storyPoint.y };
       };
       const firstAnchor = toStoryPoint(integrationSpine.getPointAtLength(0));
-      const integrationTop = page.querySelector('#integrations')?.getBoundingClientRect().top;
       const pageRect = page.getBoundingClientRect();
-      const integrationTopInStory = integrationTop == null
-        ? firstAnchor.y
-        : (integrationTop - pageRect.top) * 1000 / pageRect.height;
-
-      points.push(
-        { x: 1.25, y: Math.max(0, integrationTopInStory - 110) },
-        { x: Math.max(1.25, firstAnchor.x - 10), y: Math.max(0, firstAnchor.y - 42) },
-        firstAnchor,
-      );
+      const firstSpinePoint = toStoryPoint(integrationSpine.getPointAtLength(length / sampleCount));
+      const entryTangent = {
+        x: firstSpinePoint.x - firstAnchor.x,
+        y: firstSpinePoint.y - firstAnchor.y,
+      };
+      const approachEndY = Math.max(24, firstAnchor.y - Math.max(58, firstAnchor.y * 0.13));
+      const approachScale = approachEndY / STORY_THREAD_APPROACH[STORY_THREAD_APPROACH.length - 1][1];
+      const points = STORY_THREAD_APPROACH.map(([x, y]) => ({
+        x: Math.min(96, Math.max(4, x)),
+        y: y * approachScale,
+      }));
+      const approachLead = {
+        x: Math.min(96, Math.max(4, firstAnchor.x - entryTangent.x * 8)),
+        y: Math.max(0, firstAnchor.y - entryTangent.y * 8),
+      };
+      const approachCarry = {
+        x: firstAnchor.x - entryTangent.x,
+        y: firstAnchor.y - entryTangent.y,
+      };
+      points.push(approachLead, approachCarry, firstAnchor);
 
       for (let index = 1; index <= sampleCount; index += 1) {
         const point = integrationSpine.getPointAtLength(length * index / sampleCount);
@@ -176,15 +200,29 @@ export default function App() {
       const previousSpinePoint = points[points.length - 2];
       const tangentX = lastAnchor.x - previousSpinePoint.x;
       const tangentY = lastAnchor.y - previousSpinePoint.y;
-      const exitAlongTangent = {
+      const exitCarry = {
         x: lastAnchor.x + tangentX,
         y: lastAnchor.y + tangentY,
       };
-      points.push(
-        exitAlongTangent,
-        { x: 98.5, y: Math.max(lastAnchor.y + 90, sectionBottom - 24) },
-        { x: 98.5, y: 1000 },
-      );
+      const exitLead = {
+        x: lastAnchor.x + tangentX * 3,
+        y: lastAnchor.y + tangentY * 3,
+      };
+      const exitTransition = {
+        x: lastAnchor.x + tangentX * 6,
+        y: lastAnchor.y + tangentY * 6,
+      };
+      const tailStartY = Math.min(965, Math.max(
+        exitTransition.y + 36,
+        exitTransition.y + (1000 - exitTransition.y) * 0.1,
+        sectionBottom + 28,
+      ));
+      const tailSpan = Math.max(1, 1000 - tailStartY);
+      const departure = STORY_THREAD_DEPARTURE.map(([x, y]) => ({
+        x: Math.min(96, Math.max(4, x)),
+        y: tailStartY + ((y - 460) / (1000 - 460)) * tailSpan,
+      }));
+      points.push(exitCarry, exitLead, exitTransition, ...departure);
 
       setStoryThreadPath(splineThrough(points));
     };
