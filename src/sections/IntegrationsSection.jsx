@@ -138,16 +138,10 @@ const INTEGRATIONS = [
 const CENTER = [310, 210];
 
 /* ─── CONVERGING VECTOR TOPOLOGY SYSTEM ─── */
-/* Mathematically engineered cubic Béziers matching the reference illustration.
-   Hero Cross-Sectional Arc enters from top-left, passes smoothly through Spaces [112, 78],
-   sweeps gracefully across above the hub [310, 168], passes right through Tasks [548, 210],
-   and exits toward the right information panel at [660, 238]. */
+/* The cross-section cable follows the workspace flow through Spaces [112, 78] into Tasks [548, 210]. */
 
-// 1. Signature Hero Cross-Sectional Arc (Spaces → Hub Crest → Tasks → Right Panel)
-const PATH_HERO_CROSS_SECTION = 'M -30 40 C 40 55, 80 68, 112 78 C 165 94, 230 148, 310 168 C 390 188, 475 204, 548 210 C 585 214, 620 224, 660 238';
-
-// 2. Harmonic Parallel Guide Spline (converges alongside Hero Arc)
-const PATH_HERO_GUIDE = 'M -20 46 C 45 60, 84 72, 112 78 C 168 98, 235 152, 310 174 C 385 192, 470 208, 548 210 C 585 218, 620 228, 660 242';
+// One continuous work cable: enter from the left, pass through Spaces, then bend once into Tasks.
+const PATH_HERO_CROSS_SECTION = 'M -30 52 C 20 55, 70 70, 112 78 C 180 91, 390 210, 548 210';
 
 // 3. Converging Feeder Branches for Built-In Nodes
 const FEEDER_PATHS = {
@@ -580,8 +574,6 @@ export default function IntegrationsSection() {
 
                   {/* ── LAYER 3: Harmonic Converging Guide Splines ── */}
                   <g opacity={0.62}>
-                    {/* Parallel companion along Hero Arc */}
-                    <TopologySpline d={PATH_HERO_GUIDE} isActive={false} isGuide={true} />
                     {/* Converging feeder branches from perimeter nodes toward central hub crest/root */}
                     {visible.map((item) => {
                       const feederD = FEEDER_PATHS[item.name];
