@@ -157,7 +157,10 @@ export default function App() {
       }
 
       const length = integrationSpine.getTotalLength();
-      const sampleCount = 36;
+      // Track the illustration's native spline closely enough that the page
+      // thread reads as the same cable at both room boundaries.
+      const sampleCount = 144;
+      const tangentScale = sampleCount / 36;
       const toStoryPoint = (point) => {
         const screenPoint = new DOMPoint(point.x, point.y).matrixTransform(spineMatrix);
         const storyPoint = screenPoint.matrixTransform(inverseStoryMatrix);
@@ -177,8 +180,8 @@ export default function App() {
         y: y * approachScale,
       }));
       const approachLead = {
-        x: Math.min(96, Math.max(4, firstAnchor.x - entryTangent.x * 8)),
-        y: Math.max(0, firstAnchor.y - entryTangent.y * 8),
+        x: Math.min(96, Math.max(4, firstAnchor.x - entryTangent.x * 8 * tangentScale)),
+        y: Math.max(0, firstAnchor.y - entryTangent.y * 8 * tangentScale),
       };
       const approachCarry = {
         x: firstAnchor.x - entryTangent.x,
@@ -205,12 +208,12 @@ export default function App() {
         y: lastAnchor.y + tangentY,
       };
       const exitLead = {
-        x: lastAnchor.x + tangentX * 3,
-        y: lastAnchor.y + tangentY * 3,
+        x: lastAnchor.x + tangentX * 3 * tangentScale,
+        y: lastAnchor.y + tangentY * 3 * tangentScale,
       };
       const exitTransition = {
-        x: lastAnchor.x + tangentX * 6,
-        y: lastAnchor.y + tangentY * 6,
+        x: lastAnchor.x + tangentX * 6 * tangentScale,
+        y: lastAnchor.y + tangentY * 6 * tangentScale,
       };
       const tailStartY = Math.min(965, Math.max(
         exitTransition.y + 36,
