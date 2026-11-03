@@ -140,8 +140,8 @@ const CENTER = [310, 210];
 /* ─── CONVERGING VECTOR TOPOLOGY SYSTEM ─── */
 /* The cross-section cable follows the workspace flow through Spaces [112, 78] into Tasks [548, 210]. */
 
-// One continuous work cable: enter from the left, pass through Spaces, then bend once into Tasks.
-const PATH_HERO_CROSS_SECTION = 'M -30 52 C 20 55, 70 70, 112 78 C 154 86, 440 160, 548 210';
+// One continuous spline through the Spaces and Tasks anchors, then out of the illustration.
+const PATH_HERO_CROSS_SECTION = 'M -30 40 C -6.33 46.33, 55.33 56.67, 112 78 C 168.67 99.33, 237.33 146, 310 168 C 382.67 190, 489.67 198.33, 548 210 C 606.33 221.67, 641.33 233.33, 660 238';
 
 // 3. Converging Feeder Branches for Built-In Nodes
 const FEEDER_PATHS = {

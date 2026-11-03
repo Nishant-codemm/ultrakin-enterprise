@@ -173,8 +173,15 @@ export default function App() {
       const sectionBottom = sectionRect
         ? (sectionRect.bottom - pageRect.top) * 1000 / pageRect.height
         : lastAnchor.y + 180;
+      const previousSpinePoint = points[points.length - 2];
+      const tangentX = lastAnchor.x - previousSpinePoint.x;
+      const tangentY = lastAnchor.y - previousSpinePoint.y;
+      const exitAlongTangent = {
+        x: lastAnchor.x + tangentX,
+        y: lastAnchor.y + tangentY,
+      };
       points.push(
-        { x: Math.min(98.5, lastAnchor.x + 7), y: Math.min(sectionBottom - 36, lastAnchor.y + 52) },
+        exitAlongTangent,
         { x: 98.5, y: Math.max(lastAnchor.y + 90, sectionBottom - 24) },
         { x: 98.5, y: 1000 },
       );
