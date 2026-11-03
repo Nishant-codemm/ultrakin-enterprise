@@ -16,7 +16,22 @@ import CommandPaletteModal from './components/CommandPaletteModal';
 import KeyboardShortcutsModal from './components/KeyboardShortcutsModal';
 import { WorkspaceProvider } from './context/WorkspaceContext';
 
-const STORY_THREAD_PATH = 'M1.25 0 C1.25 330 2 670 1.7 1000';
+const STORY_THREAD_FALLBACK = 'M1.25 0 C1.25 330 2 670 1.7 1000';
+
+function splineThrough(points) {
+  if (points.length < 2) return STORY_THREAD_FALLBACK;
+  return points.reduce((path, point, index) => {
+    if (index === 0) return `M${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+    const previous = points[index - 1];
+    const beforePrevious = points[Math.max(0, index - 2)];
+    const next = points[Math.min(points.length - 1, index + 1)];
+    const c1x = previous.x + (point.x - beforePrevious.x) / 6;
+    const c1y = previous.y + (point.y - beforePrevious.y) / 6;
+    const c2x = point.x - (next.x - previous.x) / 6;
+    const c2y = point.y - (next.y - previous.y) / 6;
+    return `${path} C${c1x.toFixed(2)} ${c1y.toFixed(2)}, ${c2x.toFixed(2)} ${c2y.toFixed(2)}, ${point.x.toFixed(2)} ${point.y.toFixed(2)}`;
+  }, '');
+}
 
 const PAGE_METADATA = {
   '/': {
@@ -88,7 +103,9 @@ const ROUTE_PAGES = {
 export default function App() {
   const [pathname, setPathname] = useState(() => window.location.pathname.replace(/\/$/, '') || '/');
   const storyRef = useRef(null);
+  const storySvgRef = useRef(null);
   const routePathRef = useRef(null);
+  const [storyThreadPath, setStoryThreadPath] = useState(STORY_THREAD_FALLBACK);
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: storyRef, offset: ['start start', 'end end'] });
   const storyProgress = reduceMotion ? 0 : scrollYProgress;
@@ -104,6 +121,82 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dataset.theme = 'marketing';
   }, []);
+
+  useEffect(() => {
+    const page = storyRef.current;
+    const storySvg = storySvgRef.current;
+    if (!page || !storySvg) return undefined;
+
+    const updateStoryRoute = () => {
+      const integrationSpine = page.querySelector('[data-workline-anchor="integration-spine"]');
+      const integrationSvg = integrationSpine?.ownerSVGElement;
+      const inverseStoryMatrix = storySvg.getScreenCTM()?.inverse();
+      const spineMatrix = integrationSpine?.getScreenCTM();
+      const graphRect = integrationSvg?.getBoundingClientRect();
+
+      if (!integrationSpine || !inverseStoryMatrix || !spineMatrix || !graphRect?.width || graphRect.width < 240) {
+        setStoryThreadPath(STORY_THREAD_FALLBACK);
+        return;
+      }
+
+      const length = integrationSpine.getTotalLength();
+      const sampleCount = 36;
+      const points = [
+        { x: 1.25, y: 0 },
+      ];
+      const toStoryPoint = (point) => {
+        const screenPoint = new DOMPoint(point.x, point.y).matrixTransform(spineMatrix);
+        const storyPoint = screenPoint.matrixTransform(inverseStoryMatrix);
+        return { x: storyPoint.x, y: storyPoint.y };
+      };
+      const firstAnchor = toStoryPoint(integrationSpine.getPointAtLength(0));
+      const integrationTop = page.querySelector('#integrations')?.getBoundingClientRect().top;
+      const pageRect = page.getBoundingClientRect();
+      const integrationTopInStory = integrationTop == null
+        ? firstAnchor.y
+        : (integrationTop - pageRect.top) * 1000 / pageRect.height;
+
+      points.push(
+        { x: 1.25, y: Math.max(0, integrationTopInStory - 110) },
+        { x: Math.max(1.25, firstAnchor.x - 10), y: Math.max(0, firstAnchor.y - 42) },
+        firstAnchor,
+      );
+
+      for (let index = 1; index <= sampleCount; index += 1) {
+        const point = integrationSpine.getPointAtLength(length * index / sampleCount);
+        points.push(toStoryPoint(point));
+      }
+
+      const lastAnchor = points[points.length - 1];
+      const integrationSection = page.querySelector('#integrations');
+      const sectionRect = integrationSection?.getBoundingClientRect();
+      const sectionBottom = sectionRect
+        ? (sectionRect.bottom - pageRect.top) * 1000 / pageRect.height
+        : lastAnchor.y + 180;
+      points.push(
+        { x: Math.min(98.5, lastAnchor.x + 7), y: Math.min(sectionBottom - 36, lastAnchor.y + 52) },
+        { x: 98.5, y: Math.max(lastAnchor.y + 90, sectionBottom - 24) },
+        { x: 98.5, y: 1000 },
+      );
+
+      setStoryThreadPath(splineThrough(points));
+    };
+
+    updateStoryRoute();
+    const observer = typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(updateStoryRoute)
+      : null;
+    observer?.observe(page);
+    const integrations = page.querySelector('#integrations');
+    const graph = integrations?.querySelector('[data-workline-anchor="integration-spine"]')?.ownerSVGElement;
+    if (integrations) observer?.observe(integrations);
+    if (graph) observer?.observe(graph);
+    window.addEventListener('resize', updateStoryRoute, { passive: true });
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', updateStoryRoute);
+    };
+  }, [pathname]);
 
   // Support both exact routes and /products/* and /solutions/* dynamic routes
   const RoutePage = ROUTE_PAGES[pathname] || 
@@ -170,14 +263,14 @@ export default function App() {
           {/* ── Continuous Luminous Story Thread & Traveling Photon Node (Floats gracefully behind cards at z-0) ── */}
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
             {/* Desktop Continuous Story Thread — Delicate Luminous Ray */}
-            <svg viewBox="0 0 100 1000" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+            <svg ref={storySvgRef} viewBox="0 0 100 1000" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
               <defs>
                 <linearGradient id="ultrakin-story-thread" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#818cf8" stopOpacity="0.08" />
-                  <stop offset="25%" stopColor="#6366f1" stopOpacity="0.16" />
-                  <stop offset="50%" stopColor="#818cf8" stopOpacity="0.12" />
-                  <stop offset="75%" stopColor="#6366f1" stopOpacity="0.16" />
-                  <stop offset="100%" stopColor="#818cf8" stopOpacity="0.08" />
+                  <stop offset="0%" stopColor="#818cf8" stopOpacity="0.16" />
+                  <stop offset="25%" stopColor="#6366f1" stopOpacity="0.3" />
+                  <stop offset="50%" stopColor="#818cf8" stopOpacity="0.26" />
+                  <stop offset="75%" stopColor="#6366f1" stopOpacity="0.34" />
+                  <stop offset="100%" stopColor="#818cf8" stopOpacity="0.18" />
                 </linearGradient>
                 <linearGradient id="ultrakin-thread-active" x1="0" y1="0" x2="1" y2="1">
                   <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.35" />
@@ -197,19 +290,19 @@ export default function App() {
               {/* Base guide track — delicate, ultra-thin optical filament (0.65px) */}
               <path
                 ref={routePathRef}
-                d={STORY_THREAD_PATH}
+                d={storyThreadPath}
                 fill="none"
                 stroke="url(#ultrakin-story-thread)"
-                strokeWidth="0.7"
+                strokeWidth="1.15"
                 vectorEffect="non-scaling-stroke"
               />
 
               {/* Active scroll progression light ray — ultra-thin (0.75px) */}
               <motion.path
-                d={STORY_THREAD_PATH}
+                d={storyThreadPath}
                 fill="none"
                 stroke="url(#ultrakin-thread-active)"
-                strokeWidth="0.7"
+                strokeWidth="1.25"
                 strokeLinecap="round"
                 vectorEffect="non-scaling-stroke"
                 filter="url(#thread-glow)"

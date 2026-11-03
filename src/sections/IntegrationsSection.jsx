@@ -534,8 +534,8 @@ export default function IntegrationsSection() {
                   <defs>
                     {/* Subtle base spline gradient */}
                     <linearGradient id="topo-spline-base" x1="0" y1="0" x2="1" y2="1">
-                      <stop stopColor="#818cf8" stopOpacity=".22" />
-                      <stop offset="1" stopColor="#a5b4fc" stopOpacity=".12" />
+                      <stop stopColor="#818cf8" stopOpacity=".38" />
+                      <stop offset="1" stopColor="#a5b4fc" stopOpacity=".24" />
                     </linearGradient>
 
                     {/* Active highlighted topology gradient */}
@@ -579,7 +579,7 @@ export default function IntegrationsSection() {
                   </g>
 
                   {/* ── LAYER 3: Harmonic Converging Guide Splines ── */}
-                  <g opacity={0.45}>
+                  <g opacity={0.62}>
                     {/* Parallel companion along Hero Arc */}
                     <TopologySpline d={PATH_HERO_GUIDE} isActive={false} isGuide={true} />
                     {/* Converging feeder branches from perimeter nodes toward central hub crest/root */}
@@ -600,9 +600,10 @@ export default function IntegrationsSection() {
                   {/* ── LAYER 4: The Hero Cross-Sectional Vector Arc (Spaces → Hub Crest → Tasks → Right) ── */}
                   <path
                     d={PATH_HERO_CROSS_SECTION}
+                    data-workline-anchor="integration-spine"
                     fill="none"
                     stroke={isMasterSpineActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
-                    strokeWidth={isMasterSpineActive ? 0.95 : 0.7}
+                    strokeWidth={isMasterSpineActive ? 1.55 : 1.15}
                     className="transition-all duration-300"
                   />
 
