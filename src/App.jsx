@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { MotionConfig, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { MotionConfig, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion';
 import Navbar from './components/Navbar';
 import HeroSection from './sections/HeroSection';
 import TrustStrip from './sections/TrustStrip';
@@ -15,6 +15,8 @@ import EnterpriseDemoDrawer from './components/showcase/EnterpriseDemoDrawer';
 import CommandPaletteModal from './components/CommandPaletteModal';
 import KeyboardShortcutsModal from './components/KeyboardShortcutsModal';
 import { WorkspaceProvider } from './context/WorkspaceContext';
+
+const STORY_THREAD_PATH = 'M1.25 0 C1.25 330 2 670 1.7 1000';
 
 const PAGE_METADATA = {
   '/': {
@@ -90,9 +92,8 @@ export default function App() {
   const reduceMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: storyRef, offset: ['start start', 'end end'] });
   const storyProgress = reduceMotion ? 0 : scrollYProgress;
-  const threadX = useMotionValue('96%');
+  const threadX = useMotionValue('1.25%');
   const threadY = useMotionValue('0%');
-  const mobileThreadY = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
 
   useEffect(() => {
     const syncPathname = () => setPathname(window.location.pathname.replace(/\/$/, '') || '/');
@@ -169,7 +170,7 @@ export default function App() {
           {/* ── Continuous Luminous Story Thread & Traveling Photon Node (Floats gracefully behind cards at z-0) ── */}
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
             {/* Desktop Continuous Story Thread — Delicate Luminous Ray */}
-            <svg viewBox="0 0 100 1000" preserveAspectRatio="none" className="absolute inset-0 hidden h-full w-full md:block">
+            <svg viewBox="0 0 100 1000" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
               <defs>
                 <linearGradient id="ultrakin-story-thread" x1="0" y1="0" x2="1" y2="1">
                   <stop offset="0%" stopColor="#818cf8" stopOpacity="0.08" />
@@ -196,19 +197,19 @@ export default function App() {
               {/* Base guide track — delicate, ultra-thin optical filament (0.65px) */}
               <path
                 ref={routePathRef}
-                d="M96 0 C96 50 97 72 84 90 C68 111 15 112 8 143 C1 176 40 184 59 200 C80 217 97 233 93 263 C87 299 31 300 8 326 C4 350 8 380 18 405 C30 430 62 448 91 460 C82 497 29 504 8 537 C-11 568 11 598 42 609 C75 622 96 646 90 679 C82 720 34 725 11 754 C-11 782 10 819 48 831 C83 842 99 872 82 902 C69 927 55 945 52 1000"
+                d={STORY_THREAD_PATH}
                 fill="none"
                 stroke="url(#ultrakin-story-thread)"
-                strokeWidth="0.65"
+                strokeWidth="0.7"
                 vectorEffect="non-scaling-stroke"
               />
 
               {/* Active scroll progression light ray — ultra-thin (0.75px) */}
               <motion.path
-                d="M96 0 C96 50 97 72 84 90 C68 111 15 112 8 143 C1 176 40 184 59 200 C80 217 97 233 93 263 C87 299 31 300 8 326 C4 350 8 380 18 405 C30 430 62 448 91 460 C82 497 29 504 8 537 C-11 568 11 598 42 609 C75 622 96 646 90 679 C82 720 34 725 11 754 C-11 782 10 819 48 831 C83 842 99 872 82 902 C69 927 55 945 52 1000"
+                d={STORY_THREAD_PATH}
                 fill="none"
                 stroke="url(#ultrakin-thread-active)"
-                strokeWidth="0.75"
+                strokeWidth="0.7"
                 strokeLinecap="round"
                 vectorEffect="non-scaling-stroke"
                 filter="url(#thread-glow)"
@@ -221,7 +222,7 @@ export default function App() {
               <motion.div
                 aria-hidden="true"
                 style={{ left: threadX, top: threadY }}
-                className="absolute z-20 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center md:flex pointer-events-none"
+                className="absolute z-20 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center pointer-events-none"
               >
                 {/* Subtle soft luminous aura */}
                 <span className="absolute h-4 w-4 rounded-full bg-indigo-400/15 blur-[1.5px]" />
@@ -230,36 +231,6 @@ export default function App() {
               </motion.div>
             )}
 
-            {/* ── Mobile Story Thread ── */}
-            <svg viewBox="0 0 100 1000" preserveAspectRatio="none" className="absolute inset-0 h-full w-full opacity-60 md:hidden">
-              <path
-                d="M3 0 C3 90 3 130 3 180 S3 290 3 350 S3 460 3 520 S3 630 3 700 S3 820 3 900 S3 960 3 1000"
-                fill="none"
-                stroke="#6366f1"
-                strokeWidth="0.9"
-                strokeOpacity="0.2"
-                vectorEffect="non-scaling-stroke"
-              />
-              <motion.path
-                d="M3 0 C3 90 3 130 3 180 S3 290 3 350 S3 460 3 520 S3 630 3 700 S3 820 3 900 S3 960 3 1000"
-                fill="none"
-                stroke="url(#ultrakin-thread-active)"
-                strokeWidth="1.25"
-                vectorEffect="non-scaling-stroke"
-                pathLength={storyProgress}
-              />
-            </svg>
-
-            {!reduceMotion && (
-              <motion.div
-                aria-hidden="true"
-                style={{ left: '3%', top: mobileThreadY }}
-                className="absolute z-20 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center md:hidden pointer-events-none"
-              >
-                <span className="absolute h-5 w-5 rounded-full bg-indigo-400/20 blur-[1px]" />
-                <span className="relative h-2 w-2 rounded-full bg-white ring-1 ring-white/90 shadow-[0_0_6px_rgba(255,255,255,0.95),0_0_12px_rgba(99,102,241,0.5)]" />
-              </motion.div>
-            )}
           </div>
         </main>}
         <div className="relative z-10 bg-transparent"><Footer isHome={pathname === '/'} /></div>
