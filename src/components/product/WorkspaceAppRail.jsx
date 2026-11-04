@@ -11,7 +11,6 @@ import {
   FileText,
   CheckSquare,
   Workflow,
-  Sparkles,
 } from 'lucide-react';
 import AvatarChip from './AvatarChip';
 import { cn } from '../../lib/cn';

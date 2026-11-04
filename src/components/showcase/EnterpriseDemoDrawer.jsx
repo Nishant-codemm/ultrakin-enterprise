@@ -7,19 +7,16 @@ import {
   Calendar,
   Check,
   CheckCircle2,
-  Clock,
   Copy,
   FileText,
   Lock,
   Mail,
   ShieldCheck,
-  Sparkles,
   Users,
   X,
 } from 'lucide-react';
 import { useWorkspace } from '../../context/useWorkspace';
 import { cn } from '../../lib/cn';
-import Button from '../primitives/Button';
 
 const BRIEFING_SLOTS = [
   { id: 'slot-1', date: 'Tomorrow', time: '11:00 AM EST', label: 'Recommended' },
@@ -52,11 +49,7 @@ export default function EnterpriseDemoDrawer() {
 
   // Keyboard accessibility: Escape key & focus trap
   useEffect(() => {
-    if (!isDemoDrawerOpen) {
-      setIsSubmitted(false);
-      setIsSubmitting(false);
-      return undefined;
-    }
+    if (!isDemoDrawerOpen) return undefined;
 
     const previouslyFocused = document.activeElement;
     closeButtonRef.current?.focus();
@@ -91,6 +84,8 @@ export default function EnterpriseDemoDrawer() {
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      setIsSubmitted(false);
+      setIsSubmitting(false);
       if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) {
         previouslyFocused.focus();
       }
@@ -117,12 +112,12 @@ export default function EnterpriseDemoDrawer() {
 
   const mailtoUrl = `mailto:sales@ultrakin.com?subject=Ultrakin%20Enterprise%20Briefing%20Request%20-%20${encodeURIComponent(formData.name || 'Enterprise Buyer')}&body=Hi%20Ultrakin%20Team%2C%0A%0AI%27d%20like%20to%20schedule%20an%20Executive%20Briefing%20and%20Product%20Architecture%20Session.%0A%0A%E2%80%A2%20Preferred%20Time%3A%20${encodeURIComponent(`${selectedSlotData.date} at ${selectedSlotData.time}`)}%0A%E2%80%A2%20Evaluation%20Focus%3A%20${encodeURIComponent(selectedTopicData.label)}%0A%E2%80%A2%20Team%20Size%3A%20${encodeURIComponent(teamSize)}%0A%E2%80%A2%20Work%20Email%3A%20${encodeURIComponent(formData.email || 'Provided')}%0A%E2%80%A2%20Notes%3A%20${encodeURIComponent(formData.note || 'None')}%0A%0ALooking%20forward%20to%20reviewing%20the%20security%20documentation%20and%20architecture.%0A`;
 
-  if (!isDemoDrawerOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-[100] flex justify-end" role="presentation">
-      {/* Backdrop with smooth blur */}
-      <motion.button
+    <AnimatePresence>
+      {isDemoDrawerOpen && (
+        <div className="fixed inset-0 z-[100] flex justify-end" role="presentation">
+          {/* Backdrop with smooth blur */}
+          <motion.button
         type="button"
         aria-label="Close evaluation panel"
         onClick={closeDemoDrawer}
@@ -551,5 +546,7 @@ export default function EnterpriseDemoDrawer() {
         </footer>
       </motion.section>
     </div>
+      )}
+    </AnimatePresence>
   );
 }

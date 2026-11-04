@@ -21,7 +21,7 @@ export default function ProductFeatureGrid({ features = [], productColor }) {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {features.map((f, i) => (
             <motion.div
-              key={i}
+              key={f.problem || i}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}

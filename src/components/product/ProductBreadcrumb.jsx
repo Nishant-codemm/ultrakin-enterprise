@@ -14,15 +14,21 @@ function navigate(path) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-export default function ProductBreadcrumb({ productName, productColor, icon: Icon }) {
+export default function ProductBreadcrumb({
+  productName,
+  productColor,
+  icon: Icon,
+  parentLabel = 'Products',
+  parentPath = '/products/chat',
+}) {
   return (
     <nav className="mb-8 flex items-center gap-2 text-[13px] text-[#667085]" aria-label="Breadcrumb">
       <button
         type="button"
-        onClick={() => navigate('/products/chat')}
+        onClick={() => navigate(parentPath)}
         className="hover:text-[#111827] transition-colors duration-150 focus-visible:outline-none focus-visible:underline cursor-pointer"
       >
-        Products
+        {parentLabel}
       </button>
       <ChevronRight size={12} className="text-[#d0cdc7]" aria-hidden="true" />
       <span

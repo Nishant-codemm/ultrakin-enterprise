@@ -17,6 +17,24 @@ import {
 import { useWorkspace } from '../../context/useWorkspace';
 import { cn } from '../../lib/cn';
 
+const SPEECH_SCENARIOS = [
+  {
+    speaker: 'Sara Chen',
+    role: 'Infra Lead',
+    text: 'The token refresh update is in PR #1042. Let’s add the rollout checks to the launch checklist.',
+  },
+  {
+    speaker: 'Marcus Lindqvist',
+    role: 'VP Eng',
+    text: 'Confirmed on-call rotation updated. Moving Task #4082 to Done in Sprint 24 Kanban board.',
+  },
+  {
+    speaker: 'Alex Mercer',
+    role: 'CTO',
+    text: 'Let us commit the post-mortem summary into the Cluster Migration RFC living doc for executive sign-off.',
+  },
+];
+
 export default function HuddleSimulator() {
   const {
     huddleMuted,
@@ -36,24 +54,6 @@ export default function HuddleSimulator() {
   const [waveHeights, setWaveHeights] = useState([12, 24, 18, 30, 20, 16, 26]);
   const [speechPromptIdx, setSpeechPromptIdx] = useState(0);
 
-  const speechScenarios = [
-    {
-      speaker: 'Sara Chen',
-      role: 'Infra Lead',
-      text: 'The token refresh update is in PR #1042. Let’s add the rollout checks to the launch checklist.',
-    },
-    {
-      speaker: 'Marcus Lindqvist',
-      role: 'VP Eng',
-      text: 'Confirmed on-call rotation updated. Moving Task #4082 to Done in Sprint 24 Kanban board.',
-    },
-    {
-      speaker: 'Alex Mercer',
-      role: 'CTO',
-      text: 'Let us commit the post-mortem summary into the Cluster Migration RFC living doc for executive sign-off.',
-    },
-  ];
-
   // Dynamic audio waveform simulation
   useEffect(() => {
     const interval = setInterval(() => {
@@ -65,7 +65,7 @@ export default function HuddleSimulator() {
   }, [huddleMuted]);
 
   const handleSimulateNextSpeech = () => {
-    const scenario = speechScenarios[speechPromptIdx % speechScenarios.length];
+    const scenario = SPEECH_SCENARIOS[speechPromptIdx % SPEECH_SCENARIOS.length];
     simulateHuddleUtterance(scenario.speaker, scenario.text);
     setSpeechPromptIdx((prev) => prev + 1);
   };

@@ -8,7 +8,7 @@ import { ArrowRight } from 'lucide-react';
 
 const APP_URL = 'https://app.ultrakin.com';
 
-export default function ProductCTARow({ primaryLabel = 'Create a workspace', accentColor }) {
+export default function ProductCTARow({ primaryLabel = 'Create a workspace' }) {
   return (
     <div className="mt-8 flex flex-wrap items-center gap-4">
       <a

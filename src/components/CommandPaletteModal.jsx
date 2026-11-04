@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -78,20 +78,21 @@ export default function CommandPaletteModal() {
     }
   };
 
-  // All searchable entities across the unified workspace kernel
-  const entities = [
-    // Commands
-    {
-      id: 'cmd_huddle',
-      type: 'command',
-      category: 'Commands',
-      title: 'Start WebRTC Huddle',
-      subtitle: 'Start a Huddle and capture discussion notes',
-      icon: Video,
-      action: () => setActiveModule('huddle'),
-      badge: 'Action',
-      badgeColor: 'bg-violet-50 text-violet-800 border-violet-200',
-    },
+  // All searchable entities across the unified workspace kernel (memoized to prevent reallocation on search keystrokes)
+  const entities = useMemo(
+    () => [
+      // Commands
+      {
+        id: 'cmd_huddle',
+        type: 'command',
+        category: 'Commands',
+        title: 'Start WebRTC Huddle',
+        subtitle: 'Start a Huddle and capture discussion notes',
+        icon: Video,
+        action: () => setActiveModule('huddle'),
+        badge: 'Action',
+        badgeColor: 'bg-violet-50 text-violet-800 border-violet-200',
+      },
     {
       id: 'cmd_task',
       type: 'command',
@@ -263,10 +264,12 @@ export default function CommandPaletteModal() {
       subtitle: 'Priority P0 · Extracted from Huddle #18 commitment',
       icon: CheckSquare,
       action: () => setActiveModule('tasks'),
-      badge: 'P0 Task',
-      badgeColor: 'bg-rose-50 text-rose-800 border-rose-200',
-    },
-  ];
+        badge: 'P0 Task',
+        badgeColor: 'bg-rose-50 text-rose-800 border-rose-200',
+      },
+    ],
+    [setActiveModule, setActiveChannel, openDemoDrawer, testAutomationsWorkflow, setIsKeyboardModalOpen]
+  );
 
   // Filtering matching items
   const filtered = entities.filter((item) => {
@@ -325,20 +328,19 @@ export default function CommandPaletteModal() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isSearchPaletteOpen, filtered, selectedIndex, closeSearchPalette]);
 
-  if (!isSearchPaletteOpen) return null;
-
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[110] flex items-start justify-center pt-[12vh] sm:pt-[15vh] px-4 select-none">
-        {/* Backdrop Scrim (Section 9.9: blur 8px, rgba(3, 7, 18, 0.75)) */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={closeSearchPalette}
-          aria-hidden="true"
-          className="fixed inset-0 bg-slate-900/35 backdrop-blur-md -z-10"
-        />
+      {isSearchPaletteOpen && (
+        <div className="fixed inset-0 z-[110] flex items-start justify-center pt-[12vh] sm:pt-[15vh] px-4 select-none">
+          {/* Backdrop Scrim */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={closeSearchPalette}
+            aria-hidden="true"
+            className="fixed inset-0 bg-slate-900/35 backdrop-blur-md -z-10"
+          />
 
         {/* Dialog Box */}
         <motion.div
@@ -498,6 +500,7 @@ export default function CommandPaletteModal() {
           </div>
         </motion.div>
       </div>
+      )}
     </AnimatePresence>
   );
 }

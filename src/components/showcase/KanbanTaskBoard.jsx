@@ -18,6 +18,13 @@ import {
 import { useWorkspace } from '../../context/useWorkspace';
 import { cn } from '../../lib/cn';
 
+const COLUMNS = [
+  { id: 'backlog', title: 'Backlog', accent: 'border-slate-500/40 text-slate-300', dot: 'bg-slate-400' },
+  { id: 'in_progress', title: 'In Progress', accent: 'border-indigo-500/40 text-indigo-300', dot: 'bg-indigo-400' },
+  { id: 'review', title: 'Review', accent: 'border-violet-500/40 text-violet-300', dot: 'bg-violet-400' },
+  { id: 'done', title: 'Done', accent: 'border-emerald-500/40 text-emerald-300', dot: 'bg-emerald-400' },
+];
+
 export default function KanbanTaskBoard() {
   const {
     kanbanTasks,
@@ -38,13 +45,6 @@ export default function KanbanTaskBoard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPriority, setFilterPriority] = useState('ALL');
   const [newSubtaskText, setNewSubtaskText] = useState('');
-
-  const columns = [
-    { id: 'backlog', title: 'Backlog', accent: 'border-slate-500/40 text-slate-300', dot: 'bg-slate-400' },
-    { id: 'in_progress', title: 'In Progress', accent: 'border-indigo-500/40 text-indigo-300', dot: 'bg-indigo-400' },
-    { id: 'review', title: 'Review', accent: 'border-violet-500/40 text-violet-300', dot: 'bg-violet-400' },
-    { id: 'done', title: 'Done', accent: 'border-emerald-500/40 text-emerald-300', dot: 'bg-emerald-400' },
-  ];
 
   // Drag-and-drop handlers
   const handleDragStart = (e, taskId) => {
@@ -196,7 +196,7 @@ export default function KanbanTaskBoard() {
 
       {/* Main Kanban Board Scroll Area */}
       <div className="flex-1 overflow-x-auto p-4 flex gap-4 min-h-[500px]">
-        {columns.map((col) => {
+        {COLUMNS.map((col) => {
           const colTasks = filteredTasks.filter((t) => t.col === col.id);
           const isOver = dragOverCol === col.id;
 
@@ -412,7 +412,7 @@ export default function KanbanTaskBoard() {
               <div className="flex items-center justify-between mb-2">
                 <label className="text-[10px] font-mono uppercase text-slate-400">Pipeline Stage</label>
                 <div className="flex items-center gap-1">
-                  {columns.map((c) => (
+                  {COLUMNS.map((c) => (
                     <button
                       key={c.id}
                       type="button"

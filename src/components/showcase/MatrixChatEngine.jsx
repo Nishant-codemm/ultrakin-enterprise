@@ -28,6 +28,13 @@ export default function MatrixChatEngine() {
   const [copiedCodeId, setCopiedCodeId] = useState(null);
   const [localReactions, setLocalReactions] = useState({});
   const messagesEndRef = useRef(null);
+  const copyTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
 
   const currentChannelObj = channels.find((c) => c.id === activeChannel) || channels[0];
 
@@ -41,7 +48,8 @@ export default function MatrixChatEngine() {
   const handleCopyCode = (code, id) => {
     navigator.clipboard?.writeText(code);
     setCopiedCodeId(id);
-    setTimeout(() => setCopiedCodeId(null), 2000);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopiedCodeId(null), 2000);
   };
 
   const handleReaction = (msgId, emoji) => {

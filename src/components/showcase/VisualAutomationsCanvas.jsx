@@ -19,6 +19,35 @@ import {
 import { useWorkspace } from '../../context/useWorkspace';
 import { cn } from '../../lib/cn';
 
+const NODE_HEADER_COLORS = {
+  trigger: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300',
+  condition: 'bg-amber-500/15 border-amber-500/30 text-amber-300',
+  action: 'bg-indigo-500/15 border-indigo-500/30 text-indigo-300',
+};
+
+const NODE_ICONS = {
+  Mail: { icon: Mail, color: 'text-emerald-400' },
+  Radio: { icon: Radio, color: 'text-emerald-400' },
+  Shield: { icon: Shield, color: 'text-amber-400' },
+  Sparkles: { icon: Sparkles, color: 'text-amber-400' },
+  CheckSquare: { icon: CheckSquare, color: 'text-indigo-400' },
+  MessageSquare: { icon: MessageSquare, color: 'text-indigo-400' },
+  FileText: { icon: FileText, color: 'text-indigo-400' },
+};
+
+function getNodeIcon(iconName) {
+  const item = NODE_ICONS[iconName];
+  if (item) {
+    const Icon = item.icon;
+    return <Icon className={cn('w-4 h-4', item.color)} />;
+  }
+  return <Layers className="w-4 h-4 text-slate-400" />;
+}
+
+function getNodeHeaderColor(type) {
+  return NODE_HEADER_COLORS[type] || 'bg-slate-500/15 border-slate-500/30 text-slate-300';
+}
+
 export default function VisualAutomationsCanvas() {
   const {
     automationsWorkflows,
@@ -36,40 +65,6 @@ export default function VisualAutomationsCanvas() {
 
   const activeWorkflow =
     automationsWorkflows.find((w) => w.id === activeWorkflowId) || automationsWorkflows[0];
-
-  const getNodeIcon = (iconName) => {
-    switch (iconName) {
-      case 'Mail':
-        return <Mail className="w-4 h-4 text-emerald-400" />;
-      case 'Shield':
-        return <Shield className="w-4 h-4 text-amber-400" />;
-      case 'CheckSquare':
-        return <CheckSquare className="w-4 h-4 text-indigo-400" />;
-      case 'MessageSquare':
-        return <MessageSquare className="w-4 h-4 text-indigo-400" />;
-      case 'Radio':
-        return <Radio className="w-4 h-4 text-emerald-400" />;
-      case 'Sparkles':
-        return <Sparkles className="w-4 h-4 text-amber-400" />;
-      case 'FileText':
-        return <FileText className="w-4 h-4 text-indigo-400" />;
-      default:
-        return <Layers className="w-4 h-4 text-slate-400" />;
-    }
-  };
-
-  const getNodeHeaderColor = (type) => {
-    switch (type) {
-      case 'trigger':
-        return 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300';
-      case 'condition':
-        return 'bg-amber-500/15 border-amber-500/30 text-amber-300';
-      case 'action':
-        return 'bg-indigo-500/15 border-indigo-500/30 text-indigo-300';
-      default:
-        return 'bg-slate-500/15 border-slate-500/30 text-slate-300';
-    }
-  };
 
   const selectedNode = activeWorkflow.nodes.find((n) => n.id === selectedNodeId);
 

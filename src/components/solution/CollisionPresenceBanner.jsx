@@ -5,11 +5,17 @@
  */
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ShieldAlert, Users } from 'lucide-react';
 import AvatarChip from '../product/AvatarChip';
 
+const DEFAULT_AGENT = {
+  name: 'Priya K.',
+  initials: 'PK',
+  color: '#dc2626',
+  role: 'Support Lead',
+};
+
 export default function CollisionPresenceBanner({
-  agent = { name: 'Priya K.', initials: 'PK', color: '#dc2626', role: 'Support Lead' },
+  agent = DEFAULT_AGENT,
   action = 'is drafting a reply...',
   className = '',
 }) {

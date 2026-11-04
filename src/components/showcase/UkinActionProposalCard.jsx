@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Bot,
   CheckCircle2,
@@ -9,6 +9,9 @@ import {
 } from 'lucide-react';
 import { useWorkspace } from '../../context/useWorkspace';
 import { cn } from '../../lib/cn';
+
+const FULL_REASONING_TEXT =
+  'A customer reported a checkout issue. Ukin linked the related conversation, Huddle notes, and PR, then prepared a follow-up task for review.';
 
 export default function UkinActionProposalCard() {
   const {
@@ -24,9 +27,13 @@ export default function UkinActionProposalCard() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamProgress, setStreamProgress] = useState(100);
   const [streamTokens, setStreamTokens] = useState('');
+  const streamTimerRef = useRef(null);
 
-  const fullReasoningText =
-    'A customer reported a checkout issue. Ukin linked the related conversation, Huddle notes, and PR, then prepared a follow-up task for review.';
+  useEffect(() => {
+    return () => {
+      if (streamTimerRef.current) clearInterval(streamTimerRef.current);
+    };
+  }, []);
 
   const handleSimulateStreaming = () => {
     setIsStreaming(true);
@@ -34,16 +41,17 @@ export default function UkinActionProposalCard() {
     setStreamProgress(0);
     setProposalStatus('pending');
 
-    const words = fullReasoningText.split(' ');
+    const words = FULL_REASONING_TEXT.split(' ');
     let currentIdx = 0;
 
-    const interval = setInterval(() => {
+    if (streamTimerRef.current) clearInterval(streamTimerRef.current);
+    streamTimerRef.current = setInterval(() => {
       if (currentIdx < words.length) {
         setStreamTokens((prev) => (prev ? prev + ' ' + words[currentIdx] : words[currentIdx]));
         setStreamProgress(Math.round(((currentIdx + 1) / words.length) * 100));
         currentIdx++;
       } else {
-        clearInterval(interval);
+        clearInterval(streamTimerRef.current);
         setIsStreaming(false);
         addToast(
           'Sample suggestion ready',

@@ -7,15 +7,13 @@ import { useReducedMotion } from 'framer-motion';
 
 export default function TypewriterText({ text = '', speed = 28, onComplete, className = '' }) {
   const reduceMotion = useReducedMotion();
-  const [displayed, setDisplayed] = useState(reduceMotion ? text : '');
+  const [displayed, setDisplayed] = useState(() => (reduceMotion ? text : ''));
 
   useEffect(() => {
     if (reduceMotion) {
-      setDisplayed(text);
       onComplete?.();
       return;
     }
-    setDisplayed('');
     let i = 0;
     const interval = setInterval(() => {
       i++;
@@ -26,7 +24,7 @@ export default function TypewriterText({ text = '', speed = 28, onComplete, clas
       }
     }, speed);
     return () => clearInterval(interval);
-  }, [text, speed, reduceMotion]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [text, speed, reduceMotion, onComplete]);
 
   return <span className={className}>{displayed}</span>;
 }
