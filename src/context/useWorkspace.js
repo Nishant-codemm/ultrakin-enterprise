@@ -1,3 +1,8 @@
+/**
+ * useWorkspace.js
+ * Type-safe consumer hook for WorkspaceContext.
+ * Enforces usage within WorkspaceProvider boundaries.
+ */
 import { useContext } from 'react';
 import { WorkspaceContext } from './WorkspaceContextStore';
 
