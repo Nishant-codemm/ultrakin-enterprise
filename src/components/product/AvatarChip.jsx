@@ -3,7 +3,7 @@
  * Colored circle with initials — shared across all product and solution demos.
  * Unified prop signature: supports both person object and direct name/color/initials props.
  */
-import React from 'react';
+import React, { memo } from 'react';
 import { cn } from '../../lib/cn';
 
 const SIZE_MAP = {
@@ -23,7 +23,7 @@ function getInitials(name = '') {
   return name.slice(0, 2).toUpperCase();
 }
 
-export default function AvatarChip({
+function AvatarChip({
   person,
   name,
   color,
@@ -57,3 +57,6 @@ export default function AvatarChip({
     </span>
   );
 }
+
+export default memo(AvatarChip);
+

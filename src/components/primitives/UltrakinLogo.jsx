@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 
-export default function UltrakinLogo({
+function UltrakinLogo({
   size = 28,
   className = '',
 }) {
@@ -15,3 +15,6 @@ export default function UltrakinLogo({
     />
   );
 }
+
+export default memo(UltrakinLogo);
+

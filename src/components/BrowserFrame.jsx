@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 
-export default function BrowserFrame({ address, children, className = '', viewportClassName = '' }) {
+function BrowserFrame({ address, children, className = '', viewportClassName = '' }) {
   return (
     <div className={`marketing-browser-frame ${className}`}>
       <div className="marketing-browser-toolbar">
@@ -16,3 +16,6 @@ export default function BrowserFrame({ address, children, className = '', viewpo
     </div>
   );
 }
+
+export default memo(BrowserFrame);
+

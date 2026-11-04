@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowDownRight,
@@ -162,7 +162,7 @@ const homeScrollSpySections = [
   ['cta', null],
 ];
 
-function MenuItem({ item, onSelect }) {
+const MenuItem = memo(function MenuItem({ item, onSelect }) {
   const Icon = item.icon;
   const isCustomLogo = item.icon === UltrakinIcon;
   return (
@@ -187,7 +187,7 @@ function MenuItem({ item, onSelect }) {
       </span>
     </button>
   );
-}
+});
 
 export default function Navbar() {
   const {

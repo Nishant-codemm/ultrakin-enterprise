@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Cpu } from 'lucide-react';
 import { useWorkspace } from '../../context/useWorkspace';
 import { cn } from '../../lib/cn';
 import UkinActionProposalCard from './UkinActionProposalCard';
 
-export default function EventBusTelemetryDrawer() {
+const MODULE_SWITCHERS = [
+  { id: 'chat', label: 'CHAT', activeClass: 'bg-indigo-600 text-white' },
+  { id: 'mail', label: 'MAIL', activeClass: 'bg-sky-600 text-white' },
+  { id: 'docs', label: 'DOCS', activeClass: 'bg-emerald-600 text-white' },
+  { id: 'huddle', label: 'CALL', activeClass: 'bg-violet-600 text-white' },
+  { id: 'tasks', label: 'KANBAN', activeClass: 'bg-amber-600 text-white' },
+  { id: 'automations', label: 'DAG', activeClass: 'bg-emerald-600 text-white' },
+];
+
+function EventBusTelemetryDrawer() {
   const {
     activeModule,
     setActiveModule,
@@ -72,56 +81,25 @@ export default function EventBusTelemetryDrawer() {
       <div className="pt-2 border-t border-obsidian-border-soft flex items-center justify-between text-xs text-slate-400">
         <span className="font-mono text-[10px]">VIEWPORT:</span>
         <div role="group" aria-label="Switch workspace preview module" className="flex flex-wrap items-center gap-1 font-mono text-[9px]">
-          <button
-            type="button"
-            aria-pressed={activeModule === 'chat'}
-            onClick={() => setActiveModule('chat')}
-            className={cn('px-1.5 py-0.5 rounded cursor-pointer active:scale-95 transition-all', activeModule === 'chat' ? 'bg-indigo-600 text-white' : 'hover:text-white')}
-          >
-            CHAT
-          </button>
-          <button
-            type="button"
-            aria-pressed={activeModule === 'mail'}
-            onClick={() => setActiveModule('mail')}
-            className={cn('px-1.5 py-0.5 rounded cursor-pointer active:scale-95 transition-all', activeModule === 'mail' ? 'bg-sky-600 text-white' : 'hover:text-white')}
-          >
-            MAIL
-          </button>
-          <button
-            type="button"
-            aria-pressed={activeModule === 'docs'}
-            onClick={() => setActiveModule('docs')}
-            className={cn('px-1.5 py-0.5 rounded cursor-pointer active:scale-95 transition-all', activeModule === 'docs' ? 'bg-emerald-600 text-white' : 'hover:text-white')}
-          >
-            DOCS
-          </button>
-          <button
-            type="button"
-            aria-pressed={activeModule === 'huddle'}
-            onClick={() => setActiveModule('huddle')}
-            className={cn('px-1.5 py-0.5 rounded cursor-pointer active:scale-95 transition-all', activeModule === 'huddle' ? 'bg-violet-600 text-white' : 'hover:text-white')}
-          >
-            CALL
-          </button>
-          <button
-            type="button"
-            aria-pressed={activeModule === 'tasks'}
-            onClick={() => setActiveModule('tasks')}
-            className={cn('px-1.5 py-0.5 rounded cursor-pointer active:scale-95 transition-all', activeModule === 'tasks' ? 'bg-amber-600 text-white' : 'hover:text-white')}
-          >
-            KANBAN
-          </button>
-          <button
-            type="button"
-            aria-pressed={activeModule === 'automations'}
-            onClick={() => setActiveModule('automations')}
-            className={cn('px-1.5 py-0.5 rounded cursor-pointer active:scale-95 transition-all', activeModule === 'automations' ? 'bg-emerald-600 text-white' : 'hover:text-white')}
-          >
-            DAG
-          </button>
+          {MODULE_SWITCHERS.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              aria-pressed={activeModule === item.id}
+              onClick={() => setActiveModule(item.id)}
+              className={cn(
+                'px-1.5 py-0.5 rounded cursor-pointer active:scale-95 transition-all',
+                activeModule === item.id ? item.activeClass : 'hover:text-white'
+              )}
+            >
+              {item.label}
+            </button>
+          ))}
         </div>
       </div>
     </div>
   );
 }
+
+export default memo(EventBusTelemetryDrawer);
+

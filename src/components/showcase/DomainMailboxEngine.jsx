@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Mail,
   Shield,
@@ -48,12 +48,16 @@ export default function DomainMailboxEngine() {
     return () => clearTimeout(timer);
   }, [replyText]);
 
-  const filteredEmails = emails.filter(
-    (em) =>
-      em.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      em.sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      em.company.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredEmails = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return emails;
+    return emails.filter(
+      (em) =>
+        em.subject.toLowerCase().includes(q) ||
+        em.sender.toLowerCase().includes(q) ||
+        em.company.toLowerCase().includes(q)
+    );
+  }, [emails, searchQuery]);
 
   const handleSendReply = (e) => {
     e?.preventDefault();

@@ -3,11 +3,11 @@
  * Interactive immutable system-of-record anchor badge.
  * Represents thread/document conversion to permanent workspace record (e.g., SR-28).
  */
-import React from 'react';
+import React, { memo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { CheckCircle2, ExternalLink } from 'lucide-react';
 
-export default function SystemRecordBadge({
+function SystemRecordBadge({
   recordId = 'SR-28',
   collectionName = 'Support requests',
   isLogged = true,
@@ -49,3 +49,6 @@ export default function SystemRecordBadge({
     </motion.button>
   );
 }
+
+export default memo(SystemRecordBadge);
+

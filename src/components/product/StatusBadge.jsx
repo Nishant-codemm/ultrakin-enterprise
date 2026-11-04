@@ -3,7 +3,7 @@
  * Semantic status pills used across all product and solution demos.
  * Unified prop signature: supports status/label and variant/text with full success variant.
  */
-import React from 'react';
+import React, { memo } from 'react';
 import { cn } from '../../lib/cn';
 
 const VARIANTS = {
@@ -32,7 +32,7 @@ const DOT_COLORS = {
   new:       'bg-blue-500',
 };
 
-export default function StatusBadge({
+function StatusBadge({
   status,
   variant,
   label,
@@ -58,3 +58,6 @@ export default function StatusBadge({
     </span>
   );
 }
+
+export default memo(StatusBadge);
+

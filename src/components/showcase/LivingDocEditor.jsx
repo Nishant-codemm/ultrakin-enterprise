@@ -51,7 +51,7 @@ export default function LivingDocEditor() {
   const [insertedBlocks, setInsertedBlocks] = useState([]);
 
   const completedCount = docChecklists.filter((c) => c.checked).length;
-  const progressPct = Math.round((completedCount / docChecklists.length) * 100);
+  const progressPct = docChecklists.length > 0 ? Math.round((completedCount / docChecklists.length) * 100) : 0;
 
   const toggleFormat = (key) => {
     setActiveFormats((prev) => ({ ...prev, [key]: !prev[key] }));
