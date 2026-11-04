@@ -4,7 +4,7 @@
  * Features live reactive search, category filtering, interactive featured paper,
  * responsive resource grid, and an interactive full-text article reader modal.
  */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Search,
@@ -66,9 +66,42 @@ export default function ResourcesPage() {
     });
   }, [activeCategory, searchQuery]);
 
-  const handleShareArticle = () => {
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
+  const copiedTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (copiedTimeoutRef.current) {
+        clearTimeout(copiedTimeoutRef.current);
+        copiedTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  const handleShareArticle = async () => {
+    const shareUrl = typeof window !== 'undefined'
+      ? (activeArticle?.id
+          ? `${window.location.origin}${window.location.pathname}#${activeArticle.id}`
+          : window.location.href)
+      : '';
+
+    if (!shareUrl || !navigator?.clipboard?.writeText) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopiedLink(true);
+
+      if (copiedTimeoutRef.current) {
+        clearTimeout(copiedTimeoutRef.current);
+      }
+      copiedTimeoutRef.current = setTimeout(() => {
+        setCopiedLink(false);
+        copiedTimeoutRef.current = null;
+      }, 2000);
+    } catch {
+      // Gracefully ignore clipboard permission denial or write rejection; do not show false success
+    }
   };
 
   return (

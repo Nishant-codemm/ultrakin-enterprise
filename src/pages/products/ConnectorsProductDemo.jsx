@@ -8,16 +8,12 @@
  * - Clickable integration cards to inspect sync telemetry
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FolderOpen, Check, Plus, RefreshCw, Zap, ArrowRight, ExternalLink } from 'lucide-react';
-import StatusBadge from '../../components/product/StatusBadge';
+import { Zap } from 'lucide-react';
 import { CONNECTORS_DATA } from '../../data/productPageData';
 
 export default function ConnectorsProductDemo() {
   const [selectedId, setSelectedId] = useState('hubspot');
   const [integrations, setIntegrations] = useState(CONNECTORS_DATA.integrations);
-
-  const selectedIntegration = integrations.find((i) => i.id === selectedId) || integrations[0];
 
   const toggleConnect = (id, e) => {
     e.stopPropagation();

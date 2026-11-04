@@ -14,36 +14,16 @@
  * - Interactive Smart Suggestions & Optimistic Composer
  * - Full Keyboard Navigation (ArrowUp / ArrowDown)
  */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
-  Mail,
-  MessageSquare,
-  Video,
-  FileText,
-  CheckSquare,
-  Zap,
   Check,
   Send,
-  Sparkles,
   ExternalLink,
-  ChevronRight,
-  Info,
-  Clock,
 } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
 import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
 import { PERSONAS } from '../../data/productPageData';
-
-// ─── Workspace App Rail Roundels ─────────────────────────────────────────────
-const WORKSPACE_RAIL_ITEMS = [
-  { id: 'chat',        icon: MessageSquare, label: 'Chat',        color: '#a855f7', bg: 'bg-[#a855f7]/15 text-[#9333ea]' },
-  { id: 'calls',       icon: Video,         label: 'Calls',       color: '#14b8a6', bg: 'bg-[#14b8a6]/15 text-[#0d9488]' },
-  { id: 'mail',        icon: Mail,          label: 'Mail',        color: '#dc2626', bg: 'bg-[#dc2626] text-white', active: true },
-  { id: 'docs',        icon: FileText,      label: 'Docs',        color: '#0284c7', bg: 'bg-[#0284c7]/15 text-[#0369a1]' },
-  { id: 'lists',       icon: CheckSquare,   label: 'Lists',       color: '#10b981', bg: 'bg-[#10b981]/15 text-[#047857]' },
-  { id: 'automations', icon: Zap,           label: 'Automations', color: '#c026d3', bg: 'bg-[#c026d3]/15 text-[#a21caf]' },
-];
 
 // ─── Mail Queue Dataset matching Original Reference ─────────────────────────
 const INITIAL_INBOX = [
@@ -140,7 +120,7 @@ export default function MailProductDemo() {
   const [inbox, setInbox] = useState(INITIAL_INBOX);
   const [selectedId, setSelectedId] = useState(1);
   const [threads, setThreads] = useState(THREADS);
-  const [showCollisionAlert, setShowCollisionAlert] = useState(true);
+  const [showCollisionAlert] = useState(true);
   const [hoveredRecord, setHoveredRecord] = useState(false);
   const [replyInput, setReplyInput] = useState('');
   const [isSending, setIsSending] = useState(false);

@@ -5,23 +5,13 @@
  * Product Launch Brief -> Real-Time Reviewer Comments -> Multi-Stakeholder Signoff -> Scheduled Campaign.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Megaphone,
   CheckCircle2,
-  Calendar,
-  MessageSquare,
-  FileText,
-  Sparkles,
-  Share2,
-  Users,
 } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
-import StatusBadge from '../../components/product/StatusBadge';
 
 export default function MarketingSolutionDemo() {
-  const reduceMotion = useReducedMotion();
-  const [approvedByLegal, setApprovedByLegal] = useState(true);
   const [approvedByProduct, setApprovedByProduct] = useState(false);
 
   return (

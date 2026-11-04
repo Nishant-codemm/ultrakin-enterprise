@@ -99,6 +99,8 @@ const INITIAL_MESSAGES = {
   ],
 };
 
+const EMPTY_MESSAGES = [];
+
 export default function CustomerSupportSolutionDemo() {
   const reduceMotion = useReducedMotion();
   const [selectedThreadId, setSelectedThreadId] = useState('t-elena');
@@ -110,12 +112,12 @@ export default function CustomerSupportSolutionDemo() {
   const messagesEndRef = useRef(null);
 
   const activeThread = INBOX_ITEMS.find((item) => item.id === selectedThreadId) || INBOX_ITEMS[0];
-  const messages = threadMessages[selectedThreadId] || [];
+  const messages = threadMessages[selectedThreadId] || EMPTY_MESSAGES;
 
-  // Scroll to bottom when messages update
+  // Scroll to bottom when thread changes or a new message arrives
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
-  }, [messages, reduceMotion]);
+  }, [selectedThreadId, messages.length, reduceMotion]);
 
   // Keyboard navigation between inbox threads
   const handleKeyDown = useCallback((e) => {

@@ -94,6 +94,7 @@ const UniversalProductPage = lazy(() => import('./pages/ProductPage'));
 const UniversalSolutionPage = lazy(() => import('./pages/SolutionPage'));
 const SolutionsOverviewPage = lazy(() => import('./pages/SolutionsOverviewPage'));
 const ResourcesPage = lazy(() => import('./pages/ResourcesPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 const ROUTE_PAGES = {
   '/pricing':   lazy(() => import('./pages/PricingPage')),
@@ -246,13 +247,21 @@ export default function App() {
     };
   }, [pathname]);
 
-  // Support both exact routes and /products/* and /solutions/* dynamic routes
+  const isHome = pathname === '/';
+
+  // Support exact routes, /products/*, /solutions/* dynamic routes, and explicit 404 fallback
   const RoutePage = ROUTE_PAGES[pathname] || 
     (pathname.startsWith('/products/') ? UniversalProductPage : 
-    (pathname.startsWith('/solutions/') ? UniversalSolutionPage : null));
+    (pathname.startsWith('/solutions/') ? UniversalSolutionPage : (isHome ? null : NotFoundPage)));
 
   useEffect(() => {
-    const metadata = PAGE_METADATA[pathname] || PAGE_METADATA['/'];
+    const isNotFound = !isHome && !ROUTE_PAGES[pathname] && !pathname.startsWith('/products/') && !pathname.startsWith('/solutions/');
+    const metadata = isNotFound
+      ? {
+          title: 'Page Not Found — Ultrakin',
+          description: 'The requested page could not be found.',
+        }
+      : (PAGE_METADATA[pathname] || PAGE_METADATA['/']);
     const canonicalUrl = `https://ultrakin.com${pathname === '/' ? '/' : pathname}`;
     document.title = metadata.title;
     document.querySelector('meta[name="description"]')?.setAttribute('content', metadata.description);
@@ -262,7 +271,7 @@ export default function App() {
     document.querySelector('meta[property="og:description"]')?.setAttribute('content', metadata.description);
     document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', metadata.title);
     document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', metadata.description);
-  }, [pathname]);
+  }, [pathname, isHome]);
 
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {
     const path = routePathRef.current;

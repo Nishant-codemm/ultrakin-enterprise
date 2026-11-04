@@ -2,9 +2,19 @@ import React from 'react';
 import UltrakinLogo from '../components/primitives/UltrakinLogo';
 import { ArrowUpRight, ShieldCheck } from 'lucide-react';
 
-export default function Footer({ isHome = true }) {
-  const currentYear = new Date().getFullYear();
+const CURRENT_YEAR = new Date().getFullYear();
 
+const PRODUCT_NAV_LINKS = [
+  'Chat & Threads',
+  'Shared Mailbox',
+  'Living Docs',
+  'Huddle Simulator',
+  'Kanban Tasks',
+  'AI Agents',
+  'Integrations',
+];
+
+export default function Footer({ isHome = true }) {
   return (
     <footer className="divider-hairline border-t border-border bg-transparent py-14 text-ink-muted sm:py-16">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
@@ -77,7 +87,7 @@ export default function Footer({ isHome = true }) {
           <div>
             <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">Product</p>
             <ul className="mt-4 space-y-2.5 text-[13px]">
-              {['Chat & Threads', 'Shared Mailbox', 'Living Docs', 'Huddle Simulator', 'Kanban Tasks', 'AI Agents', 'Integrations'].map((item) => (
+              {PRODUCT_NAV_LINKS.map((item) => (
                 <li key={item}>
                   <a href="#workspace-showcase" className="transition-colors hover:text-brand-text">
                     {item}
@@ -118,7 +128,7 @@ export default function Footer({ isHome = true }) {
 
         {/* Bottom Bar: Copyright & Compliance */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 text-[11px] text-ink-subtle sm:flex-row">
-          <p>© {currentYear} Ultrakin Technologies, Inc. All rights reserved.</p>
+          <p>© {CURRENT_YEAR} Ultrakin Technologies, Inc. All rights reserved.</p>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <span className="inline-flex items-center gap-1.5 font-medium text-ink-soft">
               <ShieldCheck className="h-3.5 w-3.5 text-brand-text" />
