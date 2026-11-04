@@ -7,14 +7,19 @@ import { useEffect, useRef, useState } from 'react';
  */
 export function useReveal({ threshold = 0.12, rootMargin = '0px 0px -40px 0px', once = true } = {}) {
   const ref = useRef(null);
-  const [inView, setInView] = useState(false);
+
+  // Initialize inView to true if user prefers reduced motion or if IntersectionObserver is unsupported, avoiding cascading effect re-renders
+  const [inView, setInView] = useState(() => {
+    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
+      return true;
+    }
+    return Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches);
+  });
 
   useEffect(() => {
-    // Check prefers-reduced-motion immediately
-    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setInView(true);
-      return;
-    }
+    // If already revealed or unneeded, skip observer
+    if (inView && once) return;
+    if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') return;
 
     const node = ref.current;
     if (!node) return;
@@ -38,9 +43,10 @@ export function useReveal({ threshold = 0.12, rootMargin = '0px 0px -40px 0px', 
     return () => {
       observer.disconnect();
     };
-  }, [threshold, rootMargin, once]);
+  }, [threshold, rootMargin, once, inView]);
 
   return [ref, inView];
 }
 
 export default useReveal;
+

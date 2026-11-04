@@ -1,7 +1,8 @@
 /**
- * Lightweight className merger — avoids pulling in clsx/tailwind-merge
- * for just a few usages. Upgrade to clsx + twMerge when needed.
+ * Lightweight className merger — combines conditional and array class names.
+ * Filters falsy values (false, null, undefined, 0, '') without extra dependencies.
  */
 export function cn(...classes) {
-  return classes.filter(Boolean).join(' ')
+  return classes.flat(Infinity).filter(Boolean).join(' ');
 }
+
