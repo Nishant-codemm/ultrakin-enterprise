@@ -179,7 +179,7 @@ export default function UkinActionProposalCard() {
               <span className="inline-block w-1.5 h-3 bg-violet-400 animate-pulse ml-0.5 align-middle" />
             </span>
           ) : (
-            fullReasoningText
+            FULL_REASONING_TEXT
           )}
         </p>
       </div>
