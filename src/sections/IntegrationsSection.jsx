@@ -138,16 +138,10 @@ const INTEGRATIONS = [
 const CENTER = [310, 210];
 
 /* ─── CONVERGING VECTOR TOPOLOGY SYSTEM ─── */
-/* Mathematically engineered cubic Béziers matching the reference illustration.
-   Hero Cross-Sectional Arc enters from top-left, passes smoothly through Spaces [112, 78],
-   sweeps gracefully across above the hub [310, 168], passes right through Tasks [548, 210],
-   and exits toward the right information panel at [660, 238]. */
+/* The cross-section cable follows the workspace flow through Spaces [112, 78] into Tasks [548, 210]. */
 
-// 1. Signature Hero Cross-Sectional Arc (Spaces → Hub Crest → Tasks → Right Panel)
-const PATH_HERO_CROSS_SECTION = 'M -30 40 C 40 55, 80 68, 112 78 C 165 94, 230 148, 310 168 C 390 188, 475 204, 548 210 C 585 214, 620 224, 660 238';
-
-// 2. Harmonic Parallel Guide Spline (converges alongside Hero Arc)
-const PATH_HERO_GUIDE = 'M -20 46 C 45 60, 84 72, 112 78 C 168 98, 235 152, 310 174 C 385 192, 470 208, 548 210 C 585 218, 620 228, 660 242';
+// One continuous spline through the Spaces and Tasks anchors, then out of the illustration.
+const PATH_HERO_CROSS_SECTION = 'M -30 40 C -6.33 46.33, 55.33 56.67, 112 78 C 168.67 99.33, 237.33 146, 310 168 C 382.67 190, 489.67 198.33, 548 210 C 606.33 221.67, 641.33 233.33, 660 238';
 
 // 3. Converging Feeder Branches for Built-In Nodes
 const FEEDER_PATHS = {
@@ -534,8 +528,8 @@ export default function IntegrationsSection() {
                   <defs>
                     {/* Subtle base spline gradient */}
                     <linearGradient id="topo-spline-base" x1="0" y1="0" x2="1" y2="1">
-                      <stop stopColor="#818cf8" stopOpacity=".22" />
-                      <stop offset="1" stopColor="#a5b4fc" stopOpacity=".12" />
+                      <stop stopColor="#818cf8" stopOpacity=".38" />
+                      <stop offset="1" stopColor="#a5b4fc" stopOpacity=".24" />
                     </linearGradient>
 
                     {/* Active highlighted topology gradient */}
@@ -579,9 +573,7 @@ export default function IntegrationsSection() {
                   </g>
 
                   {/* ── LAYER 3: Harmonic Converging Guide Splines ── */}
-                  <g opacity={0.45}>
-                    {/* Parallel companion along Hero Arc */}
-                    <TopologySpline d={PATH_HERO_GUIDE} isActive={false} isGuide={true} />
+                  <g opacity={0.62}>
                     {/* Converging feeder branches from perimeter nodes toward central hub crest/root */}
                     {visible.map((item) => {
                       const feederD = FEEDER_PATHS[item.name];
@@ -600,9 +592,10 @@ export default function IntegrationsSection() {
                   {/* ── LAYER 4: The Hero Cross-Sectional Vector Arc (Spaces → Hub Crest → Tasks → Right) ── */}
                   <path
                     d={PATH_HERO_CROSS_SECTION}
+                    data-workline-anchor="integration-spine"
                     fill="none"
                     stroke={isMasterSpineActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
-                    strokeWidth={isMasterSpineActive ? 0.95 : 0.7}
+                    strokeWidth={isMasterSpineActive ? 1.55 : 1.15}
                     className="transition-all duration-300"
                   />
 
