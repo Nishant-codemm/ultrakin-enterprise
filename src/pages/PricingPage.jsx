@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, Check, Minus } from 'lucide-react';
+import { handleSpotlightMove } from '../lib/interaction';
 
 const APP_URL = 'https://app.ultrakin.com';
 const SALES_EMAIL = 'mailto:sales@ultrakin.com?subject=Ultrakin%20plan%20questions';
@@ -75,12 +76,6 @@ function Price({ plan, annual }) {
 export default function PricingPage() {
   const [annual, setAnnual] = useState(true);
 
-  const handleCardMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-    e.currentTarget.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
-  };
-
   return (
     <div className="min-h-screen bg-page pb-24 pt-28 text-ink sm:pt-32">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
@@ -98,7 +93,7 @@ export default function PricingPage() {
           {plans.map((plan) => (
             <article
               key={plan.id}
-              onMouseMove={handleCardMouseMove}
+              onMouseMove={handleSpotlightMove}
               className={`spotlight-card relative flex flex-col justify-between rounded-3xl border p-5 sm:p-6 lg:p-5 xl:p-6 transition-all duration-300 hover:-translate-y-1 ${plan.popular ? 'border-brand/40 bg-brand-soft/70 shadow-[0_20px_48px_-28px_rgba(49,86,207,.35)]' : 'border-border bg-surface-raised shadow-[0_10px_28px_-18px_rgba(0,0,0,0.06)] hover:shadow-[0_16px_36px_-20px_rgba(49,86,207,0.15)]'}`}
             >
               <div>

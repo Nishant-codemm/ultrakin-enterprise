@@ -12,6 +12,7 @@ import {
 import { cn } from '../lib/cn';
 import BrowserFrame from '../components/BrowserFrame';
 import { useReveal } from '../lib/useReveal';
+import { getSectionHeaderMotion, getSectionContentMotion } from '../lib/motion';
 
 const LENSES = [
   { id: 'memory',     number: '01', label: 'Find past decisions',   hint: 'Search across conversations and docs', icon: Search },
@@ -275,9 +276,7 @@ export default function BentoGrid() {
 
         {/* ── Header with Scroll Entrance ── */}
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          {...getSectionHeaderMotion(inView, reduceMotion)}
           className="mb-16 grid gap-6 md:grid-cols-[1fr_auto] md:items-end"
         >
           <div>
@@ -295,9 +294,7 @@ export default function BentoGrid() {
 
         {/* ── Tabs + BrowserFrame ── */}
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 28 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.65, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          {...getSectionContentMotion(inView, reduceMotion)}
           className="grid gap-10 border-t border-border pt-7 lg:grid-cols-[250px_1fr] lg:gap-16"
         >
 

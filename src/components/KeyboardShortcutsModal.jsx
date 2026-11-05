@@ -1,8 +1,10 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Keyboard, X } from 'lucide-react';
 import { useWorkspace } from '../context/useWorkspace';
 import { cn } from '../lib/cn';
+import { scrimMotion, MODAL_DIALOG_TRANSITION } from '../lib/motion';
+import { useFocusTrap } from '../lib/useFocusTrap';
 
 const SHORTCUT_GROUPS = [
   {
@@ -20,52 +22,12 @@ export default function KeyboardShortcutsModal() {
   const dialogRef = useRef(null);
   const closeButtonRef = useRef(null);
 
-  useEffect(() => {
-    if (!isKeyboardModalOpen) return;
-
-    const previouslyFocused = document.activeElement === document.body ? null : document.activeElement;
-    const focusFrame = window.requestAnimationFrame(() => closeButtonRef.current?.focus());
-
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        setIsKeyboardModalOpen(false);
-        return;
-      }
-
-      if (e.key === 'Tab') {
-        const focusable = dialogRef.current?.querySelectorAll(
-          'button:not([disabled]), [href], input:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        );
-        if (!focusable?.length) {
-          e.preventDefault();
-          return;
-        }
-
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (!dialogRef.current?.contains(document.activeElement)) {
-          e.preventDefault();
-          (e.shiftKey ? last : first).focus();
-        } else if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.cancelAnimationFrame(focusFrame);
-      window.removeEventListener('keydown', handleKeyDown);
-      if (previouslyFocused?.isConnected && previouslyFocused.getClientRects().length > 0) {
-        previouslyFocused.focus();
-      }
-    };
-  }, [isKeyboardModalOpen, setIsKeyboardModalOpen]);
+  useFocusTrap({
+    isOpen: isKeyboardModalOpen,
+    containerRef: dialogRef,
+    initialFocusRef: closeButtonRef,
+    onEscape: () => setIsKeyboardModalOpen(false),
+  });
 
   return (
     <AnimatePresence>
@@ -73,9 +35,7 @@ export default function KeyboardShortcutsModal() {
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 select-none">
           {/* Scrim */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            {...scrimMotion}
             onClick={() => setIsKeyboardModalOpen(false)}
             aria-hidden="true"
             className="fixed inset-0 -z-10 bg-slate-900/35 backdrop-blur-md"
@@ -86,7 +46,7 @@ export default function KeyboardShortcutsModal() {
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+            transition={MODAL_DIALOG_TRANSITION}
             ref={dialogRef}
             role="dialog"
             aria-modal="true"

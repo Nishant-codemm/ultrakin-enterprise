@@ -2,6 +2,8 @@ import React, { useCallback, useRef, useState } from 'react';
 import { ArrowRight, Building2, Compass } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useReveal } from '../lib/useReveal';
+import { getSectionHeaderMotion, getSectionContentMotion } from '../lib/motion';
+import { handleSpotlightMove } from '../lib/interaction';
 
 /* ─── Cursor-tracking 3D tilt ─── */
 function TiltCard({ children, className, style, maxTilt = 10 }) {
@@ -81,21 +83,13 @@ export default function EvaluationSection() {
   const [sectionRef, inView] = useReveal({ threshold: 0.12 });
   const reduceMotion = useReducedMotion();
 
-  const handleCardMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    e.currentTarget.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-    e.currentTarget.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
-  };
-
   return (
     <section ref={sectionRef} id="evaluation" className="divider-hairline bg-transparent py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
 
         {/* Header with Scroll Entrance */}
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          {...getSectionHeaderMotion(inView, reduceMotion)}
           className="max-w-2xl"
         >
           <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.19em] text-brand-text">
@@ -114,9 +108,7 @@ export default function EvaluationSection() {
           {PATHS.map(({ icon: Icon, eyebrow, title, description, action, href, external, accent, accentBorder }, index) => (
             <motion.div
               key={title}
-              initial={reduceMotion ? false : { opacity: 0, y: 28 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.65, delay: 0.1 + index * 0.12, ease: [0.16, 1, 0.3, 1] }}
+              {...getSectionContentMotion(inView, reduceMotion, 0.1 + index * 0.12)}
             >
               <TiltCard
                 maxTilt={9}
@@ -124,7 +116,7 @@ export default function EvaluationSection() {
                 style={{ borderRadius: '1rem' }}
               >
                 <article
-                  onMouseMove={handleCardMouseMove}
+                  onMouseMove={handleSpotlightMove}
                   className="spotlight-card group flex h-full flex-col rounded-2xl border bg-surface-raised p-6 shadow-[0_12px_28px_-18px_rgba(20,34,59,0.06)] sm:p-8 md:min-h-[270px]"
                   style={{ borderColor: accentBorder, background: `linear-gradient(135deg, ${accent} 0%, transparent 55%)` }}
                 >

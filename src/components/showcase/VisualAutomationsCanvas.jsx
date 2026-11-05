@@ -138,7 +138,7 @@ export default function VisualAutomationsCanvas() {
                 type="button"
                 onClick={() => setActiveWorkflowId(wf.id)}
                 className={cn(
-                  'px-2.5 py-1 rounded text-xs font-medium transition-all cursor-pointer truncate max-w-[180px]',
+                  'px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer truncate max-w-[180px] active:scale-95',
                   activeWorkflowId === wf.id
                     ? 'bg-emerald-600/20 text-emerald-300 border border-emerald-500/30'
                     : 'text-slate-400 hover:text-white'
@@ -159,7 +159,7 @@ export default function VisualAutomationsCanvas() {
               // Attempt to link Action -> Trigger (which creates a directed cycle)
               addWorkflowEdge('n_action_1', 'n_trigger_1');
             }}
-            className="flex items-center gap-1.5 px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 text-rose-300 rounded text-xs font-mono transition-all cursor-pointer"
+            className="flex items-center gap-1.5 px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 text-rose-300 rounded-lg text-xs font-mono transition-all cursor-pointer active:scale-95"
             title="Attempts to link Action to Trigger to test Tarjan Cycle Rejection"
           >
             <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
@@ -172,7 +172,7 @@ export default function VisualAutomationsCanvas() {
             disabled={isAutomationsTesting}
             onClick={testAutomationsWorkflow}
             className={cn(
-              'flex items-center gap-1.5 px-3 py-1 rounded text-xs font-bold transition-all shadow-md cursor-pointer',
+              'flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all shadow-md cursor-pointer active:scale-95',
               isAutomationsTesting
                 ? 'bg-amber-500/30 text-amber-200 border border-amber-500/40 animate-pulse'
                 : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20'

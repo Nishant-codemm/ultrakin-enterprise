@@ -3,8 +3,9 @@
  * Universal shell for all /products/<slug> pages.
  * Reads slug from pathname, loads the correct demo + metadata.
  */
-import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { createShellVariants } from '../lib/motion';
 import {
   Mail,
   MessageSquare,
@@ -119,20 +120,7 @@ export default function ProductPage() {
 
   const Demo = DEMO_MAP[slug];
 
-  const containerVariants = {
-    hidden: {},
-    visible: { transition: { staggerChildren: 0.08 } },
-  };
-
-  const leftVariants = {
-    hidden: { opacity: 0, x: reduceMotion ? 0 : -20 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
-  };
-
-  const rightVariants = {
-    hidden: { opacity: 0, x: reduceMotion ? 0 : 20, y: reduceMotion ? 0 : 8 },
-    visible: { opacity: 1, x: 0, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] } },
-  };
+  const { containerVariants, leftVariants, rightVariants } = createShellVariants(reduceMotion);
 
   return (
     <div className="min-h-screen bg-page pt-20 pb-0">

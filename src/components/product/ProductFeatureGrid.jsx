@@ -6,6 +6,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { X, Check } from 'lucide-react';
+import { ULTRAKIN_EASE } from '../../lib/motion';
 
 export default function ProductFeatureGrid({ features = [], productColor }) {
   if (!features.length) return null;
@@ -25,7 +26,7 @@ export default function ProductFeatureGrid({ features = [], productColor }) {
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
-              transition={{ duration: 0.45, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.45, delay: i * 0.07, ease: ULTRAKIN_EASE }}
               className="rounded-xl border border-[#e7e4de] bg-[#fafaf9] p-5"
             >
               {/* Problem */}

@@ -4,8 +4,9 @@
  * Features live reactive search, category filtering, interactive featured paper,
  * responsive resource grid, and an interactive full-text article reader modal.
  */
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useClipboard } from '../lib/useClipboard';
 import {
   Search,
   Clock,
@@ -48,7 +49,7 @@ export default function ResourcesPage() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeArticle, setActiveArticle] = useState(null);
-  const [copiedLink, setCopiedLink] = useState(false);
+  const { copied: copiedLink, copy: copyShareUrl } = useClipboard({ timeout: 2000 });
 
   // Filter resources based on active category & search query
   const filteredResources = useMemo(() => {
@@ -66,41 +67,14 @@ export default function ResourcesPage() {
     });
   }, [activeCategory, searchQuery]);
 
-  const copiedTimeoutRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (copiedTimeoutRef.current) {
-        clearTimeout(copiedTimeoutRef.current);
-        copiedTimeoutRef.current = null;
-      }
-    };
-  }, []);
-
-  const handleShareArticle = async () => {
+  const handleShareArticle = () => {
     const shareUrl = typeof window !== 'undefined'
       ? (activeArticle?.id
           ? `${window.location.origin}${window.location.pathname}#${activeArticle.id}`
           : window.location.href)
       : '';
-
-    if (!shareUrl || !navigator?.clipboard?.writeText) {
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopiedLink(true);
-
-      if (copiedTimeoutRef.current) {
-        clearTimeout(copiedTimeoutRef.current);
-      }
-      copiedTimeoutRef.current = setTimeout(() => {
-        setCopiedLink(false);
-        copiedTimeoutRef.current = null;
-      }, 2000);
-    } catch {
-      // Gracefully ignore clipboard permission denial or write rejection; do not show false success
+    if (shareUrl) {
+      copyShareUrl(shareUrl);
     }
   };
 

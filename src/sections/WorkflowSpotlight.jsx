@@ -13,6 +13,7 @@ import {
 import { cn } from '../lib/cn';
 import BrowserFrame from '../components/BrowserFrame';
 import { useReveal } from '../lib/useReveal';
+import { getSectionHeaderMotion, getSectionContentMotion } from '../lib/motion';
 
 const SIGNAL = {
   source: '#release-planning', icon: MessageSquareText,
@@ -260,9 +261,7 @@ export default function WorkflowSpotlight() {
 
         {/* ── Left: Copy + workflow strip ── */}
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          {...getSectionHeaderMotion(inView, reduceMotion)}
           className="max-w-lg"
         >
           <p className="mb-6 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle">
@@ -319,9 +318,7 @@ export default function WorkflowSpotlight() {
 
         {/* ── Right: Browser frame ── */}
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 28 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.65, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          {...getSectionContentMotion(inView, reduceMotion)}
           className="relative min-w-0"
         >
           <TiltCard maxTilt={5}>

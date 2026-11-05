@@ -17,6 +17,9 @@ import {
 } from 'lucide-react';
 import { useWorkspace } from '../../context/useWorkspace';
 import { cn } from '../../lib/cn';
+import { scrimMotion, DRAWER_SPRING } from '../../lib/motion';
+import { useFocusTrap } from '../../lib/useFocusTrap';
+import { useClipboard } from '../../lib/useClipboard';
 
 const BRIEFING_SLOTS = [
   { id: 'slot-1', date: 'Tomorrow', time: '11:00 AM EST', label: 'Recommended' },
@@ -45,58 +48,26 @@ export default function EnterpriseDemoDrawer() {
   const [formData, setFormData] = useState({ name: '', email: '', note: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [copiedEmail, setCopiedEmail] = useState(false);
+  const { copied: copiedEmail, copy: copyEmail } = useClipboard({ timeout: 2200 });
 
-  // Keyboard accessibility: Escape key & focus trap
+  // Standardized accessible focus trap & escape dismissal
+  useFocusTrap({
+    isOpen: isDemoDrawerOpen,
+    containerRef: dialogRef,
+    initialFocusRef: closeButtonRef,
+    onEscape: closeDemoDrawer,
+  });
+
   useEffect(() => {
-    if (!isDemoDrawerOpen) return undefined;
-
-    const previouslyFocused = document.activeElement;
-    closeButtonRef.current?.focus();
-
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        closeDemoDrawer();
-        return;
-      }
-
-      if (event.key !== 'Tab') return;
-
-      const focusableElements = dialogRef.current?.querySelectorAll(
-        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      );
-      if (!focusableElements?.length) return;
-
-      const firstElement = focusableElements[0];
-      const lastElement = focusableElements[focusableElements.length - 1];
-      if (!dialogRef.current?.contains(document.activeElement)) {
-        event.preventDefault();
-        (event.shiftKey ? lastElement : firstElement).focus();
-      } else if (event.shiftKey && document.activeElement === firstElement) {
-        event.preventDefault();
-        lastElement.focus();
-      } else if (!event.shiftKey && document.activeElement === lastElement) {
-        event.preventDefault();
-        firstElement.focus();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+    if (!isDemoDrawerOpen) {
       setIsSubmitted(false);
       setIsSubmitting(false);
-      if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) {
-        previouslyFocused.focus();
-      }
-    };
-  }, [isDemoDrawerOpen, closeDemoDrawer]);
+    }
+  }, [isDemoDrawerOpen]);
 
   const handleCopyEmail = useCallback(() => {
-    navigator.clipboard?.writeText('sales@ultrakin.com');
-    setCopiedEmail(true);
-    setTimeout(() => setCopiedEmail(false), 2200);
-  }, []);
+    copyEmail('sales@ultrakin.com');
+  }, [copyEmail]);
 
   const handleSubmitBriefing = (e) => {
     e.preventDefault();
@@ -121,9 +92,7 @@ export default function EnterpriseDemoDrawer() {
         type="button"
         aria-label="Close evaluation panel"
         onClick={closeDemoDrawer}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        {...scrimMotion}
         className="absolute inset-0 cursor-default bg-slate-900/40 backdrop-blur-sm transition-opacity"
       />
 
@@ -136,7 +105,7 @@ export default function EnterpriseDemoDrawer() {
         initial={{ x: '100%' }}
         animate={{ x: 0 }}
         exit={{ x: '100%' }}
-        transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+        transition={DRAWER_SPRING}
         className="relative z-10 flex h-full w-full max-w-xl flex-col border-l border-border bg-page text-ink shadow-[-28px_0_72px_-24px_rgba(20,34,59,.35)] overflow-hidden"
       >
         {/* ── Top Header ── */}

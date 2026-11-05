@@ -107,7 +107,7 @@ export default function DomainMailboxEngine() {
           <button
             type="button"
             onClick={() => setShowComposeModal(true)}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-sky-600 hover:bg-sky-500 px-3 py-1 rounded-lg shadow-sm transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-sky-600 hover:bg-sky-500 px-3 py-1 rounded-lg shadow-sm transition-all cursor-pointer active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Compose</span>
@@ -129,62 +129,98 @@ export default function DomainMailboxEngine() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Filter threads..."
-                className="w-full bg-obsidian-surface border border-obsidian-border rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500/50"
+                className="w-full bg-obsidian-surface border border-obsidian-border rounded-lg pl-8 pr-7 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500/50"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  aria-label="Clear search input"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 text-slate-400 hover:text-white p-0.5 rounded cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
             </div>
           </div>
 
           {/* Thread List Items */}
-          <div className="flex-1 overflow-y-auto divide-y divide-white/6">
-            {filteredEmails.map((email) => {
-              const isActive = email.id === activeEmail.id;
-              return (
-                <button
-                  key={email.id}
-                  type="button"
-                  onClick={() => setActiveEmailId(email.id)}
-                  className={cn(
-                    'w-full p-3 text-left transition-all flex flex-col gap-1 cursor-pointer relative',
-                    isActive
-                      ? 'bg-sky-500/10 border-l-2 border-sky-400'
-                      : 'hover:bg-white/[0.03]'
-                  )}
-                >
-                  <div className="flex items-center justify-between text-xs">
-                    <span
-                      className={cn(
-                        'font-semibold truncate max-w-[170px]',
-                        isActive ? 'text-white' : 'text-slate-300'
+          <div className="flex-1 overflow-y-auto divide-y divide-white/6 flex flex-col">
+            {filteredEmails.length > 0 ? (
+              filteredEmails.map((email) => {
+                const isActive = email.id === activeEmail.id;
+                return (
+                  <button
+                    key={email.id}
+                    type="button"
+                    onClick={() => setActiveEmailId(email.id)}
+                    className={cn(
+                      'w-full p-3 text-left transition-all flex flex-col gap-1 cursor-pointer relative',
+                      isActive
+                        ? 'bg-sky-500/10 border-l-2 border-sky-400'
+                        : 'hover:bg-white/[0.03]'
+                    )}
+                  >
+                    <div className="flex items-center justify-between text-xs">
+                      <span
+                        className={cn(
+                          'font-semibold truncate max-w-[170px]',
+                          isActive ? 'text-white' : 'text-slate-300'
+                        )}
+                      >
+                        {email.company}
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">{email.time}</span>
+                    </div>
+
+                    <div className="text-xs font-medium text-slate-200 line-clamp-1">
+                      {email.subject}
+                    </div>
+
+                    <div className="text-[11px] text-slate-400 line-clamp-2 leading-snug">
+                      {email.snippet}
+                    </div>
+
+                    <div className="mt-1 flex items-center gap-2">
+                      {email.converted && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400">
+                          <CheckCircle2 className="w-3 h-3" /> Task Created
+                        </span>
                       )}
-                    >
-                      {email.company}
-                    </span>
-                    <span className="text-[10px] font-mono text-slate-400">{email.time}</span>
-                  </div>
-
-                  <div className="text-xs font-medium text-slate-200 line-clamp-1">
-                    {email.subject}
-                  </div>
-
-                  <div className="text-[11px] text-slate-400 line-clamp-2 leading-snug">
-                    {email.snippet}
-                  </div>
-
-                  <div className="mt-1 flex items-center gap-2">
-                    {email.converted && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-400">
-                        <CheckCircle2 className="w-3 h-3" /> Task Created
-                      </span>
-                    )}
-                    {email.replied && (
-                      <span className="text-[10px] font-mono text-sky-400 bg-sky-500/10 px-1.5 py-0.2 rounded border border-sky-500/20">
-                        Replied
-                      </span>
-                    )}
-                  </div>
+                      {email.replied && (
+                        <span className="text-[10px] font-mono text-sky-400 bg-sky-500/10 px-1.5 py-0.2 rounded border border-sky-500/20">
+                          Replied
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })
+            ) : (
+              <div
+                role="status"
+                aria-live="polite"
+                className="p-6 text-center text-xs text-slate-400 space-y-2.5 my-auto"
+              >
+                <div className="w-8 h-8 rounded-lg bg-white/5 border border-obsidian-border flex items-center justify-center mx-auto text-slate-400">
+                  <Search className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="font-semibold text-white">No messages matching &ldquo;{searchQuery}&rdquo;</p>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                    Check your spelling or try searching for a different keyword.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Clear filter"
+                  onClick={() => setSearchQuery('')}
+                  className="inline-flex items-center gap-1 text-[11px] font-mono text-sky-400 hover:text-sky-300 underline cursor-pointer active:scale-95 transition-all"
+                >
+                  Clear filter
                 </button>
-              );
-            })}
+              </div>
+            )}
           </div>
         </div>
 
@@ -243,7 +279,7 @@ export default function DomainMailboxEngine() {
                 <button
                   type="button"
                   onClick={() => convertEmailToTask(activeEmail.id)}
-                  className="py-1 px-3.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-sky-600/25 transition-all cursor-pointer"
+                  className="py-1 px-3.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-sky-600/25 transition-all cursor-pointer active:scale-95"
                 >
                   <CheckSquare className="w-3.5 h-3.5" />
                   1-Click Convert to Task
@@ -253,7 +289,7 @@ export default function DomainMailboxEngine() {
               <button
                 type="button"
                 onClick={() => discussEmailInSpace(activeEmail, 'client-escalations')}
-                className="py-1 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs border border-obsidian-border flex items-center gap-1.5 cursor-pointer transition-colors"
+                className="py-1 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs border border-obsidian-border flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
               >
                 <MessageSquare className="w-3.5 h-3.5 text-indigo-400" />
                 Discuss in #client-escalations →
@@ -262,7 +298,7 @@ export default function DomainMailboxEngine() {
               <button
                 type="button"
                 onClick={() => setIsReplying(!isReplying)}
-                className="py-1 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs border border-obsidian-border flex items-center gap-1.5 cursor-pointer transition-colors"
+                className="py-1 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs border border-obsidian-border flex items-center gap-1.5 cursor-pointer transition-colors active:scale-95"
               >
                 <Send className="w-3.5 h-3.5 text-sky-400" />
                 <span>{isReplying ? 'Close Reply' : 'Draft reply'}</span>
@@ -320,7 +356,7 @@ export default function DomainMailboxEngine() {
                     onClick={handleSendReply}
                     disabled={!replyText.trim()}
                     className={cn(
-                      'px-4 py-1.5 rounded-lg text-xs font-semibold text-white transition-all flex items-center gap-1.5 cursor-pointer',
+                      'px-4 py-1.5 rounded-lg text-xs font-semibold text-white transition-all flex items-center gap-1.5 cursor-pointer active:scale-95',
                       replyText.trim()
                         ? 'bg-sky-600 hover:bg-sky-500 shadow-sm'
                         : 'bg-white/10 text-slate-500 cursor-not-allowed'

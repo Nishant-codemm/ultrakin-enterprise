@@ -7,12 +7,7 @@
  */
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
-
-function navigate(path) {
-  window.history.pushState({}, '', path);
-  window.dispatchEvent(new PopStateEvent('popstate'));
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+import { navigate } from '../../lib/navigate';
 
 export default function ProductBreadcrumb({
   productName,

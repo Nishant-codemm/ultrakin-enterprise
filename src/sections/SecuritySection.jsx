@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, FileCheck2, Globe, KeyRound, Lock, MapPinned, Plus, Server, ShieldCheck } from 'lucide-react';
 import { cn } from '../lib/cn';
 import { useReveal } from '../lib/useReveal';
+import { ULTRAKIN_EASE } from '../lib/motion';
 
 /* ─── Reusable cursor-tracking 3D tilt ─── */
 function TiltCard({ children, className, style, maxTilt = 9 }) {
@@ -102,7 +103,7 @@ export default function SecuritySection() {
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, x: -24 }}
           animate={inView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.6, ease: ULTRAKIN_EASE }}
           className="max-w-xl"
         >
           <p className="mb-6 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle">
@@ -144,7 +145,7 @@ export default function SecuritySection() {
         <motion.div
           initial={reduceMotion ? false : { opacity: 0, x: 24 }}
           animate={inView ? { opacity: 1, x: 0 } : {}}
-          transition={{ duration: 0.65, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.65, delay: 0.12, ease: ULTRAKIN_EASE }}
         >
         <TiltCard maxTilt={5} className="rounded-2xl" style={{ borderRadius: '1rem' }}>
           <div className="relative overflow-hidden rounded-2xl border border-border bg-surface-raised p-3 sm:p-4">

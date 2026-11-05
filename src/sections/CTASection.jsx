@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowRight, ArrowUpRight, ShieldCheck } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useReveal } from '../lib/useReveal';
+import { getSectionHeaderMotion } from '../lib/motion';
 
 export default function CTASection() {
   const [sectionRef, inView] = useReveal({ threshold: 0.12 });
@@ -20,9 +21,7 @@ export default function CTASection() {
 
       <div className="relative mx-auto max-w-7xl px-5 lg:px-8">
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          {...getSectionHeaderMotion(inView, reduceMotion)}
         >
           <div className="mb-8 flex items-center justify-between border-t border-border pt-5">
             <p className="flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">

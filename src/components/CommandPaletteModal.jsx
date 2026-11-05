@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { useWorkspace } from '../context/useWorkspace';
 import { cn } from '../lib/cn';
+import { scrimMotion, MODAL_DIALOG_TRANSITION } from '../lib/motion';
+import { useFocusTrap } from '../lib/useFocusTrap';
 
 export default function CommandPaletteModal() {
   const {
@@ -33,50 +35,15 @@ export default function CommandPaletteModal() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
   const dialogRef = useRef(null);
-  const restoreFocusRef = useRef(null);
   const resultRefs = useRef([]);
 
-  useEffect(() => {
-    if (!isSearchPaletteOpen) return undefined;
-
-    const previouslyFocused = document.activeElement;
-    restoreFocusRef.current = previouslyFocused === document.body ? null : previouslyFocused;
-    const focusFrame = window.requestAnimationFrame(() => inputRef.current?.focus());
-
-    return () => {
-      window.cancelAnimationFrame(focusFrame);
-      const restoreTarget = restoreFocusRef.current;
-      if (restoreTarget?.isConnected && !restoreTarget.hasAttribute('disabled') && restoreTarget.getClientRects().length > 0) {
-        restoreTarget.focus();
-      }
-      restoreFocusRef.current = null;
-    };
-  }, [isSearchPaletteOpen]);
-
-  const trapDialogFocus = (event) => {
-    if (event.key !== 'Tab') return;
-    const focusable = dialogRef.current?.querySelectorAll(
-      'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
-    );
-    if (!focusable?.length) {
-      event.preventDefault();
-      return;
-    }
-
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    const activeElement = document.activeElement;
-    if (!dialogRef.current?.contains(activeElement)) {
-      event.preventDefault();
-      (event.shiftKey ? last : first).focus();
-    } else if (event.shiftKey && activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
-  };
+  // Accessible focus trapping, initial focus, and escape dismissal
+  useFocusTrap({
+    isOpen: isSearchPaletteOpen,
+    containerRef: dialogRef,
+    initialFocusRef: inputRef,
+    onEscape: closeSearchPalette,
+  });
 
   // All searchable entities across the unified workspace kernel (memoized to prevent reallocation on search keystrokes)
   const entities = useMemo(
@@ -334,9 +301,7 @@ export default function CommandPaletteModal() {
         <div className="fixed inset-0 z-[110] flex items-start justify-center pt-[12vh] sm:pt-[15vh] px-4 select-none">
           {/* Backdrop Scrim */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            {...scrimMotion}
             onClick={closeSearchPalette}
             aria-hidden="true"
             className="fixed inset-0 bg-slate-900/35 backdrop-blur-md -z-10"
@@ -347,13 +312,12 @@ export default function CommandPaletteModal() {
           initial={{ opacity: 0, scale: 0.96, y: -10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: -10 }}
-          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+          transition={MODAL_DIALOG_TRANSITION}
           ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-label="Search Ultrakin"
           aria-describedby="command-palette-description"
-          onKeyDown={trapDialogFocus}
           className={cn(
             'w-full max-w-[640px] overflow-hidden rounded-2xl border border-border bg-surface-raised text-ink shadow-[0_28px_80px_-32px_rgba(17,24,39,.32),0_8px_24px_rgba(17,24,39,.12)] backdrop-blur-2xl'
           )}
@@ -402,66 +366,79 @@ export default function CommandPaletteModal() {
               filtered.map((item, idx) => {
                 const isSelected = selectedIndex === idx;
                 const IconComp = item.icon;
+                const isFirstInCategory = idx === 0 || item.category !== filtered[idx - 1].category;
 
                 return (
-                  <button
-                    key={item.id}
-                    ref={(element) => { resultRefs.current[idx] = element; }}
-                    id={`command-option-${item.id}`}
-                    type="button"
-                    role="option"
-                    aria-selected={isSelected}
-                    aria-label={`${item.title}. ${item.category}. ${item.subtitle}. ${item.badge}.`}
-                    onClick={() => {
-                      item.action();
-                      closeSearchPalette();
-                    }}
-                    onMouseEnter={() => setSelectedIndex(idx)}
-                    onFocus={() => setSelectedIndex(idx)}
-                    className={cn(
-                      'flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
-                      isSelected
-                        ? 'border-brand/25 bg-brand-soft text-ink shadow-[inset_0_1px_0_rgba(255,255,255,.8)]'
-                        : 'border-transparent text-ink-soft hover:border-border hover:bg-surface-soft'
-                    )}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
+                  <React.Fragment key={item.id}>
+                    {isFirstInCategory && (
                       <div
+                        role="presentation"
                         className={cn(
-                          'w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border',
-                          isSelected
-                            ? 'border-brand/20 bg-brand-soft text-brand-text'
-                            : 'border-border bg-surface-soft text-ink-subtle'
+                          'px-3 pb-1 font-mono text-[10px] font-bold uppercase tracking-wider text-ink-subtle select-none',
+                          idx === 0 ? 'pt-1.5' : 'pt-3.5 mt-1 border-t border-border/40'
                         )}
                       >
-                        <IconComp className="w-4 h-4" />
+                        {item.category}
                       </div>
-                      <div className="truncate">
-                        <div className="text-xs sm:text-sm font-semibold truncate flex items-center gap-2">
-                          <span className={isSelected ? 'text-ink' : 'text-ink-soft'}>
-                            {item.title}
-                          </span>
-                        </div>
-                        <div className="truncate text-[11px] text-ink-muted">
-                          {item.subtitle}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0 ml-3">
-                      <span
-                        className={cn(
-                          'text-[10px] font-mono px-2 py-0.5 rounded border',
-                          item.badgeColor
-                        )}
-                      >
-                        {item.badge}
-                      </span>
-                      {isSelected && (
-                        <ArrowRight className="hidden h-4 w-4 text-brand-text sm:block" />
+                    )}
+                    <button
+                      ref={(element) => { resultRefs.current[idx] = element; }}
+                      id={`command-option-${item.id}`}
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      aria-label={`${item.title}. ${item.category}. ${item.subtitle}. ${item.badge}.`}
+                      onClick={() => {
+                        item.action();
+                        closeSearchPalette();
+                      }}
+                      onMouseEnter={() => setSelectedIndex(idx)}
+                      onFocus={() => setSelectedIndex(idx)}
+                      className={cn(
+                        'flex w-full items-center justify-between rounded-xl border p-3 text-left transition-all duration-150 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+                        isSelected
+                          ? 'border-brand/25 bg-brand-soft text-ink shadow-[inset_0_1px_0_rgba(255,255,255,.8)]'
+                          : 'border-transparent text-ink-soft hover:border-border hover:bg-surface-soft'
                       )}
-                    </div>
-                  </button>
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div
+                          className={cn(
+                            'w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border',
+                            isSelected
+                              ? 'border-brand/20 bg-brand-soft text-brand-text'
+                              : 'border-border bg-surface-soft text-ink-subtle'
+                          )}
+                        >
+                          <IconComp className="w-4 h-4" />
+                        </div>
+                        <div className="truncate">
+                          <div className="text-xs sm:text-sm font-semibold truncate flex items-center gap-2">
+                            <span className={isSelected ? 'text-ink' : 'text-ink-soft'}>
+                              {item.title}
+                            </span>
+                          </div>
+                          <div className="truncate text-[11px] text-ink-muted">
+                            {item.subtitle}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0 ml-3">
+                        <span
+                          className={cn(
+                            'text-[10px] font-mono px-2 py-0.5 rounded border',
+                            item.badgeColor
+                          )}
+                        >
+                          {item.badge}
+                        </span>
+                        {isSelected && (
+                          <ArrowRight className="hidden h-4 w-4 text-brand-text sm:block" />
+                        )}
+                      </div>
+                    </button>
+                  </React.Fragment>
                 );
               })
             ) : (

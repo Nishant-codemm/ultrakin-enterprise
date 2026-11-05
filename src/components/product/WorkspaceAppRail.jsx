@@ -13,14 +13,9 @@ import {
   Workflow,
 } from 'lucide-react';
 import AvatarChip from './AvatarChip';
+import UltrakinLogo from '../primitives/UltrakinLogo';
 import { cn } from '../../lib/cn';
-
-function navigate(path) {
-  if (window.location.pathname === path) return;
-  window.history.pushState({}, '', path);
-  window.dispatchEvent(new PopStateEvent('popstate'));
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+import { navigate } from '../../lib/navigate';
 
 const APPS = [
   { id: 'chat', label: 'Chat', icon: MessageSquare, path: '/products/chat', color: '#5c5bd6' },
@@ -55,9 +50,9 @@ export default function WorkspaceAppRail({
           type="button"
           onClick={() => navigate('/workspace')}
           title="Switch Workspace (Acme Studio)"
-          className="h-7 w-7 rounded-lg bg-[#2563eb] text-white flex items-center justify-center font-bold text-[11px] shadow-xs hover:opacity-90 transition-opacity cursor-pointer focus:outline-none"
+          className="h-7 w-7 rounded-lg bg-[#2563eb] text-white flex items-center justify-center shadow-xs hover:opacity-90 transition-opacity cursor-pointer focus:outline-none"
         >
-          U
+          <UltrakinLogo size={14} className="text-white" />
         </button>
 
         <div className={cn('w-5 h-px my-0.5', isDark ? 'bg-white/10' : 'bg-[#e7e4de]')} />

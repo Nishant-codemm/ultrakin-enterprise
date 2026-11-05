@@ -1,9 +1,12 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { cn } from '../../lib/cn';
+import { FOCUS_RING } from '../../lib/interaction';
 
-const BASE_STYLES =
-  'group relative inline-flex items-center justify-center font-medium transition-[color,background-color,border-color,box-shadow,transform] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] select-none cursor-pointer transform-gpu focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-page disabled:opacity-50 disabled:pointer-events-none active:scale-[0.99] motion-reduce:transform-none motion-reduce:transition-none';
+const BASE_STYLES = cn(
+  'group relative inline-flex items-center justify-center font-medium transition-[color,background-color,border-color,box-shadow,transform] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] select-none cursor-pointer transform-gpu disabled:opacity-50 disabled:pointer-events-none active:scale-[0.99] motion-reduce:transform-none motion-reduce:transition-none',
+  FOCUS_RING
+);
 
 const SIZE_STYLES = {
   sm: 'h-8 px-3 text-xs rounded-md gap-1.5',

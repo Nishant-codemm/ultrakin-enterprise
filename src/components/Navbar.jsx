@@ -34,6 +34,8 @@ import {
 import UltrakinLogo from './primitives/UltrakinLogo';
 import Button from './primitives/Button';
 import { useWorkspace } from '../context/useWorkspace';
+import { navigate } from '../lib/navigate';
+import { SMOOTH_EASE } from '../lib/motion';
 
 const APP_URL = 'https://app.ultrakin.com';
 
@@ -129,22 +131,14 @@ const asideContent = {
     title: 'Templates to start from.',
     desc: 'Website lead → qualified deal · Inbound mail → support request · New hire onboarding',
     actionText: 'Browse all templates',
-    action: () => {
-      window.history.pushState({}, '', '/products/templates');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
+    action: () => navigate('/products/templates'),
   },
   Resources: {
     tag: 'ARCHITECTURE & GUIDES',
     title: 'Knowledge, docs & playbooks.',
     desc: 'Deep architecture whitepapers, MCP tutorials, migration guides, and case studies.',
     actionText: 'Browse all resources',
-    action: () => {
-      window.history.pushState({}, '', '/resources');
-      window.dispatchEvent(new PopStateEvent('popstate'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    },
+    action: () => navigate('/resources'),
   },
 };
 
@@ -312,9 +306,7 @@ export default function Navbar() {
     }
     // Product, Solution, and Resource page navigation — href takes priority
     if (item.href?.startsWith('/products/') || item.href?.startsWith('/solutions') || item.href?.startsWith('/resources')) {
-      window.history.pushState({}, '', item.href);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      navigate(item.href);
       return;
     }
     if (item.module) {
@@ -331,9 +323,7 @@ export default function Navbar() {
     } else if (item.href?.startsWith('#')) {
       scrollToSection(item.href.slice(1));
     } else if (item.href?.startsWith('/')) {
-      window.history.pushState({}, '', item.href);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      navigate(item.href);
     } else if (item.href) {
       window.open(item.href, '_blank', 'noopener,noreferrer');
     }
@@ -348,11 +338,11 @@ export default function Navbar() {
 
   const compactTransition = reduceMotion
     ? { initial: false, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.01 } }
-    : { initial: { opacity: 0, y: -8 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -6 }, transition: { duration: 0.24, ease: [0.22, 1, 0.36, 1] } };
+    : { initial: { opacity: 0, y: -8 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -6 }, transition: { duration: 0.24, ease: SMOOTH_EASE } };
 
   const menuMotion = reduceMotion
     ? { initial: false, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.01 } }
-    : { initial: { opacity: 0, y: 8, scale: 0.99 }, animate: { opacity: 1, y: 0, scale: 1 }, exit: { opacity: 0, y: 5, scale: 0.995 }, transition: { duration: 0.18, ease: [0.22, 1, 0.36, 1] } };
+    : { initial: { opacity: 0, y: 8, scale: 0.99 }, animate: { opacity: 1, y: 0, scale: 1 }, exit: { opacity: 0, y: 5, scale: 0.995 }, transition: { duration: 0.18, ease: SMOOTH_EASE } };
 
   const routeName = window.location.pathname.replace(/^\//, '').replace(/\/$/, '');
   const activePageRoute = ['workspace', 'agents', 'security', 'pricing'].includes(routeName) ? routeName : '';
@@ -377,9 +367,7 @@ export default function Navbar() {
           onClick={(event) => {
             event.preventDefault();
             if (window.location.pathname !== '/') {
-              window.history.pushState({}, '', '/');
-              window.dispatchEvent(new PopStateEvent('popstate'));
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              navigate('/');
             } else {
               scrollToSection('hero');
             }
@@ -434,9 +422,7 @@ export default function Navbar() {
             onClick={(event) => {
               event.preventDefault();
               if (window.location.pathname !== '/') {
-                window.history.pushState({}, '', '/');
-                window.dispatchEvent(new PopStateEvent('popstate'));
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                navigate('/');
               } else {
                 scrollToSection('hero');
               }
@@ -558,9 +544,7 @@ export default function Navbar() {
                     type="button"
                     onClick={() => {
                       setOpenMenu(null);
-                      window.history.pushState({}, '', '/solutions');
-                      window.dispatchEvent(new PopStateEvent('popstate'));
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      navigate('/solutions');
                     }}
                     className="font-medium text-brand hover:underline transition-colors flex items-center gap-1 cursor-pointer"
                   >

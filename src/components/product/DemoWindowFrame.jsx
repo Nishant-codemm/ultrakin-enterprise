@@ -6,9 +6,10 @@
  * - Interactive Chrome bar with clickable URL that triggers "Copied" feedback
  * - Strict Retina hairline border
  */
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { Check, Copy } from 'lucide-react';
 import { cn } from '../../lib/cn';
+import { useClipboard } from '../../lib/useClipboard';
 
 export default function DemoWindowFrame({
   children,
@@ -18,21 +19,10 @@ export default function DemoWindowFrame({
   height = 'h-[440px]',
   noPad = false,
 }) {
-  const [copied, setCopied] = useState(false);
-  const copyTimerRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-    };
-  }, []);
+  const { copied, copy } = useClipboard({ timeout: 2000 });
 
   const handleCopyUrl = () => {
-    if (!url) return;
-    navigator.clipboard?.writeText(`https://${url}`);
-    setCopied(true);
-    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
-    copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
+    if (url) copy(`https://${url}`);
   };
 
   return (

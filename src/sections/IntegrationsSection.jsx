@@ -20,6 +20,7 @@ import { cn } from '../lib/cn';
 import BrowserFrame from '../components/BrowserFrame';
 import UltrakinLogo from '../components/primitives/UltrakinLogo';
 import { useReveal } from '../lib/useReveal';
+import { getSectionHeaderMotion } from '../lib/motion';
 
 /* ─── 3D Tilt Context for synchronized perspective parallax ─── */
 const TiltContext = createContext({ rx: 0, ry: 0, gx: 50, gy: 50, active: false });
@@ -456,9 +457,7 @@ export default function IntegrationsSection() {
 
         {/* Header with Scroll Entrance */}
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          {...getSectionHeaderMotion(inView, reduceMotion)}
           className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-end"
         >
           <div>

@@ -6,6 +6,7 @@
  */
 import React, { useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { navigate } from '../lib/navigate';
 import {
   Headphones,
   TrendingUp,
@@ -39,12 +40,6 @@ const SOLUTION_ICONS = {
   'professional-services': Scale,
   'field-services': Truck,
 };
-
-function navigate(path) {
-  window.history.pushState({}, '', path);
-  window.dispatchEvent(new PopStateEvent('popstate'));
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
 
 export default function SolutionsOverviewPage() {
   const reduceMotion = useReducedMotion();

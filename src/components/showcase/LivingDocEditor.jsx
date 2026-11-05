@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   FileText,
   CheckCircle2,
@@ -16,6 +16,7 @@ import {
   AlertCircle,
   Send,
   X,
+  Check,
 } from 'lucide-react';
 import { useWorkspace } from '../../context/useWorkspace';
 import { cn } from '../../lib/cn';
@@ -49,6 +50,7 @@ export default function LivingDocEditor() {
 
   // Custom inserted blocks
   const [insertedBlocks, setInsertedBlocks] = useState([]);
+  const blockIdRef = useRef(0);
 
   const completedCount = docChecklists.filter((c) => c.checked).length;
   const progressPct = docChecklists.length > 0 ? Math.round((completedCount / docChecklists.length) * 100) : 0;
@@ -59,13 +61,16 @@ export default function LivingDocEditor() {
 
   const handleInsertBlock = (type) => {
     setShowSlashMenu(false);
+    blockIdRef.current += 1;
+    const newId = `blk_${blockIdRef.current}`;
+
     if (type === 'checklist') {
       setShowAddChecklist(true);
     } else if (type === 'callout') {
       setInsertedBlocks((prev) => [
         ...prev,
         {
-          id: 'blk_' + Date.now(),
+          id: newId,
           type: 'callout',
           title: 'Architecture Security Invariant',
           desc: 'All inter-module state transitions must be idempotent and broadcast across the in-memory bus with deterministic sequence numbers.',
@@ -75,7 +80,7 @@ export default function LivingDocEditor() {
       setInsertedBlocks((prev) => [
         ...prev,
         {
-          id: 'blk_' + Date.now(),
+          id: newId,
           type: 'code',
           title: 'launch-checklist.md',
           code: `# Launch checklist\n\n- Confirm the rollout owner\n- Review the support handoff\n- Link the release notes`,
@@ -105,11 +110,13 @@ export default function LivingDocEditor() {
     <div className="flex flex-col h-full bg-obsidian-canvas text-slate-200 relative overflow-hidden font-sans">
       {/* Document header with collaborator presence */}
       <div className="h-12 px-4 border-b border-obsidian-border bg-obsidian-surface/80 flex items-center justify-between select-none shrink-0">
-        <div className="flex items-center gap-2">
-          <FileText className="w-4 h-4 text-emerald-400" />
-          <span className="font-semibold text-xs sm:text-sm text-white">Q4 EU Cluster Architecture RFC</span>
-          <span className="text-[10px] font-mono text-emerald-300 bg-emerald-500/15 border border-emerald-500/20 px-2 py-0.5 rounded">
-            Sample document
+        <div className="flex items-center gap-2 min-w-0">
+          <FileText className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span className="text-slate-400 text-xs hidden md:inline truncate">Acme Architecture / RFCs /</span>
+          <span className="font-semibold text-xs sm:text-sm text-white truncate">RFC-891: Redis Sentinel</span>
+          <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-300 bg-emerald-500/15 border border-emerald-500/20 px-2 py-0.5 rounded shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="hidden sm:inline">Synced</span>
           </span>
         </div>
 
@@ -202,42 +209,51 @@ export default function LivingDocEditor() {
 
             {/* Dropdown Menu */}
             {showSlashMenu && (
-              <div className="absolute top-8 left-0 z-40 w-56 bg-obsidian-surface border border-obsidian-border-medium rounded-xl shadow-2xl p-1.5 space-y-1 text-xs">
+              <div className="absolute top-8 left-0 z-40 w-60 bg-obsidian-surface border border-obsidian-border-medium rounded-xl shadow-2xl p-1.5 space-y-1 text-xs">
                 <div className="px-2 py-1 text-[10px] font-mono uppercase text-slate-500">
-                  TipTap Block Elements
+                  Block Elements
                 </div>
                 <button
                   type="button"
                   onClick={() => handleInsertBlock('checklist')}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white text-left cursor-pointer"
+                  className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white text-left cursor-pointer transition-colors"
                 >
-                  <CheckSquare className="w-3.5 h-3.5 text-emerald-400" />
-                  <div>
-                    <div className="font-semibold text-white">/check</div>
-                    <div className="text-[10px] text-slate-400">Operational Checklist Item</div>
+                  <div className="flex items-center gap-2">
+                    <CheckSquare className="w-3.5 h-3.5 text-emerald-400" />
+                    <div>
+                      <div className="font-semibold text-white">Checklist</div>
+                      <div className="text-[10px] text-slate-400">Operational Checklist Item</div>
+                    </div>
                   </div>
+                  <kbd className="text-[10px] font-mono px-1 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400">/check</kbd>
                 </button>
                 <button
                   type="button"
                   onClick={() => handleInsertBlock('callout')}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white text-left cursor-pointer"
+                  className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white text-left cursor-pointer transition-colors"
                 >
-                  <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
-                  <div>
-                    <div className="font-semibold text-white">/callout</div>
-                    <div className="text-[10px] text-slate-400">Architecture Callout Box</div>
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
+                    <div>
+                      <div className="font-semibold text-white">Callout Box</div>
+                      <div className="text-[10px] text-slate-400">Architecture Invariant</div>
+                    </div>
                   </div>
+                  <kbd className="text-[10px] font-mono px-1 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400">/callout</kbd>
                 </button>
                 <button
                   type="button"
                   onClick={() => handleInsertBlock('code')}
-                  className="w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white text-left cursor-pointer"
+                  className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-slate-300 hover:bg-white/10 hover:text-white text-left cursor-pointer transition-colors"
                 >
-                  <Code2 className="w-3.5 h-3.5 text-indigo-400" />
-                  <div>
-                    <div className="font-semibold text-white">/code</div>
-                    <div className="text-[10px] text-slate-400">Syntax Code Block</div>
+                  <div className="flex items-center gap-2">
+                    <Code2 className="w-3.5 h-3.5 text-indigo-400" />
+                    <div>
+                      <div className="font-semibold text-white">Code Block</div>
+                      <div className="text-[10px] text-slate-400">Syntax Code Block</div>
+                    </div>
                   </div>
+                  <kbd className="text-[10px] font-mono px-1 py-0.5 rounded bg-white/5 border border-white/10 text-slate-400">/code</kbd>
                 </button>
               </div>
             )}
@@ -245,8 +261,10 @@ export default function LivingDocEditor() {
         </div>
 
         <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400">
-          <span>Document state:</span>
-          <span className="text-emerald-400 font-bold">Sample preview</span>
+          <span>Auto-sync:</span>
+          <span className="text-emerald-400 font-medium inline-flex items-center gap-1">
+            <Check className="w-3 h-3 text-emerald-400" /> Enabled
+          </span>
         </div>
       </div>
 
@@ -254,10 +272,12 @@ export default function LivingDocEditor() {
       <div className="flex-1 overflow-y-auto p-5 sm:p-8 max-w-4xl mx-auto w-full space-y-6">
         {/* Document Title Header */}
         <div className="space-y-2 border-b border-obsidian-border pb-4">
-          <div className="flex items-center gap-2 text-xs font-mono text-slate-400">
-            <span className="text-emerald-400">DOC-891</span>
+          <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-slate-400">
+            <span className="text-emerald-400 font-semibold">DOC-891</span>
             <span>·</span>
-            <span>Created Oct 2026</span>
+            <span>Last edited 2m ago by Sara Chen</span>
+            <span>·</span>
+            <span>640 words · 3 min read</span>
           </div>
 
           <h1 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
@@ -293,7 +313,7 @@ export default function LivingDocEditor() {
           </div>
         </div>
 
-        {/* Section 1: Context & Objective (With Paragraph Anchor node_p1) */}
+        {/* Section 1: Context & Objective (With Multiplayer Selection & Paragraph Anchor node_p1) */}
         <div
           id="node_p1"
           className="group relative p-3 rounded-xl border border-transparent hover:border-obsidian-border-medium hover:bg-white/[0.02] transition-all space-y-2 text-xs sm:text-sm text-slate-300 leading-relaxed"
@@ -315,8 +335,15 @@ export default function LivingDocEditor() {
           </div>
 
           <p>
-            During the launch rehearsal, the team noticed intermittent timeouts in the sample environment. They linked the
-            related discussion and token refresh change, then captured the agreed follow-up checks below.
+            During the launch rehearsal, the team noticed intermittent timeouts in the sample environment.{' '}
+            {/* Real multiplayer text selection flag (Alex Mercer) */}
+            <span className="relative inline bg-indigo-500/20 text-indigo-100 rounded px-1 py-0.5 border-b border-indigo-400">
+              They linked the related discussion and token refresh change
+              <span className="absolute -top-3.5 right-0 px-1 py-0.2 rounded text-[9px] font-semibold bg-indigo-600 text-white shadow-xs select-none pointer-events-none whitespace-nowrap">
+                Alex Mercer
+              </span>
+            </span>
+            , then captured the agreed follow-up checks below.
           </p>
         </div>
 
@@ -326,7 +353,14 @@ export default function LivingDocEditor() {
           className="space-y-3 p-4 rounded-xl border border-indigo-500/25 bg-obsidian-surface/80 relative"
         >
           <div className="flex items-center justify-between text-xs font-semibold text-indigo-300 uppercase font-mono tracking-wider">
-            <span>2. Operational Verification Checklist</span>
+            <div className="flex items-center gap-2">
+              <span>2. Operational Verification Checklist</span>
+              {/* Real multiplayer live cursor flag (Sara Chen) */}
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-sans font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 normal-case">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Sara Chen editing
+              </span>
+            </div>
 
             <div className="flex items-center gap-2">
               <button
@@ -409,12 +443,17 @@ export default function LivingDocEditor() {
           )}
         </div>
 
-        {/* Section 3: GitHub PR & Commit Synchronizer Card (Sprint 4 Deliverable) */}
+        {/* Section 3: GitHub PR & Commit Synchronizer Card */}
         <div className="p-4 rounded-xl border border-obsidian-border-medium bg-obsidian-surface/90 space-y-3">
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-2 text-indigo-300 font-mono font-bold">
               <GitPullRequest className="w-4 h-4 text-indigo-400" />
               <span>LINKED GITHUB PULL REQUEST #1042</span>
+              {/* Multiplayer viewing indicator */}
+              <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-sans font-medium bg-violet-500/20 text-violet-300 border border-violet-500/30 normal-case">
+                <span className="w-1.5 h-1.5 rounded-full bg-violet-400" />
+                Marcus Lindqvist viewing
+              </span>
             </div>
             <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/20 font-semibold">
               ✓ Merged &amp; Deployed
@@ -484,7 +523,7 @@ export default function LivingDocEditor() {
             Synchronized from Live Huddle #18 (10:42 AM)
           </div>
           <p className="text-[12px] text-slate-400 italic">
-            "Token cache TTL expired prematurely under peak load. I have reverted the cache TTL to 3600s in PR #1042." &mdash; Sara Chen
+            &ldquo;Token cache TTL expired prematurely under peak load. I have reverted the cache TTL to 3600s in PR #1042.&rdquo; &mdash; Sara Chen
           </p>
         </div>
       </div>

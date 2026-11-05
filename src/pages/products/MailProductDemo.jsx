@@ -24,6 +24,7 @@ import {
 import AvatarChip from '../../components/product/AvatarChip';
 import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
 import { PERSONAS } from '../../data/productPageData';
+import { ULTRAKIN_EASE } from '../../lib/motion';
 
 // ─── Mail Queue Dataset matching Original Reference ─────────────────────────
 const INITIAL_INBOX = [
@@ -277,7 +278,7 @@ export default function MailProductDemo() {
                   initial={reduceMotion ? false : { opacity: 0, y: 4 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.2, ease: ULTRAKIN_EASE }}
                   className="space-y-3.5 flex-1 flex flex-col justify-between"
                 >
                   <div className="space-y-3">

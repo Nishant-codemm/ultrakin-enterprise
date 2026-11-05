@@ -30,6 +30,7 @@ import {
 import AvatarChip from '../../components/product/AvatarChip';
 import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
 import { LISTS_DATA, PERSONAS } from '../../data/productPageData';
+import { ULTRAKIN_EASE, scrimMotion } from '../../lib/motion';
 
 const STATUS_CONFIG = {
   Incoming:    { label: 'Todo',        color: 'text-slate-700 bg-slate-100 border-slate-300', dot: 'bg-slate-400' },
@@ -360,7 +361,7 @@ export default function ListsProductDemo() {
                             initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.92 }}
-                            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                            transition={{ duration: 0.2, ease: ULTRAKIN_EASE }}
                             className="group p-3 rounded-lg bg-white border border-[#e7e4de] shadow-2xs hover:border-[#3156cf] hover:shadow-xs transition-all cursor-pointer relative"
                             onClick={() => setSelectedRecord(card)}
                           >
@@ -547,9 +548,7 @@ export default function ListsProductDemo() {
       <AnimatePresence>
         {selectedRecord && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            {...scrimMotion}
             className="absolute inset-0 bg-black/25 backdrop-blur-[1px] z-30 flex justify-end"
             onClick={() => setSelectedRecord(null)}
           >
@@ -557,7 +556,7 @@ export default function ListsProductDemo() {
               initial={{ x: 340 }}
               animate={{ x: 0 }}
               exit={{ x: 340 }}
-              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.22, ease: ULTRAKIN_EASE }}
               className="w-full max-w-md bg-white border-l border-[#e7e4de] shadow-2xl h-full flex flex-col overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
