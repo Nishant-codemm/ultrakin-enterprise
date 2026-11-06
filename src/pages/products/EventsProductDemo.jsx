@@ -8,10 +8,9 @@
  * - Automated recording & transcript distribution indicator
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Clock, MapPin, Users, Video, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Clock, MapPin, Users } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
-import { EVENTS_DATA, PERSONAS } from '../../data/productPageData';
+import { EVENTS_DATA } from '../../data/productPageData';
 
 export default function EventsProductDemo() {
   const [selectedRsvp, setSelectedRsvp] = useState('Going');
@@ -122,7 +121,9 @@ export default function EventsProductDemo() {
                 return (
                   <button
                     key={status}
+                    type="button"
                     onClick={() => handleRsvp(status)}
+                    aria-pressed={active}
                     className={`py-1 text-[11px] rounded font-medium transition-all ${
                       active
                         ? 'bg-[#111827] text-white shadow-sm'

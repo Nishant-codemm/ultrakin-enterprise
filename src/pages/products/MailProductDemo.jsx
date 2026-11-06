@@ -9,7 +9,7 @@
  * - Left Workspace App Rail (Blue U, Lavender Chat, Teal Calls, Active Red Mail roundel, Blue Docs, Green Lists, Fuchsia Automations)
  * - Domain Header (support@northwind.studio + gray Inbox badge)
  * - Left Queue: Maya Chen (coral unread dot, warm peach #fff5f5 selection), Lumen Health, Dana Lee, Sam Ortiz
- * - Right Active Thread: Customer Inquiry -> Team Reply Container (with "Replied by Priya" badge) -> "✓ Logged as SR-14 in Support requests"
+ * - Right Active Thread: Customer Inquiry -> Agent draft awaiting review -> "Logged as SR-14 in Support requests"
  * - Live Collision Alert: "Sam Ortiz is viewing this thread"
  * - Interactive Smart Suggestions & Optimistic Composer
  * - Full Keyboard Navigation (ArrowUp / ArrowDown)
@@ -33,8 +33,8 @@ const INITIAL_INBOX = [
     from: PERSONAS.maya,
     name: 'Maya Chen',
     time: 'Now',
-    subject: 'Charged twice for October',
-    preview: 'Charged twice for Octo...',
+    subject: 'Charged twice for order #4821',
+    preview: 'Two separate charges of $120...',
     unread: true,
   },
   {
@@ -68,23 +68,17 @@ const INITIAL_INBOX = [
 
 const THREADS = {
   1: {
-    subject: 'Charged twice for October',
+    subject: 'Charged twice for order #4821',
     senderEmail: 'maya@northwind.studio',
-    time: '9:04 AM',
+    time: '9:12 AM',
     customerMessage:
-      'Hi, I was charged twice for October — order #4821. Can you please check and process a refund? My billing statement shows two separate charges of $49.',
-    reply: {
-      author: 'Priya K',
-      authorLabel: 'Replied by Priya',
-      time: '9:18 AM',
-      body:
-        'Hi Maya, sorry about that. We have refunded the duplicate charge and it will show in 3 to 5 days.',
-    },
+      'Hi, I was charged twice for order #4821. My billing statement shows two separate charges of $120. Can someone check this?',
+    reply: null,
     record: {
       id: 'SR-14',
       list: 'Support requests',
-      status: 'In Progress',
-      assignee: 'Priya K',
+      status: 'Needs review',
+      assignee: 'Dana Lee',
     },
   },
   2: {
@@ -121,7 +115,7 @@ export default function MailProductDemo() {
   const [inbox, setInbox] = useState(INITIAL_INBOX);
   const [selectedId, setSelectedId] = useState(1);
   const [threads, setThreads] = useState(THREADS);
-  const [showCollisionAlert] = useState(true);
+  const showCollisionAlert = true;
   const [hoveredRecord, setHoveredRecord] = useState(false);
   const [replyInput, setReplyInput] = useState('');
   const [isSending, setIsSending] = useState(false);
@@ -382,6 +376,7 @@ export default function MailProductDemo() {
                         type="text"
                         value={replyInput}
                         onChange={(e) => setReplyInput(e.target.value)}
+                        aria-label={`Reply to ${selectedThread.senderEmail}`}
                         placeholder={`Reply to ${selectedThread.senderEmail}...`}
                         className="flex-1 bg-[#faf9f7] border border-[#e7e4de] focus:border-[#dc2626] rounded-lg px-2.5 py-1.5 text-xs text-[#111827] placeholder-slate-400 focus:outline-none transition-colors"
                       />

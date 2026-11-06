@@ -4,12 +4,41 @@
  * Shows problem/solution pairs in a 2-column grid.
  */
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { X, Check } from 'lucide-react';
 import { ULTRAKIN_EASE } from '../../lib/motion';
 
-export default function ProductFeatureGrid({ features = [], productColor }) {
+export default function ProductFeatureGrid({ features = [], productColor, productName, variant = 'comparison' }) {
+  const reduceMotion = useReducedMotion();
   if (!features.length) return null;
+
+  if (variant === 'capabilities') {
+    return (
+      <section className="mt-20 border-t border-[#e7e4de] pt-16 pb-20">
+        <div className="mx-auto max-w-7xl px-5 lg:px-8">
+          <h2 className="mb-10 font-sans text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-[1.1] tracking-[-0.04em] text-[#111827]">
+            What you can do with {productName}.
+          </h2>
+
+          <div className="grid grid-cols-1 gap-x-10 gap-y-0 sm:grid-cols-2 lg:grid-cols-4">
+            {features.map((feature, index) => (
+              <motion.article
+                key={feature.title}
+                initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+                whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.4, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
+                className="border-t border-[#e7e4de] py-5"
+              >
+                <h3 className="text-sm font-semibold leading-5 text-[#111827]">{feature.title}</h3>
+                <p className="mt-2 text-[13px] leading-5 text-[#667085]">{feature.description}</p>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="mt-20 border-t border-[#e7e4de] pt-16 pb-20">

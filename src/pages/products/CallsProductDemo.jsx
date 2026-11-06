@@ -10,21 +10,21 @@
  */
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Mic, MicOff, Video, VideoOff, PhoneOff, PhoneCall, Sparkles, CheckSquare, Share2, Users } from 'lucide-react';
+import { Mic, MicOff, Video, VideoOff, PhoneOff, PhoneCall, Sparkles, CheckSquare, Share2 } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
 import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
 import TypewriterText from '../../components/product/TypewriterText';
 import { CALLS_DATA } from '../../data/productPageData';
 
-function AudioWaveform() {
+function AudioWaveform({ reduceMotion }) {
   return (
     <div className="flex items-center gap-0.5 h-3 px-1.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30">
       {[40, 90, 60, 100, 50].map((h, i) => (
         <motion.span
           key={i}
           className="w-0.5 rounded-full bg-emerald-400"
-          animate={{ height: ['25%', `${h}%`, '30%'] }}
-          transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.12, ease: 'easeInOut' }}
+          animate={reduceMotion ? { height: `${h}%` } : { height: ['25%', `${h}%`, '30%'] }}
+          transition={reduceMotion ? { duration: 0 } : { duration: 0.6, repeat: Infinity, delay: i * 0.12, ease: 'easeInOut' }}
         />
       ))}
     </div>
@@ -36,8 +36,9 @@ export default function CallsProductDemo() {
   const [inCall, setInCall] = useState(true);
   const [muted, setMuted] = useState(false);
   const [cameraOff, setCameraOff] = useState(false);
+  const [sharingScreen, setSharingScreen] = useState(false);
   const [activeSpeaker, setActiveSpeaker] = useState(1);
-  const [seconds, setSeconds] = useState(868); // 14:28
+  const [seconds, setSeconds] = useState(738); // 12:18
 
   // Live timer tick
   useEffect(() => {
@@ -63,7 +64,7 @@ export default function CallsProductDemo() {
       <div className="h-10 shrink-0 border-b border-white/[0.08] flex items-center justify-between px-4 bg-[#0B0F19]">
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
-          <span className="text-xs font-semibold text-slate-200">Engineering Sync · Audio Huddle</span>
+          <span className="text-xs font-semibold text-slate-200">Kestrel Robotics · Project kickoff</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-mono text-slate-400 bg-white/[0.05] px-2 py-0.5 rounded border border-white/[0.08] tabular-nums">
@@ -92,9 +93,12 @@ export default function CallsProductDemo() {
                   const isSpeaking = p.id === activeSpeaker;
                   const isUser = p.id === 2;
                   return (
-                    <div
+                    <button
                       key={p.id}
+                      type="button"
                       onClick={() => setActiveSpeaker(p.id)}
+                      aria-label={`Show ${p.person.name} as active speaker`}
+                      aria-pressed={isSpeaking}
                       className={`relative rounded-xl border p-2.5 flex flex-col items-center justify-center transition-all cursor-pointer ${
                         isSpeaking
                           ? 'border-emerald-500/50 bg-[#0F172A] shadow-[0_0_20px_rgba(16,185,129,0.14)]'
@@ -119,7 +123,7 @@ export default function CallsProductDemo() {
                         </span>
                         <div className="flex items-center justify-center gap-1 mt-0.5">
                           {isSpeaking ? (
-                            <AudioWaveform />
+                            <AudioWaveform reduceMotion={reduceMotion} />
                           ) : (
                             <span className="text-[9.5px] text-slate-500 font-mono">{p.person.role}</span>
                           )}
@@ -136,7 +140,7 @@ export default function CallsProductDemo() {
                           <Mic size={11} className="text-emerald-400" />
                         )}
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
@@ -144,11 +148,11 @@ export default function CallsProductDemo() {
               {/* Live Streaming Speech Caption Ticker */}
               <div className="mt-2 px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.06] flex items-center justify-between text-[11px] text-slate-300">
                 <span className="flex items-center gap-1.5">
-                  <span className="text-emerald-400 font-bold font-mono text-[9px] uppercase">Dana Lee:</span>
-                  <span className="italic text-slate-200">"...and then we soft launch to 20% of users on Nov 15th."</span>
+                  <span className="text-emerald-400 font-bold font-mono text-[9px] uppercase">Priya K:</span>
+                  <span className="italic text-slate-200">"...let’s keep the checklist in the shared kickoff doc and assign an owner to each follow-up."</span>
                 </span>
                 <span className="text-[9px] font-mono text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">
-                  Live
+                  {sharingScreen ? 'Sharing screen' : 'Live'}
                 </span>
               </div>
             </motion.div>
@@ -195,7 +199,7 @@ export default function CallsProductDemo() {
               </div>
 
               <div className="pt-3 border-t border-white/[0.08] flex items-center justify-between text-[11px]">
-                <span className="text-slate-400">All attendees notified in #engineering</span>
+                <span className="text-slate-400">Summary saved to #client-kestrel</span>
                 <button
                   onClick={() => setInCall(true)}
                   className="px-3 py-1 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white font-medium flex items-center gap-1.5 cursor-pointer"
@@ -213,7 +217,10 @@ export default function CallsProductDemo() {
         {inCall ? (
           <>
             <button
+              type="button"
               onClick={() => setMuted((m) => !m)}
+              aria-label={muted ? 'Unmute microphone' : 'Mute microphone'}
+              aria-pressed={muted}
               className={`p-2 rounded-xl border text-xs font-medium transition-colors cursor-pointer ${
                 muted
                   ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
@@ -225,7 +232,10 @@ export default function CallsProductDemo() {
             </button>
 
             <button
+              type="button"
               onClick={() => setCameraOff((c) => !c)}
+              aria-label={cameraOff ? 'Turn camera on' : 'Turn camera off'}
+              aria-pressed={cameraOff}
               className={`p-2 rounded-xl border text-xs font-medium transition-colors cursor-pointer ${
                 cameraOff
                   ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
@@ -237,13 +247,17 @@ export default function CallsProductDemo() {
             </button>
 
             <button
-              className="p-2 rounded-xl border border-white/[0.1] bg-white/[0.06] text-slate-200 hover:bg-white/[0.1] text-xs font-medium transition-colors cursor-pointer"
-              title="Share screen"
+              type="button"
+              onClick={() => setSharingScreen((sharing) => !sharing)}
+              aria-pressed={sharingScreen}
+              className={`p-2 rounded-xl border text-xs font-medium transition-colors cursor-pointer ${sharingScreen ? 'border-indigo-400/50 bg-indigo-500/20 text-indigo-200' : 'border-white/[0.1] bg-white/[0.06] text-slate-200 hover:bg-white/[0.1]'}`}
+              title={sharingScreen ? 'Stop sharing screen' : 'Share screen'}
             >
               <Share2 size={14} />
             </button>
 
             <button
+              type="button"
               onClick={() => setInCall(false)}
               className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-lg shadow-rose-900/40 cursor-pointer"
             >
@@ -252,6 +266,7 @@ export default function CallsProductDemo() {
           </>
         ) : (
           <button
+            type="button"
             onClick={() => setInCall(true)}
             className="px-4 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-lg shadow-emerald-900/40 cursor-pointer"
           >

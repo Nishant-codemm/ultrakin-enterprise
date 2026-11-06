@@ -9,19 +9,18 @@
  * - Realistic editing simulation
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, CheckSquare, Square, MessageSquare, Sparkles, Clock, MoreHorizontal } from 'lucide-react';
+import { FileText, CheckSquare, Square, MessageSquare, Sparkles, Clock } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
 import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
-import { DOCS_DATA, PERSONAS } from '../../data/productPageData';
+import { DOCS_DATA } from '../../data/productPageData';
 
 export default function DocsProductDemo() {
   const [activeCommentId, setActiveCommentId] = useState(1);
-  const [tasks, setTasks] = useState([
-    { id: 1, text: 'Feature flags configured', done: true },
-    { id: 2, text: 'Performance tests passing', done: true },
-    { id: 3, text: 'Rollback plan documented', done: false },
-  ]);
+  const [tasks, setTasks] = useState(() => (
+    DOCS_DATA.content
+      .find((section) => section.type === 'task')
+      .items.map((text, index) => ({ id: index + 1, text, done: index === 0 }))
+  ));
 
   const toggleTask = (id) => {
     setTasks((prev) =>
@@ -40,9 +39,9 @@ export default function DocsProductDemo() {
         <div className="flex items-center justify-between border-b border-[#e7e4de] pb-3 mb-4">
           <div>
             <div className="flex items-center gap-1.5 text-[11px] text-[#667085] font-mono mb-1">
-              <span>Engineering</span>
+              <span>{DOCS_DATA.breadcrumb.split(' / ')[0]}</span>
               <span>/</span>
-              <span>Planning</span>
+              <span>{DOCS_DATA.breadcrumb.split(' / ')[1]}</span>
             </div>
             <h2 className="text-base font-bold text-[#111827] flex items-center gap-2">
               <FileText size={16} className="text-[#2563eb]" />
@@ -53,7 +52,7 @@ export default function DocsProductDemo() {
           {/* Active Presence Avatars */}
           <div className="flex items-center gap-2">
             <span className="text-[11px] text-[#667085] flex items-center gap-1 font-mono">
-              <Clock size={11} /> Edited 2m ago
+              <Clock size={11} /> Edited {DOCS_DATA.lastEdited}
             </span>
             <div className="flex -space-x-1.5 ml-2">
               {DOCS_DATA.onlineUsers.map((u, i) => (
@@ -66,18 +65,19 @@ export default function DocsProductDemo() {
         {/* Doc Body Content */}
         <div className="space-y-4 text-xs leading-relaxed text-[#344054]">
           {/* Section 1: Overview with active comment highlight */}
-          <div
+          <button
+            type="button"
             onClick={() => setActiveCommentId(1)}
-            className={`p-2.5 rounded-lg transition-colors cursor-pointer ${
+            aria-pressed={activeCommentId === 1}
+            className={`block w-full text-left p-2.5 rounded-lg transition-colors cursor-pointer ${
               activeCommentId === 1 ? 'bg-amber-500/10 border border-amber-300' : 'hover:bg-slate-100/60'
             }`}
           >
-            <h3 className="font-semibold text-sm text-[#111827] mb-1">1. Overview</h3>
+            <h3 className="font-semibold text-sm text-[#111827] mb-1">Kickoff</h3>
             <p>
-              This document outlines the operational plan for our Q4 product release on November 15th.
-              All teams should review their sections and confirm readiness by November 10th.
+              {DOCS_DATA.content.find((section) => section.type === 'p')?.text}
             </p>
-          </div>
+          </button>
 
           {/* Section 2: Pinned Decision Block */}
           <div className="p-3 rounded-xl border border-emerald-200 bg-emerald-50/70 text-emerald-900 shadow-sm">
@@ -85,22 +85,24 @@ export default function DocsProductDemo() {
               <Sparkles size={13} className="text-emerald-600" /> Pinned Team Decision
             </div>
             <p className="font-medium text-xs leading-relaxed">
-              Soft launch to 20% of users first, then full rollout 48 hours later pending error rate metrics.
+              {DOCS_DATA.content.find((section) => section.type === 'decision')?.text.replace('Decision: ', '')}
             </p>
             <div className="mt-1 text-[10px] text-emerald-700/80 font-mono">
-              Confirmed in #launch-planning by Sam Ortiz
+              Captured from the Kestrel Robotics kickoff
             </div>
           </div>
 
           {/* Section 3: Interactive Checklist */}
           <div>
-            <h3 className="font-semibold text-sm text-[#111827] mb-2">2. Engineering Checklist</h3>
+            <h3 className="font-semibold text-sm text-[#111827] mb-2">Follow-up</h3>
             <div className="space-y-1.5">
               {tasks.map((task) => (
-                <div
+                <button
                   key={task.id}
+                  type="button"
                   onClick={() => toggleTask(task.id)}
-                  className="flex items-center gap-2 p-1.5 rounded-md hover:bg-slate-100 cursor-pointer text-xs"
+                  aria-pressed={task.done}
+                  className="flex w-full items-center gap-2 p-1.5 rounded-md hover:bg-slate-100 cursor-pointer text-left text-xs"
                 >
                   {task.done ? (
                     <CheckSquare size={14} className="text-emerald-600 shrink-0" />
@@ -110,7 +112,7 @@ export default function DocsProductDemo() {
                   <span className={task.done ? 'line-through text-slate-400' : 'text-slate-700'}>
                     {task.text}
                   </span>
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -130,10 +132,12 @@ export default function DocsProductDemo() {
           {DOCS_DATA.comments.map((comment) => {
             const isSelected = activeCommentId === comment.id;
             return (
-              <div
+              <button
                 key={comment.id}
+                type="button"
                 onClick={() => setActiveCommentId(comment.id)}
-                className={`p-2.5 rounded-xl border text-xs cursor-pointer transition-all ${
+                aria-pressed={isSelected}
+                className={`block w-full text-left p-2.5 rounded-xl border text-xs cursor-pointer transition-all ${
                   isSelected
                     ? 'border-indigo-400 bg-white shadow-sm ring-1 ring-indigo-300'
                     : 'border-[#e7e4de] bg-white/70 hover:bg-white'
@@ -147,7 +151,7 @@ export default function DocsProductDemo() {
                   <span className="text-[9px] text-slate-400 ml-auto">{comment.time}</span>
                 </div>
                 <p className="text-[11px] text-slate-600 leading-normal">{comment.text}</p>
-              </div>
+              </button>
             );
           })}
         </div>

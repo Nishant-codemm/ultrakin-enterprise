@@ -7,9 +7,8 @@
  * - Highlighted query substring matches
  * - Instant context inspector sync on arrow change
  */
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Command, ArrowRight, CornerDownLeft, FileText, MessageSquare, Mail, CheckSquare, X } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Search, CornerDownLeft, FileText, MessageSquare, Mail, CheckSquare, X } from 'lucide-react';
 import { SEARCH_DATA } from '../../data/productPageData';
 
 const TYPE_ICONS = {
@@ -22,6 +21,7 @@ const TYPE_ICONS = {
 export default function SearchProductDemo() {
   const [query, setQuery] = useState(SEARCH_DATA.defaultQuery);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [openedResultId, setOpenedResultId] = useState(null);
   const inputRef = useRef(null);
 
   const filtered = SEARCH_DATA.results.filter((item) =>
@@ -41,9 +41,13 @@ export default function SearchProductDemo() {
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setSelectedIndex((prev) => (prev - 1 + filtered.length) % Math.max(filtered.length, 1));
+    } else if (e.key === 'Enter' && selectedItem) {
+      e.preventDefault();
+      setOpenedResultId(selectedItem.id);
     } else if (e.key === 'Escape') {
       setQuery('');
       setSelectedIndex(0);
+      setOpenedResultId(null);
     }
   };
 
@@ -72,6 +76,7 @@ export default function SearchProductDemo() {
         <input
           ref={inputRef}
           type="text"
+          aria-label="Search workspace content"
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -83,6 +88,7 @@ export default function SearchProductDemo() {
         {query && (
           <button
             type="button"
+            aria-label="Clear search"
             onClick={() => {
               setQuery('');
               setSelectedIndex(0);
@@ -108,10 +114,15 @@ export default function SearchProductDemo() {
               const Icon = TYPE_ICONS[item.type] || FileText;
               const isSelected = selectedIndex === idx;
               return (
-                <div
+                <button
                   key={item.id}
-                  onClick={() => setSelectedIndex(idx)}
-                  className={`flex items-center gap-2.5 p-2 rounded-lg text-xs cursor-pointer transition-all ${
+                  type="button"
+                  onClick={() => {
+                    setSelectedIndex(idx);
+                    setOpenedResultId(item.id);
+                  }}
+                  aria-pressed={isSelected}
+                  className={`flex w-full items-center gap-2.5 p-2 rounded-lg text-left text-xs cursor-pointer transition-all ${
                     isSelected
                       ? 'bg-indigo-600/25 border border-indigo-500/40 text-slate-100 shadow-xs'
                       : 'text-slate-300 hover:bg-white/[0.04] border border-transparent'
@@ -138,7 +149,7 @@ export default function SearchProductDemo() {
                   {isSelected && (
                     <CornerDownLeft size={10} className="text-indigo-400 shrink-0 opacity-70" />
                   )}
-                </div>
+                </button>
               );
             })
           ) : (
@@ -174,7 +185,9 @@ export default function SearchProductDemo() {
           )}
 
           <div className="pt-2 border-t border-white/[0.08] flex items-center justify-between text-[10px] font-mono text-slate-400">
-            <span>↑↓ Navigate · ↵ Select</span>
+            <span aria-live="polite">
+              {openedResultId === selectedItem?.id ? 'Preview opened' : '↑↓ Navigate · ↵ Open preview'}
+            </span>
             <CornerDownLeft size={10} />
           </div>
         </div>

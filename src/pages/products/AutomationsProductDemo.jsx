@@ -9,7 +9,7 @@
  */
 import React, { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Mail, Filter, PlusSquare, Bell, ShieldCheck, Play, ArrowRight, Settings2 } from 'lucide-react';
+import { Mail, Filter, PlusSquare, ShieldCheck, Play, Settings2 } from 'lucide-react';
 import { AUTOMATIONS_DATA } from '../../data/productPageData';
 
 const NODE_ICONS = {
@@ -22,6 +22,7 @@ const NODE_ICONS = {
 export default function AutomationsProductDemo() {
   const reduceMotion = useReducedMotion();
   const [selectedNodeId, setSelectedNodeId] = useState('trigger');
+  const [testRunComplete, setTestRunComplete] = useState(false);
 
   const selectedNode = AUTOMATIONS_DATA.nodes.find((n) => n.id === selectedNodeId) || AUTOMATIONS_DATA.nodes[0];
 
@@ -36,8 +37,9 @@ export default function AutomationsProductDemo() {
             <span className="text-xs font-semibold text-slate-200">Support Inbound Triager</span>
             <span className="text-[10px] font-mono text-slate-500">v2.1 · Active</span>
           </div>
-          <button className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 text-[10px] font-semibold hover:bg-indigo-600/50 transition-colors">
-            <Play size={10} fill="currentColor" /> Test Run
+          <button type="button" onClick={() => setTestRunComplete(true)} className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 text-[10px] font-semibold hover:bg-indigo-600/50 transition-colors">
+            {testRunComplete ? <ShieldCheck size={10} /> : <Play size={10} fill="currentColor" />}
+            {testRunComplete ? 'Test passed' : 'Test Run'}
           </button>
         </div>
 
@@ -49,9 +51,11 @@ export default function AutomationsProductDemo() {
             return (
               <div key={node.id} className="relative">
                 {/* Node Box */}
-                <div
+                <button
+                  type="button"
                   onClick={() => setSelectedNodeId(node.id)}
-                  className={`flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer ${
+                  aria-pressed={isSelected}
+                  className={`flex w-full items-center gap-3 p-3 rounded-xl border text-left transition-all cursor-pointer ${
                     isSelected
                       ? 'border-indigo-400 bg-[#1E293B] shadow-[0_0_20px_rgba(99,102,241,0.2)] ring-1 ring-indigo-400'
                       : 'border-white/[0.08] bg-[#0F172A] hover:border-white/[0.2]'
@@ -75,7 +79,7 @@ export default function AutomationsProductDemo() {
                       {node.sub}
                     </span>
                   </div>
-                </div>
+                </button>
 
                 {/* Connecting arrow line */}
                 {index < AUTOMATIONS_DATA.nodes.length - 1 && (
