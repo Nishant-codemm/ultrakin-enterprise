@@ -5,18 +5,15 @@
  * Class Event RSVP card in #ap-physics channel -> Live Video Lecture -> AI Recording & Class Notes.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   Calendar,
-  Video,
   Play,
   Pause,
   Download,
   Check,
   Users,
-  MessageSquare,
   Sparkles,
-  Clock,
   Share2,
   Volume2,
 } from 'lucide-react';
@@ -37,6 +34,42 @@ export default function EducationSolutionDemo() {
     { id: 'calculus-prep', name: 'calculus-prep', unread: false },
     { id: 'announcements', name: 'announcements', unread: false },
   ];
+
+  const channelContent = {
+    general: {
+      title: 'Study Hall: Weekly Problem Clinic',
+      schedule: 'Wednesday 4:00 PM – 4:45 PM · Prof. David Chen · Open Huddle',
+      recap: 'Study Hall Notes & Recording',
+      takeaways: ['Bring questions from this week’s problem set.', 'Review the worked examples in the class notes.', 'Next study hall: Wednesday at 4:00 PM.'],
+      studentNote: 'I added the questions I want to review to the class thread.',
+    },
+    'ap-physics': {
+      title: 'AP Physics: Mechanics & Orbital Motion',
+      schedule: 'Tuesday 3:00 PM – 3:45 PM · Prof. David Chen · Room 402 + Video Huddle',
+      recap: 'Class Recording & AI Recap',
+      takeaways: [
+        'Kepler’s Third Law Derivation: $T^2 ∝ r^3$ demonstrated via centripetal balance equation.',
+        'Orbital Velocity Shortcut: $v = √(GM/r)$ applies to circular geostationary orbits.',
+        'Homework Due Friday: Problem set 4, questions 3–9.',
+      ],
+      studentNote: 'Thank you Prof. Chen! The diagram in the recap notes makes question 4 easier to follow.',
+    },
+    'calculus-prep': {
+      title: 'Calculus Prep: Integration Review',
+      schedule: 'Thursday 2:00 PM – 2:45 PM · Prof. David Chen · Video Huddle',
+      recap: 'Integration Review Notes & Recording',
+      takeaways: ['Compare substitution and integration by parts.', 'Work through the area-under-the-curve examples.', 'Practice set 6 is due Friday.'],
+      studentNote: 'I’ll revisit the worked integration example before the practice set is due.',
+    },
+    announcements: {
+      title: 'Week 6: Class & Office Hour Schedule',
+      schedule: 'Posted Monday · Prof. David Chen · STEM Prep Academy',
+      recap: 'Week 6 Schedule Notes',
+      takeaways: ['AP Physics meets Tuesday at 3:00 PM.', 'Calculus Prep meets Thursday at 2:00 PM.', 'Use #general to share questions before study hall.'],
+      studentNote: 'Thanks — I’ve added the updated class times to my calendar.',
+    },
+  };
+  const selectedChannel = channelContent[activeChannel] || channelContent['ap-physics'];
 
   const attendees = [
     { name: 'David Chen', role: 'Host / Tutor', initials: 'DC', color: '#3b82f6' },
@@ -68,7 +101,11 @@ export default function EducationSolutionDemo() {
           {channels.map((ch) => (
             <button
               key={ch.id}
-              onClick={() => setActiveChannel(ch.id)}
+              onClick={() => {
+                setActiveChannel(ch.id);
+                setRsvpState('going');
+                setIsPlaying(false);
+              }}
               className={`flex w-full items-center justify-between px-2 py-1.5 rounded-md text-left transition-colors cursor-pointer ${
                 activeChannel === ch.id
                   ? 'bg-white font-semibold text-[#111827] shadow-xs'
@@ -104,7 +141,7 @@ export default function EducationSolutionDemo() {
         {/* Room Header */}
         <div className="flex items-center justify-between border-b border-[#e5e2dc] bg-white px-4 py-2.5 shrink-0">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-[#111827]"># ap-physics</span>
+            <span className="text-sm font-semibold text-[#111827]"># {activeChannel}</span>
             <span className="rounded-full bg-[#eff6ff] px-2 py-0.5 text-[10px] font-medium text-[#2563eb]">
               Semester 1 · Fall 2026
             </span>
@@ -141,14 +178,14 @@ export default function EducationSolutionDemo() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-[#111827] text-sm">
-                      AP Physics: Mechanics & Orbital Motion
+                      {selectedChannel.title}
                     </span>
                     <span className="rounded bg-[#ecfdf5] px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
                       Live Class
                     </span>
                   </div>
                   <p className="mt-0.5 text-[11px] text-[#6b7280]">
-                    Tuesday 3:00 PM – 3:45 PM · Prof. David Chen · Room 402 + Video Huddle
+                    {selectedChannel.schedule}
                   </p>
                 </div>
               </div>
@@ -202,7 +239,7 @@ export default function EducationSolutionDemo() {
                   <Sparkles size={13} />
                 </div>
                 <span className="font-semibold text-[#111827]">
-                  Class Recording & AI Recap
+                  {selectedChannel.recap}
                 </span>
                 <span className="text-[10px] text-[#9ca3af]">Generated immediately after session</span>
               </div>
@@ -246,15 +283,7 @@ export default function EducationSolutionDemo() {
             <div className="rounded-lg bg-[#f8fafc] border border-[#e2e8f0] p-2.5 space-y-1.5">
               <p className="text-[11px] font-semibold text-[#334155]">Key Lecture Takeaways:</p>
               <ul className="text-[11px] text-[#475569] space-y-1 list-disc list-inside">
-                <li>
-                  <span className="font-medium text-[#1e293b]">Kepler’s Third Law Derivation:</span> $T^2 \propto r^3$ demonstrated via centripetal balance equation.
-                </li>
-                <li>
-                  <span className="font-medium text-[#1e293b]">Orbital Velocity Shortcut:</span> $v = \sqrt{GM/r}$ applies to all circular geostationary orbits.
-                </li>
-                <li>
-                  <span className="font-medium text-[#1e293b]">Homework Due Friday:</span> Problem set 4 questions 3–9 submitted via Workspace Form.
-                </li>
+                {selectedChannel.takeaways.map((takeaway) => <li key={takeaway}>{takeaway}</li>)}
               </ul>
             </div>
 
@@ -263,7 +292,7 @@ export default function EducationSolutionDemo() {
               <AvatarChip name="Maya Chen" color="#5c5bd6" size="xs" />
               <div className="flex-1 rounded-lg bg-[#f3f4f6] px-3 py-2 text-[11px]">
                 <p className="font-semibold text-[#111827]">Maya Chen <span className="font-normal text-[#9ca3af] text-[10px]">3:48 PM</span></p>
-                <p className="text-[#374151] mt-0.5">Thank you Prof. Chen! The diagram in the recap notes makes question 4 so much easier to follow.</p>
+                <p className="text-[#374151] mt-0.5">{selectedChannel.studentNote}</p>
               </div>
             </div>
           </motion.div>

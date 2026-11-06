@@ -1,109 +1,96 @@
 /**
  * CustomerSupportSolutionDemo.jsx
  * Interactive demo for /solutions/customer-support ("Customer support")
- * Recreates the authentic Ultrakin workflow:
- * Customer Signal -> Collision Guardrail -> In-Context Escalation -> System Record (SR-28).
+ * Illustrates a sample support workflow:
+ * shared email -> team context -> tracked request -> human-reviewed reply.
  */
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
-  Mail,
   Send,
   CheckCircle2,
+  FileText,
+  ListChecks,
+  MessageSquare,
   Sparkles,
-  ArrowRight,
-  ExternalLink,
-  ShieldCheck,
-  AlertCircle,
-  Clock,
 } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
 import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
-import CollisionPresenceBanner from '../../components/solution/CollisionPresenceBanner';
 import SystemRecordBadge from '../../components/solution/SystemRecordBadge';
 
 const INBOX_ITEMS = [
   {
-    id: 't-elena',
-    sender: { name: 'Elena Rostova', initials: 'ER', color: '#ef4444', role: 'Customer' },
+    id: 't-jortiz',
+    sender: { name: 'J. Ortiz', initials: 'JO', color: '#475569', role: 'Customer' },
     time: '9:04 AM',
-    subject: 'Webhook 504 Gateway Timeout',
-    preview: 'Our production webhook failed three times with 504...',
-    unread: true,
-    hasCollision: true,
-    tag: 'P0 SLA · 15m',
+    subject: 'Duplicate charge on order #4821',
+    preview: 'I see two $120 charges for the same order...',
+    unread: false,
+    tag: 'Refund review',
     orderId: 'Order #4821',
+    requestId: 'SR-31',
+    owner: 'Dana Lee',
+    status: 'Needs review',
   },
   {
-    id: 't-marcus',
-    sender: { name: 'Marcus Vance', initials: 'MV', color: '#059669', role: 'Enterprise AE' },
+    id: 't-setup',
+    sender: { name: 'Mia Chen', initials: 'MC', color: '#059669', role: 'Customer' },
     time: 'Yesterday',
-    subject: 'Annual invoice review request',
-    preview: 'Can we schedule a 10 min sync to review the new tier?',
+    subject: 'Setup instructions for my account',
+    preview: 'Could you point me to the connection guide?',
     unread: false,
-    hasCollision: false,
-    tag: 'Sales Sync',
-    orderId: 'Account #9120',
+    tag: 'How-to question',
+    orderId: 'Help center',
   },
   {
-    id: 't-lumen',
-    sender: { name: 'Lumen Health', initials: 'LH', color: '#3b82f6', role: 'Customer' },
+    id: 't-shipment',
+    sender: { name: 'A. Rivera', initials: 'AR', color: '#3b82f6', role: 'Customer' },
     time: 'Yesterday',
-    subject: 'SSO provisioning query',
-    preview: 'Okta SAML assertion metadata attached for review.',
+    subject: 'Replacement shipment update',
+    preview: 'Could you share the latest delivery status?',
     unread: false,
-    hasCollision: false,
-    tag: 'Security',
-    orderId: 'Ticket #1042',
+    tag: 'Order update',
+    orderId: 'Order #4798',
   },
 ];
 
 const INITIAL_MESSAGES = {
-  't-elena': [
+  't-jortiz': [
     {
       id: 'm1',
-      from: { name: 'Elena Rostova', initials: 'ER', color: '#ef4444', role: 'Customer' },
+      from: { name: 'J. Ortiz', initials: 'JO', color: '#475569', role: 'Customer' },
       time: '9:04 AM',
-      body: 'Hi team, our production webhook failed three times with 504 Gateway Timeout on invoice #4821. Can someone review the gateway logs?',
+      body: 'Hi, I was charged twice for order #4821. Both charges are $120. Could you check this for me?',
     },
     {
       id: 'm2',
-      from: { name: 'Sam Ortiz', initials: 'SO', color: '#dc2626', role: 'Support' },
+      from: { name: 'Dana Lee', initials: 'DL', color: '#6366f1', role: 'Support Lead' },
       time: '9:12 AM',
-      replyLabel: 'Replied by Priya (Support Lead)',
-      body: 'Hi Elena! Looking into this now. Looping in @Dana from Systems to trace the endpoint latency.',
-    },
-    {
-      id: 'm3',
-      from: { name: 'Dana Lee', initials: 'DL', color: '#6366f1', role: 'Systems Eng' },
-      time: '9:15 AM',
-      replyLabel: 'Internal Note',
-      body: 'Replica lag resolved on webhook cluster us-east-2. Retries cleared and ping latency dropped back to 34ms.',
+      replyLabel: 'Team context · #support',
+      body: 'I’m checking the order history and refund guidance before we confirm the next step.',
     },
   ],
-  't-marcus': [
+  't-setup': [
     {
-      id: 'm-m1',
-      from: { name: 'Marcus Vance', initials: 'MV', color: '#059669', role: 'Enterprise AE' },
+      id: 'm-s1',
+      from: { name: 'Mia Chen', initials: 'MC', color: '#059669', role: 'Customer' },
       time: 'Yesterday',
-      body: 'Can we schedule a 10 min sync to review the new enterprise pricing tier for Meridian Systems?',
+      body: 'Could you point me to the setup instructions for connecting my account?',
     },
   ],
-  't-lumen': [
+  't-shipment': [
     {
       id: 'm-l1',
-      from: { name: 'Lumen Health', initials: 'LH', color: '#3b82f6', role: 'Customer' },
+      from: { name: 'A. Rivera', initials: 'AR', color: '#3b82f6', role: 'Customer' },
       time: 'Yesterday',
-      body: 'Okta SAML assertion metadata attached. We are ready to verify user sync in the staging tenant.',
+      body: 'Could you share the latest delivery status for my replacement order?',
     },
   ],
 };
 
-const EMPTY_MESSAGES = [];
-
 export default function CustomerSupportSolutionDemo() {
   const reduceMotion = useReducedMotion();
-  const [selectedThreadId, setSelectedThreadId] = useState('t-elena');
+  const [selectedThreadId, setSelectedThreadId] = useState('t-jortiz');
   const [threadMessages, setThreadMessages] = useState(INITIAL_MESSAGES);
   const [isLogged, setIsLogged] = useState(true);
   const [replyText, setReplyText] = useState('');
@@ -112,12 +99,15 @@ export default function CustomerSupportSolutionDemo() {
   const messagesEndRef = useRef(null);
 
   const activeThread = INBOX_ITEMS.find((item) => item.id === selectedThreadId) || INBOX_ITEMS[0];
-  const messages = threadMessages[selectedThreadId] || EMPTY_MESSAGES;
+  const messages = useMemo(
+    () => threadMessages[selectedThreadId] || [],
+    [threadMessages, selectedThreadId]
+  );
 
-  // Scroll to bottom when thread changes or a new message arrives
+  // Scroll to bottom when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
-  }, [selectedThreadId, messages.length, reduceMotion]);
+  }, [messages, reduceMotion]);
 
   // Keyboard navigation between inbox threads
   const handleKeyDown = useCallback((e) => {
@@ -162,7 +152,7 @@ export default function CustomerSupportSolutionDemo() {
       }));
       setReplyText('');
       setIsSending(false);
-      setToastMessage('Reply dispatched to Elena Rostova');
+      setToastMessage(`Sample reply added to ${activeThread.sender.name}’s thread`);
       setTimeout(() => setToastMessage(null), 2500);
     }, 300);
   };
@@ -170,7 +160,7 @@ export default function CustomerSupportSolutionDemo() {
   const handleToggleLog = () => {
     const nextState = !isLogged;
     setIsLogged(nextState);
-    setToastMessage(nextState ? 'Logged as SR-28 in Support requests' : 'Removed from Support requests');
+    setToastMessage(nextState ? 'Sample request SR-31 added to Support requests' : 'Sample request removed from Support requests');
     setTimeout(() => setToastMessage(null), 2500);
   };
 
@@ -195,8 +185,9 @@ export default function CustomerSupportSolutionDemo() {
                 role="button"
                 tabIndex={0}
                 onClick={() => setSelectedThreadId(item.id)}
-                onKeyDown={(e) => e.key === 'Enter' && setSelectedThreadId(item.id)}
-                className={`p-2.5 cursor-pointer transition-colors relative ${
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), setSelectedThreadId(item.id))}
+                aria-pressed={isSelected}
+                className={`p-2.5 cursor-pointer transition-colors relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#4f46e5] ${
                   isSelected
                     ? 'bg-[#fff5f5] border-l-2 border-[#ef4444]'
                     : 'hover:bg-white/80 border-l-2 border-transparent'
@@ -223,14 +214,6 @@ export default function CustomerSupportSolutionDemo() {
                   {item.preview}
                 </p>
 
-                {item.hasCollision && (
-                  <div className="mt-1.5 flex items-center gap-1.5">
-                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-[#ef4444] animate-pulse" />
-                    <span className="text-[9px] font-semibold text-[#ef4444] uppercase tracking-wide">
-                      Priya drafting
-                    </span>
-                  </div>
-                )}
               </div>
             );
           })}
@@ -239,12 +222,12 @@ export default function CustomerSupportSolutionDemo() {
 
       {/* ─── Thread & Record Workflow ────────────────────────────────────────── */}
       <div className="flex flex-1 flex-col overflow-y-auto bg-white min-w-0">
-        {/* Header Bar with Collision & Escalation */}
+        {/* Request and approval record */}
         <div className="flex flex-wrap items-center justify-between border-b border-[#e5e2dc] bg-[#fdfcfb] px-4 py-2.5 gap-2 shrink-0">
           <div>
             <div className="flex items-center gap-2">
               <span className="font-semibold text-sm text-[#111827] truncate">{activeThread.subject}</span>
-              <span className="rounded bg-[#fee2e2] px-1.5 py-0.5 text-[9.5px] font-semibold text-[#b91c1c] shrink-0">
+              <span className="rounded bg-[#eef2ff] px-1.5 py-0.5 text-[9.5px] font-semibold text-[#4338ca] shrink-0">
                 {activeThread.tag}
               </span>
             </div>
@@ -252,24 +235,19 @@ export default function CustomerSupportSolutionDemo() {
           </div>
 
           {/* Connected Record Action Pill */}
-          <SystemRecordBadge
-            recordId="SR-28"
-            collectionName="Support requests"
-            isLogged={isLogged}
-            onToggle={handleToggleLog}
-            showLink={true}
-          />
+          {activeThread.requestId && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-[10px] text-[#667085]">{activeThread.owner} · {activeThread.status}</span>
+              <SystemRecordBadge
+                recordId={activeThread.requestId}
+                collectionName="Support requests"
+                isLogged={isLogged}
+                onToggle={handleToggleLog}
+                showLink={true}
+              />
+            </div>
+          )}
         </div>
-
-        {/* Collision Presence Guardrail */}
-        {activeThread.hasCollision && (
-          <div className="px-4 pt-2.5">
-            <CollisionPresenceBanner
-              agent={{ name: 'Priya K.', initials: 'PK', color: '#dc2626', role: 'Support Lead' }}
-              action="is drafting a reply..."
-            />
-          </div>
-        )}
 
         {/* Message Stream */}
         <div className="flex-1 p-4 space-y-3 overflow-y-auto">
@@ -291,18 +269,44 @@ export default function CustomerSupportSolutionDemo() {
             </div>
           ))}
 
+          {selectedThreadId === 't-jortiz' && (
+            <section aria-label="Related support context" className="rounded-lg border border-[#e5e2dc] bg-white p-2.5">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-[#667085]">Related work</p>
+                <span className="text-[9px] text-[#98a2b3]">Same request</span>
+              </div>
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2 rounded-md bg-[#faf9f7] px-2 py-1.5">
+                  <MessageSquare size={12} className="shrink-0 text-[#4f46e5]" aria-hidden="true" />
+                  <span className="min-w-0 flex-1 truncate text-[10px] text-[#344054]">#support · Check guidance before replying</span>
+                  <span className="shrink-0 text-[9px] text-[#667085]">Chat</span>
+                </div>
+                <div className="flex items-center gap-2 rounded-md bg-[#faf9f7] px-2 py-1.5">
+                  <FileText size={12} className="shrink-0 text-[#3156cf]" aria-hidden="true" />
+                  <span className="min-w-0 flex-1 truncate text-[10px] text-[#344054]">Refund review guidance</span>
+                  <span className="shrink-0 text-[9px] text-[#667085]">Docs</span>
+                </div>
+                <div className="flex items-center gap-2 rounded-md bg-[#faf9f7] px-2 py-1.5">
+                  <ListChecks size={12} className="shrink-0 text-emerald-700" aria-hidden="true" />
+                  <span className="min-w-0 flex-1 truncate text-[10px] text-[#344054]">SR-31 · Dana Lee · Needs review</span>
+                  <span className="shrink-0 text-[9px] text-[#667085]">Lists</span>
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* AI Assist Suggestion Bar */}
-          {selectedThreadId === 't-elena' && (
+          {selectedThreadId === 't-jortiz' && (
             <div className="rounded-lg border border-[#e0e7ff] bg-[#f5f7ff] p-2.5 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 truncate">
                 <Sparkles size={13} className="text-[#6366f1] shrink-0" />
                 <span className="text-[11px] text-[#3730a3] truncate">
-                  Ukin drafted reply: Verified webhook retry queue cleared at 9:15 AM. Retries now succeeding.
+                  Ukin draft · based on the email and linked support context
                 </span>
               </div>
               <button
                 type="button"
-                onClick={() => setReplyText('Verified webhook retry queue cleared at 9:15 AM. Retries now succeeding.')}
+                onClick={() => setReplyText('Thanks for flagging the duplicate charge. Our team is reviewing the order and will follow up here with the next step.')}
                 className="shrink-0 rounded bg-white border border-[#c7d2fe] px-2 py-0.5 text-[10px] font-semibold text-[#4f46e5] hover:bg-[#eef2ff] transition-colors cursor-pointer"
               >
                 Insert Draft
@@ -318,9 +322,10 @@ export default function CustomerSupportSolutionDemo() {
           <div className="flex items-center gap-2">
             <input
               type="text"
+              aria-label={`Reply to ${activeThread.sender.name}`}
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
-              placeholder={`Reply to ${activeThread.sender.name} or type @ to mention an engineer...`}
+              placeholder={`Write a sample reply to ${activeThread.sender.name}…`}
               disabled={isSending}
               className="flex-1 rounded-md border border-[#e5e2dc] bg-[#faf9f7] px-3 py-1.5 text-xs text-[#111827] focus:border-[#ef4444] focus:bg-white focus:outline-none transition-colors disabled:opacity-50"
             />
