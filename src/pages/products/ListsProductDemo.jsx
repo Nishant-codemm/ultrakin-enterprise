@@ -33,7 +33,7 @@ import { LISTS_DATA, PERSONAS } from '../../data/productPageData';
 import { ULTRAKIN_EASE, scrimMotion } from '../../lib/motion';
 
 const STATUS_CONFIG = {
-  Incoming:    { label: 'Todo',        color: 'text-slate-700 bg-slate-100 border-slate-300', dot: 'bg-slate-400' },
+  Incoming:    { label: 'New',         color: 'text-slate-700 bg-slate-100 border-slate-300', dot: 'bg-slate-400' },
   'In Progress':{ label: 'In Progress', color: 'text-indigo-700 bg-indigo-50 border-indigo-200', dot: 'bg-indigo-500' },
   Resolved:    { label: 'Done',        color: 'text-emerald-700 bg-emerald-50 border-emerald-200', dot: 'bg-emerald-500' },
 };
@@ -215,7 +215,8 @@ export default function ListsProductDemo() {
               type="text"
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
-              placeholder="Add record to Todo (press Enter)..."
+              aria-label="New record title"
+              placeholder="Add a new record (press Enter)..."
               className="flex-1 bg-transparent text-xs text-[#111827] placeholder-[#98a2b3] focus:outline-none"
             />
             {newTitle && (
@@ -238,11 +239,12 @@ export default function ListsProductDemo() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                aria-label="Filter records"
                 placeholder="Filter records..."
                 className="w-24 md:w-32 bg-transparent text-xs text-[#111827] placeholder-[#98a2b3] focus:outline-none"
               />
               {searchQuery && (
-                <button type="button" onClick={() => setSearchQuery('')} className="hover:text-black">
+                <button type="button" onClick={() => setSearchQuery('')} aria-label="Clear record filter" className="hover:text-black">
                   <X size={10} />
                 </button>
               )}
@@ -362,9 +364,15 @@ export default function ListsProductDemo() {
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.92 }}
                             transition={{ duration: 0.2, ease: ULTRAKIN_EASE }}
-                            className="group p-3 rounded-lg bg-white border border-[#e7e4de] shadow-2xs hover:border-[#3156cf] hover:shadow-xs transition-all cursor-pointer relative"
-                            onClick={() => setSelectedRecord(card)}
+                            className="group p-3 rounded-lg bg-white border border-[#e7e4de] shadow-2xs hover:border-[#3156cf] hover:shadow-xs transition-all relative"
                           >
+                            <button
+                              type="button"
+                              onClick={() => setSelectedRecord(card)}
+                              aria-label={`Open ${card.id}: ${card.title}`}
+                              className="absolute inset-0 z-0 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#3156cf]"
+                            />
+                            <div className="relative z-[1] pointer-events-none">
                             <div className="flex items-center justify-between gap-1 mb-2">
                               <span className="text-[10px] font-mono font-bold text-[#3156cf] bg-blue-50/80 px-1.5 py-0.5 rounded border border-blue-100">
                                 {card.id}
@@ -391,6 +399,7 @@ export default function ListsProductDemo() {
                                 </span>
                               )}
                             </div>
+                            </div>
 
                             {/* Quick advance button on hover */}
                             <button
@@ -399,7 +408,7 @@ export default function ListsProductDemo() {
                                 e.stopPropagation();
                                 moveCard(card, colName);
                               }}
-                              className="absolute right-2.5 top-2.5 opacity-0 group-hover:opacity-100 transition-opacity bg-[#3156cf] text-white p-1 rounded shadow-xs hover:bg-[#2546b8]"
+                              className="absolute right-2.5 top-2.5 z-10 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity bg-[#3156cf] text-white p-1 rounded shadow-xs hover:bg-[#2546b8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3156cf] focus-visible:ring-offset-2"
                               title="Advance to next column"
                             >
                               <ArrowRight size={11} />
@@ -422,6 +431,7 @@ export default function ListsProductDemo() {
                   <th className="py-2.5 px-3 w-8">
                     <input
                       type="checkbox"
+                      aria-label="Select all records"
                       checked={selectedRows.length === allRecords.length && allRecords.length > 0}
                       onChange={(e) => {
                         if (e.target.checked) setSelectedRows(allRecords.map((r) => r.id));
@@ -447,20 +457,24 @@ export default function ListsProductDemo() {
                   return (
                     <tr
                       key={record.id}
-                      onClick={() => setSelectedRecord(record)}
-                      className={`hover:bg-[#f6f5f2] transition-colors cursor-pointer group ${
+                      className={`hover:bg-[#f6f5f2] transition-colors group ${
                         isSelected ? 'bg-indigo-50/50' : ''
                       }`}
                     >
                       <td className="py-2.5 px-3" onClick={(e) => e.stopPropagation()}>
                         <input
                           type="checkbox"
+                          aria-label={`Select ${record.id}`}
                           checked={isSelected}
                           onChange={(e) => toggleSelectRow(record.id, e)}
                           className="rounded border-slate-300 text-[#3156cf] focus:ring-0 cursor-pointer"
                         />
                       </td>
-                      <td className="py-2.5 px-3 font-mono font-bold text-[#3156cf]">{record.id}</td>
+                      <td className="py-2.5 px-3 font-mono font-bold text-[#3156cf]">
+                        <button type="button" onClick={() => setSelectedRecord(record)} className="rounded-sm text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3156cf]">
+                          {record.id}
+                        </button>
+                      </td>
                       <td className="py-2.5 px-3 font-medium text-[#111827] max-w-xs truncate">{record.title}</td>
                       <td className="py-2.5 px-3">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${colConfig.color}`}>
@@ -604,7 +618,7 @@ export default function ListsProductDemo() {
                               : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                           }`}
                         >
-                          {st === 'Incoming' ? 'Todo' : st === 'Resolved' ? 'Done' : st}
+                          {st === 'Incoming' ? 'New' : st === 'Resolved' ? 'Done' : st}
                         </button>
                       ))}
                     </div>

@@ -8,13 +8,10 @@
  * - Interactive input prompt: user can send real questions and receive animated responses with sources!
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Sparkles, Send, Hash, FileText, CheckCircle2, ArrowRight, CornerDownLeft } from 'lucide-react';
-import TypewriterText from '../../components/product/TypewriterText';
+import { Sparkles, Send, Hash, FileText } from 'lucide-react';
 import { UKIN_DATA } from '../../data/productPageData';
 
 export default function UkinProductDemo() {
-  const reduceMotion = useReducedMotion();
   const [messages, setMessages] = useState(UKIN_DATA.initialMessages);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -137,6 +134,7 @@ export default function UkinProductDemo() {
         <div className="flex items-center gap-2 rounded-xl bg-white/[0.05] border border-white/[0.1] px-3 py-2 focus-within:border-purple-500/50 transition-colors">
           <input
             type="text"
+            aria-label="Ask Ukin a question"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask Ukin anything (e.g. 'summary', 'meeting', 'status')..."

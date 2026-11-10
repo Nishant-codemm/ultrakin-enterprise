@@ -4,16 +4,6 @@ import { ArrowUpRight, ShieldCheck } from 'lucide-react';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-const PRODUCT_NAV_LINKS = [
-  'Chat & Threads',
-  'Shared Mailbox',
-  'Living Docs',
-  'Huddle Simulator',
-  'Kanban Tasks',
-  'AI Agents',
-  'Integrations',
-];
-
 export default function Footer({ isHome = true }) {
   return (
     <footer className="divider-hairline border-t border-border bg-transparent py-14 text-ink-muted sm:py-16">
@@ -87,9 +77,17 @@ export default function Footer({ isHome = true }) {
           <div>
             <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">Product</p>
             <ul className="mt-4 space-y-2.5 text-[13px]">
-              {PRODUCT_NAV_LINKS.map((item) => (
+              {[
+                ['Chat & Threads', '/products/chat'],
+                ['Shared Mailbox', '/products/mail'],
+                ['Living Docs', '/products/docs'],
+                ['Huddle Simulator', '/products/calls'],
+                ['Kanban Tasks', '/products/lists'],
+                ['AI Agents', '/products/agents'],
+                ['Integrations', '/products/connectors'],
+              ].map(([item, href]) => (
                 <li key={item}>
-                  <a href="#workspace-showcase" className="transition-colors hover:text-brand-text">
+                  <a href={href} className="transition-colors hover:text-brand-text">
                     {item}
                   </a>
                 </li>

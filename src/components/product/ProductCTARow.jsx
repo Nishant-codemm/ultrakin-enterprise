@@ -6,13 +6,14 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 
-const APP_URL = 'https://app.ultrakin.com';
+const WORKSPACE_URL = 'https://app.ultrakin.com/auth';
+const SALES_EMAIL = 'mailto:sales@ultrakin.com';
 
 export default function ProductCTARow({ primaryLabel = 'Create a workspace' }) {
   return (
     <div className="mt-8 flex flex-wrap items-center gap-4">
       <a
-        href={APP_URL}
+        href={WORKSPACE_URL}
         target="_blank"
         rel="noopener noreferrer"
         className="group inline-flex h-11 items-center gap-2 rounded-xl bg-[#111827] px-5 text-sm font-semibold text-white
@@ -28,9 +29,7 @@ export default function ProductCTARow({ primaryLabel = 'Create a workspace' }) {
         />
       </a>
       <a
-        href={`${APP_URL}/talk`}
-        target="_blank"
-        rel="noopener noreferrer"
+        href={SALES_EMAIL}
         className="text-sm font-medium text-[#667085] underline-offset-2 hover:text-[#111827] hover:underline
                    transition-colors duration-150 focus-visible:outline-none focus-visible:underline"
       >

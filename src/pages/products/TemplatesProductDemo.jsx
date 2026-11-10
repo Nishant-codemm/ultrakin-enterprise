@@ -9,7 +9,6 @@
  */
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Layers, ArrowRight, CheckCircle2, Search, Sparkles } from 'lucide-react';
 import { TEMPLATES_DATA } from '../../data/productPageData';
 
 export default function TemplatesProductDemo() {
@@ -29,6 +28,7 @@ export default function TemplatesProductDemo() {
           return (
             <button
               key={cat}
+              type="button"
               onClick={() => setSelectedCategory(cat)}
               className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
                 active
@@ -67,6 +67,7 @@ export default function TemplatesProductDemo() {
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => setExpandedId(isExpanded ? null : template.id)}
                   className="px-2.5 py-1 rounded-lg border border-[#e7e4de] text-[11px] font-medium text-[#3156cf] hover:bg-blue-50 transition-colors shrink-0"
                 >

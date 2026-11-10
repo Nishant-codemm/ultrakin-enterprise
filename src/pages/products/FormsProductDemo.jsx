@@ -10,7 +10,7 @@
  */
 import React, { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { FileText, Plus, CheckCircle2, Send, RotateCcw, ArrowRight } from 'lucide-react';
+import { Plus, CheckCircle2, Send, RotateCcw } from 'lucide-react';
 import { FORMS_DATA } from '../../data/productPageData';
 
 export default function FormsProductDemo() {
@@ -19,7 +19,7 @@ export default function FormsProductDemo() {
   const [formData, setFormData] = useState({
     name: 'Maya Chen',
     email: 'maya@northwind.studio',
-    issue: 'Billing',
+    issue: 'Billing & Duplicate charge',
   });
 
   const handleSubmit = (e) => {
@@ -44,7 +44,7 @@ export default function FormsProductDemo() {
             ].map((f) => (
               <div
                 key={f.label}
-                className="flex items-center gap-1.5 p-1.5 rounded-lg bg-white border border-[#e7e4de] text-[11px] font-medium text-[#344054] shadow-xs cursor-pointer hover:border-[#3156cf] hover:text-[#3156cf] transition-colors"
+                className="flex items-center gap-1.5 p-1.5 rounded-lg bg-white border border-[#e7e4de] text-[11px] font-medium text-[#344054] shadow-xs"
               >
                 <Plus size={11} className="text-[#3156cf]" />
                 <span>{f.label}</span>
@@ -81,10 +81,11 @@ export default function FormsProductDemo() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-[#344054] mb-1">
+                <label htmlFor="intake-name" className="block text-[11px] font-semibold text-[#344054] mb-1">
                   Your Full Name
                 </label>
                 <input
+                  id="intake-name"
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -94,10 +95,11 @@ export default function FormsProductDemo() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-[#344054] mb-1">
+                <label htmlFor="intake-email" className="block text-[11px] font-semibold text-[#344054] mb-1">
                   Email Address
                 </label>
                 <input
+                  id="intake-email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -107,10 +109,11 @@ export default function FormsProductDemo() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-semibold text-[#344054] mb-1">
+                <label htmlFor="intake-issue" className="block text-[11px] font-semibold text-[#344054] mb-1">
                   Issue Category
                 </label>
                 <select
+                  id="intake-issue"
                   value={formData.issue}
                   onChange={(e) => setFormData({ ...formData, issue: e.target.value })}
                   className="w-full text-xs p-2 rounded-lg border border-[#e7e4de] bg-[#fbfaf8] focus:border-[#3156cf] focus:outline-none"
@@ -144,6 +147,7 @@ export default function FormsProductDemo() {
                 A new record <span className="font-mono font-bold text-emerald-600">#SR-19</span> was created in your team's Support Requests list and routed to on-call triage.
               </p>
               <button
+                type="button"
                 onClick={() => setSubmitted(false)}
                 className="mt-4 px-3 py-1.5 rounded-lg border border-[#e7e4de] bg-white text-xs font-medium text-[#344054] hover:bg-slate-50 flex items-center gap-1.5 transition-colors cursor-pointer"
               >

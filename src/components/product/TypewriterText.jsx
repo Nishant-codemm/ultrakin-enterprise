@@ -7,7 +7,7 @@ import { useReducedMotion } from 'framer-motion';
 
 export default function TypewriterText({ text = '', speed = 28, onComplete, className = '' }) {
   const reduceMotion = useReducedMotion();
-  const [displayed, setDisplayed] = useState(() => (reduceMotion ? text : ''));
+  const [reveal, setReveal] = useState(() => ({ text, value: '' }));
 
   useEffect(() => {
     if (reduceMotion) {
@@ -17,7 +17,7 @@ export default function TypewriterText({ text = '', speed = 28, onComplete, clas
     let i = 0;
     const interval = setInterval(() => {
       i++;
-      setDisplayed(text.slice(0, i));
+      setReveal({ text, value: text.slice(0, i) });
       if (i >= text.length) {
         clearInterval(interval);
         onComplete?.();
@@ -26,5 +26,6 @@ export default function TypewriterText({ text = '', speed = 28, onComplete, clas
     return () => clearInterval(interval);
   }, [text, speed, reduceMotion, onComplete]);
 
+  const displayed = reduceMotion ? text : reveal.text === text ? reveal.value : '';
   return <span className={className}>{displayed}</span>;
 }

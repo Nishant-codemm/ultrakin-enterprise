@@ -11,7 +11,7 @@
  */
 import React, { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Bot, ShieldCheck, CheckCircle2, XCircle, ArrowRight, Sparkles, Terminal } from 'lucide-react';
+import { Bot, ShieldCheck, CheckCircle2, XCircle, Terminal } from 'lucide-react';
 import StatusBadge from '../../components/product/StatusBadge';
 import { AGENTS_DATA } from '../../data/productPageData';
 
@@ -88,7 +88,7 @@ export default function AgentsProductDemo() {
               <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
                 <ShieldCheck size={11} /> Approval Required
               </span>
-              <span className="text-[10px] font-mono text-slate-400">Risk: Low</span>
+              <span className="text-[10px] font-mono text-amber-300">{AGENTS_DATA.proposal.risk}</span>
             </div>
 
             <h4 className="text-xs font-bold text-slate-100 mb-1">
@@ -114,12 +114,14 @@ export default function AgentsProductDemo() {
                   className="flex items-center gap-2"
                 >
                   <button
+                    type="button"
                     onClick={() => setProposalStatus('approved')}
                     className="flex-1 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <CheckCircle2 size={13} /> Approve Action
                   </button>
                   <button
+                    type="button"
                     onClick={() => setProposalStatus('declined')}
                     className="px-3 py-1.5 rounded-lg border border-white/[0.1] bg-white/[0.05] hover:bg-white/[0.1] text-slate-300 text-xs font-medium transition-colors cursor-pointer"
                   >
@@ -136,9 +138,10 @@ export default function AgentsProductDemo() {
                   className="p-2 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-medium flex items-center justify-between"
                 >
                   <span className="flex items-center gap-1.5">
-                    <CheckCircle2 size={14} className="text-emerald-400" /> Action Dispatched & Email Sent
+                    <CheckCircle2 size={14} className="text-emerald-400" /> Approval recorded · ready for the next step
                   </span>
                   <button
+                    type="button"
                     onClick={() => setProposalStatus('pending')}
                     className="text-[10px] underline text-emerald-400 hover:text-emerald-300 ml-2"
                   >
@@ -158,6 +161,7 @@ export default function AgentsProductDemo() {
                     <XCircle size={14} className="text-rose-400" /> Action Cancelled
                   </span>
                   <button
+                    type="button"
                     onClick={() => setProposalStatus('pending')}
                     className="text-[10px] underline text-rose-400 hover:text-rose-300 ml-2"
                   >

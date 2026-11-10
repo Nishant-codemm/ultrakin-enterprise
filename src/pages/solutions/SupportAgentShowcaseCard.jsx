@@ -1,86 +1,54 @@
 /**
  * SupportAgentShowcaseCard.jsx
- * Secondary Stacked Showcase Card for /solutions/customer-support
- * Recreates the authentic Ultrakin secondary card beneath the hero:
- * "support@northwind.shop Shared Inbox · Support agent works new threads"
+ * Shows the verified support request lifecycle beneath the interactive inbox demo.
  */
 import React from 'react';
-import { CheckCircle2, Sparkles, Clock, ShieldCheck } from 'lucide-react';
-import AvatarChip from '../../components/product/AvatarChip';
-import { SOLUTION_PERSONAS } from '../../data/solutionPageData';
+import { ArrowRight, CheckCircle2, FileText, ListChecks, Mail, MessageSquare, Sparkles } from 'lucide-react';
+import { SOLUTION_META } from '../../data/solutionPageData';
+
+const FLOW_ICONS = [Mail, MessageSquare, FileText, ListChecks, Sparkles];
 
 export default function SupportAgentShowcaseCard() {
+  const steps = SOLUTION_META['customer-support'].workflow;
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-12 rounded-2xl border border-[rgba(17,24,39,0.08)] bg-white shadow-[0_0_0_1px_rgba(17,24,39,0.04),0_4px_6px_-1px_rgba(17,24,39,0.03),0_20px_40px_-8px_rgba(17,24,39,0.08)] overflow-hidden select-none">
-      {/* Top Bar */}
-      <div className="flex h-10 items-center justify-between border-b border-[#f0ede8] bg-[#fafaf9] px-4">
-        <div className="flex items-center gap-2">
-          <div className="h-5 w-5 rounded-md bg-[#ef4444] text-white flex items-center justify-center font-bold text-[9px]">
-            U
-          </div>
-          <span className="text-[12.5px] font-semibold text-[#111827]">
-            support@northwind.shop
-          </span>
-          <span className="text-[11px] text-[#667085] hidden sm:inline">
-            Shared Inbox · Support agent works new threads
-          </span>
+    <div className="mx-auto mt-12 w-full max-w-5xl overflow-hidden rounded-2xl border border-[rgba(17,24,39,0.08)] bg-white shadow-[0_12px_36px_-20px_rgba(17,24,39,0.22)]">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#f0ede8] bg-[#faf9f7] px-5 py-4">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#667085]">One customer issue · five connected steps</p>
+          <h2 className="mt-1 text-sm font-semibold text-[#111827]">From first email to a reply ready for review</h2>
         </div>
-
-        <span className="text-[10px] font-mono text-purple-700 bg-purple-50 border border-purple-200 px-2 py-0.5 rounded-full flex items-center gap-1 font-semibold">
-          <Sparkles size={10} className="text-purple-600" />
-          Autonomous CX Triage
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-800">
+          <CheckCircle2 size={13} /> SR-31 · Needs review
         </span>
       </div>
 
-      {/* Main Content Row */}
-      <div className="p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-white">
-        <div className="flex items-center gap-3">
-          <AvatarChip
-            name={SOLUTION_PERSONAS.cxElena.name}
-            color={SOLUTION_PERSONAS.cxElena.color}
-            size="md"
-          />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-[#111827]">Elena Rostova</span>
-              <span className="text-[10.5px] text-[#8c8c8c] font-mono tabular-nums">9:04 AM</span>
-              <span className="text-[10px] bg-red-50 text-red-700 border border-red-200 px-1.5 py-0.2 rounded font-mono font-medium">
-                P0 SLA · 15m
-              </span>
-            </div>
-            <p className="text-xs text-[#344054] font-medium mt-0.5">
-              Webhook 504 Gateway Timeout (Invoice #4821)
-            </p>
-          </div>
-        </div>
+      <ol className="grid grid-cols-1 divide-y divide-[#f0ede8] px-5 sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-5 lg:divide-x lg:divide-y-0">
+        {steps.map((step, index) => {
+          const Icon = FLOW_ICONS[index];
+          return (
+            <li key={step.step} className="relative py-4 lg:px-3 lg:first:pl-0 lg:last:pr-0">
+              <div className="mb-3 flex items-center gap-2">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#f2f4ff] text-[#4f46e5]">
+                  <Icon size={14} aria-hidden="true" />
+                </span>
+                <span className="text-[10px] font-medium tabular-nums text-[#667085]">0{step.step}</span>
+              </div>
+              <h3 className="text-xs font-semibold leading-4 text-[#111827]">{step.title}</h3>
+              <p className="mt-1 text-[11px] leading-[1.55] text-[#667085]">{step.desc}</p>
+              {index < steps.length - 1 && <ArrowRight className="absolute -right-2 top-[25px] z-10 hidden bg-white text-[#98a2b3] lg:block" size={13} aria-hidden="true" />}
+            </li>
+          );
+        })}
+      </ol>
 
-        <div className="flex items-center gap-2 text-xs w-full sm:w-auto">
-          <span className="w-full sm:w-auto text-[11px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 font-medium">
-            <CheckCircle2 size={12} className="text-emerald-600 shrink-0" />
-            <span>Agent verified gateway logs, tagged @Dana, and staged SR-28 ticket</span>
-          </span>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#f0ede8] px-5 py-3">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-[#475467">
+          <span>Source · support@northwind.shop</span>
+          <span>Owner · Dana Lee</span>
+          <span className="inline-flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-500" />Needs review</span>
         </div>
-      </div>
-
-      {/* Telemetry Footer */}
-      <div className="border-t border-[#f0ede8] bg-[#faf9f7] px-4 py-2 flex flex-wrap items-center justify-between gap-2 text-[10.5px] text-[#6b7280]">
-        <div className="flex items-center gap-4">
-          <span className="flex items-center gap-1">
-            <Clock size={11} className="text-[#9ca3af]" />
-            Triage latency: <strong className="font-mono text-[#374151]">840ms</strong>
-          </span>
-          <span className="flex items-center gap-1">
-            <ShieldCheck size={11} className="text-emerald-600" />
-            Collision guard: <span className="text-emerald-700 font-medium">Priya active</span>
-          </span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="text-[#9ca3af]">Linked System Record:</span>
-          <span className="font-mono font-bold text-[#111827] bg-white border border-[#e5e2dc] px-1.5 py-0.2 rounded">
-            SR-28
-          </span>
-        </div>
+        <p className="text-[10px] text-[#667085]">Illustrative sample · no live customer data</p>
       </div>
     </div>
   );
