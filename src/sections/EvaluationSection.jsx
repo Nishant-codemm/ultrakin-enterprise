@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { useReveal } from '../lib/useReveal';
 import { getSectionHeaderMotion, getSectionContentMotion } from '../lib/motion';
 import { handleSpotlightMove } from '../lib/interaction';
+import { navigate } from '../lib/navigate';
 
 /* ─── Cursor-tracking 3D tilt ─── */
 function TiltCard({ children, className, style, maxTilt = 10 }) {
@@ -144,6 +145,7 @@ export default function EvaluationSection() {
                       href={href}
                       target={external ? '_blank' : undefined}
                       rel={external ? 'noreferrer' : undefined}
+                      onClick={!external && href.startsWith('/') ? (e) => { e.preventDefault(); navigate(href); } : undefined}
                       className="mt-7 inline-flex min-h-10 w-fit items-center gap-2 rounded-lg text-sm font-medium text-ink-soft transition-all duration-200 hover:gap-3 hover:text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
                     >
                       {action}

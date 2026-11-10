@@ -311,7 +311,11 @@ export default function Navbar() {
     }
     if (item.module) {
       if (window.location.pathname !== '/') {
-        window.location.href = '/#workspace-showcase';
+        navigate('/');
+        setTimeout(() => {
+          setActiveModule(item.module);
+          scrollToSection('workspace-showcase');
+        }, 60);
         return;
       }
       setActiveModule(item.module);
@@ -319,7 +323,10 @@ export default function Navbar() {
       return;
     }
     if (item.href?.startsWith('#') && window.location.pathname !== '/') {
-      window.location.href = `/${item.href}`;
+      navigate('/');
+      setTimeout(() => {
+        scrollToSection(item.href.slice(1));
+      }, 60);
     } else if (item.href?.startsWith('#')) {
       scrollToSection(item.href.slice(1));
     } else if (item.href?.startsWith('/')) {
@@ -333,7 +340,7 @@ export default function Navbar() {
     setActiveModule('chat');
     setMobileOpen(false);
     setOpenMenu(null);
-    window.location.href = '/workspace';
+    navigate('/workspace');
   };
 
   const compactTransition = reduceMotion
@@ -393,8 +400,8 @@ export default function Navbar() {
               {name}<ChevronDown size={14} className={`text-ink-subtle transition-transform duration-200 ${openMenu === name ? 'rotate-180' : ''}`} />
             </button>
           ))}
-          <a href="/security" className="rounded-lg px-3.5 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">Security</a>
-          <a href="/pricing" className="rounded-lg px-3.5 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">Pricing</a>
+          <a href="/security" onClick={(e) => { e.preventDefault(); navigate('/security'); }} className="rounded-lg px-3.5 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">Security</a>
+          <a href="/pricing" onClick={(e) => { e.preventDefault(); navigate('/pricing'); }} className="rounded-lg px-3.5 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">Pricing</a>
         </div>
 
         <div className="hidden shrink-0 items-center gap-2.5 lg:flex">
@@ -440,12 +447,36 @@ export default function Navbar() {
               { id: 'agents', label: 'Agents', href: '/agents' },
               { id: 'security', label: 'Security', href: '/security' },
             ].map((item) => (
-              <a key={item.id} href={item.href} aria-current={getCurrentNavState(item.id)} className={`rounded-md px-3 py-2 text-[12px] font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 ${activeStickyItem === item.id ? 'text-ink' : 'text-ink-muted hover:text-ink'}`}>
+              <a
+                key={item.id}
+                href={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (item.href === '/') {
+                    if (window.location.pathname !== '/') {
+                      navigate('/');
+                    } else {
+                      scrollToSection('hero');
+                    }
+                  } else {
+                    navigate(item.href);
+                  }
+                }}
+                aria-current={getCurrentNavState(item.id)}
+                className={`rounded-md px-3 py-2 text-[12px] font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 ${activeStickyItem === item.id ? 'text-ink' : 'text-ink-muted hover:text-ink'}`}
+              >
                 {item.label}
                 <span className={`mt-1 block h-px rounded-full transition-colors ${activeStickyItem === item.id ? 'bg-brand/80' : 'bg-transparent'}`} />
               </a>
             ))}
-            <a href="/pricing" aria-current={getCurrentNavState('pricing')} className={`rounded-md px-3 py-2 text-[12px] font-medium transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 ${activeStickyItem === 'pricing' ? 'text-ink' : 'text-ink-muted'}`}>Pricing</a>
+            <a
+              href="/pricing"
+              onClick={(e) => { e.preventDefault(); navigate('/pricing'); }}
+              aria-current={getCurrentNavState('pricing')}
+              className={`rounded-md px-3 py-2 text-[12px] font-medium transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 ${activeStickyItem === 'pricing' ? 'text-ink' : 'text-ink-muted'}`}
+            >
+              Pricing
+            </a>
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
@@ -461,8 +492,42 @@ export default function Navbar() {
                   { id: 'workspace', label: 'Workspace', href: '/workspace' },
                   { id: 'agents', label: 'Agents', href: '/agents' },
                   { id: 'security', label: 'Security', href: '/security' },
-                ].map((item) => <a key={item.id} href={item.href} aria-current={getCurrentNavState(item.id)} className={`flex w-full items-center justify-between rounded-lg px-3 py-3 text-left text-sm transition-colors hover:bg-surface-soft ${activeStickyItem === item.id ? 'text-ink' : 'text-ink-muted'}`}>{item.label}{activeStickyItem === item.id && <span className="h-1.5 w-1.5 rounded-full bg-brand" />}</a>)}
-                <a href="/pricing" aria-current={getCurrentNavState('pricing')} className={`block rounded-lg px-3 py-3 text-sm transition-colors hover:bg-surface-soft ${activeStickyItem === 'pricing' ? 'text-ink' : 'text-ink-muted'}`}>Pricing</a>
+                ].map((item) => (
+                  <a
+                    key={item.id}
+                    href={item.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setMobileOpen(false);
+                      if (item.href === '/') {
+                        if (window.location.pathname !== '/') {
+                          navigate('/');
+                        } else {
+                          scrollToSection('hero');
+                        }
+                      } else {
+                        navigate(item.href);
+                      }
+                    }}
+                    aria-current={getCurrentNavState(item.id)}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-3 text-left text-sm transition-colors hover:bg-surface-soft ${activeStickyItem === item.id ? 'text-ink' : 'text-ink-muted'}`}
+                  >
+                    {item.label}
+                    {activeStickyItem === item.id && <span className="h-1.5 w-1.5 rounded-full bg-brand" />}
+                  </a>
+                ))}
+                <a
+                  href="/pricing"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setMobileOpen(false);
+                    navigate('/pricing');
+                  }}
+                  aria-current={getCurrentNavState('pricing')}
+                  className={`block rounded-lg px-3 py-3 text-sm transition-colors hover:bg-surface-soft ${activeStickyItem === 'pricing' ? 'text-ink' : 'text-ink-muted'}`}
+                >
+                  Pricing
+                </a>
               </motion.div>
             )}
           </AnimatePresence>
@@ -585,8 +650,31 @@ export default function Navbar() {
               </section>
             ))}
             <div className="grid grid-cols-2 gap-2 pt-3">
-              <button type="button" onClick={() => { closeMobileNavigation(); scrollToSection('security'); }} className="rounded-lg px-3 py-3 text-left text-sm font-medium text-ink-muted hover:bg-surface-soft">Security</button>
-          <a href="/pricing" onClick={closeMobileNavigation} className="rounded-lg px-3 py-3 text-left text-sm font-medium text-ink-muted hover:bg-surface-soft">Pricing</a>
+              <button
+                type="button"
+                onClick={() => {
+                  closeMobileNavigation();
+                  if (window.location.pathname !== '/') {
+                    navigate('/security');
+                  } else {
+                    scrollToSection('security');
+                  }
+                }}
+                className="rounded-lg px-3 py-3 text-left text-sm font-medium text-ink-muted hover:bg-surface-soft"
+              >
+                Security
+              </button>
+              <a
+                href="/pricing"
+                onClick={(e) => {
+                  e.preventDefault();
+                  closeMobileNavigation();
+                  navigate('/pricing');
+                }}
+                className="rounded-lg px-3 py-3 text-left text-sm font-medium text-ink-muted hover:bg-surface-soft"
+              >
+                Pricing
+              </a>
             </div>
             <div className="mt-3 flex flex-col gap-2 border-t border-border pt-4">
               <Button variant="secondary" onClick={() => { closeMobileNavigation(); openDemoDrawer(); }} className="w-full">Talk with us</Button>
