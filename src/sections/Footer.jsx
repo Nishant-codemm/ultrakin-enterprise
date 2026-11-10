@@ -1,6 +1,7 @@
 import React from 'react';
 import UltrakinLogo from '../components/primitives/UltrakinLogo';
 import { ArrowUpRight, ShieldCheck } from 'lucide-react';
+import { navigate } from '../lib/navigate';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -15,7 +16,15 @@ export default function Footer({ isHome = true }) {
           {/* Column 1: Brand & Live Status (Spans 2 cols on desktop) */}
           <div className="lg:col-span-2">
             <a
-              href={isHome ? '#hero' : '/'}
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                if (window.location.pathname === '/') {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                  navigate('/');
+                }
+              }}
               className="inline-flex items-center gap-2.5 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand"
             >
               <UltrakinLogo size={28} className="shrink-0" />
@@ -26,7 +35,15 @@ export default function Footer({ isHome = true }) {
             </p>
 
             {/* Live Infrastructure Status Beacon */}
-            <a href="/security" className="group mt-6 flex items-center gap-2.5 rounded-lg border border-border bg-surface-raised px-3 py-2 text-[11px] font-mono text-ink-soft transition-all hover:border-brand/30 hover:bg-surface-hover w-fit focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus" title="View infrastructure reliability, compliance and SLA metrics">
+            <a
+              href="/security"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/security');
+              }}
+              className="group mt-6 flex items-center gap-2.5 rounded-lg border border-border bg-surface-raised px-3 py-2 text-[11px] font-mono text-ink-soft transition-all hover:border-brand/30 hover:bg-surface-hover w-fit focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+              title="View infrastructure reliability, compliance and SLA metrics"
+            >
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 motion-reduce:hidden" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -87,7 +104,14 @@ export default function Footer({ isHome = true }) {
                 ['Integrations', '/products/connectors'],
               ].map(([item, href]) => (
                 <li key={item}>
-                  <a href={href} className="transition-colors hover:text-brand-text">
+                  <a
+                    href={href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate(href);
+                    }}
+                    className="transition-colors hover:text-brand-text"
+                  >
                     {item}
                   </a>
                 </li>
@@ -99,13 +123,60 @@ export default function Footer({ isHome = true }) {
           <div>
             <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">Platform</p>
             <ul className="mt-4 space-y-2.5 text-[13px]">
-              <li><a href="/resources" className="transition-colors hover:text-brand-text">Resources & Architecture</a></li>
-              <li><a href="/workspace" className="transition-colors hover:text-brand-text">Workspace OS</a></li>
-              <li><a href="/agents" className="transition-colors hover:text-brand-text">Agent Architecture</a></li>
-              <li><a href="/security" className="transition-colors hover:text-brand-text">Trust & Compliance</a></li>
-              <li><a href="/pricing" className="transition-colors hover:text-brand-text">Pricing & Plans</a></li>
-              <li><a href="#platform" className="transition-colors hover:text-brand-text">Memory Engine</a></li>
-              <li><a href="#workflows" className="transition-colors hover:text-brand-text">Workflow Automation</a></li>
+              {[
+                ['Resources & Architecture', '/resources'],
+                ['Workspace OS', '/workspace'],
+                ['Agent Architecture', '/agents'],
+                ['Trust & Compliance', '/security'],
+                ['Pricing & Plans', '/pricing'],
+              ].map(([item, href]) => (
+                <li key={item}>
+                  <a
+                    href={href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate(href);
+                    }}
+                    className="transition-colors hover:text-brand-text"
+                  >
+                    {item}
+                  </a>
+                </li>
+              ))}
+              <li>
+                <a
+                  href="/#platform"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (window.location.pathname === '/') {
+                      document.getElementById('platform')?.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                      navigate('/');
+                      setTimeout(() => document.getElementById('platform')?.scrollIntoView({ behavior: 'smooth' }), 60);
+                    }
+                  }}
+                  className="transition-colors hover:text-brand-text"
+                >
+                  Memory Engine
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/#workflows"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (window.location.pathname === '/') {
+                      document.getElementById('workflows')?.scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                      navigate('/');
+                      setTimeout(() => document.getElementById('workflows')?.scrollIntoView({ behavior: 'smooth' }), 60);
+                    }
+                  }}
+                  className="transition-colors hover:text-brand-text"
+                >
+                  Workflow Automation
+                </a>
+              </li>
             </ul>
           </div>
 
