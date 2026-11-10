@@ -5,7 +5,7 @@ import { navigate } from '../lib/navigate';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-export default function Footer({ isHome = true }) {
+export default function Footer() {
   return (
     <footer className="divider-hairline border-t border-border bg-transparent py-14 text-ink-muted sm:py-16">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
