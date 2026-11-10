@@ -55,7 +55,7 @@ export default function Footer({ isHome = true }) {
 
             <div className="mt-6 flex items-center gap-3 text-ink-subtle">
               <a
-                href="https://github.com/Nishant-codemm/ultrakin-enterprise"
+                href="https://github.com/ultrakin/ultrakin-enterprise"
                 target="_blank"
                 rel="noreferrer"
                 className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface-raised transition-colors hover:border-brand/40 hover:text-brand-text"
@@ -66,7 +66,7 @@ export default function Footer({ isHome = true }) {
                 </svg>
               </a>
               <a
-                href="https://twitter.com"
+                href="https://x.com/ultrakin"
                 target="_blank"
                 rel="noreferrer"
                 className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface-raised transition-colors hover:border-brand/40 hover:text-brand-text"
@@ -77,7 +77,7 @@ export default function Footer({ isHome = true }) {
                 </svg>
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://linkedin.com/company/ultrakin"
                 target="_blank"
                 rel="noreferrer"
                 className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface-raised transition-colors hover:border-brand/40 hover:text-brand-text"
@@ -184,12 +184,27 @@ export default function Footer({ isHome = true }) {
           <div>
             <p className="font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">Enterprise Trust</p>
             <ul className="mt-4 space-y-2.5 text-[13px]">
-              <li><a href="/security" className="inline-flex items-center gap-1 transition-colors hover:text-brand-text">Security Overview <ArrowUpRight className="h-3 w-3" /></a></li>
-              <li><a href="mailto:sales@ultrakin.com" className="transition-colors hover:text-brand-text">SOC 2 Report</a></li>
-              <li><a href="mailto:sales@ultrakin.com" className="transition-colors hover:text-brand-text">Data Processing (DPA)</a></li>
-              <li><a href="mailto:sales@ultrakin.com" className="transition-colors hover:text-brand-text">Privacy Policy</a></li>
-              <li><a href="mailto:sales@ultrakin.com" className="transition-colors hover:text-brand-text">Terms of Service</a></li>
-              <li><a href="mailto:sales@ultrakin.com" className="transition-colors hover:text-brand-text">Subprocessors</a></li>
+              {[
+                ['Security Overview', '/security', true],
+                ['SOC 2 Report', '/soc2', false],
+                ['Data Processing (DPA)', '/dpa', false],
+                ['Privacy Policy', '/privacy', false],
+                ['Terms of Service', '/terms', false],
+                ['Subprocessors', '/subprocessors', false],
+              ].map(([item, href, isOverview]) => (
+                <li key={item}>
+                  <a
+                    href={href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      navigate(href);
+                    }}
+                    className="inline-flex items-center gap-1 transition-colors hover:text-brand-text"
+                  >
+                    {item} {isOverview && <ArrowUpRight className="h-3 w-3" />}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 

@@ -79,6 +79,26 @@ const PAGE_METADATA = {
     title: 'Resources & Architecture — Ultrakin',
     description: 'Explore architectural whitepapers, operational playbooks, hands-on tutorials, and case studies for Ultrakin.',
   },
+  '/privacy': {
+    title: 'Privacy Policy — Ultrakin',
+    description: 'Learn how Ultrakin protects your data, handles privacy, and adheres to GDPR and CCPA standards.',
+  },
+  '/terms': {
+    title: 'Terms of Service — Ultrakin',
+    description: 'Read the terms and conditions governing the use of Ultrakin enterprise workspaces and platforms.',
+  },
+  '/dpa': {
+    title: 'Data Processing Agreement (DPA) — Ultrakin',
+    description: 'Ultrakin Data Processing Addendum with standard contractual clauses and enterprise data commitments.',
+  },
+  '/subprocessors': {
+    title: 'Authorized Subprocessors — Ultrakin',
+    description: 'List of third-party infrastructure and sub-processors utilized across Ultrakin systems.',
+  },
+  '/soc2': {
+    title: 'SOC 2 Type II Certification — Ultrakin',
+    description: 'Ultrakin SOC 2 Type II compliance details, auditor evaluation criteria, and report access.',
+  },
 };
 
 // Product page slugs
@@ -94,16 +114,22 @@ const UniversalProductPage = lazy(() => import('./pages/ProductPage'));
 const UniversalSolutionPage = lazy(() => import('./pages/SolutionPage'));
 const SolutionsOverviewPage = lazy(() => import('./pages/SolutionsOverviewPage'));
 const ResourcesPage = lazy(() => import('./pages/ResourcesPage'));
+const LegalPage = lazy(() => import('./pages/LegalPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 const ROUTE_PAGES = {
-  '/pricing':   lazy(() => import('./pages/PricingPage')),
-  '/workspace': lazy(() => import('./pages/WorkspacePage')),
-  '/agents':    lazy(() => import('./pages/AgentsPage')),
-  '/security':  lazy(() => import('./pages/SecurityPage')),
-  '/solutions': SolutionsOverviewPage,
-  '/resources': ResourcesPage,
-  '/products':  UniversalProductPage,
+  '/pricing':       lazy(() => import('./pages/PricingPage')),
+  '/workspace':     lazy(() => import('./pages/WorkspacePage')),
+  '/agents':        lazy(() => import('./pages/AgentsPage')),
+  '/security':      lazy(() => import('./pages/SecurityPage')),
+  '/privacy':       LegalPage,
+  '/terms':         LegalPage,
+  '/dpa':           LegalPage,
+  '/subprocessors': LegalPage,
+  '/soc2':          LegalPage,
+  '/solutions':     SolutionsOverviewPage,
+  '/resources':     ResourcesPage,
+  '/products':      UniversalProductPage,
   ...Object.fromEntries(
     PRODUCT_SLUGS.map(slug => [
       `/products/${slug}`,
