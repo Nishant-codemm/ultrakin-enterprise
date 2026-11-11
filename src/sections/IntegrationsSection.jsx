@@ -497,9 +497,13 @@ export default function IntegrationsSection() {
             <p className="max-w-sm text-[13px] leading-6 text-ink-muted">
               Chat, mail, meetings, calendar, tasks, docs, and Ukin are built into one workspace. External entries are illustrative examples.
             </p>
-            <a href="#workspace-showcase" className="mt-4 inline-flex items-center gap-2 text-xs font-medium text-ink-soft transition-colors hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus">
+            <button
+              type="button"
+              onClick={() => document.getElementById('workspace-showcase')?.scrollIntoView({ behavior: 'smooth' })}
+              className="mt-4 inline-flex items-center gap-2 text-xs font-medium text-ink-soft transition-colors hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus cursor-pointer"
+            >
               Explore the workspace <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-            </a>
+            </button>
           </div>
         </motion.div>
 
@@ -622,20 +626,28 @@ export default function IntegrationsSection() {
                     className="transition-all duration-300"
                   />
 
-                  {/* Active highlight for currently hovered / selected perimeter feeder spline */}
+                  {/* Active highlight & converging photon for currently hovered / selected perimeter feeder spline */}
                   {visible.map((item) => {
                     const feederD = FEEDER_PATHS[item.name];
                     const isActive = item.name === activeNode;
                     if (!feederD || !isActive) return null;
                     return (
-                      <path
-                        key={`active-feeder-${item.name}`}
-                        d={feederD}
-                        fill="none"
-                        stroke="url(#topo-spline-active)"
-                        strokeWidth={0.88}
-                        className="transition-all duration-300"
-                      />
+                      <React.Fragment key={`active-feeder-group-${item.name}`}>
+                        <path
+                          d={feederD}
+                          fill="none"
+                          stroke="url(#topo-spline-active)"
+                          strokeWidth={1.2}
+                          className="transition-all duration-300"
+                        />
+                        {inView && !reduceMotion && (
+                          <ConvergingPhotonNode
+                            d={feederD}
+                            color="#c7d2fe"
+                            duration={2.2}
+                          />
+                        )}
+                      </React.Fragment>
                     );
                   })}
 
