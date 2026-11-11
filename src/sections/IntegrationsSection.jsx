@@ -9,8 +9,6 @@ import {
   Sparkles,
   MessageSquare,
   Video,
-  GitPullRequest,
-  BarChart3,
   Cpu,
   Route,
   ClipboardList,
@@ -103,6 +101,24 @@ function TiltCard({ children, className }) {
 
 const CATEGORIES = ['Built in', 'Extension examples'];
 
+/* ─── Dedicated SVG Brand Marks for Developer Tools & Extensions ─── */
+function GitHubIcon({ size = 16, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+    </svg>
+  );
+}
+
+function PostHogIcon({ size = 16, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M4 14.5V9.5C4 6.46 6.46 4 9.5 4h5c3.04 0 5.5 2.46 5.5 5.5v5c0 3.04-2.46 5.5-5.5 5.5h-5C6.46 20 4 17.54 4 14.5Z" fillOpacity="0.25"/>
+      <path d="M7.5 13.5h2v3.5h-2v-3.5zm3.5-5.5h2v9h-2V8zm3.5 3h2v6h-2v-6z" />
+    </svg>
+  );
+}
+
 /* ─── Product Icon & Badge Mapping matching Navigation Mega-Menu ─── */
 const PRODUCT_ICON_CONFIG = {
   Spaces:      { icon: MessageSquare, bg: 'bg-[#5c5bd6]', glow: '#5c5bd6' },
@@ -112,8 +128,8 @@ const PRODUCT_ICON_CONFIG = {
   Calendar:    { icon: Calendar,      bg: 'bg-[#d97706]', glow: '#d97706' },
   Docs:        { icon: FileText,      bg: 'bg-[#2563eb]', glow: '#2563eb' },
   'Ukin agent':{ icon: Sparkles,      bg: 'bg-[#8b5cf6]', glow: '#8b5cf6' },
-  GitHub:      { icon: GitPullRequest,bg: 'bg-[#24292f]', glow: '#64748b' },
-  PostHog:     { icon: BarChart3,     bg: 'bg-[#ea580c]', glow: '#ea580c' },
+  GitHub:      { icon: GitHubIcon,    bg: 'bg-[#181d24]', glow: '#64748b' },
+  PostHog:     { icon: PostHogIcon,   bg: 'bg-[#ea580c]', glow: '#ea580c' },
   'MCP tools': { icon: Cpu,           bg: 'bg-[#0284c7]', glow: '#0284c7' },
   Journeys:    { icon: Route,         bg: 'bg-[#c026d3]', glow: '#c026d3' },
   Forms:       { icon: ClipboardList, bg: 'bg-[#2563eb]', glow: '#2563eb' },
@@ -382,12 +398,18 @@ function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) 
 
 /* ─── Surface preview card (Detail Panel) ─── */
 function SurfacePreview({ item }) {
+  const iconConfig = PRODUCT_ICON_CONFIG[item.name] || {
+    icon: Sparkles,
+    bg: 'bg-indigo-600',
+    glow: '#6366f1',
+  };
+  const Icon = iconConfig.icon;
+
   const preview = PREVIEWS[item.name] ?? {
     surface: item.name.toLowerCase(),
     actor: `${item.name} · connected view`,
     message: `Connected view of how ${item.name} context sits alongside team work.`,
     outcome: 'Integrated into workspace context',
-    icon: item.iconLetter,
   };
 
   return (
@@ -396,8 +418,8 @@ function SurfacePreview({ item }) {
         {/* Surface Header */}
         <div className="flex items-center justify-between border-b border-obsidian-border-soft px-3.5 py-2.5">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-obsidian-border bg-white/[0.04] font-mono text-[8px] text-indigo-200">
-              {preview.icon}
+            <span className={cn('flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-white shadow-sm', iconConfig.bg)}>
+              <Icon size={12} strokeWidth={2.2} />
             </span>
             <span className="truncate text-[10px] font-medium text-slate-300">{preview.surface}</span>
           </div>
@@ -416,7 +438,9 @@ function SurfacePreview({ item }) {
           </div>
           <p className="mt-1.5 text-[11.5px] leading-[1.6] text-slate-200">{preview.message}</p>
           <div className="mt-3.5 flex items-center gap-2 border-t border-obsidian-border-soft pt-2.5 text-[9.5px] text-indigo-100/85">
-            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-indigo-300/10 text-[9px] text-indigo-200">↗</span>
+            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-indigo-300/10 text-[9px] text-indigo-200">
+              <ArrowUpRight className="h-2.5 w-2.5" aria-hidden="true" />
+            </span>
             <span className="truncate">{preview.outcome}</span>
           </div>
         </div>
