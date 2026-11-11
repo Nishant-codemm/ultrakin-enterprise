@@ -912,7 +912,7 @@ function HeroWorkspaceContent() {
       </div>
     </section>
 
-    <section id="workspace-showcase" className="relative border-t border-border bg-transparent py-20 text-ink md:py-28">
+    <section id="workspace-showcase" className="divider-hairline relative bg-transparent py-20 text-ink md:py-28">
       <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <header className="mb-8 flex items-end justify-between gap-6">
           <h2 className="font-display text-[clamp(2rem,3.5vw,2.75rem)] font-medium tracking-[-0.045em] text-ink">Everything in one workspace</h2>

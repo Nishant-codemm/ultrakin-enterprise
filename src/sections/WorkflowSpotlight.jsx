@@ -399,10 +399,7 @@ export default function WorkflowSpotlight() {
   const ActionIcon = currentStage.right.actionIcon;
 
   return (
-    <section ref={sectionRef} id="workflows" className="relative overflow-hidden bg-transparent py-20 text-ink md:py-28">
-
-      {/* Section hairline — visual continuity */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/12 to-transparent" />
+    <section ref={sectionRef} id="workflows" className="divider-hairline relative overflow-hidden bg-transparent py-20 text-ink md:py-28">
 
       {/* Ambient background depth */}
       <div

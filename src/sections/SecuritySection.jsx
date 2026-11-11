@@ -151,7 +151,7 @@ export default function SecuritySection() {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.22, ease: [0.2, 0.7, 0.2, 1] }}
+                        transition={{ duration: 0.24, ease: ULTRAKIN_EASE }}
                         className="overflow-hidden"
                       >
                         <div className="pb-6 pl-14 sm:pl-[4.5rem]">

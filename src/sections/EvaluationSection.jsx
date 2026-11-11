@@ -2,8 +2,8 @@ import React from 'react';
 import { ArrowRight, Building2, Compass } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useReveal } from '../lib/useReveal';
-import { getSectionHeaderMotion, getSectionContentMotion } from '../lib/motion';
-import { handleSpotlightMove } from '../lib/interaction';
+import { getSectionHeaderMotion, getSectionContentMotion, DRAWER_SPRING } from '../lib/motion';
+import { handleSpotlightMove, FOCUS_RING } from '../lib/interaction';
 import { navigate } from '../lib/navigate';
 import TiltCard from '../components/primitives/TiltCard';
 
@@ -102,13 +102,13 @@ export default function EvaluationSection() {
                           navigate(href);
                         }
                       }}
-                      className="mt-7 inline-flex min-h-10 w-fit items-center gap-2 rounded-lg text-sm font-medium text-ink-soft transition-all duration-200 hover:gap-3 hover:text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus cursor-pointer"
+                      className={`mt-7 inline-flex min-h-10 w-fit items-center gap-2 rounded-lg text-sm font-medium text-ink-soft transition-all duration-200 hover:gap-3 hover:text-brand-text cursor-pointer ${FOCUS_RING}`}
                     >
                       {action}
                       <motion.span
                         className="inline-flex"
                         whileHover={{ x: 4 }}
-                        transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                        transition={DRAWER_SPRING}
                       >
                         <ArrowRight aria-hidden="true" className="h-4 w-4" />
                       </motion.span>

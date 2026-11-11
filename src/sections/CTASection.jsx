@@ -12,10 +12,7 @@ export default function CTASection() {
   const { openDemoDrawer } = useWorkspace();
 
   return (
-    <section ref={sectionRef} id="cta" className="relative isolate overflow-hidden bg-transparent py-24 text-ink md:py-32">
-      {/* Top hairline — visual continuity from preceding sections */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand/15 to-transparent" />
-
+    <section ref={sectionRef} id="cta" className="divider-hairline relative isolate overflow-hidden bg-transparent py-24 text-ink md:py-32">
       {/* Left brand ambient glow — new depth anchor */}
       <div aria-hidden="true" className="pointer-events-none absolute -left-[10rem] top-1/2 h-[38rem] w-[38rem] -translate-y-1/2 rounded-full bg-brand/[0.045] blur-[110px]" />
       {/* Right decorative rings */}
@@ -26,7 +23,7 @@ export default function CTASection() {
         <motion.div
           {...getSectionHeaderMotion(inView, reduceMotion)}
         >
-          <div className="mb-8 flex items-center justify-between border-t border-border pt-5">
+          <div className="mb-8 flex items-center justify-between pt-1">
             <p className="flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">
               <span className="h-px w-7 bg-brand" /> Enterprise Evaluation & Deployment
             </p>

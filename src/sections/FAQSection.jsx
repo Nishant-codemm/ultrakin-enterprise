@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../lib/cn';
 import { navigate } from '../lib/navigate';
+import { ULTRAKIN_EASE } from '../lib/motion';
 import { useWorkspace } from '../context/useWorkspace';
 
 const CATEGORIES = [
@@ -259,7 +260,7 @@ export default function FAQSection() {
                         initial={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
                         animate={reduceMotion ? { opacity: 1 } : { height: 'auto', opacity: 1 }}
                         exit={reduceMotion ? { opacity: 0 } : { height: 0, opacity: 0 }}
-                        transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+                        transition={{ duration: 0.24, ease: ULTRAKIN_EASE }}
                         className="overflow-hidden"
                       >
                         <div className="pb-5 pl-8 pr-4 sm:pl-10 sm:pr-8">

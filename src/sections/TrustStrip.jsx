@@ -134,7 +134,7 @@ export default function TrustStrip() {
     <section
       ref={sectionRef}
       aria-label="Customer trust and performance metrics"
-      className="border-b border-border bg-surface-raised/40 py-8"
+      className="divider-hairline border-b border-border/50 bg-surface-raised/40 py-8"
     >
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
         <motion.div {...getSectionHeaderMotion(inView, reduceMotion)}>

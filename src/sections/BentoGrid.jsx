@@ -14,7 +14,7 @@ import {
 import { cn } from '../lib/cn';
 import BrowserFrame from '../components/BrowserFrame';
 import { useReveal } from '../lib/useReveal';
-import { getSectionHeaderMotion, getSectionContentMotion } from '../lib/motion';
+import { getSectionHeaderMotion, getSectionContentMotion, ULTRAKIN_EASE } from '../lib/motion';
 import { navigate } from '../lib/navigate';
 import TiltCard from '../components/primitives/TiltCard';
 
@@ -374,7 +374,7 @@ export default function BentoGrid() {
                     initial={{ opacity: 0, y: 7 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -5 }}
-                    transition={{ duration: 0.22 }}
+                    transition={{ duration: 0.22, ease: ULTRAKIN_EASE }}
                   >
                     {content}
                   </motion.div>
