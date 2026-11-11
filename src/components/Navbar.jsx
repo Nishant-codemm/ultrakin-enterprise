@@ -184,6 +184,31 @@ const MenuItem = memo(function MenuItem({ item, onSelect }) {
   );
 });
 
+const SolutionMenuItem = memo(function SolutionMenuItem({ item, onSelect }) {
+  const Icon = item.icon;
+  return (
+    <button
+      type="button"
+      role="menuitem"
+      onClick={() => onSelect(item)}
+      className="group flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors duration-150 hover:bg-surface-soft/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 cursor-pointer"
+    >
+      <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-ink-subtle transition-colors duration-150 group-hover:text-brand">
+        <Icon size={15} strokeWidth={1.8} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-1 text-[13px] font-medium text-ink leading-tight transition-colors duration-150 group-hover:text-brand">
+          {item.title}
+          <ArrowRight size={11} className="opacity-0 -translate-x-1 transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-0 text-brand shrink-0" />
+        </span>
+        <span className="mt-0.5 block text-[11.5px] leading-snug text-ink-muted/80 line-clamp-1 transition-colors duration-150 group-hover:text-ink-muted">
+          {item.description}
+        </span>
+      </span>
+    </button>
+  );
+});
+
 export default function Navbar() {
   const {
     setActiveModule,
@@ -351,7 +376,11 @@ export default function Navbar() {
 
   const menuMotion = reduceMotion
     ? { initial: false, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.01 } }
-    : { initial: { opacity: 0, y: 8, scale: 0.99 }, animate: { opacity: 1, y: 0, scale: 1 }, exit: { opacity: 0, y: 5, scale: 0.995 }, transition: { duration: 0.18, ease: SMOOTH_EASE } };
+    : { initial: { opacity: 0, y: 6 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: 4 }, transition: { duration: 0.18, ease: SMOOTH_EASE } };
+
+  const solutionsMenuMotion = reduceMotion
+    ? { initial: false, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.01 } }
+    : { initial: { opacity: 0, y: 6 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: 4 }, transition: { duration: 0.18, ease: SMOOTH_EASE } };
 
   const routeName = window.location.pathname.replace(/^\//, '').replace(/\/$/, '');
   const activePageRoute = ['workspace', 'agents', 'security', 'pricing'].includes(routeName) ? routeName : '';
@@ -552,61 +581,67 @@ export default function Navbar() {
             role="menu"
             aria-label={`${openMenu} navigation menu`}
             key={openMenu}
-            {...menuMotion}
+            {...(openMenu === 'Solutions' ? solutionsMenuMotion : menuMotion)}
             onMouseEnter={() => enterMenu(openMenu)}
-            className="absolute left-1/2 top-[calc(100%+8px)] hidden w-[min(1100px,calc(100vw-48px))] -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_32px_96px_rgba(29,35,40,.11),0_2px_6px_rgba(29,35,40,.04)] backdrop-blur-2xl lg:block"
+            className={`absolute left-1/2 top-[calc(100%+8px)] hidden -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_32px_96px_rgba(29,35,40,.11),0_2px_6px_rgba(29,35,40,.04)] backdrop-blur-2xl lg:block ${
+              openMenu === 'Solutions'
+                ? 'w-[min(680px,calc(100vw-32px))]'
+                : 'w-[min(1100px,calc(100vw-48px))]'
+            }`}
           >
-            <div
-              className="grid gap-3 p-4"
-              style={{ gridTemplateColumns: `repeat(${menuContent[openMenu]?.length ?? 2}, minmax(0,1fr)) 260px` }}
-            >
-              {menuContent[openMenu].map((group) => (
-                <div key={group.label} className="px-1 py-1">
-                  <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[.16em] text-ink-subtle">{group.label}</p>
-                  <div className="space-y-0.5">
-                    {group.items.map((item) => <MenuItem key={item.title} item={item} onSelect={selectItem} />)}
+            {openMenu === 'Solutions' ? (
+              <div>
+                <div className="grid grid-cols-2 gap-4 p-5">
+                  <div className="space-y-1">
+                    <p className="mb-2 px-2.5 text-[10px] font-semibold uppercase tracking-[.14em] text-ink-subtle">
+                      By team
+                    </p>
+                    <div className="space-y-0.5">
+                      {solutionGroups[0].items.map((item) => (
+                        <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="mb-2 px-2.5 text-[10px] font-semibold uppercase tracking-[.14em] text-ink-subtle">
+                      By industry
+                    </p>
+                    <div className="space-y-0.5">
+                      {solutionGroups[1].items.map((item) => (
+                        <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
+                      ))}
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => selectItem({ href: '/solutions' })}
+                        className="group flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors duration-150 hover:bg-surface-soft/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 cursor-pointer"
+                      >
+                        <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-brand transition-colors duration-150 group-hover:translate-x-0.5">
+                          <ArrowRight size={14} strokeWidth={2} />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="flex items-center gap-1 text-[13px] font-semibold text-brand leading-tight transition-colors duration-150 group-hover:text-brand-hover">
+                            Browse all solutions
+                            <ArrowRight size={11} className="transition-transform duration-150 group-hover:translate-x-0.5" />
+                          </span>
+                          <span className="mt-0.5 block text-[11.5px] leading-snug text-ink-muted/80 line-clamp-1">
+                            Explore the full directory of enterprise team workflows.
+                          </span>
+                        </span>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              ))}
-              <aside className="relative flex min-h-[300px] flex-col justify-between overflow-hidden rounded-xl border border-border bg-[radial-gradient(ellipse_at_85%_5%,rgba(49,86,207,.045),transparent_52%),linear-gradient(145deg,#fffefd,#f6f5f2_68%)] p-5 shadow-[0_12px_30px_-24px_rgba(39,34,25,.2)]">
-                <div aria-hidden="true" className="absolute -right-10 top-16 h-36 w-36 rounded-full border border-brand/10 shadow-[0_0_60px_rgba(49,86,207,.08)]" />
-                <div className="relative">
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-brand/20 bg-brand-soft/70 p-1.5 shadow-[0_2px_8px_rgba(49,86,207,0.08)]">
-                    <UltrakinLogo size={20} />
-                  </span>
-                  <p className="mt-5 text-[10px] font-semibold uppercase tracking-[.16em] text-brand-text">
-                    {asideContent[openMenu]?.tag ?? 'One connected workspace'}
-                  </p>
-                  <h3 className="mt-2 max-w-[220px] text-lg font-semibold leading-[1.2] tracking-[-.035em] text-ink">
-                    {asideContent[openMenu]?.title ?? 'Keep the work moving forward.'}
-                  </h3>
-                  <p className="mt-2 text-xs leading-relaxed text-ink-muted">
-                    {asideContent[openMenu]?.desc ?? 'From the first conversation to the next clear action, with your team in control.'}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpenMenu(null);
-                    asideContent[openMenu]?.action(openShowcase, scrollToSection, openDemoDrawer);
-                  }}
-                  className="group relative mt-6 inline-flex w-fit items-center gap-2 text-xs font-semibold text-brand-text hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 cursor-pointer"
-                >
-                  {asideContent[openMenu]?.actionText ?? 'Explore the workspace'}
-                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-                </button>
-              </aside>
-            </div>
-            <div className="flex items-center justify-between border-t border-border px-6 py-3 text-[11px] text-ink-subtle">
-              {openMenu === 'Solutions' ? (
-                <>
-                  <div className="flex items-center gap-2 text-ink-muted">
+
+                <div className="flex items-center justify-between border-t border-border/80 bg-surface-soft/40 px-5 py-2.5 text-[11px] text-ink-muted">
+                  <div className="flex items-center gap-2.5">
                     <button
                       type="button"
                       onClick={() => { setOpenMenu(null); scrollToSection('faq'); }}
                       className="font-medium hover:text-ink transition-colors cursor-pointer"
                     >
-                      Guides
+                      Guides & FAQ
                     </button>
                     <span className="text-border">·</span>
                     <button
@@ -623,19 +658,62 @@ export default function Navbar() {
                       setOpenMenu(null);
                       navigate('/solutions');
                     }}
-                    className="font-medium text-brand hover:underline transition-colors flex items-center gap-1 cursor-pointer"
+                    className="font-medium text-brand hover:text-brand-hover transition-colors flex items-center gap-1 cursor-pointer"
                   >
                     <span>See all solutions</span>
                     <span aria-hidden="true">→</span>
                   </button>
-                </>
-              ) : (
-                <>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div
+                  className="grid gap-3 p-4"
+                  style={{ gridTemplateColumns: `repeat(${menuContent[openMenu]?.length ?? 2}, minmax(0,1fr)) 260px` }}
+                >
+                  {menuContent[openMenu].map((group) => (
+                    <div key={group.label} className="px-1 py-1">
+                      <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[.16em] text-ink-subtle">{group.label}</p>
+                      <div className="space-y-0.5">
+                        {group.items.map((item) => <MenuItem key={item.title} item={item} onSelect={selectItem} />)}
+                      </div>
+                    </div>
+                  ))}
+                  <aside className="relative flex min-h-[300px] flex-col justify-between overflow-hidden rounded-xl border border-border bg-[radial-gradient(ellipse_at_85%_5%,rgba(49,86,207,.045),transparent_52%),linear-gradient(145deg,#fffefd,#f6f5f2_68%)] p-5 shadow-[0_12px_30px_-24px_rgba(39,34,25,.2)]">
+                    <div aria-hidden="true" className="absolute -right-10 top-16 h-36 w-36 rounded-full border border-brand/10 shadow-[0_0_60px_rgba(49,86,207,.08)]" />
+                    <div className="relative">
+                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-brand/20 bg-brand-soft/70 p-1.5 shadow-[0_2px_8px_rgba(49,86,207,0.08)]">
+                        <UltrakinLogo size={20} />
+                      </span>
+                      <p className="mt-5 text-[10px] font-semibold uppercase tracking-[.16em] text-brand-text">
+                        {asideContent[openMenu]?.tag ?? 'One connected workspace'}
+                      </p>
+                      <h3 className="mt-2 max-w-[220px] text-lg font-semibold leading-[1.2] tracking-[-.035em] text-ink">
+                        {asideContent[openMenu]?.title ?? 'Keep the work moving forward.'}
+                      </h3>
+                      <p className="mt-2 text-xs leading-relaxed text-ink-muted">
+                        {asideContent[openMenu]?.desc ?? 'From the first conversation to the next clear action, with your team in control.'}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpenMenu(null);
+                        asideContent[openMenu]?.action(openShowcase, scrollToSection, openDemoDrawer);
+                      }}
+                      className="group relative mt-6 inline-flex w-fit items-center gap-2 text-xs font-semibold text-brand-text hover:text-brand-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 cursor-pointer"
+                    >
+                      {asideContent[openMenu]?.actionText ?? 'Explore the workspace'}
+                      <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                    </button>
+                  </aside>
+                </div>
+                <div className="flex items-center justify-between border-t border-border px-6 py-3 text-[11px] text-ink-subtle">
                   <span>People, tools, and agents in one app.</span>
                   <button type="button" onClick={() => { setOpenMenu(null); scrollToSection('workflows'); }} className="font-medium text-ink-muted transition-colors hover:text-ink">See how it works <span aria-hidden="true">→</span></button>
-                </>
-              )}
-            </div>
+                </div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
