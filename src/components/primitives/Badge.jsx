@@ -17,6 +17,9 @@ const VARIANT_STYLES = {
   destruct: 'bg-rose-400/10 text-rose-200 border-rose-400/20',
   indigo: 'bg-brand-soft text-brand-text border-brand/20',
   neutral: 'bg-surface-soft text-ink-muted border-border',
+  obsidian: 'bg-white/[0.06] text-slate-200 border-white/[0.12]',
+  obsidianBrand: 'bg-indigo-500/15 text-indigo-200 border-indigo-400/25',
+  obsidianSuccess: 'bg-emerald-500/15 text-emerald-200 border-emerald-400/25',
 };
 
 const DOT_COLORS = {
@@ -26,6 +29,9 @@ const DOT_COLORS = {
   destruct: 'bg-rose-300',
   indigo: 'bg-brand',
   neutral: 'bg-ink-subtle',
+  obsidian: 'bg-slate-300',
+  obsidianBrand: 'bg-indigo-400',
+  obsidianSuccess: 'bg-emerald-400',
 };
 
 export default function Badge({

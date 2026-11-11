@@ -1,58 +1,11 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ArrowUpRight, FileCheck2, Globe, KeyRound, Lock, MapPinned, Plus, Server, ShieldCheck } from 'lucide-react';
+import { ArrowRight, FileCheck2, Globe, KeyRound, Lock, MapPinned, Plus, Server, ShieldCheck } from 'lucide-react';
 import { cn } from '../lib/cn';
 import { useReveal } from '../lib/useReveal';
 import { ULTRAKIN_EASE } from '../lib/motion';
-
-/* ─── Reusable cursor-tracking 3D tilt ─── */
-function TiltCard({ children, className, style, maxTilt = 9 }) {
-  const ref = useRef(null);
-  const reduceMotion = useReducedMotion();
-  const [t, setT] = useState({ rx: 0, ry: 0, gx: 50, gy: 50, on: false });
-
-  const onMove = useCallback((e) => {
-    if (reduceMotion) return;
-    const el = ref.current; if (!el) return;
-    const r  = el.getBoundingClientRect();
-    const dx = (e.clientX - r.left) / r.width  - 0.5;
-    const dy = (e.clientY - r.top)  / r.height - 0.5;
-    setT({ rx: -dy * maxTilt, ry: dx * maxTilt, gx: (dx + 0.5) * 100, gy: (dy + 0.5) * 100, on: true });
-  }, [reduceMotion, maxTilt]);
-
-  const onLeave = useCallback(() => setT({ rx: 0, ry: 0, gx: 50, gy: 50, on: false }), []);
-
-  return (
-    <div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      className={className}
-      style={{ perspective: '900px', perspectiveOrigin: '50% 50%', ...style }}
-    >
-      <div style={{
-        transform: t.on
-          ? `rotateX(${t.rx}deg) rotateY(${t.ry}deg) scale(1.014)`
-          : 'rotateX(0deg) rotateY(0deg) scale(1)',
-        transition: t.on ? 'transform 90ms ease-out' : 'transform 500ms cubic-bezier(0.16,1,0.3,1)',
-        transformOrigin: '50% 50%',
-        willChange: 'transform',
-        position: 'relative',
-        borderRadius: 'inherit',
-        height: '100%',
-      }}>
-        {children}
-        {t.on && !reduceMotion && (
-          <span aria-hidden="true" style={{
-            position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none',
-            background: `radial-gradient(circle at ${t.gx}% ${t.gy}%, rgba(165,180,252,0.09) 0%, transparent 58%)`,
-            mixBlendMode: 'screen', zIndex: 10,
-          }} />
-        )}
-      </div>
-    </div>
-  );
-}
+import { navigate } from '../lib/navigate';
+import TiltCard from '../components/primitives/TiltCard';
 
 const TOPICS = [
   {
@@ -101,20 +54,19 @@ export default function SecuritySection() {
 
         {/* ── Left: Copy with Scroll Entrance ── */}
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, x: -24 }}
-          animate={inView ? { opacity: 1, x: 0 } : {}}
+          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease: ULTRAKIN_EASE }}
           className="max-w-xl"
         >
-          <p className="mb-6 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle">
+          <p className="mb-6 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">
             <span className="h-px w-7 bg-brand" /> A straight conversation about trust
           </p>
           <h2 className="font-display text-[clamp(2.5rem,4.5vw,3.75rem)] font-normal leading-[1.02] tracking-[-0.035em] text-ink">
             Enterprise trust is<br /><span className="font-display italic text-brand-text">earned in the details.</span>
           </h2>
           <p className="mt-6 max-w-md text-[13px] leading-6 text-ink-muted">
-            This preview does not include supporting security or compliance documents.
-            Ask the Ultrakin team for current product details before making an evaluation decision.
+            Ultrakin enforces cryptographic tenant isolation, zero-retention AI inference guarantees, and immutable SIEM-exportable audit logging across all customer workspaces.
           </p>
 
           {/* Compliance Badges Grid */}
@@ -130,21 +82,23 @@ export default function SecuritySection() {
             ))}
           </div>
           <p className="mt-3 text-[10px] text-ink-subtle">
-            Compliance documentation available under NDA. Contact the team for current reports.
+            SOC 2 Type II reports, penetration testing summaries, and vendor risk assessments available under NDA.
           </p>
 
-          <a
-            href="mailto:sales@ultrakin.com?subject=Ultrakin%20security%20and%20deployment%20questions"
-            className="mt-6 inline-flex items-center gap-2 text-xs font-medium text-brand-text transition-colors hover:text-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+          <button
+            type="button"
+            onClick={() => navigate('/security')}
+            className="group mt-6 inline-flex items-center gap-2 text-xs font-semibold text-brand-text transition-colors hover:text-ink cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
           >
-            Ask about your requirements <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-          </a>
+            <span>Review security architecture & whitepapers</span>
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+          </button>
         </motion.div>
 
         {/* ── Right: Accordion with TiltCard and Scroll Entrance ── */}
         <motion.div
-          initial={reduceMotion ? false : { opacity: 0, x: 24 }}
-          animate={inView ? { opacity: 1, x: 0 } : {}}
+          initial={reduceMotion ? false : { opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.65, delay: 0.12, ease: ULTRAKIN_EASE }}
         >
         <TiltCard maxTilt={5} className="rounded-2xl" style={{ borderRadius: '1rem' }}>

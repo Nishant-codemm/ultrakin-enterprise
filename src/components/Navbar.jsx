@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, memo } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion, useScroll } from 'framer-motion';
 import {
   ArrowDownRight,
   ArrowRight,
@@ -162,6 +162,7 @@ const MenuItem = memo(function MenuItem({ item, onSelect }) {
   return (
     <button
       type="button"
+      role="menuitem"
       onClick={() => onSelect(item)}
       className="group flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left transition-colors duration-150 hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 cursor-pointer"
     >
@@ -192,6 +193,7 @@ export default function Navbar() {
     openDemoDrawer,
   } = useWorkspace();
   const reduceMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll();
   const [openMenu, setOpenMenu] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileGroup, setMobileGroup] = useState(null);
@@ -364,6 +366,14 @@ export default function Navbar() {
       className={`fixed inset-x-0 top-0 z-[100] border-b transition-[background-color,border-color,box-shadow] duration-300 ${scrolled || openMenu ? 'border-border bg-surface-glass/90 shadow-[0_10px_35px_rgba(30,35,45,.09)] backdrop-blur-xl' : 'border-transparent bg-surface-glass/80 backdrop-blur-md'}`}
       onMouseLeave={leaveMenu}
     >
+      {/* Scroll progress hairline indicator (M-06) */}
+      {!reduceMotion && (
+        <motion.div
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-brand via-indigo-500 to-sky-400 origin-left"
+          style={{ scaleX: scrollYProgress }}
+        />
+      )}
       <AnimatePresence mode="wait" initial={false}>
       {isHeroVisible ? (
       <motion.div key="full-navigation" {...compactTransition} className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-10">
@@ -539,6 +549,8 @@ export default function Navbar() {
         {isHeroVisible && openMenu && (
           <motion.div
             id="navigation-mega-menu"
+            role="menu"
+            aria-label={`${openMenu} navigation menu`}
             key={openMenu}
             {...menuMotion}
             onMouseEnter={() => enterMenu(openMenu)}

@@ -25,6 +25,10 @@ const VARIANT_STYLES = {
     'bg-surface-soft hover:bg-surface-hover text-ink-soft hover:text-ink border border-border hover:border-border-strong shadow-sm hover:-translate-y-0.5 active:translate-y-0',
   destructive:
     'bg-[#F43F5E] hover:bg-[#E11D48] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_4px_16px_-4px_rgba(244,63,94,0.45)] border border-rose-400/30 hover:-translate-y-0.5 active:translate-y-0',
+  obsidian:
+    'bg-[#121620] hover:bg-[#1a202e] text-slate-100 border border-white/[0.12] hover:border-white/[0.24] shadow-[0_4px_16px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.08)] hover:-translate-y-px active:translate-y-0',
+  enterprise:
+    'bg-ink hover:bg-ink-muted text-white shadow-sm border border-transparent hover:-translate-y-px active:translate-y-0',
 };
 
 export default function Button({

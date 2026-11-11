@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
@@ -16,58 +16,13 @@ import BrowserFrame from '../components/BrowserFrame';
 import { useReveal } from '../lib/useReveal';
 import { getSectionHeaderMotion, getSectionContentMotion } from '../lib/motion';
 import { navigate } from '../lib/navigate';
+import TiltCard from '../components/primitives/TiltCard';
 
 const LENSES = [
   { id: 'memory',     number: '01', label: 'Find past decisions',   hint: 'Search across conversations and docs', icon: Search },
   { id: 'control',    number: '02', label: 'Review agent work',     hint: 'People approve consequential changes',  icon: ShieldCheck },
   { id: 'boundaries', number: '03', label: 'Set access boundaries', hint: 'Agents inherit workspace permissions',  icon: LockKeyhole },
 ];
-
-/* ─── Cursor-tracking 3D tilt ─── */
-function TiltCard({ children, className, style, maxTilt = 8 }) {
-  const ref = useRef(null);
-  const reduceMotion = useReducedMotion();
-  const [t, setT] = useState({ rx: 0, ry: 0, gx: 50, gy: 50, on: false });
-
-  const onMove = useCallback((e) => {
-    if (reduceMotion) return;
-    const el = ref.current; if (!el) return;
-    const r = el.getBoundingClientRect();
-    const dx = (e.clientX - r.left) / r.width  - 0.5;
-    const dy = (e.clientY - r.top)  / r.height - 0.5;
-    setT({ rx: -dy * maxTilt, ry: dx * maxTilt, gx: (dx + 0.5) * 100, gy: (dy + 0.5) * 100, on: true });
-  }, [reduceMotion, maxTilt]);
-
-  const onLeave = useCallback(() => setT({ rx: 0, ry: 0, gx: 50, gy: 50, on: false }), []);
-
-  return (
-    <div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      className={className}
-      style={{ perspective: '1100px', perspectiveOrigin: '50% 50%', ...style }}
-    >
-      <div style={{
-        transform: t.on
-          ? `rotateX(${t.rx}deg) rotateY(${t.ry}deg) scale(1.01)`
-          : 'rotateX(0deg) rotateY(0deg) scale(1)',
-        transition: t.on ? 'transform 90ms ease-out' : 'transform 600ms cubic-bezier(0.16,1,0.3,1)',
-        transformOrigin: '50% 50%', willChange: 'transform',
-        position: 'relative', borderRadius: 'inherit',
-      }}>
-        {children}
-        {t.on && !reduceMotion && (
-          <span aria-hidden="true" style={{
-            position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none',
-            background: `radial-gradient(circle at ${t.gx}% ${t.gy}%, rgba(165,180,252,0.08) 0%, transparent 55%)`,
-            mixBlendMode: 'screen', zIndex: 10,
-          }} />
-        )}
-      </div>
-    </div>
-  );
-}
 
 /* ─── Tab 1: Memory search ─── */
 function MemoryView() {
@@ -334,7 +289,7 @@ export default function BentoGrid() {
           className="mb-16 grid gap-6 md:grid-cols-[1fr_auto] md:items-end"
         >
           <div>
-            <p className="mb-5 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle">
+            <p className="mb-5 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">
               <span className="h-px w-7 bg-brand" /> Memory · review · boundaries
             </p>
             <h2 className="max-w-2xl font-display text-[clamp(2.5rem,4vw,3.25rem)] font-normal leading-[1.05] tracking-[-0.035em] text-ink">

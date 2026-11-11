@@ -15,6 +15,8 @@ import {
   CheckCircle2,
   CheckSquare,
   GitBranch,
+  Pause,
+  Play,
   ShieldCheck,
 } from 'lucide-react';
 import Button from '../components/primitives/Button';
@@ -634,7 +636,7 @@ function HeroInteractiveStage() {
 
               {/* Column 1: Left Signals Column (4 Buttons spanning 168px) */}
               <div
-                className="flex h-[168px] w-[102px] shrink-0 flex-col justify-between"
+                className="flex h-[168px] w-[116px] shrink-0 flex-col justify-between"
                 style={{ transform: 'translateZ(10px)' }}
               >
                 {WORKFLOW_SIGNALS.map((signal) => {
@@ -661,7 +663,8 @@ function HeroInteractiveStage() {
                         style={{ color: isActive ? signal.accentColor : '#64748b' }}
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[9.5px] leading-none">{signal.label}</p>
+                        <p className="truncate text-[9px] font-semibold leading-tight">{signal.label}</p>
+                        <p className="truncate text-[7.5px] text-slate-500 font-mono leading-none">{signal.channel}</p>
                       </div>
 
                       {/* Right-edge diode anchor port */}
@@ -700,9 +703,9 @@ function HeroInteractiveStage() {
 
             </div>
 
-            {/* ── Bottom Telemetry Status Pill (Crisp high-contrast white glass) ── */}
+            {/* ── Bottom Telemetry Status Pill with Pause/Resume Control (M-07) ── */}
             <div
-              className="relative z-10 mt-3 flex items-center justify-center"
+              className="relative z-10 mt-3 flex items-center justify-center gap-2"
               style={{ transform: 'translateZ(18px)' }}
             >
               <div className="flex items-center gap-2 rounded-full border border-sky-200/90 bg-white/95 px-3 py-1 text-[8.5px] font-semibold text-slate-800 shadow-[0_2px_8px_rgba(37,99,235,0.06)] backdrop-blur-sm">
@@ -714,6 +717,15 @@ function HeroInteractiveStage() {
                 <span className="text-sky-300">·</span>
                 <span className="font-mono text-slate-500 font-normal">Zero context loss across 4 apps</span>
               </div>
+              <button
+                type="button"
+                onClick={() => setIsPaused((prev) => !prev)}
+                aria-label={isPaused ? 'Resume workflow animation' : 'Pause workflow animation'}
+                className="flex items-center gap-1 rounded-full border border-sky-200/90 bg-white/95 px-2.5 py-1 text-[8.5px] font-mono font-medium text-slate-700 hover:text-slate-900 transition-colors shadow-[0_2px_8px_rgba(37,99,235,0.06)] cursor-pointer"
+              >
+                {isPaused ? <Play className="h-2.5 w-2.5 text-blue-600" aria-hidden="true" /> : <Pause className="h-2.5 w-2.5 text-slate-500" aria-hidden="true" />}
+                <span>{isPaused ? 'Resume' : 'Pause'}</span>
+              </button>
             </div>
 
           </div>
@@ -732,7 +744,6 @@ function HeroWorkspaceContent() {
     channels,
     emails,
     kanbanTasks,
-    openSearchPalette,
   } = useWorkspace();
 
   const unreadEmailCount = emails.filter((e) => e.unread).length;
@@ -874,9 +885,9 @@ function HeroWorkspaceContent() {
             <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-medium text-ink-subtle select-none">
               {[
                 'SOC 2 Type II',
-                'GDPR-ready',
-                'SSO / SAML',
-                '99.9% uptime SLA',
+                'Zero-Retention AI',
+                'SAML 2.0 / SCIM',
+                '99.99% uptime SLA',
               ].map((label, i) => (
                 <React.Fragment key={label}>
                   {i > 0 && <span className="hidden sm:inline-block h-1 w-1 rounded-full bg-border-strong" aria-hidden="true" />}

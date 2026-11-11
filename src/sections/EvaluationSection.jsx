@@ -1,59 +1,11 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React from 'react';
 import { ArrowRight, Building2, Compass } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useReveal } from '../lib/useReveal';
 import { getSectionHeaderMotion, getSectionContentMotion } from '../lib/motion';
 import { handleSpotlightMove } from '../lib/interaction';
 import { navigate } from '../lib/navigate';
-
-/* ─── Cursor-tracking 3D tilt ─── */
-function TiltCard({ children, className, style, maxTilt = 10 }) {
-  const ref = useRef(null);
-  const reduceMotion = useReducedMotion();
-  const [t, setT] = useState({ rx: 0, ry: 0, gx: 50, gy: 50, on: false });
-
-  const onMove = useCallback((e) => {
-    if (reduceMotion) return;
-    const el = ref.current; if (!el) return;
-    const r = el.getBoundingClientRect();
-    const dx = (e.clientX - r.left) / r.width  - 0.5;
-    const dy = (e.clientY - r.top)  / r.height - 0.5;
-    setT({ rx: -dy * maxTilt, ry: dx * maxTilt, gx: (dx + 0.5) * 100, gy: (dy + 0.5) * 100, on: true });
-  }, [reduceMotion, maxTilt]);
-
-  const onLeave = useCallback(() => setT({ rx: 0, ry: 0, gx: 50, gy: 50, on: false }), []);
-
-  return (
-    <div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      className={className}
-      style={{ perspective: '900px', perspectiveOrigin: '50% 50%', ...style }}
-    >
-      <div style={{
-        transform: t.on
-          ? `rotateX(${t.rx}deg) rotateY(${t.ry}deg) scale(1.018)`
-          : 'rotateX(0deg) rotateY(0deg) scale(1)',
-        transition: t.on ? 'transform 90ms ease-out' : 'transform 500ms cubic-bezier(0.16,1,0.3,1)',
-        transformOrigin: '50% 50%',
-        willChange: 'transform',
-        position: 'relative',
-        borderRadius: 'inherit',
-        height: '100%',
-      }}>
-        {children}
-        {t.on && !reduceMotion && (
-          <span aria-hidden="true" style={{
-            position: 'absolute', inset: 0, borderRadius: 'inherit', pointerEvents: 'none',
-            background: `radial-gradient(circle at ${t.gx}% ${t.gy}%, rgba(165,180,252,0.11) 0%, transparent 60%)`,
-            mixBlendMode: 'screen', zIndex: 10,
-          }} />
-        )}
-      </div>
-    </div>
-  );
-}
+import TiltCard from '../components/primitives/TiltCard';
 
 const PATHS = [
   {
@@ -93,7 +45,7 @@ export default function EvaluationSection() {
           {...getSectionHeaderMotion(inView, reduceMotion)}
           className="max-w-2xl"
         >
-          <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.19em] text-brand-text">
+          <p className="mb-5 text-[10px] font-medium uppercase tracking-[0.18em] text-brand-text">
             Next steps
           </p>
           <h2 className="max-w-xl font-display text-[clamp(2.25rem,4vw,3.25rem)] font-normal leading-[1.05] tracking-[-0.035em] text-ink">

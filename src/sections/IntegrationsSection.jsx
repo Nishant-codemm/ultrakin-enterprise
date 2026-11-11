@@ -485,7 +485,7 @@ export default function IntegrationsSection() {
           className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-end"
         >
           <div>
-            <p className="mb-5 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle">
+            <p className="mb-5 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">
               <span className="h-px w-7 bg-brand" /> BUILT IN, THEN OPEN
             </p>
             <h2 className="max-w-xl font-display text-[clamp(2.5rem,4vw,3.25rem)] font-normal leading-[1.05] tracking-[-0.035em] text-ink">
@@ -640,7 +640,7 @@ export default function IntegrationsSection() {
                   })}
 
                   {/* ── LAYER 5: Continuous Travelling Photon Bead along Hero Cross-Sectional Arc ── */}
-                  {!reduceMotion && (
+                  {inView && !reduceMotion && (
                     <ConvergingPhotonNode
                       d={PATH_HERO_CROSS_SECTION}
                       color="#c7d2fe"

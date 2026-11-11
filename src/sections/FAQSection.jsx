@@ -141,7 +141,7 @@ export default function FAQSection() {
       <div className="mx-auto max-w-4xl px-5 lg:px-8">
         {/* Eyebrow & Headline */}
         <div className="mb-9 max-w-2xl">
-          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand/20 bg-brand/5 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.19em] text-brand-text">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-brand/20 bg-brand/5 px-2.5 py-1 text-[10px] font-medium uppercase tracking-[0.18em] text-brand-text">
             <span className="h-1.5 w-1.5 rounded-full bg-brand" />
             Frequently Asked Questions
           </div>

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
@@ -16,67 +16,10 @@ import BrowserFrame from '../components/BrowserFrame';
 import { useReveal } from '../lib/useReveal';
 import { getSectionHeaderMotion, getSectionContentMotion } from '../lib/motion';
 import { navigate } from '../lib/navigate';
-
-/* ─── Cursor-tracking 3D tilt for any card ─── */
-function TiltCard({ children, className, maxTilt = 10, style }) {
-  const ref = useRef(null);
-  const reduceMotion = useReducedMotion();
-  const [tilt, setTilt] = useState({ rx: 0, ry: 0, gx: 50, gy: 50, on: false });
-
-  const onMove = useCallback((e) => {
-    if (reduceMotion) return;
-    const el = ref.current;
-    if (!el) return;
-    const r  = el.getBoundingClientRect();
-    const dx = (e.clientX - r.left)  / r.width  - 0.5;
-    const dy = (e.clientY - r.top)   / r.height - 0.5;
-    setTilt({ rx: -dy * maxTilt, ry: dx * maxTilt, gx: (dx + 0.5) * 100, gy: (dy + 0.5) * 100, on: true });
-  }, [reduceMotion, maxTilt]);
-
-  const onLeave = useCallback(() => setTilt({ rx: 0, ry: 0, gx: 50, gy: 50, on: false }), []);
-
-  return (
-    <div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      className={className}
-      style={{ perspective: '900px', perspectiveOrigin: '50% 50%', ...style }}
-    >
-      <div
-        style={{
-          transform: tilt.on
-            ? `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) scale(1.018)`
-            : 'rotateX(0deg) rotateY(0deg) scale(1)',
-          transition: tilt.on ? 'transform 90ms ease-out' : 'transform 500ms cubic-bezier(0.16,1,0.3,1)',
-          transformOrigin: '50% 50%',
-          willChange: 'transform',
-          position: 'relative',
-          borderRadius: 'inherit',
-        }}
-      >
-        {children}
-        {tilt.on && !reduceMotion && (
-          <span
-            aria-hidden="true"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              borderRadius: 'inherit',
-              pointerEvents: 'none',
-              background: `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(165,180,252,0.1) 0%, transparent 60%)`,
-              mixBlendMode: 'screen',
-              zIndex: 10,
-            }}
-          />
-        )}
-      </div>
-    </div>
-  );
-}
+import TiltCard from '../components/primitives/TiltCard';
 
 /* ─── Precision SVG Flow Connector ─── */
-function FlowConnector({ reduceMotion, activePulse = false }) {
+function FlowConnector({ reduceMotion, activePulse = false, inView = true }) {
   const MAIN  = 'M1 15 C 18 15, 20 15, 36 15 S 52 15, 71 15';
   const GUIDE = 'M1 17.5 C 18 17.5, 20 17.5, 36 17.5 S 52 17.5, 71 17.5';
 
@@ -105,7 +48,7 @@ function FlowConnector({ reduceMotion, activePulse = false }) {
         <path d={MAIN} fill="none" stroke="url(#wf-flow-grad)" strokeWidth={activePulse ? 2.5 : 2} opacity={activePulse ? 0.35 : 0.18} />
 
         {/* Particle 1 — primary signal bead */}
-        {!reduceMotion && (
+        {!reduceMotion && inView && (
           <motion.path
             d={MAIN}
             fill="none"
@@ -121,7 +64,7 @@ function FlowConnector({ reduceMotion, activePulse = false }) {
         )}
 
         {/* Particle 2 — trailing echo */}
-        {!reduceMotion && (
+        {!reduceMotion && inView && (
           <motion.path
             d={MAIN}
             fill="none"
@@ -139,7 +82,7 @@ function FlowConnector({ reduceMotion, activePulse = false }) {
         {/* Center converge point */}
         <circle cx="36" cy="15" r="3.2" fill="#3156cf" />
         <circle cx="36" cy="15" r="6.5" fill="#3156cf" fillOpacity="0.1" />
-        {!reduceMotion && (
+        {!reduceMotion && inView && (
           <motion.circle
             cx="36" cy="15" r="3.2"
             fill="none"
@@ -433,7 +376,7 @@ export default function WorkflowSpotlight() {
           {...getSectionHeaderMotion(inView, reduceMotion)}
           className="max-w-lg"
         >
-          <p className="mb-6 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-ink-subtle">
+          <p className="mb-6 flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">
             <span className="h-px w-7 bg-brand" /> THE WORK, IN CONTEXT
           </p>
           <h2 className="font-display text-[clamp(2.5rem,4vw,3.25rem)] font-normal leading-[1.05] tracking-[-0.035em] text-ink">
@@ -591,7 +534,7 @@ export default function WorkflowSpotlight() {
                   </TiltCard>
 
                   {/* ── Animated flow connector ── */}
-                  <FlowConnector reduceMotion={reduceMotion} activePulse={activeStageIdx >= 1} />
+                  <FlowConnector reduceMotion={reduceMotion} inView={inView} activePulse={activeStageIdx >= 1} />
 
                   {/* ── Right Stage Card ── */}
                   <TiltCard maxTilt={10} className="relative rounded-xl" style={{ borderRadius: '0.75rem' }}>
