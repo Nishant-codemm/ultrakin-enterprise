@@ -140,6 +140,43 @@ export default function WorkspaceShell({ className = '' }) {
         </div>
       </div>
 
+      {/* ── Compact Mobile Module Switcher Bar (< md only: Realism & Full Mobile Touch Affordance) ── */}
+      <div className="flex md:hidden items-center gap-1.5 px-3 py-2 bg-obsidian-surface border-b border-obsidian-border overflow-x-auto select-none scrollbar-none">
+        {[
+          { id: 'chat', label: 'Chat', icon: MessageSquare },
+          { id: 'threads', label: 'Threads', icon: AtSign },
+          { id: 'mail', label: 'Mail', icon: Mail, badge: unreadEmailCount > 0 ? unreadEmailCount : null },
+          { id: 'docs', label: 'Docs', icon: FileText },
+          { id: 'huddle', label: 'Huddle', icon: Video },
+          { id: 'tasks', label: 'Tasks', icon: CheckSquare, badge: kanbanTasks.length },
+          { id: 'automations', label: 'Agents', icon: Bot },
+        ].map((item) => {
+          const Icon = item.icon;
+          const isActive = activeModule === item.id;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setActiveModule(item.id)}
+              className={cn(
+                'flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all shrink-0 cursor-pointer',
+                isActive
+                  ? 'bg-indigo-600 text-white shadow-xs font-semibold'
+                  : 'bg-white/[0.04] text-slate-400 hover:text-slate-200 hover:bg-white/[0.08]'
+              )}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              <span>{item.label}</span>
+              {item.badge != null && item.badge > 0 && (
+                <span className={cn('px-1 py-0.2 rounded-full text-[9px] font-mono font-bold', isActive ? 'bg-white/20 text-white' : 'bg-indigo-500/20 text-indigo-300')}>
+                  {item.badge}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
       {/* ── Multi-Column Application Shell (64px Rail + 220px Sidebar + Main Viewport + 340px Drawer) ── */}
       <div className="grid grid-cols-1 md:grid-cols-[64px_220px_1fr] lg:grid-cols-[64px_220px_1fr_340px] min-h-[620px] bg-obsidian-base">
         {/* 1. 64px Workspace Left Rail */}

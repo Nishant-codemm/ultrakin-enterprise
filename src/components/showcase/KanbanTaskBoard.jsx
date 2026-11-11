@@ -195,6 +195,25 @@ export default function KanbanTaskBoard() {
       </div>
 
       {/* Main Kanban Board Scroll Area */}
+      {filteredTasks.length === 0 && (searchQuery || filterPriority !== 'ALL') && (
+        <div className="mx-4 mt-3 p-3.5 rounded-xl border border-obsidian-border bg-obsidian-surface/60 flex items-center justify-between text-xs text-slate-300">
+          <div className="flex items-center gap-2">
+            <Search className="w-4 h-4 text-slate-400" />
+            <span>No tasks match your active filters ({searchQuery ? `"${searchQuery}"` : ''}{filterPriority !== 'ALL' ? ` Priority: ${filterPriority}` : ''}).</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setSearchQuery('');
+              setFilterPriority('ALL');
+            }}
+            className="text-indigo-400 hover:text-indigo-300 underline font-mono text-[11px] cursor-pointer"
+          >
+            Reset all filters
+          </button>
+        </div>
+      )}
+
       <div className="flex-1 overflow-x-auto p-4 flex gap-4 min-h-[500px]">
         {COLUMNS.map((col) => {
           const colTasks = filteredTasks.filter((t) => t.col === col.id);
