@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
@@ -6,6 +6,8 @@ import {
   CheckSquare,
   FileText,
   MessageSquareText,
+  Pause,
+  Play,
   RotateCcw,
   ShieldCheck,
   Sparkles,
@@ -320,15 +322,15 @@ function StageArrow({ active }) {
   );
 }
 
-/* ─── Stage interactive pill button ─── */
-function StagePill({ stage, isActive, isSelected, onClick }) {
+/* ─── Stage interactive pill button with progress hairline ─── */
+function StagePill({ stage, isActive, isSelected, onClick, progress = 0 }) {
   const Icon = stage.icon;
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        'group flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[9.5px] font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+        'group relative overflow-hidden flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
         isSelected
           ? 'bg-brand text-white shadow-[0_2px_8px_rgba(49,86,207,0.3)] ring-1 ring-brand'
           : isActive
@@ -342,15 +344,54 @@ function StagePill({ stage, isActive, isSelected, onClick }) {
         style={{ color: isSelected ? '#ffffff' : isActive ? stage.color : undefined }}
         aria-hidden="true"
       />
-      {stage.label}
+      <span>{stage.label}</span>
+      {isSelected && progress > 0 && (
+        <span
+          className="pointer-events-none absolute bottom-0 left-0 h-[2px] bg-white/70 transition-all duration-75 ease-linear"
+          style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+          aria-hidden="true"
+        />
+      )}
     </button>
   );
 }
 
 export default function WorkflowSpotlight() {
   const [activeStageIdx, setActiveStageIdx] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [stageProgress, setStageProgress] = useState(0);
   const reduceMotion = useReducedMotion();
   const [sectionRef, inView] = useReveal({ threshold: 0.12 });
+
+  const STAGE_DURATION = 4200; // 4.2 seconds per stage
+
+  useEffect(() => {
+    if (reduceMotion || !inView || isPaused || isHovered) {
+      return;
+    }
+
+    let start = performance.now();
+    let frameId;
+
+    const tick = (now) => {
+      const elapsed = now - start;
+      const pct = (elapsed / STAGE_DURATION) * 100;
+
+      if (pct >= 100) {
+        setActiveStageIdx((prev) => (prev + 1) % WORKFLOW_STAGES.length);
+        start = performance.now();
+        setStageProgress(0);
+        frameId = requestAnimationFrame(tick);
+      } else {
+        setStageProgress(pct);
+        frameId = requestAnimationFrame(tick);
+      }
+    };
+
+    frameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameId);
+  }, [inView, reduceMotion, isPaused, isHovered, activeStageIdx]);
 
   const currentStage = STAGE_CONTENT[activeStageIdx] || STAGE_CONTENT[0];
   const SourceIcon = currentStage.sourceIcon;
@@ -387,12 +428,23 @@ export default function WorkflowSpotlight() {
           {/* ── Workflow stage pipeline ── */}
           <div className="mt-10 border-t border-border pt-6">
             <div className="mb-4 flex items-center justify-between">
-              <p className="text-[9.5px] font-medium uppercase tracking-[0.16em] text-ink-subtle">
+              <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">
                 One workflow · signal to outcome
               </p>
-              <span className="text-[9px] font-mono text-ink-subtle hidden sm:inline">
-                Click any step to scrub
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono text-ink-subtle hidden sm:inline">
+                  {isPaused ? 'Paused' : isHovered ? 'Paused on hover' : 'Auto-advancing'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setIsPaused((p) => !p)}
+                  aria-label={isPaused ? 'Resume workflow auto-advance' : 'Pause workflow auto-advance'}
+                  className="flex items-center gap-1 rounded-full border border-border bg-surface px-2.5 py-0.5 font-mono text-[9.5px] font-medium text-ink-muted hover:text-ink transition-colors cursor-pointer shadow-xs"
+                >
+                  {isPaused ? <Play className="h-2.5 w-2.5 text-brand" aria-hidden="true" /> : <Pause className="h-2.5 w-2.5 text-ink-muted" aria-hidden="true" />}
+                  <span>{isPaused ? 'Play' : 'Pause'}</span>
+                </button>
+              </div>
             </div>
             <div
               role="list"
@@ -406,7 +458,11 @@ export default function WorkflowSpotlight() {
                       stage={stage}
                       isActive={i <= activeStageIdx}
                       isSelected={i === activeStageIdx}
-                      onClick={() => setActiveStageIdx(i)}
+                      progress={i === activeStageIdx ? stageProgress : 0}
+                      onClick={() => {
+                        setActiveStageIdx(i);
+                        setStageProgress(0);
+                      }}
                     />
                   </div>
                   {i < WORKFLOW_STAGES.length - 1 && (
@@ -432,6 +488,8 @@ export default function WorkflowSpotlight() {
         <motion.div
           {...getSectionContentMotion(inView, reduceMotion)}
           className="relative min-w-0"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
           <TiltCard maxTilt={5}>
             <BrowserFrame address="app.ultrakin.com/workflows/release-planning">
