@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { AtSign, Bot, CheckSquare, FileText, FolderOpen, Mail, MessageSquare, Video } from 'lucide-react';
 import { useWorkspace } from '../context/useWorkspace';
@@ -9,6 +9,7 @@ import HuddleSimulator from '../components/showcase/HuddleSimulator';
 import KanbanTaskBoard from '../components/showcase/KanbanTaskBoard';
 import VisualAutomationsCanvas from '../components/showcase/VisualAutomationsCanvas';
 import WorkspaceToastContainer from '../components/showcase/WorkspaceToastContainer';
+import WorkspaceModuleSkeleton from '../components/showcase/WorkspaceModuleSkeleton';
 import { HeroFilesView, HeroThreadsView } from '../sections/HeroSection';
 import BrowserFrame from '../components/BrowserFrame';
 
@@ -70,7 +71,9 @@ export default function WorkspacePage() {
             <div className="relative min-w-0 overflow-hidden">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div key={activeModule} initial={reduceMotion ? false : { opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={reduceMotion ? undefined : { opacity: 0, y: -4 }} transition={{ duration: reduceMotion ? 0.01 : 0.18 }} className="min-h-[620px]">
-                  <Panel />
+                  <Suspense fallback={<WorkspaceModuleSkeleton />}>
+                    <Panel />
+                  </Suspense>
                 </motion.div>
               </AnimatePresence>
               <WorkspaceToastContainer />
