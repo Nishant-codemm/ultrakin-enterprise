@@ -6,7 +6,9 @@ import {
   FileText,
   LockKeyhole,
   MessageSquare,
+  RotateCcw,
   Search,
+  SearchX,
   ShieldCheck,
 } from 'lucide-react';
 import { cn } from '../lib/cn';
@@ -72,6 +74,7 @@ function MemoryView() {
   const records = [
     { icon: MessageSquare, type: 'CONVERSATION', title: 'Launch planning · #product-launch', body: 'Hold the announcement until the regional pilot is confirmed.', time: 'Yesterday', highlight: true },
     { icon: FileText, type: 'DECISION NOTE', title: 'Launch decision note', body: 'Support will use one shared checklist for customer updates.', time: 'Updated 2h ago', highlight: false },
+    { icon: ShieldCheck, type: 'SECURITY POLICY', title: 'Data governance & retention policy', body: 'Zero retention enforced for customer telemetry and LLM interaction logs.', time: '3d ago', highlight: false },
   ];
   const terms = query.toLowerCase().split(/\W+/).filter((w) => w.length > 2);
   const matches = records.filter((r) => terms.length === 0 || terms.some((t) => `${r.title} ${r.body} ${r.type}`.toLowerCase().includes(t)));
@@ -94,10 +97,22 @@ function MemoryView() {
           id="memory-query"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search past decisions, policies, and conversations..."
           className="min-w-0 flex-1 bg-transparent text-base font-light tracking-[-0.02em] text-slate-100 outline-none placeholder:text-obsidian-muted sm:text-lg"
           aria-label="Search workspace memory"
         />
-        <span className="hidden rounded border border-obsidian-border-medium px-1.5 py-1 font-mono text-[9px] text-obsidian-muted sm:inline">⌘ K</span>
+        {query ? (
+          <button
+            type="button"
+            onClick={() => setQuery('')}
+            aria-label="Clear search query"
+            className="rounded p-1 text-slate-400 transition-colors hover:text-white cursor-pointer"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+        ) : (
+          <span className="hidden rounded border border-obsidian-border-medium px-1.5 py-1 font-mono text-[9px] text-obsidian-muted sm:inline">⌘ K</span>
+        )}
       </div>
       <div className="mt-2 pl-1 text-[10px] text-slate-500">Across conversations, notes, and active work</div>
 
@@ -127,7 +142,45 @@ function MemoryView() {
             </motion.div>
           );
         })}
-        {matches.length === 0 && <p className="py-5 text-xs text-slate-500">No matching workspace context.</p>}
+
+        {matches.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2 }}
+            className="my-3 flex flex-col items-center justify-center rounded-xl border border-dashed border-white/10 bg-white/[0.02] px-6 py-8 text-center"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-indigo-300 shadow-sm">
+              <SearchX className="h-5 w-5" aria-hidden="true" />
+            </div>
+            <h4 className="mt-3 text-[13px] font-medium text-slate-200">
+              No matching workspace memory
+            </h4>
+            <p className="mt-1 max-w-sm text-[11px] leading-5 text-slate-400">
+              No context records found matching &ldquo;{query}&rdquo;. Memory spans synchronized conversations, decision notes, and verified deliverables.
+            </p>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-1.5">
+              <span className="text-[10px] text-slate-500">Try searching:</span>
+              {['launch', 'checklist', 'retention'].map((suggestion) => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  onClick={() => setQuery(suggestion)}
+                  className="rounded-md border border-white/10 bg-white/[0.05] px-2 py-0.5 text-[10px] text-indigo-200 transition-colors hover:border-white/20 hover:bg-white/10 cursor-pointer"
+                >
+                  {suggestion}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setQuery('What did we decide about launch?')}
+                className="ml-1 text-[10px] text-brand-text underline underline-offset-2 hover:text-white cursor-pointer"
+              >
+                Reset query
+              </button>
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );
