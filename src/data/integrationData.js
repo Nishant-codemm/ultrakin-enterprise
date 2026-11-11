@@ -117,26 +117,26 @@ export const NODE_PORTS = {
 };
 
 /* ─── CONTINUOUS ENTERPRISE BUS TOPOLOGY (Master Arterial Highway) ─── */
-/* Ingress enters from left (-30, 78), rides Spaces ingress, merges into West Trunk,
+/* Ingress enters from left (-30, 78), rides Spaces stub, merges into West Trunk,
    flows through Ultrakin Core (266 -> 354), through Tasks (524, 210), out to East (660, 210). */
 export const PATH_HERO_CROSS_SECTION =
-  'M -30 78 L 136 78 C 177 78, 177 210, 218 210 L 266 210 L 354 210 L 524 210 L 660 210';
+  'M -30 78 L 152 78 C 185 78, 185 210, 218 210 L 266 210 L 354 210 L 524 210 L 660 210';
 
-/* ─── DETERMINISTIC FEEDER ARTERIES (Node Port -> Tangential Merge -> Hub Entry) ─── */
+/* ─── DETERMINISTIC FEEDER ARTERIES (Node Port -> Orthogonal Stub -> S-Curve -> Combiner -> Core) ─── */
 export const FEEDER_PATHS = {
-  Spaces:      'M 136 78 C 177 78, 177 210, 218 210 L 266 210',
+  Spaces:      'M 136 78 L 152 78 C 185 78, 185 210, 218 210 L 266 210',
   Mail:        'M 310 74 L 310 166',
-  Meetings:    'M 486 78 C 444 78, 444 210, 402 210 L 354 210',
+  Meetings:    'M 486 78 L 470 78 C 436 78, 436 210, 402 210 L 354 210',
   Tasks:       'M 524 210 L 354 210',
-  Calendar:    'M 481 340 C 441.5 340, 441.5 210, 402 210 L 354 210',
+  Calendar:    'M 481 340 L 465 340 C 433.5 340, 433.5 210, 402 210 L 354 210',
   Docs:        'M 310 338 L 310 254',
-  'Ukin agent':'M 136 340 C 177 340, 177 210, 218 210 L 266 210',
+  'Ukin agent':'M 136 340 L 152 340 C 185 340, 185 210, 218 210 L 266 210',
   // Extension Examples Feeder Branches
-  GitHub:      'M 150 82 C 184 82, 184 210, 218 210 L 266 210',
-  PostHog:     'M 470 70 C 436 70, 436 210, 402 210 L 354 210',
+  GitHub:      'M 150 82 L 164 82 C 191 82, 191 210, 218 210 L 266 210',
+  PostHog:     'M 470 70 L 456 70 C 429 70, 429 210, 402 210 L 354 210',
   'MCP tools': 'M 526 210 L 354 210',
-  Journeys:    'M 466 344 C 434 344, 434 210, 402 210 L 354 210',
-  Forms:       'M 166 348 C 192 348, 192 210, 218 210 L 266 210',
+  Journeys:    'M 466 344 L 452 344 C 427 344, 427 210, 402 210 L 354 210',
+  Forms:       'M 166 348 L 180 348 C 199 348, 199 210, 218 210 L 266 210',
   Lists:       'M 122 210 L 266 210',
 };
 

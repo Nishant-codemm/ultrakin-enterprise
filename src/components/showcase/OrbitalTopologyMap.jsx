@@ -7,7 +7,6 @@ import UltrakinLogo from '../primitives/UltrakinLogo';
 import {
   PRODUCT_ICON_CONFIG,
   CENTER,
-  HUB_PORTS,
   NODE_PORTS,
   PATH_HERO_CROSS_SECTION,
   FEEDER_PATHS,
@@ -288,6 +287,76 @@ function NodeButton({ item, isSelected, isHovered, onHover, onLeave, onClick }) 
             <span className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-[14px] bg-gradient-to-b from-white/[0.08] to-transparent" />
           </div>
 
+          {/* Physical Edge Connector Pin Socket (protruding directly on active card border) */}
+          {x < 310 && (
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-[4px] top-[24px] -translate-y-1/2 z-30 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#0a0d14] border border-white/30 shadow-[0_0_6px_rgba(0,0,0,0.9)]"
+            >
+              <span
+                className={cn(
+                  'h-1 w-1 rounded-full transition-all duration-200',
+                  isSelected || isHovered ? 'scale-125' : 'opacity-85'
+                )}
+                style={{
+                  backgroundColor: item.color,
+                  boxShadow: isSelected || isHovered ? `0 0 6px ${item.color}` : 'none',
+                }}
+              />
+            </span>
+          )}
+          {x > 310 && (
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute -left-[4px] top-[24px] -translate-y-1/2 z-30 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#0a0d14] border border-white/30 shadow-[0_0_6px_rgba(0,0,0,0.9)]"
+            >
+              <span
+                className={cn(
+                  'h-1 w-1 rounded-full transition-all duration-200',
+                  isSelected || isHovered ? 'scale-125' : 'opacity-85'
+                )}
+                style={{
+                  backgroundColor: item.color,
+                  boxShadow: isSelected || isHovered ? `0 0 6px ${item.color}` : 'none',
+                }}
+              />
+            </span>
+          )}
+          {x === 310 && y < 210 && (
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute left-1/2 -bottom-[4px] -translate-x-1/2 z-30 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#0a0d14] border border-white/30 shadow-[0_0_6px_rgba(0,0,0,0.9)]"
+            >
+              <span
+                className={cn(
+                  'h-1 w-1 rounded-full transition-all duration-200',
+                  isSelected || isHovered ? 'scale-125' : 'opacity-85'
+                )}
+                style={{
+                  backgroundColor: item.color,
+                  boxShadow: isSelected || isHovered ? `0 0 6px ${item.color}` : 'none',
+                }}
+              />
+            </span>
+          )}
+          {x === 310 && y > 210 && (
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute left-1/2 -top-[4px] -translate-x-1/2 z-30 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-[#0a0d14] border border-white/30 shadow-[0_0_6px_rgba(0,0,0,0.9)]"
+            >
+              <span
+                className={cn(
+                  'h-1 w-1 rounded-full transition-all duration-200',
+                  isSelected || isHovered ? 'scale-125' : 'opacity-85'
+                )}
+                style={{
+                  backgroundColor: item.color,
+                  boxShadow: isSelected || isHovered ? `0 0 6px ${item.color}` : 'none',
+                }}
+              />
+            </span>
+          )}
+
           {/* Node Label */}
           <span
             className={cn(
@@ -373,14 +442,62 @@ function OrbitalTopologyMap({
               </filter>
             </defs>
 
-            {/* ── LAYER 1: Background Concentric Orbital Rings ── */}
-            <ConcentricOrbitalRing rx="270" ry="120" strokeDasharray="2 8" opacity={0.22} />
-            <ConcentricOrbitalRing rx="190" ry="85" strokeDasharray="none" opacity={0.25} />
-            <ConcentricOrbitalRing rx="86" ry="54" strokeDasharray="2 6" opacity={0.32} />
+            {/* ── LAYER 1: Background Subtle Coordinate Field ── */}
+            <ConcentricOrbitalRing rx="270" ry="120" strokeDasharray="2 8" opacity={0.16} />
+            <ConcentricOrbitalRing rx="190" ry="85" strokeDasharray="none" opacity={0.2} />
+            <ConcentricOrbitalRing rx="86" ry="54" strokeDasharray="2 6" opacity={0.25} />
             <circle cx={CENTER[0]} cy={CENTER[1]} r="80" fill="url(#orbit-core)" />
 
-            {/* ── LAYER 2: Harmonic Enterprise Bus Topology (Passive Guide Grid) ── */}
-            <g opacity={0.52}>
+            {/* Subtle Circuit Bus Substrate Grid */}
+            <g opacity={0.06} stroke="rgba(165,180,252,0.8)" strokeWidth="0.6">
+              <line x1="112" y1="40" x2="112" y2="380" strokeDasharray="2 6" />
+              <line x1="510" y1="40" x2="510" y2="380" strokeDasharray="2 6" />
+              <line x1="40" y1="78" x2="580" y2="78" strokeDasharray="2 6" />
+              <line x1="40" y1="340" x2="580" y2="340" strokeDasharray="2 6" />
+            </g>
+
+            {/* ── LAYER 2: Shared Arterial Conduit Highway (Dual-Trace Bus at Y=210) ── */}
+            <g>
+              {/* Primary Bus Conduit */}
+              <line
+                x1="60"
+                y1="210"
+                x2="266"
+                y2="210"
+                stroke="rgba(165,180,252,0.25)"
+                strokeWidth="1.2"
+              />
+              <line
+                x1="354"
+                y1="210"
+                x2="560"
+                y2="210"
+                stroke="rgba(165,180,252,0.25)"
+                strokeWidth="1.2"
+              />
+              {/* Secondary Telemetry Micro-Rail */}
+              <line
+                x1="80"
+                y1="213"
+                x2="264"
+                y2="213"
+                stroke="rgba(140,148,255,0.08)"
+                strokeWidth="0.6"
+                strokeDasharray="3 6"
+              />
+              <line
+                x1="356"
+                y1="213"
+                x2="540"
+                y2="213"
+                stroke="rgba(140,148,255,0.08)"
+                strokeWidth="0.6"
+                strokeDasharray="3 6"
+              />
+            </g>
+
+            {/* ── LAYER 3: Harmonic Enterprise Bus Topology (Passive Guide Grid) ── */}
+            <g opacity={0.45}>
               {visible.map((item) => {
                 const feederD = FEEDER_PATHS[item.name];
                 if (!feederD) return null;
@@ -395,7 +512,7 @@ function OrbitalTopologyMap({
               })}
             </g>
 
-            {/* ── LAYER 3: The Hero Cross-Sectional Arterial Trunk (Global Page Storyline) ── */}
+            {/* ── LAYER 4: The Hero Cross-Sectional Arterial Trunk (Global Spine) ── */}
             <path
               d={PATH_HERO_CROSS_SECTION}
               data-workline-anchor="integration-spine"
@@ -405,7 +522,7 @@ function OrbitalTopologyMap({
               className="transition-all duration-300"
             />
 
-            {/* ── LAYER 4: Active Highlight & Converging Photon along Selected Feeder Artery ── */}
+            {/* ── LAYER 5: Active Highlight & Converging Photon along Selected Feeder Artery ── */}
             {visible.map((item) => {
               const feederD = FEEDER_PATHS[item.name];
               const isActive = item.name === activeNode;
@@ -416,7 +533,7 @@ function OrbitalTopologyMap({
                     d={feederD}
                     fill="none"
                     stroke="url(#topo-spline-active)"
-                    strokeWidth={1.35}
+                    strokeWidth={1.4}
                     className="transition-all duration-300"
                   />
                   {inView && !reduceMotion && (
@@ -430,7 +547,7 @@ function OrbitalTopologyMap({
               );
             })}
 
-            {/* ── LAYER 5: Continuous Travelling Photon Bead along Master Arterial Trunk ── */}
+            {/* ── LAYER 6: Continuous Travelling Photon Bead along Master Arterial Trunk ── */}
             {inView && !reduceMotion && (
               <ConvergingPhotonNode
                 d={PATH_HERO_CROSS_SECTION}
@@ -439,27 +556,72 @@ function OrbitalTopologyMap({
               />
             )}
 
-            {/* ── LAYER 6: Central Hub Interface Ports (West, East, North, South) ── */}
-            {Object.entries(HUB_PORTS).map(([direction, [hx, hy]]) => {
-              const isPortActive =
-                (direction === 'west' && ['Spaces', 'Ukin agent', 'GitHub', 'Forms', 'Lists'].includes(activeNode)) ||
-                (direction === 'east' && ['Meetings', 'Tasks', 'Calendar', 'PostHog', 'MCP tools', 'Journeys'].includes(activeNode)) ||
-                (direction === 'north' && activeNode === 'Mail') ||
-                (direction === 'south' && activeNode === 'Docs');
+            {/* ── LAYER 7: Engineered Combiner Manifold Hubs (West & East) ── */}
+            {/* West Combiner Junction Node (218, 210) */}
+            <g className="transition-all duration-300">
+              <rect
+                x="214"
+                y="206"
+                width="8"
+                height="8"
+                rx="2"
+                fill="#0c1018"
+                stroke={['Spaces', 'Ukin agent', 'GitHub', 'Forms', 'Lists'].includes(activeNode) ? '#818cf8' : 'rgba(165,180,252,0.4)'}
+                strokeWidth="1"
+              />
+              <circle
+                cx="218"
+                cy="210"
+                r="1.5"
+                fill={['Spaces', 'Ukin agent', 'GitHub', 'Forms', 'Lists'].includes(activeNode) ? '#c7d2fe' : 'rgba(165,180,252,0.6)'}
+              />
+              <text
+                x="218"
+                y="198"
+                textAnchor="middle"
+                fill="#818cf8"
+                fillOpacity="0.45"
+                fontSize="6.5"
+                fontFamily="monospace"
+                letterSpacing="0.08em"
+              >
+                INGRESS · 40G
+              </text>
+            </g>
 
-              return (
-                <HardwarePortSocket
-                  key={`hub-port-${direction}`}
-                  cx={hx}
-                  cy={hy}
-                  isActive={isPortActive}
-                  color="#818cf8"
-                  label={`Ultrakin ${direction} bus port`}
-                />
-              );
-            })}
+            {/* East Combiner Junction Node (402, 210) */}
+            <g className="transition-all duration-300">
+              <rect
+                x="398"
+                y="206"
+                width="8"
+                height="8"
+                rx="2"
+                fill="#0c1018"
+                stroke={['Meetings', 'Tasks', 'Calendar', 'PostHog', 'MCP tools', 'Journeys'].includes(activeNode) ? '#818cf8' : 'rgba(165,180,252,0.4)'}
+                strokeWidth="1"
+              />
+              <circle
+                cx="402"
+                cy="210"
+                r="1.5"
+                fill={['Meetings', 'Tasks', 'Calendar', 'PostHog', 'MCP tools', 'Journeys'].includes(activeNode) ? '#c7d2fe' : 'rgba(165,180,252,0.6)'}
+              />
+              <text
+                x="402"
+                y="198"
+                textAnchor="middle"
+                fill="#818cf8"
+                fillOpacity="0.45"
+                fontSize="6.5"
+                fontFamily="monospace"
+                letterSpacing="0.08em"
+              >
+                EGRESS · 100G
+              </text>
+            </g>
 
-            {/* ── LAYER 7: Node Edge Ports on Card Boundaries ── */}
+            {/* ── LAYER 8: Node Edge Ports on Card Boundaries ── */}
             {visible.map((item) => {
               const port = NODE_PORTS[item.name] || item.point;
               const isHovered = item.name === hoveredNode;
@@ -479,7 +641,7 @@ function OrbitalTopologyMap({
             })}
           </svg>
 
-          {/* ── Center logo core (Responds smoothly to hover) ── */}
+          {/* ── Center logo core with Machined Hardware Intake Ports ── */}
           <motion.div
             className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
             animate={{
@@ -493,10 +655,97 @@ function OrbitalTopologyMap({
               transition: 'filter 350ms ease',
             }}
           >
-            <div className="flex h-[88px] w-[88px] items-center justify-center rounded-[1.7rem] border border-white/[0.16] bg-[linear-gradient(145deg,#1e2540,#0d1118_68%)] shadow-[0_30px_60px_-20px_rgba(0,0,0,.95),inset_0_1px_0_rgba(255,255,255,.16),inset_0_-1px_0_rgba(144,148,255,.15)]">
+            {/* The Core Chassis */}
+            <div className="relative flex h-[88px] w-[88px] items-center justify-center rounded-[1.7rem] border border-white/[0.16] bg-[linear-gradient(145deg,#1e2540,#0d1118_68%)] shadow-[0_30px_60px_-20px_rgba(0,0,0,.95),inset_0_1px_0_rgba(255,255,255,.16),inset_0_-1px_0_rgba(144,148,255,.15)]">
               {/* Specular sheen */}
               <span className="pointer-events-none absolute inset-x-2 top-1.5 h-1/3 rounded-t-2xl bg-gradient-to-b from-white/[0.09] to-transparent" />
               <UltrakinLogo size={38} />
+
+              {/* Status LED: Core Active */}
+              <span className="absolute top-2.5 right-2.5 flex h-2 w-2 items-center justify-center">
+                <span className="absolute h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+                <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
+              </span>
+
+              {/* Physical West Intake Port (Ingress Bus Receiver) */}
+              <div
+                className={cn(
+                  'absolute -left-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-2.5 h-5 rounded-l-sm border border-r-0 transition-all duration-300',
+                  ['Spaces', 'Ukin agent', 'GitHub', 'Forms', 'Lists'].includes(activeNode)
+                    ? 'border-indigo-400 bg-indigo-950/90 shadow-[0_0_8px_rgba(129,140,248,0.7)]'
+                    : 'border-white/20 bg-[#0c1018]'
+                )}
+                title="West Ingress Bus Intake"
+              >
+                <span
+                  className={cn(
+                    'w-1 h-2 rounded-full transition-all duration-300',
+                    ['Spaces', 'Ukin agent', 'GitHub', 'Forms', 'Lists'].includes(activeNode)
+                      ? 'bg-indigo-300 shadow-[0_0_6px_#c7d2fe]'
+                      : 'bg-slate-500/70'
+                  )}
+                />
+              </div>
+
+              {/* Physical East Intake Port (Egress Bus Receiver) */}
+              <div
+                className={cn(
+                  'absolute -right-2 top-1/2 -translate-y-1/2 flex items-center justify-center w-2.5 h-5 rounded-r-sm border border-l-0 transition-all duration-300',
+                  ['Meetings', 'Tasks', 'Calendar', 'PostHog', 'MCP tools', 'Journeys'].includes(activeNode)
+                    ? 'border-indigo-400 bg-indigo-950/90 shadow-[0_0_8px_rgba(129,140,248,0.7)]'
+                    : 'border-white/20 bg-[#0c1018]'
+                )}
+                title="East Egress Bus Intake"
+              >
+                <span
+                  className={cn(
+                    'w-1 h-2 rounded-full transition-all duration-300',
+                    ['Meetings', 'Tasks', 'Calendar', 'PostHog', 'MCP tools', 'Journeys'].includes(activeNode)
+                      ? 'bg-indigo-300 shadow-[0_0_6px_#c7d2fe]'
+                      : 'bg-slate-500/70'
+                  )}
+                />
+              </div>
+
+              {/* Physical North Intake Port (Direct Mail Ingress) */}
+              <div
+                className={cn(
+                  'absolute left-1/2 -top-2 -translate-x-1/2 flex items-center justify-center h-2.5 w-5 rounded-t-sm border border-b-0 transition-all duration-300',
+                  activeNode === 'Mail'
+                    ? 'border-indigo-400 bg-indigo-950/90 shadow-[0_0_8px_rgba(129,140,248,0.7)]'
+                    : 'border-white/20 bg-[#0c1018]'
+                )}
+                title="North Ingress Port"
+              >
+                <span
+                  className={cn(
+                    'h-1 w-2 rounded-full transition-all duration-300',
+                    activeNode === 'Mail'
+                      ? 'bg-indigo-300 shadow-[0_0_6px_#c7d2fe]'
+                      : 'bg-slate-500/70'
+                  )}
+                />
+              </div>
+
+              {/* Physical South Intake Port (Direct Docs Ingress) */}
+              <div
+                className={cn(
+                  'absolute left-1/2 -bottom-2 -translate-x-1/2 flex items-center justify-center h-2.5 w-5 rounded-b-sm border border-t-0 transition-all duration-300',
+                  activeNode === 'Docs'
+                    ? 'border-indigo-400 bg-indigo-950/90 shadow-[0_0_8px_rgba(129,140,248,0.7)]'
+                    : 'border-white/20 bg-[#0c1018]'
+                )}
+                title="South Ingress Port"
+              >
+                <span
+                  className={cn(
+                    'h-1 w-2 rounded-full transition-all duration-300',
+                    activeNode === 'Docs'
+                      ? 'bg-indigo-300 shadow-[0_0_6px_#c7d2fe]'
+                      : 'bg-slate-500/70'
+                  )}
+                />
+              </div>
             </div>
           </motion.div>
 
