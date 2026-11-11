@@ -264,7 +264,7 @@ export default function FAQSection() {
                         className="overflow-hidden"
                       >
                         <div className="pb-5 pl-8 pr-4 sm:pl-10 sm:pr-8">
-                          <p className="border-l-2 border-brand/30 pl-4 text-[13px] leading-relaxed text-ink-muted">
+                          <p className="border-l-2 border-brand/30 pl-4 text-[14px] leading-relaxed text-ink-muted">
                             {faq.a}
                           </p>
                         </div>
@@ -283,7 +283,7 @@ export default function FAQSection() {
             <h3 className="text-sm font-semibold text-ink">
               Have custom procurement, compliance, or private VPC requirements?
             </h3>
-            <p className="text-[13px] leading-relaxed text-ink-muted">
+            <p className="text-[14px] leading-relaxed text-ink-muted">
               Talk directly with our security architects to review SOC 2 reports, pen-test summaries, or custom MSA terms.
             </p>
           </div>

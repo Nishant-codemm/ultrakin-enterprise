@@ -268,13 +268,55 @@ export function NeuralCoreCard({ activeSignal, reduceMotion }) {
   );
 }
 
-/* ── Right: Deep Obsidian One Workspace Output Card ── */
+/* ── Right: Deep Obsidian One Workspace Output Card (M-09 dynamic status) ── */
 export function WorkspaceOutcomeCard({ activeSignal }) {
-  const rows = [
-    { icon: MessageSquare, color: '#818cf8', label: 'Decision thread', sub: '4 replies linked' },
-    { icon: FileText,      color: '#34d399', label: 'Living brief',    sub: 'Context synced' },
-    { icon: CheckSquare,   color: '#fbbf24', label: 'Assign next step', sub: 'Maya · Ready' },
-  ];
+  const signalId = activeSignal?.id || 'chat';
+
+  // Dynamic context and active count derived from active signal (M-09)
+  const metaBySignal = {
+    chat: {
+      countBadge: '4 active',
+      badgeColor: 'border-emerald-400/20 bg-emerald-400/10 text-emerald-300',
+      dotColor: 'bg-emerald-400',
+      rows: [
+        { icon: MessageSquare, color: '#818cf8', label: 'Incident thread', sub: '4 replies linked', active: true },
+        { icon: FileText,      color: '#34d399', label: 'Living brief',    sub: 'Post-mortem drafted', active: false },
+        { icon: CheckSquare,   color: '#fbbf24', label: 'Assign next step', sub: 'DevOps on-call · Assigned', active: false },
+      ],
+    },
+    email: {
+      countBadge: '2 active',
+      badgeColor: 'border-sky-400/20 bg-sky-400/10 text-sky-300',
+      dotColor: 'bg-sky-400',
+      rows: [
+        { icon: MessageSquare, color: '#818cf8', label: 'Legal thread',    sub: 'SOC-2 audit trail', active: false },
+        { icon: FileText,      color: '#34d399', label: 'Agreement brief', sub: 'Obligations extracted', active: true },
+        { icon: CheckSquare,   color: '#fbbf24', label: 'Security sign-off', sub: 'CISO review ready', active: false },
+      ],
+    },
+    huddle: {
+      countBadge: '5 queued',
+      badgeColor: 'border-purple-400/20 bg-purple-400/10 text-purple-300',
+      dotColor: 'bg-purple-400',
+      rows: [
+        { icon: MessageSquare, color: '#818cf8', label: 'Retro synthesis', sub: 'Action items parsed', active: false },
+        { icon: FileText,      color: '#34d399', label: 'Sprint doc',      sub: 'Commitments mapped', active: false },
+        { icon: CheckSquare,   color: '#fbbf24', label: 'Assign backlog',  sub: '5 Jira tickets created', active: true },
+      ],
+    },
+    docs: {
+      countBadge: '3 synced',
+      badgeColor: 'border-emerald-400/20 bg-emerald-400/10 text-emerald-300',
+      dotColor: 'bg-emerald-400',
+      rows: [
+        { icon: MessageSquare, color: '#818cf8', label: 'RFC discussion',  sub: 'Tech lead approved', active: false },
+        { icon: FileText,      color: '#34d399', label: 'Living RFC-402',  sub: 'TTL schema v2.4', active: true },
+        { icon: CheckSquare,   color: '#fbbf24', label: 'Deployment task', sub: 'Rollout checklist', active: false },
+      ],
+    },
+  };
+
+  const currentMeta = metaBySignal[signalId] || metaBySignal.chat;
 
   return (
     <div
@@ -294,38 +336,41 @@ export function WorkspaceOutcomeCard({ activeSignal }) {
           <UltrakinLogo size={13} />
           <span className="truncate text-[9px] font-semibold text-white/95">One workspace</span>
         </div>
-        <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-1.5 py-0.5 text-[7.5px] font-mono text-emerald-300">
-          3 active
+        <span
+          className={cn(
+            'flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[7.5px] font-mono font-medium transition-all duration-300',
+            currentMeta.badgeColor
+          )}
+        >
+          <span className={cn('h-1 w-1 rounded-full animate-pulse', currentMeta.dotColor)} />
+          <span>{currentMeta.countBadge}</span>
         </span>
       </div>
 
-      {/* Rows */}
+      {/* Dynamic Rows */}
       <div className="relative z-10 space-y-1 py-0.5">
-        {rows.map(({ icon: Icon, color, label, sub }, idx) => {
-          const isHighlighted = activeSignal.outcomeRow === idx;
-          return (
-            <div
-              key={label}
-              className={cn(
-                'flex items-start gap-1.5 rounded-lg px-1.5 py-1 transition-all duration-300',
-                isHighlighted
-                  ? 'bg-white/[0.12] ring-1 ring-sky-400/40 shadow-[0_2px_8px_rgba(0,0,0,0.3)]'
-                  : 'opacity-70 hover:opacity-100'
-              )}
-            >
-              <Icon style={{ color }} className="mt-0.5 h-3 w-3 shrink-0" />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between">
-                  <p className="truncate text-[8px] font-medium text-white/95">{label}</p>
-                  {isHighlighted && (
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                  )}
-                </div>
-                <p className="truncate text-[7px] text-white/50">{sub}</p>
+        {currentMeta.rows.map(({ icon: Icon, color, label, sub, active }) => (
+          <div
+            key={label}
+            className={cn(
+              'flex items-start gap-1.5 rounded-lg px-1.5 py-1 transition-all duration-300',
+              active
+                ? 'bg-white/[0.12] ring-1 ring-sky-400/40 shadow-[0_2px_8px_rgba(0,0,0,0.3)]'
+                : 'opacity-70 hover:opacity-100'
+            )}
+          >
+            <Icon style={{ color }} className="mt-0.5 h-3 w-3 shrink-0" />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between">
+                <p className="truncate text-[8px] font-medium text-white/95">{label}</p>
+                {active && (
+                  <span className={cn('h-1.5 w-1.5 rounded-full', currentMeta.dotColor)} />
+                )}
               </div>
+              <p className="truncate text-[7px] text-white/50">{sub}</p>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
 
       {/* Bottom row */}

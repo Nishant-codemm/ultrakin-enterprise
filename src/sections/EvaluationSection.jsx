@@ -90,7 +90,7 @@ export default function EvaluationSection() {
                     </h3>
 
                     {/* Description */}
-                    <p className="mt-3 max-w-lg flex-1 text-[13px] leading-6 text-ink-muted">{description}</p>
+                    <p className="mt-3 max-w-lg flex-1 text-[14px] leading-relaxed text-ink-muted">{description}</p>
 
                     {/* CTA (L-07 unified SPA navigation) */}
                     <button

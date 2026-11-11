@@ -489,7 +489,10 @@ export default function WorkflowSpotlight() {
           onMouseLeave={() => setIsHovered(false)}
         >
           <TiltCard maxTilt={5}>
-            <BrowserFrame address="app.ultrakin.com/workflows/release-planning">
+            <BrowserFrame
+              address="workspace.ultrakin.app/workflows/release-planning"
+              tabTitle="Ultrakin · #release-planning · Signal Pipeline"
+            >
               <div className="relative overflow-hidden border border-obsidian-border bg-obsidian-canvas p-3 shadow-[0_20px_42px_-32px_rgba(0,0,0,.72),inset_0_1px_0_rgba(220,224,255,.065)] sm:p-5">
 
                 {/* Top fade */}

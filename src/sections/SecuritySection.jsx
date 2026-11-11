@@ -65,7 +65,7 @@ export default function SecuritySection() {
           <h2 className="font-display text-[clamp(2.5rem,4.5vw,3.75rem)] font-normal leading-[1.02] tracking-[-0.035em] text-ink">
             Enterprise trust is<br /><span className="font-display italic text-brand-text">earned in the details.</span>
           </h2>
-          <p className="mt-6 max-w-md text-[13px] leading-6 text-ink-muted">
+          <p className="mt-6 max-w-md text-[15px] leading-7 text-ink-muted">
             Ultrakin enforces cryptographic tenant isolation, zero-retention AI inference guarantees, and immutable SIEM-exportable audit logging across all customer workspaces.
           </p>
 

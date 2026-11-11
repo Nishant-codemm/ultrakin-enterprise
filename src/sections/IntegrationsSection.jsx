@@ -413,7 +413,11 @@ function SurfacePreview({ item }) {
   };
 
   return (
-    <BrowserFrame address={`app.ultrakin.com/workspace/${item.name.toLowerCase().replaceAll(' ', '-')}`} className="mt-6 max-w-md">
+    <BrowserFrame
+      address={`workspace.ultrakin.app/integrations/${item.name.toLowerCase().replaceAll(' ', '-')}`}
+      tabTitle={`Ultrakin · ${item.name} Connector`}
+      className="mt-6 max-w-md"
+    >
       <div className="overflow-hidden bg-[#0d1118]/90 shadow-[0_18px_44px_-34px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.035)]">
         {/* Surface Header */}
         <div className="flex items-center justify-between border-b border-obsidian-border-soft px-3.5 py-2.5">
@@ -493,7 +497,7 @@ export default function IntegrationsSection() {
             </h2>
           </div>
           <div className="lg:justify-self-end lg:pb-1">
-            <p className="max-w-sm text-[13px] leading-6 text-ink-muted">
+            <p className="max-w-sm text-[15px] leading-7 text-ink-muted">
               Chat, mail, meetings, calendar, tasks, docs, and Ukin are built into one workspace. External entries are illustrative examples.
             </p>
             <button
@@ -531,7 +535,10 @@ export default function IntegrationsSection() {
 
           {/* ── Orbit Map — wrapped in cursor-tracking TiltCard ── */}
           <TiltCard>
-            <BrowserFrame address="app.ultrakin.com/workspace/integrations">
+            <BrowserFrame
+              address="workspace.ultrakin.app/topology/mesh"
+              tabTitle="Ultrakin · Connected Tools & Integrations Topology"
+            >
               <div
                 className="relative h-[430px] overflow-hidden select-none"
                 style={{
@@ -740,7 +747,7 @@ export default function IntegrationsSection() {
               >
                 <p className="text-[10px] font-medium uppercase tracking-[0.17em] text-brand-text">{current.badge}</p>
                 <h3 className="mt-5 text-3xl font-medium tracking-[-0.045em] text-ink sm:text-4xl">{current.name}</h3>
-                <p className="mt-4 max-w-sm text-[13px] leading-6 text-ink-muted">{current.desc}</p>
+                <p className="mt-4 max-w-sm text-[15px] leading-7 text-ink-muted">{current.desc}</p>
                 <SurfacePreview item={current} />
                 <div className="mt-8 flex items-center gap-3 text-[10px] text-ink-subtle">
                   <span className="h-px w-8 bg-border-strong" />

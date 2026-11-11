@@ -35,7 +35,7 @@ export default function CTASection() {
               Bring unified intelligence to your <span className="font-display italic text-brand-text">entire organization.</span>
             </h2>
             <div className="border-l border-border pl-5 sm:pl-7">
-              <p className="max-w-sm text-[13px] leading-6 text-ink-muted">
+              <p className="max-w-sm text-[15px] leading-7 text-ink-muted">
                 Schedule a tailored architectural walkthrough with our solutions team, or explore our structured 30-day proof-of-concept sandbox with your own data connectors.
               </p>
               <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap">

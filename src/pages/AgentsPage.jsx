@@ -118,7 +118,8 @@ export default function AgentsPage() {
         {/* ── Big BrowserFrame with TiltCard ── */}
         <TiltCard maxTilt={4} className="mt-12" style={{ borderRadius: '1.5rem' }}>
           <BrowserFrame
-            address="app.ultrakin.com/workspace/agents"
+            address="workspace.ultrakin.app/workspace/agents"
+            tabTitle="Ultrakin · Autonomous Agents Canvas"
             className="rounded-3xl shadow-[0_28px_72px_-54px_rgba(17,24,39,.32),0_5px_18px_rgba(17,24,39,.06)]"
             viewportClassName="p-3 sm:p-4"
           >

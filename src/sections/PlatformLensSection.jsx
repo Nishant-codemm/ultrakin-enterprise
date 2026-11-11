@@ -296,7 +296,7 @@ export default function PlatformLensSection() {
               Useful AI, with<br className="hidden sm:block" /> clear boundaries.
             </h2>
           </div>
-          <p className="max-w-xs text-[13px] leading-6 text-ink-muted md:pb-1">
+          <p className="max-w-sm text-[15px] leading-7 text-ink-muted md:pb-1">
             Find past decisions, review suggested work, and keep agent access aligned to team policy.
           </p>
         </motion.div>
@@ -359,7 +359,10 @@ export default function PlatformLensSection() {
 
           {/* BrowserFrame with TiltCard */}
           <TiltCard maxTilt={4} className="rounded-[1.25rem]" style={{ borderRadius: '1.25rem' }}>
-            <BrowserFrame address={`app.ultrakin.com/workspace/agents/${active}`}>
+            <BrowserFrame
+              address={`workspace.ultrakin.app/intelligence/${active}`}
+              tabTitle={`Ultrakin · ${active.charAt(0).toUpperCase() + active.slice(1)} Lens`}
+            >
               <div
                 id="lens-panel"
                 role="tabpanel"

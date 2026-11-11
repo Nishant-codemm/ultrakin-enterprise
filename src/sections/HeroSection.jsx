@@ -201,7 +201,11 @@ function HeroWorkspaceContent() {
               className="pointer-events-none absolute left-1/2 top-1/2 z-0 hidden h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(105,123,164,.12),rgba(169,155,132,.06)_35%,transparent_70%)] opacity-70 md:block"
               style={{ x: spotlightX, y: spotlightY, marginLeft: '-14rem', marginTop: '-14rem' }}
             />
-            <BrowserFrame address={`app.ultrakin.com/workspace/acme-eng${activeModule === 'chat' ? `#${activeChannel}` : `/${activeModule}`}`} className="relative z-10 mt-8">
+            <BrowserFrame
+              address={`workspace.ultrakin.app/acme-eng${activeModule === 'chat' ? `#${activeChannel}` : `/${activeModule}`}`}
+              tabTitle={`Ultrakin · ${activeModule === 'chat' ? activeChannel : activeModule.charAt(0).toUpperCase() + activeModule.slice(1)} · Acme Corp`}
+              className="relative z-10 mt-8"
+            >
               <div className="relative" style={{ perspective: '1400px' }}>
                 {/* Dynamic Ambient Backglow matching active module */}
                 <div

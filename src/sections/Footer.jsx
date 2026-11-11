@@ -30,7 +30,7 @@ export default function Footer() {
               <UltrakinLogo size={28} className="shrink-0" />
               <span className="text-xl font-semibold tracking-tight text-ink">Ultrakin</span>
             </a>
-            <p className="mt-4 max-w-sm text-[13px] leading-6 text-ink-muted">
+            <p className="mt-4 max-w-sm text-[14px] leading-relaxed text-ink-muted">
               The autonomous workspace for fast teams. Chat, mail, docs, huddles, and tasks—connected by context-aware agents.
             </p>
 
