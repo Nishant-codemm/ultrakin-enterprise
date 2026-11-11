@@ -82,7 +82,7 @@ export default function EvaluationSection() {
                     </span>
 
                     {/* Eyebrow */}
-                    <p className="mt-6 text-[10px] font-medium uppercase tracking-[0.17em] text-ink-subtle">{eyebrow}</p>
+                    <p className="mt-6 text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">{eyebrow}</p>
 
                     {/* Title */}
                     <h3 className="mt-2 text-xl font-medium tracking-[-0.025em] text-ink transition-colors duration-200 group-hover:text-brand-text">
@@ -92,23 +92,27 @@ export default function EvaluationSection() {
                     {/* Description */}
                     <p className="mt-3 max-w-lg flex-1 text-[13px] leading-6 text-ink-muted">{description}</p>
 
-                    {/* CTA */}
-                    <a
-                      href={href}
-                      target={external ? '_blank' : undefined}
-                      rel={external ? 'noreferrer' : undefined}
-                      onClick={!external && href.startsWith('/') ? (e) => { e.preventDefault(); navigate(href); } : undefined}
-                      className="mt-7 inline-flex min-h-10 w-fit items-center gap-2 rounded-lg text-sm font-medium text-ink-soft transition-all duration-200 hover:gap-3 hover:text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                    {/* CTA (L-07 unified SPA navigation) */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (external) {
+                          window.open(href, '_blank', 'noreferrer,noopener');
+                        } else {
+                          navigate(href);
+                        }
+                      }}
+                      className="mt-7 inline-flex min-h-10 w-fit items-center gap-2 rounded-lg text-sm font-medium text-ink-soft transition-all duration-200 hover:gap-3 hover:text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus cursor-pointer"
                     >
                       {action}
                       <motion.span
                         className="inline-flex"
-                        whileHover={{ x: 3 }}
+                        whileHover={{ x: 4 }}
                         transition={{ type: 'spring', stiffness: 400, damping: 20 }}
                       >
                         <ArrowRight aria-hidden="true" className="h-4 w-4" />
                       </motion.span>
-                    </a>
+                    </button>
                   </div>
                 </article>
               </TiltCard>

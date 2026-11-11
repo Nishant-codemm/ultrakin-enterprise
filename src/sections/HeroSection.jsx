@@ -24,6 +24,7 @@ import Badge from '../components/primitives/Badge';
 import UltrakinLogo from '../components/primitives/UltrakinLogo';
 import { cn } from '../lib/cn';
 import { useWorkspace } from '../context/useWorkspace';
+import { navigate } from '../lib/navigate';
 import BrowserFrame from '../components/BrowserFrame';
 import MatrixChatEngine from '../components/showcase/MatrixChatEngine';
 import EventBusTelemetryDrawer from '../components/showcase/EventBusTelemetryDrawer';
@@ -866,7 +867,7 @@ function HeroWorkspaceContent() {
                 size="lg"
                 iconRight={ArrowRight}
                 className="w-full sm:w-auto text-[15px] px-7 h-12 hover:shadow-[0_8px_24px_rgba(49,86,207,0.45)] transition-shadow"
-                onClick={() => window.open('https://app.ultrakin.com/auth', '_blank', 'noopener,noreferrer')}
+                onClick={() => navigate('/workspace')}
               >
                 Start free
               </Button>

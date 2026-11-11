@@ -48,12 +48,16 @@ export default function Button({
     <button
       type={type}
       disabled={disabled || isLoading}
+      aria-busy={isLoading || undefined}
       onClick={onClick}
       className={cn(BASE_STYLES, SIZE_STYLES[size] || SIZE_STYLES.md, VARIANT_STYLES[variant] || VARIANT_STYLES.primary, className)}
       {...props}
     >
       {isLoading ? (
-        <Loader2 className="w-4 h-4 animate-spin text-current" />
+        <>
+          <Loader2 className="w-4 h-4 animate-spin text-current" aria-hidden="true" />
+          <span className="sr-only">Loading</span>
+        </>
       ) : Icon ? (
         <Icon className="w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-105" />
       ) : null}

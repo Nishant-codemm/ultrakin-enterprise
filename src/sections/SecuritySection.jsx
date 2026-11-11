@@ -133,7 +133,7 @@ export default function SecuritySection() {
                       onClick={() => setActive(isOpen ? null : topic.id)}
                       className="group flex min-h-[76px] w-full items-center gap-4 px-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus sm:gap-5 sm:px-4"
                     >
-                      <span className={cn('w-7 font-mono text-[9px] transition-colors', isOpen ? 'text-brand-text' : 'text-ink-subtle')}>
+                      <span className={cn('w-7 font-mono text-[10.5px] font-semibold transition-colors', isOpen ? 'text-brand-text' : 'text-ink-subtle')}>
                         {topic.number}
                       </span>
                       <Icon aria-hidden="true" className={cn('h-4 w-4 transition-colors', isOpen ? 'text-ink-soft' : 'text-ink-subtle group-hover:text-ink-muted')} />

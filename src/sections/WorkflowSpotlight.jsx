@@ -450,15 +450,16 @@ export default function WorkflowSpotlight() {
                   </div>
 
                   {/* 6-Stage mini pipeline indicator */}
-                  <div className="hidden items-center gap-1 sm:flex" aria-label="Workflow pipeline">
+                  <div className="hidden items-center gap-1.5 sm:flex" role="toolbar" aria-label="Workflow pipeline stages">
                     {WORKFLOW_STAGES.map((stg, i) => (
                       <React.Fragment key={stg.id}>
                         <button
                           type="button"
                           onClick={() => setActiveStageIdx(i)}
+                          aria-label={`Step ${i + 1}: ${stg.label}`}
                           title={`${stg.label} (Step ${i + 1})`}
                           className={cn(
-                            'flex h-[18px] w-[18px] items-center justify-center rounded-sm text-[7.5px] font-semibold transition-all duration-200 cursor-pointer',
+                            'flex h-5 w-5 items-center justify-center rounded text-[9px] font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400',
                             i === activeStageIdx
                               ? 'bg-indigo-500 text-white shadow-sm ring-1 ring-indigo-400'
                               : i < activeStageIdx
@@ -469,20 +470,20 @@ export default function WorkflowSpotlight() {
                           {stg.letter}
                         </button>
                         {i < WORKFLOW_STAGES.length - 1 && (
-                          <span className="h-px w-1.5 bg-obsidian-border-soft" aria-hidden="true" />
+                          <span className="h-px w-1 bg-obsidian-border-soft" aria-hidden="true" />
                         )}
                       </React.Fragment>
                     ))}
                   </div>
 
-                  <span className="ml-3 shrink-0 font-mono text-[9px] text-ink-subtle">{currentStage.sourceTime}</span>
+                  <span className="ml-3 shrink-0 font-mono text-[10px] text-ink-subtle">{currentStage.sourceTime}</span>
                 </div>
 
                 {/* 3-col layout */}
                 <div className="grid gap-4 py-5 sm:grid-cols-[minmax(0,1.08fr)_72px_minmax(0,.92fr)] sm:items-center sm:gap-2 sm:px-2 sm:py-8">
 
-                  {/* ── Left Stage Card ── */}
-                  <TiltCard maxTilt={10} className="relative rounded-xl" style={{ borderRadius: '0.75rem' }}>
+                  {/* ── Left Stage Card (Non-nested for pristine 3D perspective) ── */}
+                  <div className="relative rounded-xl">
                     <div
                       className={cn(
                         'relative rounded-xl border bg-obsidian-surface px-4 py-4 shadow-[0_16px_32px_-24px_rgba(0,0,0,.88),inset_0_1px_0_rgba(220,224,255,.055)] sm:min-h-[220px] sm:p-5 transition-all duration-300',
@@ -502,17 +503,17 @@ export default function WorkflowSpotlight() {
                             {/* Stage chip */}
                             <div className="mb-3 flex items-center gap-1.5">
                               <span className={cn('h-1.5 w-1.5 rounded-full', currentStage.left.badgeColor)} aria-hidden="true" />
-                              <span className="text-[8px] font-semibold uppercase tracking-[0.17em] text-indigo-300/70">
+                              <span className="text-[9.5px] font-semibold uppercase tracking-[0.17em] text-indigo-300/80">
                                 {currentStage.left.badge}
                               </span>
                             </div>
 
                             {/* Author */}
                             <div className="mb-3 flex items-center gap-2.5">
-                              <span className={cn('flex h-8 w-8 items-center justify-center rounded-full text-[9px] font-semibold', currentStage.left.avatarBg)}>
+                              <span className={cn('flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-semibold', currentStage.left.avatarBg)}>
                                 {currentStage.left.initials}
                               </span>
-                              <span className="text-[11px] font-medium text-slate-200">
+                              <span className="text-[12px] font-medium text-slate-200">
                                 {currentStage.left.sender}
                               </span>
                             </div>
@@ -524,20 +525,20 @@ export default function WorkflowSpotlight() {
                           </div>
 
                           {/* Context meta indicator */}
-                          <div className="mt-4 flex items-center gap-2 border-t border-obsidian-border pt-3 text-[10px] text-ink-subtle">
+                          <div className="mt-4 flex items-center gap-2 border-t border-obsidian-border pt-3 text-[10.5px] text-ink-subtle">
                             <MetaIcon className="h-3 w-3 shrink-0 text-brand-text" aria-hidden="true" />
                             <span className="truncate">{currentStage.left.meta}</span>
                           </div>
                         </motion.div>
                       </AnimatePresence>
                     </div>
-                  </TiltCard>
+                  </div>
 
                   {/* ── Animated flow connector ── */}
                   <FlowConnector reduceMotion={reduceMotion} inView={inView} activePulse={activeStageIdx >= 1} />
 
-                  {/* ── Right Stage Card ── */}
-                  <TiltCard maxTilt={10} className="relative rounded-xl" style={{ borderRadius: '0.75rem' }}>
+                  {/* ── Right Stage Card (Non-nested for pristine 3D perspective) ── */}
+                  <div className="relative rounded-xl">
                     <div
                       className={cn(
                         'relative rounded-xl border bg-obsidian-base px-4 py-4 text-white shadow-[0_18px_38px_-25px_rgba(0,0,0,.72),inset_0_1px_0_rgba(220,224,255,.07)] sm:min-h-[220px] sm:px-5 sm:py-5 transition-all duration-300',
@@ -556,10 +557,10 @@ export default function WorkflowSpotlight() {
                           <div>
                             {/* Stage chip + status badge */}
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-[8.5px] font-semibold uppercase tracking-[0.16em] text-obsidian-muted">
+                              <span className="text-[9.5px] font-semibold uppercase tracking-[0.16em] text-obsidian-muted">
                                 {currentStage.right.tag}
                               </span>
-                              <span className={cn('rounded-full border px-2 py-0.5 text-[8.5px] font-medium', currentStage.right.badgeClass)}>
+                              <span className={cn('rounded-full border px-2 py-0.5 text-[9.5px] font-medium', currentStage.right.badgeClass)}>
                                 {currentStage.right.badge}
                               </span>
                             </div>
@@ -604,12 +605,12 @@ export default function WorkflowSpotlight() {
                         </motion.div>
                       </AnimatePresence>
                     </div>
-                  </TiltCard>
+                  </div>
 
                 </div>
 
                 {/* ── Bottom: workflow breadcrumb ── */}
-                <div className="flex items-center justify-between border-t border-obsidian-border-soft px-2 pt-3 text-[9px] text-ink-subtle sm:px-3">
+                <div className="flex items-center justify-between border-t border-obsidian-border-soft px-2 pt-3 text-[10.5px] text-ink-subtle sm:px-3">
                   <span className="flex items-center gap-1.5">
                     <span className="font-semibold text-indigo-200">
                       Step {activeStageIdx + 1}: {WORKFLOW_STAGES[activeStageIdx].label}

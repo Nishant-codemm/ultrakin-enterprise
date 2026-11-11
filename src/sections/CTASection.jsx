@@ -30,7 +30,7 @@ export default function CTASection() {
             <p className="flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.18em] text-ink-subtle">
               <span className="h-px w-7 bg-brand" /> Enterprise Evaluation & Deployment
             </p>
-            <span className="hidden font-mono text-[9px] tracking-[0.15em] text-ink-subtle sm:inline">ULTRAKIN / ENTERPRISE</span>
+            <span className="hidden font-mono text-[10px] tracking-[0.18em] text-ink-subtle sm:inline">ULTRAKIN / ENTERPRISE</span>
           </div>
 
           <div className="grid gap-10 lg:grid-cols-[1fr_360px] lg:items-end lg:gap-16">

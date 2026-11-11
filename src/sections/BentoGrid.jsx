@@ -67,10 +67,10 @@ function MemoryView() {
             <RotateCcw className="h-3.5 w-3.5" />
           </button>
         ) : (
-          <span className="hidden rounded border border-obsidian-border-medium px-1.5 py-1 font-mono text-[9px] text-obsidian-muted sm:inline">⌘ K</span>
+          <span className="hidden rounded border border-obsidian-border-medium px-1.5 py-1 font-mono text-[10px] text-obsidian-muted sm:inline">⌘ K</span>
         )}
       </div>
-      <div className="mt-2 pl-1 text-[10px] text-slate-500">Across conversations, notes, and active work</div>
+      <div className="mt-2 pl-1 text-[10.5px] text-slate-500">Across conversations, notes, and active work</div>
 
       {/* Results */}
       <div className="mt-7 divide-y divide-white/[0.07]" aria-live="polite">
@@ -90,11 +90,11 @@ function MemoryView() {
             >
               <Icon className="mt-1 h-4 w-4 text-indigo-200/80" />
               <div>
-                <p className="text-[9px] font-medium tracking-[0.14em] text-slate-400">{record.type}</p>
+                <p className="text-[10px] font-medium tracking-[0.14em] text-slate-400">{record.type}</p>
                 <h3 className="mt-1 text-[13px] font-medium text-slate-200">{record.title}</h3>
                 <p className="mt-1 text-[11px] leading-5 text-slate-400">{record.body}</p>
               </div>
-              <span className="hidden pt-1 text-[9px] text-slate-500 sm:block">{record.time}</span>
+              <span className="hidden pt-1 text-[10px] text-slate-500 sm:block">{record.time}</span>
             </motion.div>
           );
         })}
@@ -235,7 +235,7 @@ function BoundariesView() {
             </div>
             <span className="hidden text-[11px] text-slate-400 sm:block">{access}</span>
             <span className={cn(
-              'justify-self-end rounded-full px-2.5 py-1 text-[9px] font-medium',
+              'justify-self-end rounded-full px-2.5 py-1 text-[10px] font-medium',
               state === 'Available'  ? 'bg-emerald-300/10 text-emerald-200' :
               state === 'Restricted' ? 'bg-rose-300/10 text-rose-200' :
                                        'bg-indigo-300/10 text-indigo-200',
@@ -307,43 +307,54 @@ export default function BentoGrid() {
           className="grid gap-10 border-t border-border pt-7 lg:grid-cols-[250px_1fr] lg:gap-16"
         >
 
-          {/* Sidebar tabs */}
-          <div role="tablist" aria-label="Explore how the workspace connects" className="flex gap-3 overflow-x-auto lg:flex-col lg:gap-0 lg:overflow-visible">
-            {LENSES.map((item, index) => {
-              const Icon = item.icon;
-              const selected = active === item.id;
-              return (
-                <button
-                  key={item.id}
-                  ref={(el) => { tabRefs.current[index] = el; }}
-                  type="button"
-                  role="tab"
-                  id={`lens-tab-${item.id}`}
-                  aria-selected={selected}
-                  aria-controls="lens-panel"
-                  tabIndex={selected ? 0 : -1}
-                  onKeyDown={(e) => handleTabKeyDown(e, index)}
-                  onClick={() => setActive(item.id)}
-                  className={cn(
-                    'group relative min-w-[160px] flex-1 border-b border-border py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus lg:min-w-0 lg:flex-none lg:py-5',
-                    selected ? 'text-ink' : 'text-ink-subtle hover:text-ink-soft',
-                  )}
-                >
-                  <span className="flex items-center gap-3">
-                    <span className={cn('font-mono text-[9px]', selected ? 'text-brand-text' : 'text-ink-muted')}>{item.number}</span>
-                    <Icon className={cn('h-3.5 w-3.5', selected ? 'text-brand-text' : 'text-ink-subtle')} />
-                    <span className="text-xs font-medium">{item.label}</span>
-                  </span>
-                  <span className="mt-2 hidden pl-[3.45rem] text-[10px] text-ink-subtle lg:block">{item.hint}</span>
-                  {selected && (
-                    <motion.span
-                      layoutId="lens-indicator"
-                      className="absolute bottom-[-1px] left-0 right-0 h-px bg-brand/70 lg:right-auto lg:top-0 lg:h-auto lg:w-px"
-                    />
-                  )}
-                </button>
-              );
-            })}
+          {/* Sidebar tabs (M-13 mobile overflow fix) */}
+          <div className="relative min-w-0">
+            <div
+              role="tablist"
+              aria-label="Explore how the workspace connects"
+              className="flex gap-2 overflow-x-auto pb-2 scrollbar-none sm:gap-3 lg:flex-col lg:gap-0 lg:overflow-visible lg:pb-0"
+            >
+              {LENSES.map((item, index) => {
+                const Icon = item.icon;
+                const selected = active === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    ref={(el) => { tabRefs.current[index] = el; }}
+                    type="button"
+                    role="tab"
+                    id={`lens-tab-${item.id}`}
+                    aria-selected={selected}
+                    aria-controls="lens-panel"
+                    tabIndex={selected ? 0 : -1}
+                    onKeyDown={(e) => handleTabKeyDown(e, index)}
+                    onClick={() => setActive(item.id)}
+                    className={cn(
+                      'group relative min-w-[155px] shrink-0 border-b border-border py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus lg:min-w-0 lg:flex-none lg:shrink lg:py-5 cursor-pointer',
+                      selected ? 'text-ink' : 'text-ink-subtle hover:text-ink-soft',
+                    )}
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className={cn('font-mono text-[10px]', selected ? 'text-brand-text' : 'text-ink-muted')}>{item.number}</span>
+                      <Icon className={cn('h-3.5 w-3.5', selected ? 'text-brand-text' : 'text-ink-subtle')} />
+                      <span className="text-xs font-medium">{item.label}</span>
+                    </span>
+                    <span className="mt-2 hidden pl-[3.45rem] text-[10px] text-ink-subtle lg:block">{item.hint}</span>
+                    {selected && (
+                      <motion.span
+                        layoutId="lens-indicator"
+                        className="absolute bottom-[-1px] left-0 right-0 h-px bg-brand/70 lg:right-auto lg:top-0 lg:h-auto lg:w-px"
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            {/* Mobile edge scroll indicator */}
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-page to-transparent lg:hidden"
+            />
           </div>
 
           {/* BrowserFrame with TiltCard */}
@@ -374,7 +385,7 @@ export default function BentoGrid() {
         </motion.div>
 
         {/* Footer label */}
-        <div className="mt-5 flex items-center justify-between text-[9px] uppercase tracking-[0.14em] text-ink-subtle">
+        <div className="mt-5 flex items-center justify-between text-[10px] uppercase tracking-[0.16em] text-ink-subtle">
           <span className="flex items-center gap-2"><ActiveIcon className="h-3 w-3" /> {lens.label}</span>
           <span>Interactive lenses · sample data</span>
         </div>

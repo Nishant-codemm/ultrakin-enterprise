@@ -183,8 +183,8 @@ export default function FAQSection() {
           })}
         </div>
 
-        {/* Accordion Card */}
-        <div className="premium-card relative overflow-hidden rounded-[1.4rem] border border-border bg-surface shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
+        {/* Accordion Card (L-01 standardized radius) */}
+        <div className="premium-card relative overflow-hidden rounded-2xl border border-border bg-surface shadow-[0_4px_24px_rgba(0,0,0,0.04)]">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-y-0 left-0 w-48 bg-[radial-gradient(ellipse_at_left,rgba(79,70,229,.06),transparent_72%)]"
@@ -193,11 +193,11 @@ export default function FAQSection() {
           {/* Top metadata strip */}
           <div className="relative flex items-center justify-between border-b border-border px-5 py-3.5 sm:px-7">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-[9px] font-medium tracking-[0.17em] text-ink-subtle uppercase">
+              <span className="font-mono text-[10px] font-medium tracking-[0.18em] text-ink-subtle uppercase">
                 ENTERPRISE ARCHITECTURE & COMPLIANCE FAQ
               </span>
             </div>
-            <span className="font-mono text-[9px] text-ink-subtle">
+            <span className="font-mono text-[10px] text-ink-subtle">
               {String(filteredFaqs.length).padStart(2, '0')} {filteredFaqs.length === 1 ? 'ENTRY' : 'ENTRIES'}
             </span>
           </div>
@@ -222,12 +222,12 @@ export default function FAQSection() {
                       className="group flex min-h-14 w-full items-center justify-between gap-4 py-4 text-left text-[14px] font-medium text-ink transition-colors hover:text-brand-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus cursor-pointer"
                     >
                       <div className="flex items-start gap-3.5 sm:items-center">
-                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border border-border bg-surface-muted font-mono text-[9px] font-semibold text-ink-subtle sm:mt-0">
+                        <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border border-border bg-surface-muted font-mono text-[10px] font-semibold text-ink-subtle sm:mt-0">
                           {String(idx + 1).padStart(2, '0')}
                         </span>
                         <div className="space-y-0.5">
                           <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center gap-1 font-mono text-[9px] font-semibold uppercase tracking-wider text-brand-text">
+                            <span className="inline-flex items-center gap-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-brand-text">
                               <Icon className="h-2.5 w-2.5" aria-hidden="true" />
                               {faq.tag}
                             </span>
