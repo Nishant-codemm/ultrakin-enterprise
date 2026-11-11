@@ -83,33 +83,61 @@ export const INTEGRATIONS = [
   { name: 'Ukin agent', category: 'Built in',          badge: 'Intelligence across the workspace',  desc: 'Ukin works across workspace context to surface and move work forward.',                     color: '#d0d2ff', iconLetter: 'UK',  point: [112, 340] },
   { name: 'GitHub',     category: 'Extension examples',badge: 'Illustrative · developer tools',    desc: 'An example of how developer-tool context sits alongside team work.',                        color: '#c0c6d2', iconLetter: 'GH',  point: [126, 82]  },
   { name: 'PostHog',    category: 'Extension examples',badge: 'Illustrative · product analytics',  desc: 'An example of keeping product analytics context close to team work.',                       color: '#e9b18a', iconLetter: 'PH',  point: [494, 70]  },
-  { name: 'MCP tools',  category: 'Extension examples',badge: 'Illustrative · external tools',     desc: 'An example of connecting approved external tools through MCP.',                             color: '#a8c9c2', iconLetter: 'MCP', point: [550, 206] },
+  { name: 'MCP tools',  category: 'Extension examples',badge: 'Illustrative · external tools',     desc: 'An example of connecting approved external tools through MCP.',                             color: '#a8c9c2', iconLetter: 'MCP', point: [550, 210] },
   { name: 'Journeys',   category: 'Extension examples',badge: 'Illustrative · app ecosystem',      desc: 'An example of extending the workspace with an installable app.',                           color: '#c6b5f2', iconLetter: 'JR',  point: [490, 344] },
   { name: 'Forms',      category: 'Extension examples',badge: 'Illustrative · structured intake',  desc: 'An example of bringing structured requests into the team workspace.',                       color: '#a8c1ec', iconLetter: 'FM',  point: [142, 348] },
-  { name: 'Lists',      category: 'Extension examples',badge: 'Illustrative · lightweight tracking',desc: 'An example of adding lightweight tracking alongside team work.',                           color: '#b5d3a5', iconLetter: 'LS',  point: [98, 212] },
+  { name: 'Lists',      category: 'Extension examples',badge: 'Illustrative · lightweight tracking',desc: 'An example of adding lightweight tracking alongside team work.',                           color: '#b5d3a5', iconLetter: 'LS',  point: [98, 210] },
 ];
 
 export const CENTER = [310, 210];
 
-/* ─── CONVERGING VECTOR TOPOLOGY SYSTEM ─── */
-/* The cross-section cable follows the workspace flow through Spaces [112, 78] into Tasks [548, 210]. */
-export const PATH_HERO_CROSS_SECTION =
-  'M -30 40 C -6.33 46.33, 55.33 56.67, 112 78 C 168.67 99.33, 237.33 146, 310 168 C 382.67 190, 489.67 198.33, 548 210 C 606.33 221.67, 641.33 233.33, 660 238';
+/* ─── DEDICATED HUB INTERFACE PORTS (Squircle Perimeter Anchors) ─── */
+export const HUB_PORTS = {
+  west:  [266, 210],
+  east:  [354, 210],
+  north: [310, 166],
+  south: [310, 254],
+};
 
-/* Converging Feeder Branches for Nodes */
+/* ─── DEDICATED NODE PERIMETER PORTS (Card Edge Sockets) ─── */
+export const NODE_PORTS = {
+  Spaces:      [136, 78],
+  Mail:        [310, 74],
+  Meetings:    [486, 78],
+  Tasks:       [524, 210],
+  Calendar:    [481, 340],
+  Docs:        [310, 338],
+  'Ukin agent':[136, 340],
+  GitHub:      [150, 82],
+  PostHog:     [470, 70],
+  'MCP tools': [526, 210],
+  Journeys:    [466, 344],
+  Forms:       [166, 348],
+  Lists:       [122, 210],
+};
+
+/* ─── CONTINUOUS ENTERPRISE BUS TOPOLOGY (Master Arterial Highway) ─── */
+/* Ingress enters from left (-30, 78), rides Spaces ingress, merges into West Trunk,
+   flows through Ultrakin Core (266 -> 354), through Tasks (524, 210), out to East (660, 210). */
+export const PATH_HERO_CROSS_SECTION =
+  'M -30 78 L 136 78 C 177 78, 177 210, 218 210 L 266 210 L 354 210 L 524 210 L 660 210';
+
+/* ─── DETERMINISTIC FEEDER ARTERIES (Node Port -> Tangential Merge -> Hub Entry) ─── */
 export const FEEDER_PATHS = {
-  Mail:         'M 310 50 C 310 95, 310 135, 310 168',
-  Meetings:     'M 510 78 C 450 110, 380 145, 310 168',
-  Calendar:     'M 505 340 C 450 310, 380 270, 310 252',
-  Docs:         'M 310 362 C 310 325, 310 285, 310 252',
-  'Ukin agent': 'M 112 340 C 165 310, 235 270, 310 252',
+  Spaces:      'M 136 78 C 177 78, 177 210, 218 210 L 266 210',
+  Mail:        'M 310 74 L 310 166',
+  Meetings:    'M 486 78 C 444 78, 444 210, 402 210 L 354 210',
+  Tasks:       'M 524 210 L 354 210',
+  Calendar:    'M 481 340 C 441.5 340, 441.5 210, 402 210 L 354 210',
+  Docs:        'M 310 338 L 310 254',
+  'Ukin agent':'M 136 340 C 177 340, 177 210, 218 210 L 266 210',
   // Extension Examples Feeder Branches
-  GitHub:       'M 126 82 C 175 105, 240 150, 310 168',
-  PostHog:      'M 494 70 C 440 105, 380 145, 310 168',
-  'MCP tools':  'M 550 206 C 480 208, 410 210, 354 210',
-  Journeys:     'M 490 344 C 440 310, 380 270, 310 252',
-  Forms:        'M 142 348 C 190 315, 250 270, 310 252',
-  Lists:        'M 98 212 C 160 212, 220 210, 266 210',
+  GitHub:      'M 150 82 C 184 82, 184 210, 218 210 L 266 210',
+  PostHog:     'M 470 70 C 436 70, 436 210, 402 210 L 354 210',
+  'MCP tools': 'M 526 210 L 354 210',
+  Journeys:    'M 466 344 C 434 344, 434 210, 402 210 L 354 210',
+  Forms:       'M 166 348 C 192 348, 192 210, 218 210 L 266 210',
+  Lists:       'M 122 210 L 266 210',
 };
 
 export const PREVIEWS = {

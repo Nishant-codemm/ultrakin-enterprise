@@ -7,6 +7,8 @@ import UltrakinLogo from '../primitives/UltrakinLogo';
 import {
   PRODUCT_ICON_CONFIG,
   CENTER,
+  HUB_PORTS,
+  NODE_PORTS,
   PATH_HERO_CROSS_SECTION,
   FEEDER_PATHS,
 } from '../../data/integrationData';
@@ -149,19 +151,26 @@ function TopologySpline({ d, isActive, isGuide = false }) {
   );
 }
 
-/* ─── Reusable Hub Spoke Line Component ─── */
-function HubSpoke({ x2, y2, isActive }) {
+/* ─── Hardware Interface Port Socket Component ─── */
+function HardwarePortSocket({ cx, cy, isActive, color = '#818cf8', label }) {
   return (
-    <line
-      x1={CENTER[0]}
-      y1={CENTER[1]}
-      x2={x2}
-      y2={y2}
-      stroke={isActive ? 'url(#topo-spline-active)' : 'rgba(140,148,255,0.11)'}
-      strokeWidth={isActive ? 0.85 : 0.52}
-      strokeDasharray={isActive ? 'none' : '3 6'}
-      className="transition-all duration-300"
-    />
+    <g className="transition-all duration-300">
+      <circle
+        cx={cx}
+        cy={cy}
+        r={isActive ? 4.2 : 2.8}
+        fill="#0c1018"
+        stroke={isActive ? color : 'rgba(165,180,252,0.32)'}
+        strokeWidth={isActive ? 1.3 : 0.8}
+      />
+      <circle
+        cx={cx}
+        cy={cy}
+        r={isActive ? 2.2 : 1.3}
+        fill={isActive ? color : 'rgba(165,180,252,0.65)'}
+      />
+      {label && <title>{label}</title>}
+    </g>
   );
 }
 
@@ -370,20 +379,8 @@ function OrbitalTopologyMap({
             <ConcentricOrbitalRing rx="86" ry="54" strokeDasharray="2 6" opacity={0.32} />
             <circle cx={CENTER[0]} cy={CENTER[1]} r="80" fill="url(#orbit-core)" />
 
-            {/* ── LAYER 2: Delicate Radial Spokes from Hub to Nodes ── */}
-            <g>
-              {visible.map((item) => (
-                <HubSpoke
-                  key={`spoke-${item.name}`}
-                  x2={item.point[0]}
-                  y2={item.point[1]}
-                  isActive={item.name === activeNode}
-                />
-              ))}
-            </g>
-
-            {/* ── LAYER 3: Harmonic Converging Guide Splines ── */}
-            <g opacity={0.62}>
+            {/* ── LAYER 2: Harmonic Enterprise Bus Topology (Passive Guide Grid) ── */}
+            <g opacity={0.52}>
               {visible.map((item) => {
                 const feederD = FEEDER_PATHS[item.name];
                 if (!feederD) return null;
@@ -398,17 +395,17 @@ function OrbitalTopologyMap({
               })}
             </g>
 
-            {/* ── LAYER 4: The Hero Cross-Sectional Vector Arc (Spaces → Hub Crest → Tasks → Right) ── */}
+            {/* ── LAYER 3: The Hero Cross-Sectional Arterial Trunk (Global Page Storyline) ── */}
             <path
               d={PATH_HERO_CROSS_SECTION}
               data-workline-anchor="integration-spine"
               fill="none"
               stroke={isMasterSpineActive ? 'url(#topo-spline-active)' : 'url(#topo-spline-base)'}
-              strokeWidth={isMasterSpineActive ? 1.55 : 1.15}
+              strokeWidth={isMasterSpineActive ? 1.6 : 1.15}
               className="transition-all duration-300"
             />
 
-            {/* Active highlight & converging photon for currently hovered / selected perimeter feeder spline */}
+            {/* ── LAYER 4: Active Highlight & Converging Photon along Selected Feeder Artery ── */}
             {visible.map((item) => {
               const feederD = FEEDER_PATHS[item.name];
               const isActive = item.name === activeNode;
@@ -419,7 +416,7 @@ function OrbitalTopologyMap({
                     d={feederD}
                     fill="none"
                     stroke="url(#topo-spline-active)"
-                    strokeWidth={1.2}
+                    strokeWidth={1.35}
                     className="transition-all duration-300"
                   />
                   {inView && !reduceMotion && (
@@ -433,7 +430,7 @@ function OrbitalTopologyMap({
               );
             })}
 
-            {/* ── LAYER 5: Continuous Travelling Photon Bead along Hero Cross-Sectional Arc ── */}
+            {/* ── LAYER 5: Continuous Travelling Photon Bead along Master Arterial Trunk ── */}
             {inView && !reduceMotion && (
               <ConvergingPhotonNode
                 d={PATH_HERO_CROSS_SECTION}
@@ -442,21 +439,41 @@ function OrbitalTopologyMap({
               />
             )}
 
-            {/* Connection Endpoint dots under node centers */}
+            {/* ── LAYER 6: Central Hub Interface Ports (West, East, North, South) ── */}
+            {Object.entries(HUB_PORTS).map(([direction, [hx, hy]]) => {
+              const isPortActive =
+                (direction === 'west' && ['Spaces', 'Ukin agent', 'GitHub', 'Forms', 'Lists'].includes(activeNode)) ||
+                (direction === 'east' && ['Meetings', 'Tasks', 'Calendar', 'PostHog', 'MCP tools', 'Journeys'].includes(activeNode)) ||
+                (direction === 'north' && activeNode === 'Mail') ||
+                (direction === 'south' && activeNode === 'Docs');
+
+              return (
+                <HardwarePortSocket
+                  key={`hub-port-${direction}`}
+                  cx={hx}
+                  cy={hy}
+                  isActive={isPortActive}
+                  color="#818cf8"
+                  label={`Ultrakin ${direction} bus port`}
+                />
+              );
+            })}
+
+            {/* ── LAYER 7: Node Edge Ports on Card Boundaries ── */}
             {visible.map((item) => {
+              const port = NODE_PORTS[item.name] || item.point;
               const isHovered = item.name === hoveredNode;
               const isSelected = item.name === current.name;
+              const isPortActive = isHovered || isSelected;
+
               return (
-                <circle
-                  key={`dot-${item.name}`}
-                  cx={item.point[0]}
-                  cy={item.point[1]}
-                  r={isHovered ? 3.5 : isSelected ? 2.8 : 1.8}
-                  fill={item.color}
-                  fillOpacity={isHovered ? 0.95 : isSelected ? 0.85 : 0.55}
-                  style={{
-                    transition: 'r 200ms ease, fill-opacity 200ms ease',
-                  }}
+                <HardwarePortSocket
+                  key={`node-port-${item.name}`}
+                  cx={port[0]}
+                  cy={port[1]}
+                  isActive={isPortActive}
+                  color={item.color}
+                  label={`${item.name} edge port`}
                 />
               );
             })}
