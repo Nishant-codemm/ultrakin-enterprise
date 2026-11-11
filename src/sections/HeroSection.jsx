@@ -17,6 +17,7 @@ import {
   GitBranch,
   Pause,
   Play,
+  Search,
   ShieldCheck,
 } from 'lucide-react';
 import Button from '../components/primitives/Button';
@@ -664,8 +665,8 @@ function HeroInteractiveStage() {
                         style={{ color: isActive ? signal.accentColor : '#64748b' }}
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[9px] font-semibold leading-tight">{signal.label}</p>
-                        <p className="truncate text-[7.5px] text-slate-500 font-mono leading-none">{signal.channel}</p>
+                        <p className="truncate text-[10.5px] font-semibold leading-tight">{signal.label}</p>
+                        <p className="truncate text-[9.5px] text-slate-500 font-mono leading-none mt-0.5">{signal.channel}</p>
                       </div>
 
                       {/* Right-edge diode anchor port */}
@@ -709,7 +710,7 @@ function HeroInteractiveStage() {
               className="relative z-10 mt-3 flex items-center justify-center gap-2"
               style={{ transform: 'translateZ(18px)' }}
             >
-              <div className="flex items-center gap-2 rounded-full border border-sky-200/90 bg-white/95 px-3 py-1 text-[8.5px] font-semibold text-slate-800 shadow-[0_2px_8px_rgba(37,99,235,0.06)] backdrop-blur-sm">
+              <div className="flex items-center gap-2 rounded-full border border-sky-200/90 bg-white/95 px-3 py-1 text-[10px] font-semibold text-slate-800 shadow-[0_2px_8px_rgba(37,99,235,0.06)] backdrop-blur-sm">
                 <span className="flex h-2 w-2 items-center justify-center">
                   <span className="absolute h-2 w-2 animate-ping rounded-full bg-emerald-400 opacity-60" />
                   <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-500" />
@@ -722,7 +723,7 @@ function HeroInteractiveStage() {
                 type="button"
                 onClick={() => setIsPaused((prev) => !prev)}
                 aria-label={isPaused ? 'Resume workflow animation' : 'Pause workflow animation'}
-                className="flex items-center gap-1 rounded-full border border-sky-200/90 bg-white/95 px-2.5 py-1 text-[8.5px] font-mono font-medium text-slate-700 hover:text-slate-900 transition-colors shadow-[0_2px_8px_rgba(37,99,235,0.06)] cursor-pointer"
+                className="flex items-center gap-1 rounded-full border border-sky-200/90 bg-white/95 px-2.5 py-1 text-[10px] font-mono font-medium text-slate-700 hover:text-slate-900 transition-colors shadow-[0_2px_8px_rgba(37,99,235,0.06)] cursor-pointer"
               >
                 {isPaused ? <Play className="h-2.5 w-2.5 text-blue-600" aria-hidden="true" /> : <Pause className="h-2.5 w-2.5 text-slate-500" aria-hidden="true" />}
                 <span>{isPaused ? 'Resume' : 'Pause'}</span>
@@ -745,6 +746,7 @@ function HeroWorkspaceContent() {
     channels,
     emails,
     kanbanTasks,
+    openSearchPalette,
   } = useWorkspace();
 
   const unreadEmailCount = emails.filter((e) => e.unread).length;
@@ -963,25 +965,51 @@ function HeroWorkspaceContent() {
               }}
             />
 
-            {/* Window Chrome Title Bar */}
-            <div className="h-11 px-4 bg-obsidian-surface/90 border-b border-obsidian-border flex items-center justify-between select-none relative z-20">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-rose-500/80 inline-block shadow-[0_0_8px_rgba(244,63,94,0.3)]" />
-                <span className="w-3 h-3 rounded-full bg-amber-500/80 inline-block shadow-[0_0_8px_rgba(245,158,11,0.3)]" />
-                <span className="w-3 h-3 rounded-full bg-emerald-500/80 inline-block shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
-                <span className="ml-3 text-xs font-mono text-slate-400 hidden sm:inline">
-                    app.ultrakin.com/workspace/acme-eng
-                    {activeModule === 'chat' ? `#${activeChannel}` : `/${activeModule}`}
-                  </span>
+            {/* Workspace Application Command Bar (Eliminates redundant OS chrome under BrowserFrame) */}
+            <div className="h-11 px-3 sm:px-4 bg-obsidian-surface/95 border-b border-obsidian-border flex items-center justify-between select-none relative z-20 backdrop-blur-md">
+              {/* Left: Organization & Active Context Breadcrumb */}
+              <div className="flex items-center gap-2 min-w-0">
+                <div
+                  className="flex items-center gap-2 px-2 py-1 rounded-md bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0"
+                  title="Switch organization"
+                >
+                  <div className="w-4 h-4 rounded bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-bold text-[9.5px]">A</div>
+                  <span className="text-xs font-semibold tracking-tight text-white hidden sm:inline">Acme Corp</span>
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
                 </div>
+                <span className="text-obsidian-border text-xs hidden sm:inline" aria-hidden="true">/</span>
+                <span className="text-xs font-mono text-indigo-300 truncate font-medium">
+                  {activeModule === 'chat' ? `#${activeChannel}` : activeModule === 'threads' ? 'Threads' : activeModule === 'mail' ? 'Inbox' : activeModule === 'docs' ? 'Living Docs' : activeModule === 'huddle' ? 'Live Huddle' : activeModule === 'tasks' ? 'Sprint Board' : 'Automations'}
+                </span>
+              </div>
 
-                <div className="hidden items-center gap-3 md:flex">
+              {/* Center: Command Palette Search Bar */}
+              <button
+                type="button"
+                onClick={openSearchPalette}
+                className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.035] border border-white/[0.08] text-xs text-obsidian-muted hover:text-slate-200 hover:border-white/[0.16] hover:bg-white/[0.06] transition-all duration-200 cursor-pointer max-w-[280px] w-full justify-between"
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                  <span className="truncate text-[11.5px]">Search or ask Ukin...</span>
+                </div>
+                <kbd className="font-mono text-[9.5px] px-1.5 py-0.5 rounded bg-white/[0.08] border border-white/[0.1] text-slate-300 shrink-0">⌘K</kbd>
+              </button>
+
+              {/* Right: Real-time Presence & Sync Status */}
+              <div className="flex items-center gap-3 shrink-0">
+                <div className="hidden md:flex items-center -space-x-1.5" title="Active in workspace">
+                  <span className="w-5 h-5 rounded-full bg-indigo-500/25 border border-obsidian-surface text-[9px] font-semibold text-indigo-200 flex items-center justify-center">SC</span>
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/25 border border-obsidian-surface text-[9px] font-semibold text-emerald-200 flex items-center justify-center">EL</span>
+                  <span className="w-5 h-5 rounded-full bg-violet-500/25 border border-obsidian-surface text-[9px] font-semibold text-violet-200 flex items-center justify-center">UK</span>
+                </div>
+                <span className="hidden md:inline h-3 w-px bg-white/10" aria-hidden="true" />
                 <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-40 motion-reduce:hidden" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
                   </span>
-                  <span className="hidden md:inline">Workspace active</span>
+                  <span className="hidden lg:inline text-[10.5px]">3 agents synced</span>
                 </span>
               </div>
             </div>
@@ -1000,22 +1028,39 @@ function HeroWorkspaceContent() {
 
                 <div className="w-8 h-[1px] bg-white/10" />
 
-                {/* Module Quick Switchers */}
+                {/* Module Quick Switchers with Tactile Active Indicator (Linear/Slack Craftsmanship) */}
                 <button
                   type="button"
                   onClick={() => setActiveModule('chat')}
                   className={cn(
-                    'w-10 h-10 rounded-xl flex items-center justify-center transition-colors cursor-pointer',
+                    'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
                     activeModule === 'chat'
-                      ? 'bg-white/15 text-indigo-400 border border-indigo-400/30'
+                      ? 'bg-white/15 text-indigo-400 border border-indigo-400/30 shadow-[0_2px_10px_rgba(99,102,241,0.2)]'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   )}
                   title="Spaces Chat"
                 >
+                  {activeModule === 'chat' && (
+                    <span className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]" aria-hidden="true" />
+                  )}
                   <MessageSquare className="w-5 h-5" />
                 </button>
 
-                <button type="button" onClick={() => setActiveModule('threads')} className={cn('w-10 h-10 rounded-xl flex items-center justify-center transition-colors cursor-pointer', activeModule === 'threads' ? 'bg-white/15 text-indigo-300 border border-indigo-400/30' : 'text-slate-400 hover:text-white hover:bg-white/5')} title="Threads" aria-label="Threads">
+                <button
+                  type="button"
+                  onClick={() => setActiveModule('threads')}
+                  className={cn(
+                    'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
+                    activeModule === 'threads'
+                      ? 'bg-white/15 text-indigo-300 border border-indigo-400/30 shadow-[0_2px_10px_rgba(99,102,241,0.2)]'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  )}
+                  title="Threads"
+                  aria-label="Threads"
+                >
+                  {activeModule === 'threads' && (
+                    <span className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]" aria-hidden="true" />
+                  )}
                   <AtSign className="w-5 h-5" />
                 </button>
 
@@ -1023,13 +1068,16 @@ function HeroWorkspaceContent() {
                   type="button"
                   onClick={() => setActiveModule('mail')}
                   className={cn(
-                    'w-10 h-10 rounded-xl flex items-center justify-center transition-colors cursor-pointer relative',
+                    'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
                     activeModule === 'mail'
-                      ? 'bg-white/15 text-sky-400 border border-sky-400/30'
+                      ? 'bg-white/15 text-sky-400 border border-sky-400/30 shadow-[0_2px_10px_rgba(56,189,248,0.2)]'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   )}
                   title="Custom Domain Email"
                 >
+                  {activeModule === 'mail' && (
+                    <span className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]" aria-hidden="true" />
+                  )}
                   <Mail className="w-5 h-5" />
                   {unreadEmailCount > 0 && (
                     <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-sky-400" />
@@ -1040,17 +1088,34 @@ function HeroWorkspaceContent() {
                   type="button"
                   onClick={() => setActiveModule('docs')}
                   className={cn(
-                    'w-10 h-10 rounded-xl flex items-center justify-center transition-colors cursor-pointer',
+                    'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
                     activeModule === 'docs'
-                      ? 'bg-white/15 text-emerald-400 border border-emerald-400/30'
+                      ? 'bg-white/15 text-emerald-400 border border-emerald-400/30 shadow-[0_2px_10px_rgba(52,211,153,0.2)]'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   )}
                   title="TipTap Living Docs"
                 >
+                  {activeModule === 'docs' && (
+                    <span className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" aria-hidden="true" />
+                  )}
                   <FileText className="w-5 h-5" />
                 </button>
 
-                <button type="button" onClick={() => setActiveModule('files')} className={cn('w-10 h-10 rounded-xl flex items-center justify-center transition-colors cursor-pointer', activeModule === 'files' ? 'bg-white/15 text-indigo-300 border border-indigo-400/30' : 'text-slate-400 hover:text-white hover:bg-white/5')} title="Files" aria-label="Files">
+                <button
+                  type="button"
+                  onClick={() => setActiveModule('files')}
+                  className={cn(
+                    'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
+                    activeModule === 'files'
+                      ? 'bg-white/15 text-indigo-300 border border-indigo-400/30 shadow-[0_2px_10px_rgba(99,102,241,0.2)]'
+                      : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  )}
+                  title="Files"
+                  aria-label="Files"
+                >
+                  {activeModule === 'files' && (
+                    <span className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]" aria-hidden="true" />
+                  )}
                   <FolderOpen className="w-5 h-5" />
                 </button>
 
@@ -1058,13 +1123,16 @@ function HeroWorkspaceContent() {
                   type="button"
                   onClick={() => setActiveModule('huddle')}
                   className={cn(
-                    'w-10 h-10 rounded-xl flex items-center justify-center transition-colors cursor-pointer relative',
+                    'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
                     activeModule === 'huddle'
-                      ? 'bg-white/15 text-violet-400 border border-violet-400/30'
+                      ? 'bg-white/15 text-violet-400 border border-violet-400/30 shadow-[0_2px_10px_rgba(167,139,250,0.2)]'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   )}
                   title="Huddle"
                 >
+                  {activeModule === 'huddle' && (
+                    <span className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-violet-400 shadow-[0_0_8px_rgba(167,139,250,0.8)]" aria-hidden="true" />
+                  )}
                   <Video className="w-5 h-5" />
                   <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 </button>
@@ -1073,13 +1141,16 @@ function HeroWorkspaceContent() {
                   type="button"
                   onClick={() => setActiveModule('tasks')}
                   className={cn(
-                    'w-10 h-10 rounded-xl flex items-center justify-center transition-colors cursor-pointer relative',
+                    'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
                     activeModule === 'tasks'
-                      ? 'bg-white/15 text-amber-400 border border-amber-400/30'
+                      ? 'bg-white/15 text-amber-400 border border-amber-400/30 shadow-[0_2px_10px_rgba(251,191,36,0.2)]'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   )}
                   title="Sprint Kanban Board"
                 >
+                  {activeModule === 'tasks' && (
+                    <span className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]" aria-hidden="true" />
+                  )}
                   <CheckSquare className="w-5 h-5" />
                   {kanbanTasks.length > 0 && (
                     <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-400" />
@@ -1090,13 +1161,16 @@ function HeroWorkspaceContent() {
                   type="button"
                   onClick={() => setActiveModule('automations')}
                   className={cn(
-                    'w-10 h-10 rounded-xl flex items-center justify-center transition-colors cursor-pointer',
+                    'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
                     activeModule === 'automations'
-                      ? 'bg-white/15 text-emerald-400 border border-emerald-400/30'
+                      ? 'bg-white/15 text-emerald-400 border border-emerald-400/30 shadow-[0_2px_10px_rgba(52,211,153,0.2)]'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   )}
                   title="Workflow automation"
                 >
+                  {activeModule === 'automations' && (
+                    <span className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]" aria-hidden="true" />
+                  )}
                   <GitBranch className="w-5 h-5" />
                 </button>
 
