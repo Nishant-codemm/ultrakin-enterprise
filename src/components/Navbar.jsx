@@ -190,10 +190,10 @@ const SolutionMenuItem = memo(function SolutionMenuItem({ item, onSelect }) {
       type="button"
       role="menuitem"
       onClick={() => onSelect(item)}
-      className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-[14.5px] font-medium text-ink transition-colors duration-150 hover:bg-surface-soft hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 cursor-pointer"
+      className="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-[16px] font-medium text-ink transition-colors duration-150 hover:bg-surface-soft hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 cursor-pointer"
     >
       <span>{item.title}</span>
-      <ArrowRight size={13} className="opacity-0 -translate-x-1.5 transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-0 text-brand" />
+      <ArrowRight size={15} className="opacity-0 -translate-x-1.5 transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-0 text-brand shrink-0" />
     </button>
   );
 });
@@ -572,20 +572,20 @@ export default function Navbar() {
             key={openMenu}
             {...(openMenu === 'Solutions' ? solutionsMenuMotion : menuMotion)}
             onMouseEnter={() => enterMenu(openMenu)}
-            className={`absolute left-1/2 top-[calc(100%+8px)] hidden -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_24px_70px_rgba(29,35,40,.09),0_2px_6px_rgba(29,35,40,.03)] backdrop-blur-2xl lg:block ${
+            className={`absolute left-1/2 top-[calc(100%+8px)] hidden -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_32px_96px_rgba(29,35,40,.11),0_2px_6px_rgba(29,35,40,.04)] backdrop-blur-2xl lg:block ${
               openMenu === 'Solutions'
-                ? 'w-[min(560px,calc(100vw-32px))]'
+                ? 'w-[min(660px,calc(100vw-32px))]'
                 : 'w-[min(1100px,calc(100vw-48px))]'
             }`}
           >
             {openMenu === 'Solutions' ? (
-              <div className="p-6">
-                <div className="grid grid-cols-2 gap-8">
+              <div className="px-8 pt-8 pb-10">
+                <div className="grid grid-cols-2 gap-10">
                   <div>
-                    <p className="mb-3 px-3 text-[12px] font-medium uppercase tracking-wider text-ink-subtle">
+                    <p className="mb-4 px-4 text-[12px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
                       By team
                     </p>
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       {solutionGroups[0].items.map((item) => (
                         <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
                       ))}
@@ -593,10 +593,10 @@ export default function Navbar() {
                   </div>
 
                   <div>
-                    <p className="mb-3 px-3 text-[12px] font-medium uppercase tracking-wider text-ink-subtle">
+                    <p className="mb-4 px-4 text-[12px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
                       By industry
                     </p>
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       {solutionGroups[1].items.map((item) => (
                         <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
                       ))}
@@ -604,11 +604,11 @@ export default function Navbar() {
                         type="button"
                         role="menuitem"
                         onClick={() => selectItem({ href: '/solutions' })}
-                        className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-[14px] font-semibold text-brand transition-colors duration-150 hover:bg-brand-soft/40 hover:text-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 cursor-pointer"
+                        className="group flex w-full items-center justify-between rounded-xl px-4 py-3 text-left text-[15.5px] font-semibold text-brand transition-colors duration-150 hover:bg-brand-soft/40 hover:text-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 cursor-pointer"
                       >
-                        <span className="flex items-center gap-1.5">
+                        <span className="flex items-center gap-2">
                           <span>See all solutions</span>
-                          <ArrowRight size={13} className="transition-transform duration-150 group-hover:translate-x-0.5" />
+                          <ArrowRight size={15} className="transition-transform duration-150 group-hover:translate-x-1" />
                         </span>
                       </button>
                     </div>
