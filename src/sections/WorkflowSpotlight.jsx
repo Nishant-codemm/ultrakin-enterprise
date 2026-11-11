@@ -1,12 +1,13 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
   Check,
   CheckSquare,
   FileText,
   MessageSquareText,
-  Plus,
+  RotateCcw,
+  ShieldCheck,
   Sparkles,
   Zap,
 } from 'lucide-react';
@@ -14,13 +15,6 @@ import { cn } from '../lib/cn';
 import BrowserFrame from '../components/BrowserFrame';
 import { useReveal } from '../lib/useReveal';
 import { getSectionHeaderMotion, getSectionContentMotion } from '../lib/motion';
-
-const SIGNAL = {
-  source: '#release-planning', icon: MessageSquareText,
-  by: 'Maya Chen', initials: 'MC', time: '10:42',
-  message: 'Can someone own the SSO timeout before Thursday\u2019s rollout? The EU tenant is still seeing retries.',
-  context: 'SSO rollout checklist', action: 'Trace EU tenant retry spikes', owner: 'Maya Chen', due: 'Thursday',
-};
 
 /* ─── Cursor-tracking 3D tilt for any card ─── */
 function TiltCard({ children, className, maxTilt = 10, style }) {
@@ -167,12 +161,196 @@ function FlowConnector({ reduceMotion, activePulse = false }) {
 
 /* ─── Workflow narrative stage strip ─── */
 const WORKFLOW_STAGES = [
-  { id: 'signal',   label: 'Signal',   icon: MessageSquareText, color: '#818cf8' },
-  { id: 'context',  label: 'Context',  icon: FileText,          color: '#a5b4fc' },
-  { id: 'agent',    label: 'Agent',    icon: Sparkles,          color: '#c4b5fd' },
-  { id: 'decision', label: 'Decision', icon: Zap,               color: '#818cf8' },
-  { id: 'task',     label: 'Task',     icon: CheckSquare,       color: '#6ee7b7' },
-  { id: 'outcome',  label: 'Outcome',  icon: Check,             color: '#34d399' },
+  { id: 'signal',   label: 'Signal',   letter: 'S', icon: MessageSquareText, color: '#818cf8' },
+  { id: 'context',  label: 'Context',  letter: 'C', icon: FileText,          color: '#38bdf8' },
+  { id: 'agent',    label: 'Agent',    letter: 'A', icon: Sparkles,          color: '#c084fc' },
+  { id: 'decision', label: 'Decision', letter: 'D', icon: Zap,               color: '#f59e0b' },
+  { id: 'task',     label: 'Task',     letter: 'T', icon: CheckSquare,       color: '#10b981' },
+  { id: 'outcome',  label: 'Outcome',  letter: 'O', icon: Check,             color: '#34d399' },
+];
+
+/* ─── Detailed Stage Narrative Data Model ─── */
+const STAGE_CONTENT = [
+  {
+    id: 'signal',
+    source: '#release-planning',
+    sourceIcon: MessageSquareText,
+    sourceTime: '10:42 AM',
+    left: {
+      badge: 'Signal · Inbound Event',
+      badgeColor: 'bg-indigo-400/80',
+      sender: 'Maya Chen',
+      initials: 'MC',
+      avatarBg: 'bg-indigo-500/20 text-indigo-200',
+      body: 'Can someone own the SSO timeout before Thursday’s rollout? The EU tenant is still seeing retries.',
+      meta: 'Detected via #release-planning · Unassigned deployment blocker',
+      metaIcon: MessageSquareText,
+    },
+    right: {
+      badge: 'Listening',
+      badgeClass: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/30',
+      tag: 'Ukin Ingestion Bus',
+      title: 'Real-time Signal Ingestion',
+      desc: 'Ukin parsed thread intent, recognized a critical release dependency with an approaching Thursday deadline, and activated context correlation.',
+      fields: [
+        { label: 'Priority', value: 'P0 Blocker' },
+        { label: 'Target', value: 'EU Tenant SSO' },
+      ],
+      actionText: 'Correlate connected context',
+      actionIcon: ArrowRight,
+      nextStage: 1,
+    },
+  },
+  {
+    id: 'context',
+    source: 'RFC-891 & EU Telemetry Cluster',
+    sourceIcon: FileText,
+    sourceTime: '10:43 AM',
+    left: {
+      badge: 'Context · Unified Memory',
+      badgeColor: 'bg-sky-400/80',
+      sender: 'Knowledge Graph',
+      initials: 'KG',
+      avatarBg: 'bg-sky-500/20 text-sky-200',
+      body: 'Correlated 14 previous deployment logs with token cache TTL expiry in the regional auth proxy across Frankfurt and Dublin clusters.',
+      meta: 'Linked artifact: RFC-891 Launch Plan (Sec 4.2 Auth Token Refresh)',
+      metaIcon: FileText,
+    },
+    right: {
+      badge: 'Synthesized',
+      badgeClass: 'bg-sky-500/15 text-sky-300 border-sky-400/30',
+      tag: 'Memory Graph Engine',
+      title: 'Root-Cause Hypothesis Formed',
+      desc: 'Token cache TTL mismatch between EU and US auth replicas is causing 401 refresh retries under peak load. Recommended patch: increase cache TTL to 300s.',
+      fields: [
+        { label: 'Matched Incidents', value: '14 historical logs' },
+        { label: 'Root Cause', value: 'Token Cache TTL (60s)' },
+      ],
+      actionText: 'Generate agent proposal',
+      actionIcon: ArrowRight,
+      nextStage: 2,
+    },
+  },
+  {
+    id: 'agent',
+    source: '#release-planning',
+    sourceIcon: Sparkles,
+    sourceTime: '10:44 AM',
+    left: {
+      badge: 'Agent · Autonomous Synthesis',
+      badgeColor: 'bg-violet-400/80',
+      sender: 'Ukin Assistant',
+      initials: 'UK',
+      avatarBg: 'bg-violet-500/20 text-violet-200',
+      body: 'I’ve prepared a remediation plan for the EU tenant retry spikes. Would you like me to log a blocking sprint task and assign it to Maya?',
+      meta: 'Target sprint: Sprint 24 · Due Thursday 2:00 PM',
+      metaIcon: CheckSquare,
+    },
+    right: {
+      badge: 'Action Proposal',
+      badgeClass: 'bg-violet-500/15 text-violet-300 border-violet-400/30',
+      tag: 'Ukin Proposal',
+      title: 'Trace EU tenant retry spikes',
+      desc: 'Drafted actionable Jira/Kanban task containing reproduction steps, linked telemetry traces, and proposed configuration patch.',
+      fields: [
+        { label: 'Owner', value: 'Maya Chen' },
+        { label: 'Due', value: 'Thursday · Sprint 24' },
+      ],
+      actionText: 'Review and authorize plan',
+      actionIcon: Zap,
+      nextStage: 3,
+    },
+  },
+  {
+    id: 'decision',
+    source: '#release-planning · Governance Log',
+    sourceIcon: Zap,
+    sourceTime: '10:45 AM',
+    left: {
+      badge: 'Decision · Stakeholder Signoff',
+      badgeColor: 'bg-amber-400/80',
+      sender: 'Alex Mercer (Lead)',
+      initials: 'AM',
+      avatarBg: 'bg-amber-500/20 text-amber-200',
+      body: 'Approved. Maya, take this up as the primary release blocker. Let’s make sure we test against EU staging before merge.',
+      meta: 'Policy check: Explicit human authorization confirmed & audited',
+      metaIcon: ShieldCheck,
+    },
+    right: {
+      badge: 'Approved',
+      badgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-400/30',
+      tag: 'Human Governance Boundary',
+      title: 'Consensus Log Recorded',
+      desc: 'Human-in-the-loop governance verified. Ukin is authorized to dispatch work, commit backlog items, and update customer incident monitors.',
+      fields: [
+        { label: 'Approver', value: 'Alex Mercer (Tech Lead)' },
+        { label: 'Audit Hash', value: 'sec_auth_902f4' },
+      ],
+      actionText: 'Dispatch task to board',
+      actionIcon: CheckSquare,
+      nextStage: 4,
+    },
+  },
+  {
+    id: 'task',
+    source: 'Kanban Sprint Board · Active',
+    sourceIcon: CheckSquare,
+    sourceTime: '10:46 AM',
+    left: {
+      badge: 'Task · Execution Board',
+      badgeColor: 'bg-emerald-400/80',
+      sender: 'Sprint Backlog',
+      initials: 'SB',
+      avatarBg: 'bg-emerald-500/20 text-emerald-200',
+      body: 'Task [TSK-891] moved to In Progress. Branch feat/eu-sso-ttl created with linked PR #1042.',
+      meta: 'PR #1042: Token cache TTL recovery (14 CI checks passing)',
+      metaIcon: CheckSquare,
+    },
+    right: {
+      badge: 'In Progress',
+      badgeClass: 'bg-indigo-500/15 text-indigo-300 border-indigo-400/30',
+      tag: 'Board Execution',
+      title: 'TSK-891: Trace EU tenant retry spikes',
+      desc: 'Remediation branch deployed to staging. Automated test suite validating token refresh under synthetic European tenant load.',
+      fields: [
+        { label: 'Assignee', value: 'Maya Chen' },
+        { label: 'Status', value: 'In Progress (PR #1042)' },
+      ],
+      actionText: 'Verify resolution & telemetry',
+      actionIcon: Check,
+      nextStage: 5,
+    },
+  },
+  {
+    id: 'outcome',
+    source: '#infra-alerts & Status Page',
+    sourceIcon: Check,
+    sourceTime: '11:15 AM',
+    left: {
+      badge: 'Outcome · Verified Delivery',
+      badgeColor: 'bg-emerald-300',
+      sender: 'Release Telemetry',
+      initials: 'RT',
+      avatarBg: 'bg-emerald-500/20 text-emerald-200',
+      body: 'Patch deployed to EU cluster. Retry spikes dropped to 0.00%. All enterprise single-sign-on authentications verified.',
+      meta: 'Verified outcome: Latency improved 94ms across 12k logins',
+      metaIcon: Check,
+    },
+    right: {
+      badge: 'Resolved',
+      badgeClass: 'bg-emerald-500/15 text-emerald-300 border-emerald-400/30',
+      tag: 'Zero Friction Delivery',
+      title: 'Rollout Unblocked on Schedule',
+      desc: 'Customer status brief auto-generated, changelog committed, and all 4 stakeholder channels notified with zero manual status meetings.',
+      fields: [
+        { label: 'Impact', value: '0.00% Error Rate' },
+        { label: 'Saved Time', value: '3.5 Dev Hours' },
+      ],
+      actionText: 'Replay workflow from signal',
+      actionIcon: RotateCcw,
+      nextStage: 0,
+    },
+  },
 ];
 
 /* ─── Stage arrow connector — SVG precision ─── */
@@ -226,24 +404,14 @@ function StagePill({ stage, isActive, isSelected, onClick }) {
 }
 
 export default function WorkflowSpotlight() {
-  const [created, setCreated] = useState(false);
-  const [selectedStage, setSelectedStage] = useState(null);
+  const [activeStageIdx, setActiveStageIdx] = useState(0);
   const reduceMotion = useReducedMotion();
   const [sectionRef, inView] = useReveal({ threshold: 0.12 });
-  const signal = SIGNAL;
-  const SignalIcon = signal.icon;
 
-  // Compute active stage index: user selection takes priority, otherwise follows task creation state
-  const activeStageIdx = selectedStage !== null ? selectedStage : (created ? 4 : 0);
-
-  const handleStageSelect = (idx) => {
-    setSelectedStage(idx);
-    if (idx >= 4) {
-      setCreated(true);
-    } else if (idx === 0) {
-      setCreated(false);
-    }
-  };
+  const currentStage = STAGE_CONTENT[activeStageIdx] || STAGE_CONTENT[0];
+  const SourceIcon = currentStage.sourceIcon;
+  const MetaIcon = currentStage.left.metaIcon;
+  const ActionIcon = currentStage.right.actionIcon;
 
   return (
     <section ref={sectionRef} id="workflows" className="relative overflow-hidden bg-transparent py-20 text-ink md:py-28">
@@ -294,7 +462,7 @@ export default function WorkflowSpotlight() {
                       stage={stage}
                       isActive={i <= activeStageIdx}
                       isSelected={i === activeStageIdx}
-                      onClick={() => handleStageSelect(i)}
+                      onClick={() => setActiveStageIdx(i)}
                     />
                   </div>
                   {i < WORKFLOW_STAGES.length - 1 && (
@@ -332,117 +500,165 @@ export default function WorkflowSpotlight() {
                 <div className="flex items-center justify-between border-b border-obsidian-border-soft px-2 pb-3 sm:px-3">
                   <div className="flex items-center gap-2 text-[11px] font-medium text-slate-200">
                     <span className="flex h-6 w-6 items-center justify-center rounded-md bg-obsidian-elevated text-indigo-200">
-                      <SignalIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                      <SourceIcon className="h-3.5 w-3.5" aria-hidden="true" />
                     </span>
-                    <span className="truncate">{signal.source}</span>
+                    <span className="truncate">{currentStage.source}</span>
                   </div>
-                  {/* Mini pipeline indicator */}
+
+                  {/* 6-Stage mini pipeline indicator */}
                   <div className="hidden items-center gap-1 sm:flex" aria-label="Workflow pipeline">
-                    {['S', 'C', 'A', 'T'].map((letter, i) => (
-                      <React.Fragment key={letter}>
-                        <span className={cn(
-                          'flex h-[18px] w-[18px] items-center justify-center rounded-sm text-[7.5px] font-semibold transition-all duration-300',
-                          i <= activeStageIdx ? 'bg-indigo-500/25 text-indigo-200 ring-1 ring-indigo-400/30' : 'bg-white/[0.04] text-obsidian-muted',
-                        )}>
-                          {letter}
-                        </span>
-                        {i < 3 && <span className="h-px w-2 bg-obsidian-border-soft" aria-hidden="true" />}
+                    {WORKFLOW_STAGES.map((stg, i) => (
+                      <React.Fragment key={stg.id}>
+                        <button
+                          type="button"
+                          onClick={() => setActiveStageIdx(i)}
+                          title={`${stg.label} (Step ${i + 1})`}
+                          className={cn(
+                            'flex h-[18px] w-[18px] items-center justify-center rounded-sm text-[7.5px] font-semibold transition-all duration-200 cursor-pointer',
+                            i === activeStageIdx
+                              ? 'bg-indigo-500 text-white shadow-sm ring-1 ring-indigo-400'
+                              : i < activeStageIdx
+                              ? 'bg-indigo-500/25 text-indigo-200 ring-1 ring-indigo-400/30'
+                              : 'bg-white/[0.04] text-obsidian-muted hover:text-slate-200',
+                          )}
+                        >
+                          {stg.letter}
+                        </button>
+                        {i < WORKFLOW_STAGES.length - 1 && (
+                          <span className="h-px w-1.5 bg-obsidian-border-soft" aria-hidden="true" />
+                        )}
                       </React.Fragment>
                     ))}
                   </div>
-                  <span className="ml-3 shrink-0 font-mono text-[9px] text-ink-subtle">{signal.time}</span>
+
+                  <span className="ml-3 shrink-0 font-mono text-[9px] text-ink-subtle">{currentStage.sourceTime}</span>
                 </div>
 
                 {/* 3-col layout */}
                 <div className="grid gap-4 py-5 sm:grid-cols-[minmax(0,1.08fr)_72px_minmax(0,.92fr)] sm:items-center sm:gap-2 sm:px-2 sm:py-8">
 
-                  {/* ── Signal card ── */}
-                  <TiltCard maxTilt={12} className="relative rounded-xl" style={{ borderRadius: '0.75rem' }}>
-                    <motion.div
-                      initial={reduceMotion ? false : { opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: reduceMotion ? 0.01 : 0.22 }}
+                  {/* ── Left Stage Card ── */}
+                  <TiltCard maxTilt={10} className="relative rounded-xl" style={{ borderRadius: '0.75rem' }}>
+                    <div
                       className={cn(
-                        'relative rounded-xl border bg-obsidian-surface px-4 py-4 shadow-[0_16px_32px_-24px_rgba(0,0,0,.88),inset_0_1px_0_rgba(220,224,255,.055)] sm:min-h-[190px] sm:p-5 transition-all duration-300',
-                        activeStageIdx === 0 ? 'border-indigo-500/40 shadow-[0_0_24px_-6px_rgba(99,102,241,0.25)]' : 'border-obsidian-border',
+                        'relative rounded-xl border bg-obsidian-surface px-4 py-4 shadow-[0_16px_32px_-24px_rgba(0,0,0,.88),inset_0_1px_0_rgba(220,224,255,.055)] sm:min-h-[220px] sm:p-5 transition-all duration-300',
+                        'border-indigo-500/30 shadow-[0_0_24px_-6px_rgba(99,102,241,0.2)]',
                       )}
                     >
-                      {/* Stage chip */}
-                      <div className="mb-3 flex items-center gap-1.5">
-                        <span className="h-1 w-1 rounded-full bg-indigo-400/70" aria-hidden="true" />
-                        <span className="text-[8px] font-semibold uppercase tracking-[0.17em] text-indigo-300/60">Signal</span>
-                      </div>
-                      <div className="mb-4 flex items-center gap-2.5">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-obsidian-elevated text-[9px] font-semibold text-indigo-200">{signal.initials}</span>
-                        <span className="text-[11px] font-medium text-slate-200">{signal.by}</span>
-                      </div>
-                      <p className="text-[13px] leading-[1.75] text-obsidian-muted">&ldquo;{signal.message}&rdquo;</p>
-                      <div className={cn(
-                        'mt-5 flex items-center gap-2 border-t pt-3 text-[10px] transition-all duration-300',
-                        activeStageIdx === 1 ? 'border-indigo-400/40 text-indigo-200' : 'border-obsidian-border text-ink-subtle',
-                      )}>
-                        <FileText className="h-3 w-3 shrink-0 text-brand-text" aria-hidden="true" />
-                        <span className="truncate">{signal.context}</span>
-                      </div>
-                    </motion.div>
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={`left-card-${activeStageIdx}`}
+                          initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.18 }}
+                          className="flex h-full flex-col justify-between"
+                        >
+                          <div>
+                            {/* Stage chip */}
+                            <div className="mb-3 flex items-center gap-1.5">
+                              <span className={cn('h-1.5 w-1.5 rounded-full', currentStage.left.badgeColor)} aria-hidden="true" />
+                              <span className="text-[8px] font-semibold uppercase tracking-[0.17em] text-indigo-300/70">
+                                {currentStage.left.badge}
+                              </span>
+                            </div>
+
+                            {/* Author */}
+                            <div className="mb-3 flex items-center gap-2.5">
+                              <span className={cn('flex h-8 w-8 items-center justify-center rounded-full text-[9px] font-semibold', currentStage.left.avatarBg)}>
+                                {currentStage.left.initials}
+                              </span>
+                              <span className="text-[11px] font-medium text-slate-200">
+                                {currentStage.left.sender}
+                              </span>
+                            </div>
+
+                            {/* Body quote / statement */}
+                            <p className="text-[12.5px] leading-[1.7] text-slate-300">
+                              &ldquo;{currentStage.left.body}&rdquo;
+                            </p>
+                          </div>
+
+                          {/* Context meta indicator */}
+                          <div className="mt-4 flex items-center gap-2 border-t border-obsidian-border pt-3 text-[10px] text-ink-subtle">
+                            <MetaIcon className="h-3 w-3 shrink-0 text-brand-text" aria-hidden="true" />
+                            <span className="truncate">{currentStage.left.meta}</span>
+                          </div>
+                        </motion.div>
+                      </AnimatePresence>
+                    </div>
                   </TiltCard>
 
                   {/* ── Animated flow connector ── */}
-                  <FlowConnector reduceMotion={reduceMotion} activePulse={activeStageIdx >= 2} />
+                  <FlowConnector reduceMotion={reduceMotion} activePulse={activeStageIdx >= 1} />
 
-                  {/* ── Agent suggestion card ── */}
-                  <TiltCard maxTilt={12} className="relative rounded-xl" style={{ borderRadius: '0.75rem' }}>
-                    <div className={cn(
-                      'relative rounded-xl border bg-obsidian-base px-4 py-4 text-white shadow-[0_18px_38px_-25px_rgba(0,0,0,.72),inset_0_1px_0_rgba(220,224,255,.07)] sm:min-h-[190px] sm:px-5 sm:py-5 transition-all duration-300',
-                      activeStageIdx >= 2 ? 'border-violet-500/40 shadow-[0_0_24px_-6px_rgba(139,92,246,0.25)]' : 'border-obsidian-border-medium',
-                    )}>
-                      {/* Stage chip */}
-                      <div className="mb-3 flex items-center gap-1.5">
-                        <span className="h-1 w-1 rounded-full bg-violet-400/70" aria-hidden="true" />
-                        <span className="text-[8px] font-semibold uppercase tracking-[0.17em] text-violet-300/60">Agent</span>
-                      </div>
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-[9px] font-medium uppercase tracking-[0.15em] text-obsidian-muted">Ukin suggestion</span>
-                        <span className={cn(
-                          'rounded-full px-2 py-1 text-[9px] transition-all duration-300',
-                          activeStageIdx === 3 ? 'bg-indigo-400/20 text-indigo-200 ring-1 ring-indigo-400/40' : 'bg-white/[0.08] text-slate-300',
-                        )}>Review</span>
-                      </div>
-                      <motion.div
-                        initial={reduceMotion ? false : { opacity: 0, y: 5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: reduceMotion ? 0.01 : 0.18 }}
-                      >
-                        <h3 className="mt-4 text-[16px] font-medium leading-6 tracking-[-0.02em] text-white">{signal.action}</h3>
-                        <div className="mt-5 space-y-2.5 border-t border-white/[0.09] pt-4 text-[10px]">
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-obsidian-muted">Owner</span>
-                            <span className="text-slate-200">{signal.owner}</span>
+                  {/* ── Right Stage Card ── */}
+                  <TiltCard maxTilt={10} className="relative rounded-xl" style={{ borderRadius: '0.75rem' }}>
+                    <div
+                      className={cn(
+                        'relative rounded-xl border bg-obsidian-base px-4 py-4 text-white shadow-[0_18px_38px_-25px_rgba(0,0,0,.72),inset_0_1px_0_rgba(220,224,255,.07)] sm:min-h-[220px] sm:px-5 sm:py-5 transition-all duration-300',
+                        'border-violet-500/35 shadow-[0_0_24px_-6px_rgba(139,92,246,0.22)]',
+                      )}
+                    >
+                      <AnimatePresence mode="wait">
+                        <motion.div
+                          key={`right-card-${activeStageIdx}`}
+                          initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.18 }}
+                          className="flex h-full flex-col justify-between"
+                        >
+                          <div>
+                            {/* Stage chip + status badge */}
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-[8.5px] font-semibold uppercase tracking-[0.16em] text-obsidian-muted">
+                                {currentStage.right.tag}
+                              </span>
+                              <span className={cn('rounded-full border px-2 py-0.5 text-[8.5px] font-medium', currentStage.right.badgeClass)}>
+                                {currentStage.right.badge}
+                              </span>
+                            </div>
+
+                            {/* Headline */}
+                            <h3 className="mt-3 text-[15px] font-medium leading-snug tracking-[-0.02em] text-white">
+                              {currentStage.right.title}
+                            </h3>
+
+                            {/* Description narrative */}
+                            <p className="mt-2 text-[11px] leading-5 text-obsidian-muted">
+                              {currentStage.right.desc}
+                            </p>
+
+                            {/* Contextual fields */}
+                            <div className="mt-3 space-y-1.5 border-t border-white/[0.08] pt-2.5 text-[10px]">
+                              {currentStage.right.fields.map((f) => (
+                                <div key={f.label} className="flex items-center justify-between gap-3">
+                                  <span className="text-obsidian-muted">{f.label}</span>
+                                  <span className="font-medium text-slate-200">{f.value}</span>
+                                </div>
+                              ))}
+                            </div>
                           </div>
-                          <div className="flex items-center justify-between gap-3">
-                            <span className="text-obsidian-muted">Due</span>
-                            <span className="text-slate-200">{signal.due}</span>
-                          </div>
-                        </div>
-                      </motion.div>
-                      <button
-                        type="button"
-                        aria-pressed={created}
-                        onClick={() => {
-                          const nextState = !created;
-                          setCreated(nextState);
-                          setSelectedStage(nextState ? 4 : 0);
-                        }}
-                        className={cn(
-                          'mt-5 flex min-h-9 w-full items-center justify-center gap-2 rounded-md px-3 text-[11px] font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-obsidian-focus focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian-base cursor-pointer',
-                          created
-                            ? 'bg-emerald-300/10 text-emerald-200 hover:bg-emerald-300/15'
-                            : 'bg-brand text-white hover:bg-brand-hover shadow-[0_4px_12px_rgba(49,86,207,0.3)]',
-                        )}
-                      >
-                        {created ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Plus className="h-3.5 w-3.5" aria-hidden="true" />}
-                        {created ? 'Added to the board · undo' : 'Create task'}
-                      </button>
+
+                          {/* Action button advancing narrative */}
+                          <button
+                            type="button"
+                            onClick={() => setActiveStageIdx(currentStage.right.nextStage)}
+                            className={cn(
+                              'mt-4 flex min-h-9 w-full items-center justify-center gap-2 rounded-md px-3 text-[11px] font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-obsidian-focus focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian-base cursor-pointer',
+                              activeStageIdx === 5
+                                ? 'bg-emerald-400/15 text-emerald-200 hover:bg-emerald-400/25 border border-emerald-400/30'
+                                : activeStageIdx === 3 || activeStageIdx === 4
+                                ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-[0_4px_12px_rgba(99,102,241,0.35)]'
+                                : 'bg-brand text-white hover:bg-brand-hover shadow-[0_4px_12px_rgba(49,86,207,0.3)]',
+                            )}
+                          >
+                            <ActionIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                            <span>{currentStage.right.actionText}</span>
+                          </button>
+                        </motion.div>
+                      </AnimatePresence>
                     </div>
                   </TiltCard>
 
@@ -451,15 +667,15 @@ export default function WorkflowSpotlight() {
                 {/* ── Bottom: workflow breadcrumb ── */}
                 <div className="flex items-center justify-between border-t border-obsidian-border-soft px-2 pt-3 text-[9px] text-ink-subtle sm:px-3">
                   <span className="flex items-center gap-1.5">
-                    <span className={cn('transition-colors', activeStageIdx === 0 ? 'text-indigo-200 font-semibold' : 'text-indigo-300/55')}>Conversation</span>
+                    <span className="font-semibold text-indigo-200">
+                      Step {activeStageIdx + 1}: {WORKFLOW_STAGES[activeStageIdx].label}
+                    </span>
                     <ArrowRight className="h-2.5 w-2.5 text-obsidian-muted" aria-hidden="true" />
-                    <span className={cn('transition-colors', activeStageIdx === 1 ? 'text-indigo-200 font-semibold' : 'text-indigo-300/55')}>Context</span>
-                    <ArrowRight className="h-2.5 w-2.5 text-obsidian-muted" aria-hidden="true" />
-                    <span className={cn('transition-colors duration-300', activeStageIdx >= 4 ? 'text-emerald-300 font-semibold' : 'text-indigo-300/55')}>
-                      {created ? 'Task · created' : 'Action'}
+                    <span className="text-obsidian-muted">
+                      {activeStageIdx < 5 ? `Next: ${WORKFLOW_STAGES[activeStageIdx + 1].label}` : 'End-to-End Complete'}
                     </span>
                   </span>
-                  <span>Interactive preview · sample data</span>
+                  <span className="hidden sm:inline">Interactive Context Graph · Live Sample</span>
                 </div>
 
               </div>
