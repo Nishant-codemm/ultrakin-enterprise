@@ -700,7 +700,7 @@ export default function WorkflowSpotlight() {
         </div>
       </div>
 
-      {/* Bottom hairline — continuity to BentoGrid */}
+      {/* Bottom hairline — continuity to PlatformLensSection */}
       <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-brand/10 to-transparent" />
     </section>
   );

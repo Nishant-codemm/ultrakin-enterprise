@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import HeroSection from './sections/HeroSection';
 import TrustStrip from './sections/TrustStrip';
 import WorkflowSpotlight from './sections/WorkflowSpotlight';
-import BentoGrid from './sections/BentoGrid';
+import PlatformLensSection from './sections/PlatformLensSection';
 import IntegrationsSection from './sections/IntegrationsSection';
 import SecuritySection from './sections/SecuritySection';
 import EvaluationSection from './sections/EvaluationSection';
@@ -335,7 +335,7 @@ export default function App() {
             <HeroSection />
             <TrustStrip />
             <WorkflowSpotlight />
-            <BentoGrid />
+            <PlatformLensSection />
             <IntegrationsSection />
             <SecuritySection />
             <EvaluationSection />
