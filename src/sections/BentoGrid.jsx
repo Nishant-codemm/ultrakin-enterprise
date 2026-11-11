@@ -15,6 +15,7 @@ import { cn } from '../lib/cn';
 import BrowserFrame from '../components/BrowserFrame';
 import { useReveal } from '../lib/useReveal';
 import { getSectionHeaderMotion, getSectionContentMotion } from '../lib/motion';
+import { navigate } from '../lib/navigate';
 
 const LENSES = [
   { id: 'memory',     number: '01', label: 'Find past decisions',   hint: 'Search across conversations and docs', icon: Search },
@@ -369,7 +370,7 @@ export default function BentoGrid() {
                   onKeyDown={(e) => handleTabKeyDown(e, index)}
                   onClick={() => setActive(item.id)}
                   className={cn(
-                    'group relative min-w-[190px] flex-1 border-b border-border py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus lg:min-w-0 lg:flex-none lg:py-5',
+                    'group relative min-w-[160px] flex-1 border-b border-border py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus lg:min-w-0 lg:flex-none lg:py-5',
                     selected ? 'text-ink' : 'text-ink-subtle hover:text-ink-soft',
                   )}
                 >
@@ -421,6 +422,23 @@ export default function BentoGrid() {
         <div className="mt-5 flex items-center justify-between text-[9px] uppercase tracking-[0.14em] text-ink-subtle">
           <span className="flex items-center gap-2"><ActiveIcon className="h-3 w-3" /> {lens.label}</span>
           <span>Interactive lenses · sample data</span>
+        </div>
+
+        {/* ── Micro-CTA: Inter-section discovery ── */}
+        <div className="mt-8 flex flex-col items-center justify-between gap-4 rounded-xl border border-border/80 bg-surface px-5 py-3.5 sm:flex-row">
+          <span className="text-xs text-ink-muted">
+            Looking for enterprise permissions, role hierarchies, and private VPC deployment?
+          </span>
+          <div className="flex shrink-0 items-center gap-3">
+            <button
+              type="button"
+              onClick={() => navigate('/security')}
+              className="group inline-flex items-center gap-1.5 text-xs font-semibold text-brand-text transition-colors hover:text-ink cursor-pointer"
+            >
+              <span>Explore security architecture</span>
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+            </button>
+          </div>
         </div>
       </div>
     </section>

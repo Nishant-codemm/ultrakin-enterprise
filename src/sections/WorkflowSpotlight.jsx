@@ -15,6 +15,7 @@ import { cn } from '../lib/cn';
 import BrowserFrame from '../components/BrowserFrame';
 import { useReveal } from '../lib/useReveal';
 import { getSectionHeaderMotion, getSectionContentMotion } from '../lib/motion';
+import { navigate } from '../lib/navigate';
 
 /* ─── Cursor-tracking 3D tilt for any card ─── */
 function TiltCard({ children, className, maxTilt = 10, style }) {
@@ -683,6 +684,21 @@ export default function WorkflowSpotlight() {
           </TiltCard>
         </motion.div>
 
+        {/* ── Micro-CTA: Inter-section discovery ── */}
+        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-border/70 pt-6 text-center sm:flex-row sm:text-left">
+          <div className="flex items-center gap-2 text-xs text-ink-muted">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+            <span>Telemetry and context streams connect natively across workspaces, tools, and autonomous agents.</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/products/automations')}
+            className="group inline-flex shrink-0 items-center gap-1.5 text-xs font-semibold text-brand-text transition-colors hover:text-ink cursor-pointer"
+          >
+            <span>See automation pipeline specs</span>
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+          </button>
+        </div>
       </div>
 
       {/* Bottom hairline — continuity to BentoGrid */}
