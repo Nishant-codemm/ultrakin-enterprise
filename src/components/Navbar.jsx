@@ -185,26 +185,15 @@ const MenuItem = memo(function MenuItem({ item, onSelect }) {
 });
 
 const SolutionMenuItem = memo(function SolutionMenuItem({ item, onSelect }) {
-  const Icon = item.icon;
   return (
     <button
       type="button"
       role="menuitem"
       onClick={() => onSelect(item)}
-      className="group flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors duration-150 hover:bg-surface-soft/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 cursor-pointer"
+      className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-[14.5px] font-medium text-ink transition-colors duration-150 hover:bg-surface-soft hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 cursor-pointer"
     >
-      <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-ink-subtle transition-colors duration-150 group-hover:text-brand">
-        <Icon size={15} strokeWidth={1.8} />
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="flex items-center gap-1 text-[13px] font-medium text-ink leading-tight transition-colors duration-150 group-hover:text-brand">
-          {item.title}
-          <ArrowRight size={11} className="opacity-0 -translate-x-1 transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-0 text-brand shrink-0" />
-        </span>
-        <span className="mt-0.5 block text-[11.5px] leading-snug text-ink-muted/80 line-clamp-1 transition-colors duration-150 group-hover:text-ink-muted">
-          {item.description}
-        </span>
-      </span>
+      <span>{item.title}</span>
+      <ArrowRight size={13} className="opacity-0 -translate-x-1.5 transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-0 text-brand" />
     </button>
   );
 });
@@ -583,31 +572,31 @@ export default function Navbar() {
             key={openMenu}
             {...(openMenu === 'Solutions' ? solutionsMenuMotion : menuMotion)}
             onMouseEnter={() => enterMenu(openMenu)}
-            className={`absolute left-1/2 top-[calc(100%+8px)] hidden -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_32px_96px_rgba(29,35,40,.11),0_2px_6px_rgba(29,35,40,.04)] backdrop-blur-2xl lg:block ${
+            className={`absolute left-1/2 top-[calc(100%+8px)] hidden -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_24px_70px_rgba(29,35,40,.09),0_2px_6px_rgba(29,35,40,.03)] backdrop-blur-2xl lg:block ${
               openMenu === 'Solutions'
-                ? 'w-[min(680px,calc(100vw-32px))]'
+                ? 'w-[min(560px,calc(100vw-32px))]'
                 : 'w-[min(1100px,calc(100vw-48px))]'
             }`}
           >
             {openMenu === 'Solutions' ? (
-              <div>
-                <div className="grid grid-cols-2 gap-4 p-5">
-                  <div className="space-y-1">
-                    <p className="mb-2 px-2.5 text-[10px] font-semibold uppercase tracking-[.14em] text-ink-subtle">
+              <div className="p-6">
+                <div className="grid grid-cols-2 gap-8">
+                  <div>
+                    <p className="mb-3 px-3 text-[12px] font-medium uppercase tracking-wider text-ink-subtle">
                       By team
                     </p>
-                    <div className="space-y-0.5">
+                    <div className="space-y-1">
                       {solutionGroups[0].items.map((item) => (
                         <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
                       ))}
                     </div>
                   </div>
 
-                  <div className="space-y-1">
-                    <p className="mb-2 px-2.5 text-[10px] font-semibold uppercase tracking-[.14em] text-ink-subtle">
+                  <div>
+                    <p className="mb-3 px-3 text-[12px] font-medium uppercase tracking-wider text-ink-subtle">
                       By industry
                     </p>
-                    <div className="space-y-0.5">
+                    <div className="space-y-1">
                       {solutionGroups[1].items.map((item) => (
                         <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
                       ))}
@@ -615,54 +604,15 @@ export default function Navbar() {
                         type="button"
                         role="menuitem"
                         onClick={() => selectItem({ href: '/solutions' })}
-                        className="group flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors duration-150 hover:bg-surface-soft/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 cursor-pointer"
+                        className="group flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-[14px] font-semibold text-brand transition-colors duration-150 hover:bg-brand-soft/40 hover:text-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 cursor-pointer"
                       >
-                        <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-brand transition-colors duration-150 group-hover:translate-x-0.5">
-                          <ArrowRight size={14} strokeWidth={2} />
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="flex items-center gap-1 text-[13px] font-semibold text-brand leading-tight transition-colors duration-150 group-hover:text-brand-hover">
-                            Browse all solutions
-                            <ArrowRight size={11} className="transition-transform duration-150 group-hover:translate-x-0.5" />
-                          </span>
-                          <span className="mt-0.5 block text-[11.5px] leading-snug text-ink-muted/80 line-clamp-1">
-                            Explore the full directory of enterprise team workflows.
-                          </span>
+                        <span className="flex items-center gap-1.5">
+                          <span>See all solutions</span>
+                          <ArrowRight size={13} className="transition-transform duration-150 group-hover:translate-x-0.5" />
                         </span>
                       </button>
                     </div>
                   </div>
-                </div>
-
-                <div className="flex items-center justify-between border-t border-border/80 bg-surface-soft/40 px-5 py-2.5 text-[11px] text-ink-muted">
-                  <div className="flex items-center gap-2.5">
-                    <button
-                      type="button"
-                      onClick={() => { setOpenMenu(null); scrollToSection('faq'); }}
-                      className="font-medium hover:text-ink transition-colors cursor-pointer"
-                    >
-                      Guides & FAQ
-                    </button>
-                    <span className="text-border">·</span>
-                    <button
-                      type="button"
-                      onClick={() => { setOpenMenu(null); openDemoDrawer(); }}
-                      className="font-medium hover:text-ink transition-colors cursor-pointer"
-                    >
-                      Talk to us
-                    </button>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOpenMenu(null);
-                      navigate('/solutions');
-                    }}
-                    className="font-medium text-brand hover:text-brand-hover transition-colors flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>See all solutions</span>
-                    <span aria-hidden="true">→</span>
-                  </button>
                 </div>
               </div>
             ) : (
