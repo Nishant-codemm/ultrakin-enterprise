@@ -105,15 +105,19 @@ const resourceGroups = [
       { title: 'Core Workspace Engine', description: 'Explore the full connected enterprise workspace.', icon: UltrakinIcon, color: 'bg-brand/10 border border-brand/20', href: '#platform' },
       { title: 'How it works', description: 'Watch an incoming signal turn into completed work.', icon: Workflow, color: 'bg-[#c026d3]', href: '#workflows' },
       { title: 'Integrations Matrix', description: 'Connect GitHub, Slack, Jira, Figma, and linear tools.', icon: FolderOpen, color: 'bg-[#64748b]', href: '#integrations' },
+      { title: 'Living specs & Docs', description: 'Pages and living specifications written together.', icon: FileText, color: 'bg-[#2563eb]', href: '/products/docs' },
+      { title: 'AI Agents framework', description: 'Autonomous agent jobs with clear enterprise bounds.', icon: Bot, color: 'bg-[#6366f1]', href: '/agents' },
     ],
   },
   {
     label: 'Trust & Evaluation',
     items: [
       { title: 'Security & Compliance', description: 'SOC 2 Type II, GDPR, AES-256 encryption & audit logs.', icon: ShieldCheck, color: 'bg-[#059669]', href: '/security' },
+      { title: 'SOC 2 Type II Report', description: 'Auditor verification and continuous compliance posture.', icon: ShieldCheck, color: 'bg-[#059669]', href: '/soc2' },
       { title: 'Transparent Pricing', description: 'Per-seat plans with clear enterprise licensing terms.', icon: CheckSquare, color: 'bg-[#d97706]', href: '/pricing' },
       { title: 'Enterprise Consultation', description: 'Schedule an architecture review or security debrief.', icon: FileText, color: 'bg-[#2563eb]', action: 'openDemoDrawer' },
-      { title: 'FAQ & Details', description: 'Detailed specs on security, permissions, and offline state.', icon: HelpCircle, color: 'bg-[#475569]', href: '#faq' },
+      { title: 'Authorized Subprocessors', description: 'Third-party infrastructure and sub-processors list.', icon: Layers, color: 'bg-[#475569]', href: '/subprocessors' },
+      { title: 'FAQ & System Details', description: 'Detailed specs on security, permissions, and offline state.', icon: HelpCircle, color: 'bg-[#475569]', href: '#faq' },
     ],
   },
 ];
@@ -570,7 +574,7 @@ export default function Navbar() {
             role="menu"
             aria-label={`${openMenu} navigation menu`}
             key={openMenu}
-            {...(openMenu === 'Solutions' ? solutionsMenuMotion : menuMotion)}
+            {...(openMenu === 'Solutions' || openMenu === 'Resources' ? solutionsMenuMotion : menuMotion)}
             onMouseEnter={() => enterMenu(openMenu)}
             className="absolute left-1/2 top-[calc(100%+8px)] hidden w-[min(1100px,calc(100vw-48px))] -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_32px_96px_rgba(29,35,40,.11),0_2px_6px_rgba(29,35,40,.04)] backdrop-blur-2xl lg:block"
           >
@@ -653,6 +657,89 @@ export default function Navbar() {
                     className="font-semibold text-brand hover:text-brand-hover transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>See all solutions</span>
+                    <ArrowRight size={13} aria-hidden="true" />
+                  </button>
+                </div>
+              </div>
+            ) : openMenu === 'Resources' ? (
+              <div>
+                <div className="grid grid-cols-[1fr_1fr_310px] gap-8 p-7">
+                  <div>
+                    <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
+                      Knowledge & Architecture
+                    </p>
+                    <div className="space-y-1">
+                      {resourceGroups[0].items.map((item) => (
+                        <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
+                      Trust & Evaluation
+                    </p>
+                    <div className="space-y-1">
+                      {resourceGroups[1].items.map((item) => (
+                        <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="rounded-xl border border-border/80 bg-surface-soft/40 p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                      <h4 className="text-[13.5px] font-semibold text-ink">Architecture & Guides</h4>
+                      <p className="mt-1 text-[12px] leading-relaxed text-ink-muted">
+                        Deep architecture whitepapers, MCP tutorials, and case studies.
+                      </p>
+                      <div className="mt-4 space-y-2.5 border-t border-border/60 pt-3">
+                        {[
+                          { title: 'MCP Connectors & API Reference', href: '/products/connectors' },
+                          { title: 'Hybrid VPC & Security Whitepaper', href: '/security' },
+                          { title: 'Enterprise Migration Playbooks', href: '/resources' },
+                        ].map((guide) => (
+                          <button
+                            key={guide.title}
+                            type="button"
+                            onClick={() => selectItem({ href: guide.href })}
+                            className="group flex w-full items-center justify-between py-1 text-left text-[12.5px] font-medium text-ink transition-colors hover:text-brand cursor-pointer"
+                          >
+                            <span>{guide.title}</span>
+                            <ArrowRight size={12} className="opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0 text-brand shrink-0" />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between border-t border-border/70 bg-surface-soft/30 px-7 py-3 text-[12px] text-ink-muted">
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => { setOpenMenu(null); scrollToSection('faq'); }}
+                      className="font-medium hover:text-ink transition-colors cursor-pointer"
+                    >
+                      Guides & FAQ
+                    </button>
+                    <span className="text-border">·</span>
+                    <button
+                      type="button"
+                      onClick={() => { setOpenMenu(null); openDemoDrawer(); }}
+                      className="font-medium hover:text-ink transition-colors cursor-pointer"
+                    >
+                      Talk to us
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpenMenu(null);
+                      navigate('/resources');
+                    }}
+                    className="font-semibold text-brand hover:text-brand-hover transition-colors flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span>Browse all resources</span>
                     <ArrowRight size={13} aria-hidden="true" />
                   </button>
                 </div>
