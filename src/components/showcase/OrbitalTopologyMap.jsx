@@ -4,6 +4,7 @@ import { Sparkles } from 'lucide-react';
 import { cn } from '../../lib/cn';
 import BrowserFrame from '../BrowserFrame';
 import UltrakinLogo from '../primitives/UltrakinLogo';
+import OrbitalReactorMesh from './OrbitalReactorMesh';
 import {
   PRODUCT_ICON_CONFIG,
   CENTER,
@@ -395,16 +396,27 @@ function OrbitalTopologyMap({
         address="workspace.ultrakin.app/topology/mesh"
         tabTitle="Ultrakin · Connected Tools & Integrations Topology"
       >
-        <div
-          className="relative h-[430px] overflow-hidden select-none"
-          style={{
-            background: tilt.active
-              ? `radial-gradient(ellipse 85% 75% at ${tilt.gx}% ${tilt.gy}%, rgba(55,62,150,0.16) 0%, rgba(15,19,28,0.94) 55%, #080b12 100%)`
-              : 'radial-gradient(ellipse 80% 70% at 50% 48%, rgba(50,56,140,0.14) 0%, rgba(15,19,28,0.94) 55%, #080b12 100%)',
-            transition: tilt.active ? 'none' : 'background 600ms ease',
-          }}
-          aria-label="Connected tools map"
-        >
+        {selectedCat === 'Built in' ? (
+          <OrbitalReactorMesh
+            visible={visible}
+            current={current}
+            activeNode={activeNode}
+            hoveredNode={hoveredNode}
+            setHoveredNode={setHoveredNode}
+            setSelected={setSelected}
+            inView={inView}
+          />
+        ) : (
+          <div
+            className="relative h-[430px] overflow-hidden select-none"
+            style={{
+              background: tilt.active
+                ? `radial-gradient(ellipse 85% 75% at ${tilt.gx}% ${tilt.gy}%, rgba(55,62,150,0.16) 0%, rgba(15,19,28,0.94) 55%, #080b12 100%)`
+                : 'radial-gradient(ellipse 80% 70% at 50% 48%, rgba(50,56,140,0.14) 0%, rgba(15,19,28,0.94) 55%, #080b12 100%)',
+              transition: tilt.active ? 'none' : 'background 600ms ease',
+            }}
+            aria-label="Connected tools map"
+          >
           {/* ── SVG layer: CONVERGING VECTOR TOPOLOGY SYSTEM ── */}
           <svg
             viewBox="0 0 620 420"
@@ -764,6 +776,7 @@ function OrbitalTopologyMap({
             ))}
           </AnimatePresence>
         </div>
+        )}
       </BrowserFrame>
     </TiltCard>
   );
