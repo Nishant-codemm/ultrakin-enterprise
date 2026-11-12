@@ -3,10 +3,11 @@ import { motion, useReducedMotion, useTime, useTransform } from 'framer-motion';
 import UltrakinLogo from '../primitives/UltrakinLogo';
 import { PRODUCT_ICON_CONFIG } from '../../data/integrationData';
 
-/* ─── Celestial Orbital Parameters for the 7 Built-In Satellites ─── */
+/* ─── Celestial Orbital Parameters ─── */
 const CENTER = { x: 310, y: 210 };
 
-const ORBITAL_CONFIGS = {
+/* Built-in satellites (7 nodes) */
+const BUILT_IN_ORBITAL_CONFIGS = {
   // Inner Orbital Ring α (Tau = 54s, Tilt: -14°)
   Mail: {
     ring: 1,
@@ -83,6 +84,83 @@ const ORBITAL_CONFIGS = {
     glow: 'rgba(139,92,246,0.5)',
   },
 };
+
+/* Extension example satellites (6 nodes across 3 orbital shells) */
+const EXTENSION_ORBITAL_CONFIGS = {
+  // Inner Shell α — Tilt: -18°, Tau: 58s
+  GitHub: {
+    ring: 1,
+    a: 138,
+    b: 60,
+    tilt: -18,
+    period: 58,
+    initialPhase: 255, // north quadrant
+    color: '#64748b',
+    glow: 'rgba(100,116,139,0.5)',
+  },
+  Journeys: {
+    ring: 1,
+    a: 138,
+    b: 60,
+    tilt: -18,
+    period: 58,
+    initialPhase: 75, // south quadrant
+    color: '#c026d3',
+    glow: 'rgba(192,38,211,0.5)',
+  },
+
+  // Mid Shell β — Tilt: +8°, Tau: 76s
+  Lists: {
+    ring: 2,
+    a: 208,
+    b: 90,
+    tilt: 8,
+    period: 76,
+    initialPhase: 182, // west quadrant
+    color: '#10b981',
+    glow: 'rgba(16,185,129,0.5)',
+  },
+  'MCP tools': {
+    ring: 2,
+    a: 208,
+    b: 90,
+    tilt: 8,
+    period: 76,
+    initialPhase: 2, // east quadrant
+    color: '#0284c7',
+    glow: 'rgba(2,132,199,0.5)',
+  },
+
+  // Outer Shell γ — Tilt: -26°, Tau: 96s
+  PostHog: {
+    ring: 3,
+    a: 268,
+    b: 116,
+    tilt: -26,
+    period: 96,
+    initialPhase: 42, // north-east
+    color: '#ea580c',
+    glow: 'rgba(234,88,12,0.5)',
+  },
+  Forms: {
+    ring: 3,
+    a: 268,
+    b: 116,
+    tilt: -26,
+    period: 96,
+    initialPhase: 215, // south-west
+    color: '#2563eb',
+    glow: 'rgba(37,99,235,0.5)',
+  },
+};
+
+/* Unified config selector */
+function getOrbitalConfig(itemName, selectedCat) {
+  if (selectedCat === 'Extension examples') {
+    return EXTENSION_ORBITAL_CONFIGS[itemName] || null;
+  }
+  return BUILT_IN_ORBITAL_CONFIGS[itemName] || null;
+}
 
 /* ─── Mathematical 3D-to-2D Coordinate Calculator ─── */
 function getOrbitalCoords(config, tSec) {
@@ -275,14 +353,21 @@ function OrbitalReactorMesh({
   setHoveredNode,
   setSelected,
   inView: _inView,
+  selectedCat,
 }) {
   const id = useId();
   const reduceMotion = useReducedMotion();
   const time = useTime();
 
   // Focus beam connects to hovered satellite if present, otherwise active/selected satellite
-  const targetNodeName = hoveredNode || current?.name || 'Spaces';
-  const targetConfig = ORBITAL_CONFIGS[targetNodeName];
+  const targetNodeName = hoveredNode || current?.name;
+  const targetConfig = targetNodeName ? getOrbitalConfig(targetNodeName, selectedCat) : null;
+
+  /* Per-category ring configuration */
+  const isExt = selectedCat === 'Extension examples';
+  const ring3 = isExt ? { tilt: -26, rx: 268, ry: 116, color1: 'rgba(234,88,12,', color2: 'rgba(234,88,12,', ticks: [0, 45, 90, 135, 180, 225, 270, 315] } : { tilt: -24, rx: 268, ry: 118, color1: 'rgba(56,189,248,', color2: 'rgba(56,189,248,', ticks: [0, 45, 90, 135, 180, 225, 270, 315] };
+  const ring2 = isExt ? { tilt: 8, rx: 208, ry: 90, color1: 'rgba(2,132,199,', color2: 'rgba(2,132,199,', ticks: [0, 60, 120, 180, 240, 300] } : { tilt: 12, rx: 208, ry: 92, color1: 'rgba(99,102,241,', color2: 'rgba(99,102,241,', ticks: [0, 60, 120, 180, 240, 300] };
+  const ring1 = isExt ? { tilt: -18, rx: 138, ry: 60, color1: 'rgba(192,38,211,', color2: 'rgba(192,38,211,', ticks: [0, 90, 180, 270] } : { tilt: -14, rx: 138, ry: 64, color1: 'rgba(244,63,94,', color2: 'rgba(244,63,94,', ticks: [0, 90, 180, 270] };
 
   return (
     <div className="relative h-[430px] w-full overflow-hidden select-none bg-[radial-gradient(ellipse_80%_75%_at_50%_50%,#111625_0%,#080b12_70%,#05070a_100%)]">
@@ -320,98 +405,60 @@ function OrbitalReactorMesh({
 
         {/* ── Layer 1: Celestial Sphere Grid & Latitude Reference Rails ── */}
         <g opacity="0.08" stroke="rgba(165,180,252,0.8)" strokeWidth="0.6">
-          {/* Central Polar Axis */}
           <line x1="310" y1="30" x2="310" y2="390" strokeDasharray="3 6" />
-          {/* Celestial Equatorial Baseline */}
           <line x1="60" y1="210" x2="560" y2="210" strokeDasharray="3 6" />
-          {/* Spherical Boundary Horizon */}
           <circle cx="310" cy="210" r="195" fill="none" strokeDasharray="2 8" />
         </g>
 
-        {/* ── Layer 2: 3 Inclined Orbital Rings with Precision Coordinate Ticks ── */}
-        {/* Ring 3: Outer Inclined Telemetry Orbit (Meetings, Calendar, Ukin Agent) */}
-        <g transform="rotate(-24 310 210)">
+        {/* ── Layer 2: 3 Inclined Orbital Rings ── */}
+
+        {/* Ring 3: Outer */}
+        <g transform={`rotate(${ring3.tilt} 310 210)`}>
           <ellipse
-            cx="310"
-            cy="210"
-            rx="268"
-            ry="118"
+            cx="310" cy="210" rx={ring3.rx} ry={ring3.ry}
             fill="none"
-            stroke={targetConfig?.ring === 3 ? 'rgba(56,189,248,0.45)' : 'rgba(56,189,248,0.2)'}
+            stroke={targetConfig?.ring === 3 ? `${ring3.color1}0.45)` : `${ring3.color1}0.2)`}
             strokeWidth={targetConfig?.ring === 3 ? '1.2' : '0.8'}
             className="transition-colors duration-300"
           />
-          {/* Telemetry Coordinate Ticks on Ring 3 */}
-          {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
+          {ring3.ticks.map((deg) => {
             const rad = (deg * Math.PI) / 180;
-            const tx = 310 + 268 * Math.cos(rad);
-            const ty = 210 + 118 * Math.sin(rad);
             return (
-              <circle
-                key={`r3-tick-${deg}`}
-                cx={tx}
-                cy={ty}
-                r="1"
-                fill="rgba(56,189,248,0.3)"
-              />
+              <circle key={`r3-${deg}`} cx={310 + ring3.rx * Math.cos(rad)} cy={210 + ring3.ry * Math.sin(rad)} r="1" fill={`${ring3.color1}0.3)`} />
             );
           })}
         </g>
 
-        {/* Ring 2: Mid Equatorial Operations Orbit (Spaces, Tasks) */}
-        <g transform="rotate(12 310 210)">
+        {/* Ring 2: Mid */}
+        <g transform={`rotate(${ring2.tilt} 310 210)`}>
           <ellipse
-            cx="310"
-            cy="210"
-            rx="208"
-            ry="92"
+            cx="310" cy="210" rx={ring2.rx} ry={ring2.ry}
             fill="none"
-            stroke={targetConfig?.ring === 2 ? 'rgba(99,102,241,0.48)' : 'rgba(99,102,241,0.22)'}
+            stroke={targetConfig?.ring === 2 ? `${ring2.color1}0.48)` : `${ring2.color1}0.22)`}
             strokeWidth={targetConfig?.ring === 2 ? '1.25' : '0.85'}
             className="transition-colors duration-300"
           />
-          {/* Telemetry Coordinate Ticks on Ring 2 */}
-          {[0, 60, 120, 180, 240, 300].map((deg) => {
+          {ring2.ticks.map((deg) => {
             const rad = (deg * Math.PI) / 180;
-            const tx = 310 + 208 * Math.cos(rad);
-            const ty = 210 + 92 * Math.sin(rad);
             return (
-              <circle
-                key={`r2-tick-${deg}`}
-                cx={tx}
-                cy={ty}
-                r="1.2"
-                fill="rgba(99,102,241,0.35)"
-              />
+              <circle key={`r2-${deg}`} cx={310 + ring2.rx * Math.cos(rad)} cy={210 + ring2.ry * Math.sin(rad)} r="1.2" fill={`${ring2.color1}0.35)`} />
             );
           })}
         </g>
 
-        {/* Ring 1: Inner Transverse Orbit (Mail, Docs) */}
-        <g transform="rotate(-14 310 210)">
+        {/* Ring 1: Inner */}
+        <g transform={`rotate(${ring1.tilt} 310 210)`}>
           <ellipse
-            cx="310"
-            cy="210"
-            rx="138"
-            ry="64"
+            cx="310" cy="210" rx={ring1.rx} ry={ring1.ry}
             fill="none"
-            stroke={targetConfig?.ring === 1 ? 'rgba(244,63,94,0.48)' : 'rgba(244,63,94,0.22)'}
+            stroke={targetConfig?.ring === 1 ? `${ring1.color1}0.48)` : `${ring1.color1}0.22)`}
             strokeWidth={targetConfig?.ring === 1 ? '1.25' : '0.85'}
             className="transition-colors duration-300"
           />
-          {/* Telemetry Coordinate Ticks on Ring 1 */}
-          {[0, 90, 180, 270].map((deg) => {
+          {ring1.ticks.map((deg) => {
             const rad = (deg * Math.PI) / 180;
-            const tx = 310 + 138 * Math.cos(rad);
-            const ty = 210 + 64 * Math.sin(rad);
             return (
-              <circle
-                key={`r1-tick-${deg}`}
-                cx={tx}
-                cy={ty}
-                r="1.2"
-                fill="rgba(244,63,94,0.35)"
-              />
+              <circle key={`r1-${deg}`} cx={310 + ring1.rx * Math.cos(rad)} cy={210 + ring1.ry * Math.sin(rad)} r="1.2" fill={`${ring1.color1}0.35)`} />
             );
           })}
         </g>
@@ -470,9 +517,9 @@ function OrbitalReactorMesh({
         </div>
       </div>
 
-      {/* ── LAYER 6: The 7 Floating Service Satellites ── */}
+      {/* ── LAYER 6: Floating Service Satellites ── */}
       {visible.map((item) => {
-        const config = ORBITAL_CONFIGS[item.name];
+        const config = getOrbitalConfig(item.name, selectedCat);
         if (!config) return null;
 
         return (
