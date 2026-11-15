@@ -29,6 +29,7 @@ import {
   Video,
   Workflow,
   X,
+  Zap,
   Menu,
 } from 'lucide-react';
 import UltrakinLogo from './primitives/UltrakinLogo';
@@ -86,6 +87,17 @@ const solutionGroups = [
     ],
   },
   {
+    label: 'Use cases',
+    items: [
+      { title: 'Incident triage & post-mortems', description: 'Correlate alerts to living briefs and on-call assignments.', icon: Zap, color: 'bg-[#f59e0b]', href: '/solutions/engineering' },
+      { title: 'Lead qualification & velocity', description: 'Qualify inbound enterprise leads with automated CRM sync.', icon: TrendingUp, color: 'bg-[#059669]', href: '/solutions/sales' },
+      { title: 'Cross-tool executive approvals', description: 'Approve PRs, invoices, and budget requests inside chat.', icon: CheckSquare, color: 'bg-[#10b981]', href: '/solutions/operations' },
+      { title: 'Autonomous knowledge routing', description: 'Keep context synced across mail, chat, docs, and tasks.', icon: Sparkles, color: 'bg-[#8b5cf6]', href: '/agents' },
+      { title: 'Client vaults & creative reviews', description: 'Confidential shared spaces with verified access logs.', icon: Palette, color: 'bg-[#0284c7]', href: '/solutions/agencies' },
+      { title: 'Class recordings & auto-notes', description: 'Live audio huddles with auto-generated transcripts and PDFs.', icon: GraduationCap, color: 'bg-[#3b82f6]', href: '/solutions/education' },
+    ],
+  },
+  {
     label: 'By industry',
     items: [
       { title: 'Agencies and studios', description: 'Run client projects and creative reviews in shared spaces.', icon: Palette, color: 'bg-[#0284c7]', href: '/solutions/agencies' },
@@ -99,25 +111,30 @@ const solutionGroups = [
 
 const resourceGroups = [
   {
-    label: 'Knowledge & Architecture',
+    label: 'Architecture & Platform',
     items: [
       { title: 'Resources & Knowledge Hub', description: 'Architectural whitepapers, guides, tutorials, and case studies.', icon: BookOpen, color: 'bg-[#2563eb]', href: '/resources' },
       { title: 'Core Workspace Engine', description: 'Explore the full connected enterprise workspace.', icon: UltrakinIcon, color: 'bg-brand/10 border border-brand/20', href: '#platform' },
       { title: 'How it works', description: 'Watch an incoming signal turn into completed work.', icon: Workflow, color: 'bg-[#c026d3]', href: '#workflows' },
       { title: 'Integrations Matrix', description: 'Connect GitHub, Slack, Jira, Figma, and linear tools.', icon: FolderOpen, color: 'bg-[#64748b]', href: '#integrations' },
-      { title: 'Living specs & Docs', description: 'Pages and living specifications written together.', icon: FileText, color: 'bg-[#2563eb]', href: '/products/docs' },
-      { title: 'AI Agents framework', description: 'Autonomous agent jobs with clear enterprise bounds.', icon: Bot, color: 'bg-[#6366f1]', href: '/agents' },
     ],
   },
   {
-    label: 'Trust & Evaluation',
+    label: 'Enterprise Trust',
     items: [
       { title: 'Security & Compliance', description: 'SOC 2 Type II, GDPR, AES-256 encryption & audit logs.', icon: ShieldCheck, color: 'bg-[#059669]', href: '/security' },
       { title: 'SOC 2 Type II Report', description: 'Auditor verification and continuous compliance posture.', icon: ShieldCheck, color: 'bg-[#059669]', href: '/soc2' },
       { title: 'Transparent Pricing', description: 'Per-seat plans with clear enterprise licensing terms.', icon: CheckSquare, color: 'bg-[#d97706]', href: '/pricing' },
-      { title: 'Enterprise Consultation', description: 'Schedule an architecture review or security debrief.', icon: FileText, color: 'bg-[#2563eb]', action: 'openDemoDrawer' },
       { title: 'Authorized Subprocessors', description: 'Third-party infrastructure and sub-processors list.', icon: Layers, color: 'bg-[#475569]', href: '/subprocessors' },
-      { title: 'FAQ & System Details', description: 'Detailed specs on security, permissions, and offline state.', icon: HelpCircle, color: 'bg-[#475569]', href: '#faq' },
+    ],
+  },
+  {
+    label: 'Guides & Specs',
+    items: [
+      { title: 'Living Specs & Docs', description: 'Pages and living specifications written together.', icon: FileText, color: 'bg-[#2563eb]', href: '/products/docs' },
+      { title: 'AI Agents Framework', description: 'Autonomous agent jobs with clear enterprise bounds.', icon: Bot, color: 'bg-[#6366f1]', href: '/agents' },
+      { title: 'MCP Connectors & API', description: 'Connect external models, tools, and databases with MCP.', icon: FolderOpen, color: 'bg-[#0284c7]', href: '/products/connectors' },
+      { title: 'FAQ & System Specs', description: 'Detailed specs on security, permissions, and offline state.', icon: HelpCircle, color: 'bg-[#475569]', href: '#faq' },
     ],
   },
 ];
@@ -580,13 +597,24 @@ export default function Navbar() {
           >
             {openMenu === 'Solutions' ? (
               <div>
-                <div className="grid grid-cols-[1fr_1fr_310px] gap-8 p-7">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-7">
                   <div>
                     <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
                       By team
                     </p>
-                    <div className="space-y-1">
+                    <div className="space-y-0.5">
                       {solutionGroups[0].items.map((item) => (
+                        <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
+                      Use cases
+                    </p>
+                    <div className="space-y-0.5">
+                      {solutionGroups[1].items.map((item) => (
                         <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
                       ))}
                     </div>
@@ -596,36 +624,10 @@ export default function Navbar() {
                     <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
                       By industry
                     </p>
-                    <div className="space-y-1">
-                      {solutionGroups[1].items.map((item) => (
+                    <div className="space-y-0.5">
+                      {solutionGroups[2].items.map((item) => (
                         <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
                       ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="rounded-xl border border-border/80 bg-surface-soft/40 p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-                      <h4 className="text-[13.5px] font-semibold text-ink">Templates</h4>
-                      <p className="mt-1 text-[12px] leading-relaxed text-ink-muted">
-                        Start from an automation or agent other teams already use.
-                      </p>
-                      <div className="mt-4 space-y-2.5 border-t border-border/60 pt-3">
-                        {[
-                          { title: 'Website lead → qualified deal', href: '/products/templates' },
-                          { title: 'Inbound mail → support request', href: '/products/templates' },
-                          { title: 'New hire onboarding', href: '/products/templates' },
-                        ].map((tmpl) => (
-                          <button
-                            key={tmpl.title}
-                            type="button"
-                            onClick={() => selectItem({ href: tmpl.href })}
-                            className="group flex w-full items-center justify-between py-1 text-left text-[12.5px] font-medium text-ink transition-colors hover:text-brand cursor-pointer"
-                          >
-                            <span>{tmpl.title}</span>
-                            <ArrowRight size={12} className="opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0 text-brand shrink-0" />
-                          </button>
-                        ))}
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -637,7 +639,7 @@ export default function Navbar() {
                       onClick={() => { setOpenMenu(null); scrollToSection('faq'); }}
                       className="font-medium hover:text-ink transition-colors cursor-pointer"
                     >
-                      Guides
+                      Guides & FAQ
                     </button>
                     <span className="text-border">·</span>
                     <button
@@ -663,12 +665,12 @@ export default function Navbar() {
               </div>
             ) : openMenu === 'Resources' ? (
               <div>
-                <div className="grid grid-cols-[1fr_1fr_310px] gap-8 p-7">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-7">
                   <div>
                     <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
-                      Knowledge & Architecture
+                      Architecture & Platform
                     </p>
-                    <div className="space-y-1">
+                    <div className="space-y-0.5">
                       {resourceGroups[0].items.map((item) => (
                         <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
                       ))}
@@ -677,9 +679,9 @@ export default function Navbar() {
 
                   <div>
                     <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
-                      Trust & Evaluation
+                      Enterprise Trust
                     </p>
-                    <div className="space-y-1">
+                    <div className="space-y-0.5">
                       {resourceGroups[1].items.map((item) => (
                         <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
                       ))}
@@ -687,28 +689,13 @@ export default function Navbar() {
                   </div>
 
                   <div>
-                    <div className="rounded-xl border border-border/80 bg-surface-soft/40 p-5 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
-                      <h4 className="text-[13.5px] font-semibold text-ink">Architecture & Guides</h4>
-                      <p className="mt-1 text-[12px] leading-relaxed text-ink-muted">
-                        Deep architecture whitepapers, MCP tutorials, and case studies.
-                      </p>
-                      <div className="mt-4 space-y-2.5 border-t border-border/60 pt-3">
-                        {[
-                          { title: 'MCP Connectors & API Reference', href: '/products/connectors' },
-                          { title: 'Hybrid VPC & Security Whitepaper', href: '/security' },
-                          { title: 'Enterprise Migration Playbooks', href: '/resources' },
-                        ].map((guide) => (
-                          <button
-                            key={guide.title}
-                            type="button"
-                            onClick={() => selectItem({ href: guide.href })}
-                            className="group flex w-full items-center justify-between py-1 text-left text-[12.5px] font-medium text-ink transition-colors hover:text-brand cursor-pointer"
-                          >
-                            <span>{guide.title}</span>
-                            <ArrowRight size={12} className="opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0 text-brand shrink-0" />
-                          </button>
-                        ))}
-                      </div>
+                    <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-ink-subtle">
+                      Guides & Specs
+                    </p>
+                    <div className="space-y-0.5">
+                      {resourceGroups[2].items.map((item) => (
+                        <SolutionMenuItem key={item.title} item={item} onSelect={selectItem} />
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -720,7 +707,7 @@ export default function Navbar() {
                       onClick={() => { setOpenMenu(null); scrollToSection('faq'); }}
                       className="font-medium hover:text-ink transition-colors cursor-pointer"
                     >
-                      Guides & FAQ
+                      Documentation & Whitepapers
                     </button>
                     <span className="text-border">·</span>
                     <button
@@ -728,7 +715,7 @@ export default function Navbar() {
                       onClick={() => { setOpenMenu(null); openDemoDrawer(); }}
                       className="font-medium hover:text-ink transition-colors cursor-pointer"
                     >
-                      Talk to us
+                      Enterprise Consultation
                     </button>
                   </div>
                   <button
