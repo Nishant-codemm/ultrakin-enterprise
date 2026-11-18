@@ -23,30 +23,29 @@ export default function HeroThreadsView() {
     setActiveChannel,
     huddleTranscript,
     setActiveModule,
+    sendMessage,
   } = useWorkspace();
 
   const channel = channels.find((item) => item.id === activeChannel) || channels[0];
-  const [reactions, setReactions] = useState({
-    msg_1: { thumbs: 3, rocket: 2, reacted: false },
-    msg_2: { thumbs: 4, rocket: 1, reacted: true },
-    ukin: { thumbs: 5, rocket: 4, reacted: true },
+  const [userReactions, setUserReactions] = useState({
+    msg_2_thumbs: true,
   });
   const [filterQuery, setFilterQuery] = useState('');
   const [replyText, setReplyText] = useState('');
 
-  const toggleReaction = (id, type) => {
-    setReactions((prev) => {
-      const current = prev[id] || { thumbs: 0, rocket: 0, reacted: false };
-      const isReacted = current.reacted;
-      return {
-        ...prev,
-        [id]: {
-          ...current,
-          [type]: isReacted ? Math.max(0, current[type] - 1) : current[type] + 1,
-          reacted: !isReacted,
-        },
-      };
-    });
+  const toggleReaction = (msgId, type) => {
+    const key = `${msgId}_${type}`;
+    setUserReactions((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const handleSendReply = () => {
+    const trimmed = replyText.trim();
+    if (!trimmed) return;
+    sendMessage(trimmed, activeChannel);
+    setReplyText('');
   };
 
   const filteredChannels = channels.filter(
@@ -161,7 +160,18 @@ export default function HeroThreadsView() {
           {/* Messages scroll river */}
           <div className="mt-4 flex-1 space-y-3.5 overflow-y-auto">
             {activeMessages.map((message) => {
-              const msgReactions = reactions[message.id] || { thumbs: 2, rocket: 1, reacted: false };
+              const baseThumbs =
+                message.reactions?.['👍'] ??
+                (message.id === 'msg_1' ? 3 : message.id === 'msg_2' ? 3 : 0);
+              const isThumbsReacted = Boolean(userReactions[`${message.id}_thumbs`]);
+              const thumbsCount = baseThumbs + (isThumbsReacted ? 1 : 0);
+
+              const baseRocket =
+                message.reactions?.['🚀'] ??
+                (message.id === 'msg_1' ? 2 : message.id === 'msg_2' ? 1 : 0);
+              const isRocketReacted = Boolean(userReactions[`${message.id}_rocket`]);
+              const rocketCount = baseRocket + (isRocketReacted ? 1 : 0);
+
               return (
                 <article
                   key={message.id}
@@ -188,22 +198,27 @@ export default function HeroThreadsView() {
                         type="button"
                         onClick={() => toggleReaction(message.id, 'thumbs')}
                         className={cn(
-                          'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9.5px] font-medium transition-all cursor-pointer',
-                          msgReactions.reacted
+                          'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9.5px] font-medium transition-all cursor-pointer select-none',
+                          isThumbsReacted
                             ? 'border-indigo-400/40 bg-indigo-500/15 text-indigo-200'
                             : 'border-white/10 bg-white/[0.03] text-obsidian-muted hover:text-slate-200',
                         )}
                       >
                         <ThumbsUp className="h-2.5 w-2.5" />
-                        <span>{msgReactions.thumbs}</span>
+                        <span>{thumbsCount}</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => toggleReaction(message.id, 'rocket')}
-                        className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[9.5px] font-medium text-obsidian-muted hover:text-slate-200 transition-all cursor-pointer"
+                        className={cn(
+                          'inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9.5px] font-medium transition-all cursor-pointer select-none',
+                          isRocketReacted
+                            ? 'border-indigo-400/40 bg-indigo-500/15 text-indigo-200'
+                            : 'border-white/10 bg-white/[0.03] text-obsidian-muted hover:text-slate-200',
+                        )}
                       >
                         <Rocket className="h-2.5 w-2.5" />
-                        <span>{msgReactions.rocket}</span>
+                        <span>{rocketCount}</span>
                       </button>
                     </div>
                   </div>
@@ -262,6 +277,12 @@ export default function HeroThreadsView() {
                 type="text"
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
+                onKeyDown={(e) => {
+                  if ((e.key === 'Enter' && (e.metaKey || e.ctrlKey)) || (e.key === 'Enter' && !e.shiftKey)) {
+                    e.preventDefault();
+                    handleSendReply();
+                  }
+                }}
                 placeholder={`Reply in #${channel.name}… (Markdown supported)`}
                 className="flex-1 bg-transparent text-xs text-slate-200 placeholder:text-obsidian-muted/60 focus:outline-none"
               />
@@ -270,9 +291,7 @@ export default function HeroThreadsView() {
               </span>
               <button
                 type="button"
-                onClick={() => {
-                  if (replyText.trim()) setReplyText('');
-                }}
+                onClick={handleSendReply}
                 aria-label="Send reply"
                 className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-white transition-colors hover:bg-indigo-500 cursor-pointer"
               >
