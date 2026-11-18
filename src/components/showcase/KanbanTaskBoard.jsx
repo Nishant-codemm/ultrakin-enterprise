@@ -25,6 +25,13 @@ const COLUMNS = [
   { id: 'done', title: 'Done', dot: 'bg-emerald-400' },
 ];
 
+function getTaskCol(task) {
+  if (!task) return 'backlog';
+  if (task.col) return task.col;
+  if (task.column === 'in-progress') return 'in_progress';
+  return task.column || 'backlog';
+}
+
 export default function KanbanTaskBoard() {
   const {
     kanbanTasks,
@@ -115,7 +122,7 @@ export default function KanbanTaskBoard() {
   // Keyboard navigation & move helpers
   const moveColumnStep = (task, direction) => {
     const colOrder = ['backlog', 'in_progress', 'review', 'done'];
-    const currIdx = colOrder.indexOf(task.col);
+    const currIdx = colOrder.indexOf(getTaskCol(task));
     const targetIdx = direction === 'next' ? currIdx + 1 : currIdx - 1;
     if (targetIdx >= 0 && targetIdx < colOrder.length) {
       moveKanbanTask(task.id, colOrder[targetIdx]);
@@ -245,7 +252,7 @@ export default function KanbanTaskBoard() {
 
       <div className="flex-1 overflow-x-auto p-4 flex gap-4 min-h-[500px]">
         {COLUMNS.map((col) => {
-          const colTasks = filteredTasks.filter((t) => t.col === col.id);
+          const colTasks = filteredTasks.filter((t) => getTaskCol(t) === col.id);
           const isOver = dragOverCol === col.id;
 
           return (
@@ -492,7 +499,7 @@ export default function KanbanTaskBoard() {
                       onClick={() => moveKanbanTask(selectedKanbanTask.id, c.id)}
                       className={cn(
                         'px-2 py-0.5 rounded-md text-[10px] font-mono transition-colors cursor-pointer active:scale-95',
-                        selectedKanbanTask.col === c.id
+                        getTaskCol(selectedKanbanTask) === c.id
                           ? 'bg-sky-600 text-white font-medium'
                           : 'bg-white/[0.04] text-slate-400 hover:text-white'
                       )}

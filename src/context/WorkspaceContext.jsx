@@ -726,13 +726,21 @@ export function WorkspaceProvider({ children }) {
     ];
     const newTasks = actionItems.map((item, idx) => ({
       id: `tsk_evt_${Date.now()}_${idx}`,
+      col: 'in_progress',
       title: item.text.replace(/^@[a-zA-Z]+:\s*/, ''),
-      column: 'in-progress',
-      priority: 'P1',
-      assignee: item.assignee || 'Sara Chen',
+      description: `Action item extracted from ${event.title} discussion and transcript.`,
       source: `Event: ${event.title}`,
       sourceType: 'event',
       sourceId: event.id,
+      priority: 'P1',
+      time: 'Just now',
+      assignee: item.assignee || 'Sara Chen',
+      assigneeAvatar: (item.assignee || 'Sara Chen')
+        .split(' ')
+        .map((p) => p[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase(),
       subtasks: [
         { id: 'st_1', text: 'Review meeting transcript and agenda', done: true },
         { id: 'st_2', text: 'Implement required architectural change', done: false },
@@ -741,7 +749,7 @@ export function WorkspaceProvider({ children }) {
         {
           time: 'Just now',
           actor: 'Ukin AI Agent',
-          action: `Extracted action item from Huddle transcript`,
+          action: `Extracted action item from ${event.title}`,
         },
       ],
     }));
