@@ -163,7 +163,20 @@ export default function HeroThreadsView() {
               </h2>
               <p className="mt-0.5 text-xs text-obsidian-muted">{channel.topic}</p>
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center -space-x-1.5" title="Sara Chen and Alex Mercer are viewing this channel">
+                <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500/30 border border-obsidian-surface text-[8.5px] font-semibold text-indigo-200">
+                  SC
+                  <span className="absolute -bottom-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-emerald-400 border border-obsidian-canvas" />
+                </span>
+                <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-sky-500/30 border border-obsidian-surface text-[8.5px] font-semibold text-sky-200">
+                  AM
+                  <span className="absolute -bottom-0.5 -right-0.5 h-1.5 w-1.5 rounded-full bg-emerald-400 border border-obsidian-canvas" />
+                </span>
+              </div>
+              <span className="hidden sm:inline font-mono text-[10px] text-obsidian-muted">
+                2 viewing
+              </span>
               <span className="flex h-5 items-center gap-1 rounded-md border border-emerald-400/20 bg-emerald-400/10 px-2 font-mono text-[9px] text-emerald-200">
                 <CheckCircle2 className="h-2.5 w-2.5" /> Context Retained
               </span>
@@ -282,6 +295,13 @@ export default function HeroThreadsView() {
 
           {/* Quick reply bar dock */}
           <div className="mt-4 border-t border-obsidian-border pt-3">
+            <div className="mb-1.5 flex items-center justify-between px-1">
+              <span className="flex items-center gap-1.5 font-mono text-[9.5px] text-slate-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Sara Chen is active in #{channel.name}</span>
+              </span>
+              <span className="font-mono text-[9px] text-obsidian-muted">End-to-end encrypted</span>
+            </div>
             <div className="flex items-center gap-2 rounded-xl border border-obsidian-border bg-obsidian-base/60 p-2 focus-within:border-indigo-400/40">
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-obsidian-muted hover:text-slate-200 cursor-pointer">
                 <Paperclip className="h-3.5 w-3.5" />

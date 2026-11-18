@@ -553,14 +553,16 @@ export function WorkspaceProvider({ children }) {
 
   // Toasts / Telemetry Feed
   const [toasts, setToasts] = useState([]);
+  const [lastSyncedAt, setLastSyncedAt] = useState('Just now');
 
-  const addToast = useCallback((title, desc, type = 'info') => {
+  const addToast = useCallback((title, desc, type = 'info', options = {}) => {
     toastSeq = (toastSeq + 1) % 1000000;
     const id = `t_${Date.now()}_${toastSeq}_${Math.random().toString(36).slice(2, 6)}`;
-    setToasts((prev) => [...prev, { id, title, desc, type }]);
+    const action = options?.action;
+    setToasts((prev) => [...prev, { id, title, desc, type, action }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 4000);
+    }, 4500);
   }, []);
 
   // Real-time Client Network Connectivity State Machine
@@ -586,14 +588,22 @@ export function WorkspaceProvider({ children }) {
   }, [addToast]);
 
   const moveKanbanTask = useCallback((taskId, targetCol) => {
-    const audit = {
-      time: 'Just now',
-      actor: 'Sara Chen (You)',
-      action: `Shifted column to [${targetCol.toUpperCase()}]`,
-    };
+    let previousCol = null;
 
-    setKanbanTasks((prev) =>
-      prev.map((t) => {
+    setKanbanTasks((prev) => {
+      const existing = prev.find((t) => t.id === taskId);
+      if (existing) {
+        previousCol = existing.col;
+      }
+      if (previousCol === targetCol) return prev;
+
+      const audit = {
+        time: 'Just now',
+        actor: 'Sara Chen (You)',
+        action: `Shifted column to [${targetCol.toUpperCase()}]`,
+      };
+
+      return prev.map((t) => {
         if (t.id === taskId) {
           return {
             ...t,
@@ -602,11 +612,16 @@ export function WorkspaceProvider({ children }) {
           };
         }
         return t;
-      })
-    );
+      });
+    });
 
     setSelectedKanbanTask((prev) => {
       if (prev && prev.id === taskId) {
+        const audit = {
+          time: 'Just now',
+          actor: 'Sara Chen (You)',
+          action: `Shifted column to [${targetCol.toUpperCase()}]`,
+        };
         return {
           ...prev,
           col: targetCol,
@@ -616,7 +631,35 @@ export function WorkspaceProvider({ children }) {
       return prev;
     });
 
-    addToast('Task updated', `Moved to ${targetCol.replace('_', ' ').toUpperCase()} in the sample workspace.`, 'success');
+    setLastSyncedAt('Just now');
+
+    if (previousCol && previousCol !== targetCol) {
+      addToast(
+        'Task updated',
+        `Moved #${taskId} to [${targetCol.replace('_', ' ').toUpperCase()}].`,
+        'success',
+        {
+          action: {
+            label: 'Undo',
+            onClick: () => {
+              setKanbanTasks((current) =>
+                current.map((t) => (t.id === taskId ? { ...t, col: previousCol } : t))
+              );
+              setSelectedKanbanTask((curr) =>
+                curr && curr.id === taskId ? { ...curr, col: previousCol } : curr
+              );
+              addToast(
+                'Move undone',
+                `Restored #${taskId} to [${previousCol.replace('_', ' ').toUpperCase()}].`,
+                'info'
+              );
+            },
+          },
+        }
+      );
+    } else {
+      addToast('Task updated', `Moved to ${targetCol.replace('_', ' ').toUpperCase()} in the sample workspace.`, 'success');
+    }
   }, [addToast]);
 
   const updateKanbanTask = useCallback((taskId, updates) => {
@@ -1370,6 +1413,8 @@ export function WorkspaceProvider({ children }) {
     testAutomationsWorkflow,
     toasts,
     addToast,
+    lastSyncedAt,
+    setLastSyncedAt,
     isDemoDrawerOpen,
     openDemoDrawer,
     closeDemoDrawer,
@@ -1458,6 +1503,8 @@ export function WorkspaceProvider({ children }) {
     testAutomationsWorkflow,
     toasts,
     addToast,
+    lastSyncedAt,
+    setLastSyncedAt,
     isDemoDrawerOpen,
     openDemoDrawer,
     closeDemoDrawer,

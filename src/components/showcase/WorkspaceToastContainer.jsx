@@ -79,6 +79,18 @@ function ToastItem({ toast, onDismiss }) {
       <div className="flex-1 min-w-0 pr-1">
         <div className="font-semibold text-white">{toast.title}</div>
         <div className="text-[11px] text-slate-300 mt-0.5 leading-snug">{toast.desc}</div>
+        {toast.action && (
+          <button
+            type="button"
+            onClick={() => {
+              toast.action.onClick?.();
+              onDismiss(toast.id);
+            }}
+            className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-indigo-300 hover:text-white font-mono text-[10px] font-semibold transition-colors cursor-pointer"
+          >
+            {toast.action.label || 'Undo'}
+          </button>
+        )}
       </div>
 
       <button

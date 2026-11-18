@@ -69,6 +69,8 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
     openSearchPalette,
     setIsKeyboardModalOpen,
     isOnline = true,
+    lastSyncedAt = 'Just now',
+    toasts = [],
   } = useWorkspace();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -135,6 +137,11 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
         className,
       )}
     >
+      {/* Accessible live status announcement region */}
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {toasts.length > 0 ? toasts[toasts.length - 1]?.title : `Active module: ${activeModule}`}
+      </div>
+
       {/* ── Workspace Application Command Bar ── */}
       <div className="h-11 px-3 sm:px-4 bg-obsidian-surface/95 border-b border-obsidian-border flex items-center justify-between select-none relative z-30 backdrop-blur-md">
         {/* Left: Organization & Active Context Breadcrumb */}
@@ -241,22 +248,37 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
 
         {/* Right: Real-time Presence & Sync Status */}
         <div className="flex items-center gap-3 shrink-0">
-          <div className="hidden md:flex items-center -space-x-1.5" title="Active in workspace">
-            <span className="w-5 h-5 rounded-full bg-indigo-500/30 border border-obsidian-surface text-[9px] font-semibold text-indigo-200 flex items-center justify-center">
+          <div className="hidden md:flex items-center -space-x-1.5" title="Active collaborators in workspace">
+            <span
+              className="relative w-5 h-5 rounded-full bg-indigo-500/30 border border-obsidian-surface text-[9px] font-semibold text-indigo-200 flex items-center justify-center cursor-default"
+              title={`Sara Chen · Active in ${activeModule}`}
+            >
               SC
+              <span className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-emerald-400 border border-obsidian-canvas" />
             </span>
-            <span className="w-5 h-5 rounded-full bg-emerald-500/30 border border-obsidian-surface text-[9px] font-semibold text-emerald-200 flex items-center justify-center">
+            <span
+              className="relative w-5 h-5 rounded-full bg-emerald-500/30 border border-obsidian-surface text-[9px] font-semibold text-emerald-200 flex items-center justify-center cursor-default"
+              title="Elena Rostova · Idle 4m"
+            >
               EL
+              <span className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-amber-400 border border-obsidian-canvas" />
             </span>
-            <span className="w-5 h-5 rounded-full bg-violet-500/30 border border-obsidian-surface text-[9px] font-semibold text-violet-200 flex items-center justify-center">
+            <span
+              className="relative w-5 h-5 rounded-full bg-violet-500/30 border border-obsidian-surface text-[9px] font-semibold text-violet-200 flex items-center justify-center cursor-default"
+              title="Ukin Agent · Real-time pipeline active"
+            >
               UK
+              <span className="absolute -bottom-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-violet-400 border border-obsidian-canvas animate-pulse" />
             </span>
           </div>
           <span className="hidden md:inline h-3 w-px bg-white/10" aria-hidden="true" />
           {isOnline ? (
-            <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5" title="Live real-time sync active">
+            <span
+              className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5"
+              title={`Live real-time sync active · Synced ${lastSyncedAt}`}
+            >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span className="hidden lg:inline text-[10.5px]">3 agents synced</span>
+              <span className="hidden lg:inline text-[10.5px]">3 agents synced · {lastSyncedAt}</span>
             </span>
           ) : (
             <span
