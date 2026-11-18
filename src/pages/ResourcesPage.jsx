@@ -252,7 +252,7 @@ export default function ResourcesPage() {
 
                 <div className="flex flex-col items-start lg:items-end justify-between self-stretch shrink-0 pt-2 lg:pt-0">
                   <div className="rounded-xl border border-indigo-500/20 bg-indigo-950/5 p-4 text-[11px] font-mono text-indigo-950 max-w-xs space-y-1 hidden sm:block">
-                    <p className="text-indigo-600 font-semibold">// Architecture Invariant</p>
+                    <p className="text-indigo-600 font-semibold">{"// Architecture Invariant"}</p>
                     <p className="text-slate-600 text-[10.5px]">
                       RFC-822 email parser + WebRTC audio mesh + CRDT distributed task journal.
                     </p>

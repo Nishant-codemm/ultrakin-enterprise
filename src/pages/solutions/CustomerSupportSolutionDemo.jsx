@@ -106,7 +106,7 @@ export default function CustomerSupportSolutionDemo() {
 
   // Scroll to bottom of container when messages update without scrolling window
   useEffect(() => {
-    if (messagesEndRef.current?.parentElement) {
+    if (messages && messagesEndRef.current?.parentElement) {
       messagesEndRef.current.parentElement.scrollTop = messagesEndRef.current.parentElement.scrollHeight;
     }
   }, [messages]);

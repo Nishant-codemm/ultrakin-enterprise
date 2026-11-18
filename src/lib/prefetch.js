@@ -31,11 +31,8 @@ export function prefetch(factory, key) {
 
   const promise = Promise.resolve()
     .then(() => factory())
-    .catch((err) => {
-      // In production, suppress offline or network errors during speculative prefetch
-      if (process.env.NODE_ENV !== 'production') {
-        console.debug('[Prefetch] Silently handled speculative prefetch rejection:', err?.message || err);
-      }
+    .catch(() => {
+      // Suppress speculative prefetch rejection (e.g. offline or abort)
       return null;
     });
 

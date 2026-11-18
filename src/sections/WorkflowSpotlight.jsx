@@ -391,7 +391,7 @@ function WorkflowSpotlight() {
 
     frameId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frameId);
-  }, [inView, reduceMotion, isPaused, isHovered, activeStageIdx]);
+  }, [inView, reduceMotion, isPaused, isHovered]);
 
   const currentStage = STAGE_CONTENT[activeStageIdx] || STAGE_CONTENT[0];
   const SourceIcon = currentStage.sourceIcon;

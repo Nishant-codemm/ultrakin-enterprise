@@ -136,7 +136,7 @@ function MatrixChatEngine() {
     } else if (isNewMessage) {
       setShowNewMessagesPill(true);
     }
-  }, [activeMessages, activeChannel, isAgentTyping]);
+  }, [activeMessages, activeChannel]);
 
   const channelSuggestions = useMemo(() => {
     switch (activeChannel) {
