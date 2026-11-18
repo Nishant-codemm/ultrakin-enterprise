@@ -473,7 +473,33 @@ export function WorkspaceProvider({ children }) {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
-  const [activeChannel, setActiveChannel] = useState('general-arch');
+  const [activeChannel, setActiveChannelState] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = window.sessionStorage?.getItem('ultrakin_active_channel');
+        if (saved && INITIAL_CHANNELS.some((c) => c.id === saved)) {
+          return saved;
+        }
+      } catch {
+        // Safe fallback
+      }
+    }
+    return 'general-arch';
+  });
+
+  const setActiveChannel = useCallback((channelOrFn) => {
+    setActiveChannelState((prev) => {
+      const next = typeof channelOrFn === 'function' ? channelOrFn(prev) : channelOrFn;
+      if (typeof window !== 'undefined') {
+        try {
+          window.sessionStorage?.setItem('ultrakin_active_channel', next);
+        } catch {
+          // Safe fallback
+        }
+      }
+      return next;
+    });
+  }, []);
 
   // Enterprise Demo & Sales Drawer State (Week 5 Deliverable)
   const [isDemoDrawerOpen, setIsDemoDrawerOpen] = useState(false);
@@ -1123,7 +1149,7 @@ export function WorkspaceProvider({ children }) {
     }));
 
     addToast('Message linked', `Added the email context to #${channelId} in the sample workspace.`, 'info');
-  }, [addToast, setActiveModule]);
+  }, [addToast, setActiveModule, setActiveChannel]);
 
   const addDocComment = useCallback((nodeId, text) => {
     if (!text?.trim()) return;
@@ -1159,6 +1185,17 @@ export function WorkspaceProvider({ children }) {
   const activeEmail = useMemo(() => {
     return emails.find((e) => e.id === activeEmailId) || emails[0];
   }, [emails, activeEmailId]);
+
+  const unreadEmailCount = useMemo(() => {
+    return emails.filter((e) => e.unread).length;
+  }, [emails]);
+
+  const selectEmail = useCallback((emailId) => {
+    setActiveEmailId(emailId);
+    setEmails((prev) =>
+      prev.map((em) => (em.id === emailId && em.unread ? { ...em, unread: false } : em))
+    );
+  }, []);
 
   // Sprint Week 7: Universal ⌘K Command Palette & Keyboard Shortcuts
   const [isSearchPaletteOpen, setIsSearchPaletteOpen] = useState(false);
@@ -1268,7 +1305,8 @@ export function WorkspaceProvider({ children }) {
     approveProposal,
     emails,
     activeEmail,
-    setActiveEmailId,
+    setActiveEmailId: selectEmail,
+    unreadEmailCount,
     convertEmailToTask,
     sendEmailReply,
     composeNewEmail,
@@ -1351,6 +1389,7 @@ export function WorkspaceProvider({ children }) {
     activeModule,
     setActiveModule,
     activeChannel,
+    setActiveChannel,
     channels,
     activeMessages,
     sendMessage,
@@ -1359,6 +1398,8 @@ export function WorkspaceProvider({ children }) {
     approveProposal,
     emails,
     activeEmail,
+    selectEmail,
+    unreadEmailCount,
     convertEmailToTask,
     sendEmailReply,
     composeNewEmail,

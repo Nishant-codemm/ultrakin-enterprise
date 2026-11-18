@@ -1,4 +1,5 @@
 import React, { Suspense, lazy, useState, useEffect, useRef } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   Activity,
   AtSign,
@@ -74,6 +75,27 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [orgMenuOpen, setOrgMenuOpen] = useState(false);
   const [userStatus, setUserStatus] = useState('online');
+
+  const reduceMotion = useReducedMotion();
+  const [visitedModules, setVisitedModules] = useState(() => [activeModule]);
+  if (!visitedModules.includes(activeModule)) {
+    setVisitedModules((prev) => (prev.includes(activeModule) ? prev : [...prev, activeModule]));
+  }
+
+  const mainCanvasRef = useRef(null);
+  const prevModuleRef = useRef(activeModule);
+
+  useEffect(() => {
+    if (prevModuleRef.current !== activeModule) {
+      prevModuleRef.current = activeModule;
+      if (
+        mainCanvasRef.current &&
+        !['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)
+      ) {
+        mainCanvasRef.current.focus({ preventScroll: true });
+      }
+    }
+  }, [activeModule]);
 
   const orgMenuRef = useRef(null);
   const profileMenuRef = useRef(null);
@@ -277,7 +299,11 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
       </div>
 
       {/* ── Compact Mobile Module Switcher Bar (< md only: Realism & Full Mobile Touch Affordance) ── */}
-      <div className="flex md:hidden items-center gap-1.5 px-3 py-2 bg-obsidian-surface border-b border-obsidian-border overflow-x-auto select-none scrollbar-none">
+      <div
+        role="tablist"
+        aria-label="Mobile workspace modules"
+        className="flex md:hidden items-center gap-1.5 px-3 py-2 bg-obsidian-surface border-b border-obsidian-border overflow-x-auto select-none scrollbar-none"
+      >
         {[
           { id: 'chat', label: 'Chat', icon: MessageSquare },
           { id: 'threads', label: 'Threads', icon: AtSign },
@@ -294,18 +320,30 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
           return (
             <button
               key={item.id}
+              role="tab"
+              id={`mobile-tab-${item.id}`}
+              aria-selected={isActive}
+              aria-controls={`module-panel-${item.id}`}
               type="button"
               onClick={() => setActiveModule(item.id)}
               onMouseEnter={() => MODULE_PREFETCH_MAP[item.id] && prefetch(MODULE_PREFETCH_MAP[item.id])}
               onFocus={() => MODULE_PREFETCH_MAP[item.id] && prefetch(MODULE_PREFETCH_MAP[item.id])}
               onTouchStart={() => MODULE_PREFETCH_MAP[item.id] && prefetch(MODULE_PREFETCH_MAP[item.id])}
               className={cn(
-                'flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all shrink-0 cursor-pointer',
+                'relative flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-colors shrink-0 cursor-pointer',
                 isActive
-                  ? 'bg-indigo-600 text-white shadow-xs font-semibold'
-                  : 'bg-white/[0.04] text-slate-400 hover:text-slate-200 hover:bg-white/[0.08]'
+                  ? 'text-white font-semibold'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
               )}
             >
+              {isActive && (
+                <motion.span
+                  layoutId="activeMobileModulePill"
+                  className="absolute inset-0 rounded-lg bg-indigo-600 shadow-xs -z-10"
+                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                  aria-hidden="true"
+                />
+              )}
               <Icon className="w-3.5 h-3.5" />
               <span>{item.label}</span>
               {item.badge != null && item.badge > 0 && (
@@ -338,213 +376,278 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
           <div className="w-7 h-[1px] bg-white/10 my-1" />
 
           {/* Module Quick Switchers (Linear/Slack Craftsmanship: Restrained, Pixel-Aligned) */}
-          <button
-            type="button"
-            onClick={() => setActiveModule('chat')}
-            className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
-              activeModule === 'chat'
-                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
-            )}
-            title="Spaces Chat (⌘1)"
-            aria-label="Spaces Chat"
-          >
-            {activeModule === 'chat' && (
-              <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                aria-hidden="true"
-              />
-            )}
-            <MessageSquare className="w-5 h-5" />
-          </button>
+          <nav role="tablist" aria-label="Workspace modules" className="flex flex-col items-center gap-2 w-full">
+            <button
+              type="button"
+              role="tab"
+              id="module-tab-chat"
+              aria-selected={activeModule === 'chat'}
+              aria-controls="module-panel-chat"
+              tabIndex={activeModule === 'chat' ? 0 : -1}
+              onClick={() => setActiveModule('chat')}
+              className={cn(
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                activeModule === 'chat'
+                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
+              )}
+              title="Spaces Chat (⌘1)"
+              aria-label="Spaces Chat"
+            >
+              {activeModule === 'chat' && (
+                <motion.span
+                  layoutId="activeModuleIndicator"
+                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                  aria-hidden="true"
+                />
+              )}
+              <MessageSquare className="w-5 h-5" />
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveModule('threads')}
-            className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
-              activeModule === 'threads'
-                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
-            )}
-            title="Threads (⌘2)"
-            aria-label="Threads"
-          >
-            {activeModule === 'threads' && (
-              <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                aria-hidden="true"
-              />
-            )}
-            <AtSign className="w-5 h-5" />
-          </button>
+            <button
+              type="button"
+              role="tab"
+              id="module-tab-threads"
+              aria-selected={activeModule === 'threads'}
+              aria-controls="module-panel-threads"
+              tabIndex={activeModule === 'threads' ? 0 : -1}
+              onClick={() => setActiveModule('threads')}
+              className={cn(
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                activeModule === 'threads'
+                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
+              )}
+              title="Threads (⌘2)"
+              aria-label="Threads"
+            >
+              {activeModule === 'threads' && (
+                <motion.span
+                  layoutId="activeModuleIndicator"
+                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                  aria-hidden="true"
+                />
+              )}
+              <AtSign className="w-5 h-5" />
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveModule('mail')}
-            onMouseEnter={() => prefetch(loadMail)}
-            onFocus={() => prefetch(loadMail)}
-            className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
-              activeModule === 'mail'
-                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
-            )}
-            title="Custom Domain Email (⌘3)"
-            aria-label="Custom Domain Email"
-          >
-            {activeModule === 'mail' && (
-              <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                aria-hidden="true"
-              />
-            )}
-            <Mail className="w-5 h-5" />
-            {unreadEmailCount > 0 && (
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-sky-400" />
-            )}
-          </button>
+            <button
+              type="button"
+              role="tab"
+              id="module-tab-mail"
+              aria-selected={activeModule === 'mail'}
+              aria-controls="module-panel-mail"
+              tabIndex={activeModule === 'mail' ? 0 : -1}
+              onClick={() => setActiveModule('mail')}
+              onMouseEnter={() => prefetch(loadMail)}
+              onFocus={() => prefetch(loadMail)}
+              className={cn(
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                activeModule === 'mail'
+                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
+              )}
+              title="Custom Domain Email (⌘3)"
+              aria-label="Custom Domain Email"
+            >
+              {activeModule === 'mail' && (
+                <motion.span
+                  layoutId="activeModuleIndicator"
+                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                  aria-hidden="true"
+                />
+              )}
+              <Mail className="w-5 h-5" />
+              {unreadEmailCount > 0 && (
+                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-sky-400" />
+              )}
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveModule('docs')}
-            onMouseEnter={() => prefetch(loadDocs)}
-            onFocus={() => prefetch(loadDocs)}
-            className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
-              activeModule === 'docs'
-                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
-            )}
-            title="TipTap Living Docs (⌘4)"
-            aria-label="TipTap Living Docs"
-          >
-            {activeModule === 'docs' && (
-              <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                aria-hidden="true"
-              />
-            )}
-            <FileText className="w-5 h-5" />
-          </button>
+            <button
+              type="button"
+              role="tab"
+              id="module-tab-docs"
+              aria-selected={activeModule === 'docs'}
+              aria-controls="module-panel-docs"
+              tabIndex={activeModule === 'docs' ? 0 : -1}
+              onClick={() => setActiveModule('docs')}
+              onMouseEnter={() => prefetch(loadDocs)}
+              onFocus={() => prefetch(loadDocs)}
+              className={cn(
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                activeModule === 'docs'
+                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
+              )}
+              title="TipTap Living Docs (⌘4)"
+              aria-label="TipTap Living Docs"
+            >
+              {activeModule === 'docs' && (
+                <motion.span
+                  layoutId="activeModuleIndicator"
+                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                  aria-hidden="true"
+                />
+              )}
+              <FileText className="w-5 h-5" />
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveModule('calendar')}
-            onMouseEnter={() => prefetch(loadCalendar)}
-            onFocus={() => prefetch(loadCalendar)}
-            className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
-              activeModule === 'calendar'
-                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
-            )}
-            title="Team Calendar & Events (⌘5)"
-            aria-label="Team Calendar & Events"
-          >
-            {activeModule === 'calendar' && (
-              <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                aria-hidden="true"
-              />
-            )}
-            <CalendarIcon className="w-5 h-5" />
-          </button>
+            <button
+              type="button"
+              role="tab"
+              id="module-tab-calendar"
+              aria-selected={activeModule === 'calendar'}
+              aria-controls="module-panel-calendar"
+              tabIndex={activeModule === 'calendar' ? 0 : -1}
+              onClick={() => setActiveModule('calendar')}
+              onMouseEnter={() => prefetch(loadCalendar)}
+              onFocus={() => prefetch(loadCalendar)}
+              className={cn(
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                activeModule === 'calendar'
+                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
+              )}
+              title="Team Calendar & Events (⌘5)"
+              aria-label="Team Calendar & Events"
+            >
+              {activeModule === 'calendar' && (
+                <motion.span
+                  layoutId="activeModuleIndicator"
+                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                  aria-hidden="true"
+                />
+              )}
+              <CalendarIcon className="w-5 h-5" />
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveModule('huddle')}
-            onMouseEnter={() => prefetch(loadHuddle)}
-            onFocus={() => prefetch(loadHuddle)}
-            className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
-              activeModule === 'huddle'
-                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
-            )}
-            title="Huddle Video Chamber (⌘6)"
-            aria-label="Huddle"
-          >
-            {activeModule === 'huddle' && (
-              <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                aria-hidden="true"
-              />
-            )}
-            <Video className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-400" />
-          </button>
+            <button
+              type="button"
+              role="tab"
+              id="module-tab-huddle"
+              aria-selected={activeModule === 'huddle'}
+              aria-controls="module-panel-huddle"
+              tabIndex={activeModule === 'huddle' ? 0 : -1}
+              onClick={() => setActiveModule('huddle')}
+              onMouseEnter={() => prefetch(loadHuddle)}
+              onFocus={() => prefetch(loadHuddle)}
+              className={cn(
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                activeModule === 'huddle'
+                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
+              )}
+              title="Huddle Video Chamber (⌘6)"
+              aria-label="Huddle"
+            >
+              {activeModule === 'huddle' && (
+                <motion.span
+                  layoutId="activeModuleIndicator"
+                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                  aria-hidden="true"
+                />
+              )}
+              <Video className="w-5 h-5" />
+              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-400" />
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveModule('tasks')}
-            onMouseEnter={() => prefetch(loadTasks)}
-            onFocus={() => prefetch(loadTasks)}
-            className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
-              activeModule === 'tasks'
-                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
-            )}
-            title="Tasks & Sprint Board (⌘7)"
-            aria-label="Tasks Kanban Board"
-          >
-            {activeModule === 'tasks' && (
-              <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                aria-hidden="true"
-              />
-            )}
-            <CheckSquare className="w-5 h-5" />
-            {kanbanTasks.length > 0 && (
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-400" />
-            )}
-          </button>
+            <button
+              type="button"
+              role="tab"
+              id="module-tab-tasks"
+              aria-selected={activeModule === 'tasks'}
+              aria-controls="module-panel-tasks"
+              tabIndex={activeModule === 'tasks' ? 0 : -1}
+              onClick={() => setActiveModule('tasks')}
+              onMouseEnter={() => prefetch(loadTasks)}
+              onFocus={() => prefetch(loadTasks)}
+              className={cn(
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                activeModule === 'tasks'
+                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
+              )}
+              title="Tasks & Sprint Board (⌘7)"
+              aria-label="Tasks Kanban Board"
+            >
+              {activeModule === 'tasks' && (
+                <motion.span
+                  layoutId="activeModuleIndicator"
+                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                  aria-hidden="true"
+                />
+              )}
+              <CheckSquare className="w-5 h-5" />
+              {kanbanTasks.length > 0 && (
+                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-amber-400" />
+              )}
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveModule('files')}
-            className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
-              activeModule === 'files'
-                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
-            )}
-            title="Files & Evidence (⌘8)"
-            aria-label="Files"
-          >
-            {activeModule === 'files' && (
-              <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                aria-hidden="true"
-              />
-            )}
-            <FolderOpen className="w-5 h-5" />
-          </button>
+            <button
+              type="button"
+              role="tab"
+              id="module-tab-files"
+              aria-selected={activeModule === 'files'}
+              aria-controls="module-panel-files"
+              tabIndex={activeModule === 'files' ? 0 : -1}
+              onClick={() => setActiveModule('files')}
+              className={cn(
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                activeModule === 'files'
+                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
+              )}
+              title="Files & Evidence (⌘8)"
+              aria-label="Files"
+            >
+              {activeModule === 'files' && (
+                <motion.span
+                  layoutId="activeModuleIndicator"
+                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                  aria-hidden="true"
+                />
+              )}
+              <FolderOpen className="w-5 h-5" />
+            </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveModule('automations')}
-            onMouseEnter={() => prefetch(loadAutomations)}
-            onFocus={() => prefetch(loadAutomations)}
-            className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
-              activeModule === 'automations'
-                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
-            )}
-            title="Workflow Automations & Agents (⌘9)"
-            aria-label="Automations and Agents"
-          >
-            {activeModule === 'automations' && (
-              <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                aria-hidden="true"
-              />
-            )}
-            <GitBranch className="w-5 h-5" />
-          </button>
+            <button
+              type="button"
+              role="tab"
+              id="module-tab-automations"
+              aria-selected={activeModule === 'automations'}
+              aria-controls="module-panel-automations"
+              tabIndex={activeModule === 'automations' ? 0 : -1}
+              onClick={() => setActiveModule('automations')}
+              onMouseEnter={() => prefetch(loadAutomations)}
+              onFocus={() => prefetch(loadAutomations)}
+              className={cn(
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                activeModule === 'automations'
+                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
+              )}
+              title="Workflow Automations & Agents (⌘9)"
+              aria-label="Automations and Agents"
+            >
+              {activeModule === 'automations' && (
+                <motion.span
+                  layoutId="activeModuleIndicator"
+                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                  aria-hidden="true"
+                />
+              )}
+              <GitBranch className="w-5 h-5" />
+            </button>
+          </nav>
 
           {/* User Profile Avatar with Floating Settings Menu */}
           <div ref={profileMenuRef} className="mt-auto relative flex flex-col items-center">
@@ -886,18 +989,131 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
         </div>
 
         {/* 3. Main Multi-Mode Interactive Canvas (Engines) */}
-        <div className="flex flex-col bg-obsidian-base min-h-[580px] flex-1 min-h-0 overflow-hidden relative">
+        <div
+          ref={mainCanvasRef}
+          tabIndex={-1}
+          aria-label={`Workspace ${activeModule.charAt(0).toUpperCase() + activeModule.slice(1)} view`}
+          className="flex flex-col bg-obsidian-base min-h-[580px] flex-1 min-h-0 overflow-hidden relative outline-none"
+        >
           <ErrorBoundary name={activeModule.charAt(0).toUpperCase() + activeModule.slice(1)}>
             <Suspense fallback={<WorkspaceModuleSkeleton />}>
-              {activeModule === 'chat' && <MatrixChatEngine />}
-              {activeModule === 'threads' && <HeroThreadsView />}
-              {activeModule === 'mail' && <DomainMailboxEngine />}
-              {activeModule === 'docs' && <LivingDocEditor />}
-              {activeModule === 'files' && <HeroFilesView />}
-              {activeModule === 'calendar' && <CalendarEngine />}
-              {activeModule === 'huddle' && <HuddleSimulator />}
-              {activeModule === 'tasks' && <KanbanTaskBoard />}
-              {activeModule === 'automations' && <VisualAutomationsCanvas />}
+              {visitedModules.includes('chat') && (
+                <div
+                  role="tabpanel"
+                  id="module-panel-chat"
+                  aria-labelledby="module-tab-chat"
+                  className={cn(
+                    'h-full w-full flex flex-col flex-1 min-h-0 overflow-hidden',
+                    activeModule !== 'chat' && 'hidden'
+                  )}
+                >
+                  <MatrixChatEngine />
+                </div>
+              )}
+              {visitedModules.includes('threads') && (
+                <div
+                  role="tabpanel"
+                  id="module-panel-threads"
+                  aria-labelledby="module-tab-threads"
+                  className={cn(
+                    'h-full w-full flex flex-col flex-1 min-h-0 overflow-hidden',
+                    activeModule !== 'threads' && 'hidden'
+                  )}
+                >
+                  <HeroThreadsView />
+                </div>
+              )}
+              {visitedModules.includes('mail') && (
+                <div
+                  role="tabpanel"
+                  id="module-panel-mail"
+                  aria-labelledby="module-tab-mail"
+                  className={cn(
+                    'h-full w-full flex flex-col flex-1 min-h-0 overflow-hidden',
+                    activeModule !== 'mail' && 'hidden'
+                  )}
+                >
+                  <DomainMailboxEngine />
+                </div>
+              )}
+              {visitedModules.includes('docs') && (
+                <div
+                  role="tabpanel"
+                  id="module-panel-docs"
+                  aria-labelledby="module-tab-docs"
+                  className={cn(
+                    'h-full w-full flex flex-col flex-1 min-h-0 overflow-hidden',
+                    activeModule !== 'docs' && 'hidden'
+                  )}
+                >
+                  <LivingDocEditor />
+                </div>
+              )}
+              {visitedModules.includes('calendar') && (
+                <div
+                  role="tabpanel"
+                  id="module-panel-calendar"
+                  aria-labelledby="module-tab-calendar"
+                  className={cn(
+                    'h-full w-full flex flex-col flex-1 min-h-0 overflow-hidden',
+                    activeModule !== 'calendar' && 'hidden'
+                  )}
+                >
+                  <CalendarEngine />
+                </div>
+              )}
+              {visitedModules.includes('huddle') && (
+                <div
+                  role="tabpanel"
+                  id="module-panel-huddle"
+                  aria-labelledby="module-tab-huddle"
+                  className={cn(
+                    'h-full w-full flex flex-col flex-1 min-h-0 overflow-hidden',
+                    activeModule !== 'huddle' && 'hidden'
+                  )}
+                >
+                  <HuddleSimulator />
+                </div>
+              )}
+              {visitedModules.includes('tasks') && (
+                <div
+                  role="tabpanel"
+                  id="module-panel-tasks"
+                  aria-labelledby="module-tab-tasks"
+                  className={cn(
+                    'h-full w-full flex flex-col flex-1 min-h-0 overflow-hidden',
+                    activeModule !== 'tasks' && 'hidden'
+                  )}
+                >
+                  <KanbanTaskBoard />
+                </div>
+              )}
+              {visitedModules.includes('files') && (
+                <div
+                  role="tabpanel"
+                  id="module-panel-files"
+                  aria-labelledby="module-tab-files"
+                  className={cn(
+                    'h-full w-full flex flex-col flex-1 min-h-0 overflow-hidden',
+                    activeModule !== 'files' && 'hidden'
+                  )}
+                >
+                  <HeroFilesView />
+                </div>
+              )}
+              {visitedModules.includes('automations') && (
+                <div
+                  role="tabpanel"
+                  id="module-panel-automations"
+                  aria-labelledby="module-tab-automations"
+                  className={cn(
+                    'h-full w-full flex flex-col flex-1 min-h-0 overflow-hidden',
+                    activeModule !== 'automations' && 'hidden'
+                  )}
+                >
+                  <VisualAutomationsCanvas />
+                </div>
+              )}
             </Suspense>
           </ErrorBoundary>
         </div>

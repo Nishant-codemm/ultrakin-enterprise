@@ -100,36 +100,49 @@ export default function HeroThreadsView() {
           </div>
 
           <div className="space-y-0.5 overflow-y-auto">
-            {filteredChannels.map((item) => {
-              const isSelected = activeChannel === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setActiveChannel(item.id)}
-                  aria-current={isSelected ? 'page' : undefined}
-                  className={cn(
-                    'group relative w-full rounded-lg px-2.5 py-2 text-left transition-all cursor-pointer',
-                    FOCUS_RING_OBSIDIAN,
-                    isSelected
-                      ? 'bg-indigo-500/15 border-l-2 border-indigo-400 text-indigo-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
-                      : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-200',
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="block truncate text-xs font-medium">
-                      #{item.name.replaceAll('-', ' ')}
-                    </span>
-                    {isSelected && (
-                      <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
+            {filteredChannels.length > 0 ? (
+              filteredChannels.map((item) => {
+                const isSelected = activeChannel === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setActiveChannel(item.id)}
+                    aria-current={isSelected ? 'page' : undefined}
+                    className={cn(
+                      'group relative w-full rounded-lg px-2.5 py-2 text-left transition-all cursor-pointer',
+                      FOCUS_RING_OBSIDIAN,
+                      isSelected
+                        ? 'bg-indigo-500/15 border-l-2 border-indigo-400 text-indigo-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
+                        : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-200',
                     )}
-                  </div>
-                  <span className="mt-0.5 block truncate text-[10px] text-obsidian-muted">
-                    {item.topic}
-                  </span>
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="block truncate text-xs font-medium">
+                        #{item.name.replaceAll('-', ' ')}
+                      </span>
+                      {isSelected && (
+                        <span className="h-1.5 w-1.5 rounded-full bg-indigo-400" />
+                      )}
+                    </div>
+                    <span className="mt-0.5 block truncate text-[10px] text-obsidian-muted">
+                      {item.topic}
+                    </span>
+                  </button>
+                );
+              })
+            ) : (
+              <div className="px-3 py-6 text-center text-xs text-obsidian-muted space-y-2">
+                <p>No threads matching &ldquo;{filterQuery}&rdquo;</p>
+                <button
+                  type="button"
+                  onClick={() => setFilterQuery('')}
+                  className="text-indigo-400 hover:underline text-[11px] font-mono cursor-pointer"
+                >
+                  Clear filter
                 </button>
-              );
-            })}
+              </div>
+            )}
           </div>
         </aside>
 

@@ -15,6 +15,8 @@ import {
   Keyboard,
   Shield,
   Calendar,
+  AtSign,
+  FolderOpen,
 } from 'lucide-react';
 import { useWorkspace } from '../context/useWorkspace';
 import { cn } from '../lib/cn';
@@ -51,10 +53,54 @@ export default function CommandPaletteModal() {
     () => [
       // Commands
       {
+        id: 'cmd_chat',
+        type: 'command',
+        category: 'Commands',
+        title: 'Open Spaces Chat (⌘1)',
+        subtitle: 'Real-time multi-agent communication and Ukin assistant channel',
+        icon: MessageSquare,
+        action: () => setActiveModule('chat'),
+        badge: 'Chat',
+        badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+      },
+      {
+        id: 'cmd_threads',
+        type: 'command',
+        category: 'Commands',
+        title: 'Open Incident Threads (⌘2)',
+        subtitle: 'Focused discussions and incident resolution threads',
+        icon: AtSign,
+        action: () => setActiveModule('threads'),
+        badge: 'Threads',
+        badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+      },
+      {
+        id: 'cmd_mail',
+        type: 'command',
+        category: 'Commands',
+        title: 'Compose Domain Email (⌘3)',
+        subtitle: 'Draft a message in the sample workspace',
+        icon: Mail,
+        action: () => setActiveModule('mail'),
+        badge: 'Action',
+        badgeColor: 'bg-sky-50 text-sky-800 border-sky-200',
+      },
+      {
+        id: 'cmd_docs',
+        type: 'command',
+        category: 'Commands',
+        title: 'Open Living Docs (⌘4)',
+        subtitle: 'TipTap collaborative documents, architecture specs, and RFCs',
+        icon: FileText,
+        action: () => setActiveModule('docs'),
+        badge: 'Docs',
+        badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      },
+      {
         id: 'cmd_calendar',
         type: 'command',
         category: 'Commands',
-        title: 'Open Team Calendar & Schedule',
+        title: 'Open Team Calendar & Schedule (⌘5)',
         subtitle: 'View multi-timezone calendar and upcoming architecture sessions',
         icon: Calendar,
         action: () => setActiveModule('calendar'),
@@ -65,35 +111,35 @@ export default function CommandPaletteModal() {
         id: 'cmd_huddle',
         type: 'command',
         category: 'Commands',
-        title: 'Start WebRTC Huddle',
+        title: 'Start WebRTC Huddle (⌘6)',
         subtitle: 'Start a Huddle and capture discussion notes',
         icon: Video,
         action: () => setActiveModule('huddle'),
         badge: 'Action',
         badgeColor: 'bg-violet-50 text-violet-800 border-violet-200',
       },
-    {
-      id: 'cmd_task',
-      type: 'command',
-      category: 'Commands',
-      title: 'Create Kanban Task',
-      subtitle: 'Spawn a ticket in Sprint 24 pipeline',
-      icon: CheckSquare,
-      action: () => setActiveModule('tasks'),
-      badge: 'Action',
-      badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
-    },
-    {
-      id: 'cmd_mail',
-      type: 'command',
-      category: 'Commands',
-      title: 'Compose Domain Email',
-      subtitle: 'Draft a message in the sample workspace',
-      icon: Mail,
-      action: () => setActiveModule('mail'),
-      badge: 'Action',
-      badgeColor: 'bg-sky-50 text-sky-800 border-sky-200',
-    },
+      {
+        id: 'cmd_task',
+        type: 'command',
+        category: 'Commands',
+        title: 'Create Kanban Task (⌘7)',
+        subtitle: 'Spawn a ticket in Sprint 24 pipeline',
+        icon: CheckSquare,
+        action: () => setActiveModule('tasks'),
+        badge: 'Action',
+        badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+      },
+      {
+        id: 'cmd_files',
+        type: 'command',
+        category: 'Commands',
+        title: 'Browse Files & Evidence (⌘8)',
+        subtitle: 'Explore uploaded audit specifications, hashes, and compliance evidence',
+        icon: FolderOpen,
+        action: () => setActiveModule('files'),
+        badge: 'Files',
+        badgeColor: 'bg-slate-50 text-slate-800 border-slate-200',
+      },
     {
       id: 'cmd_dag',
       type: 'command',
@@ -472,8 +518,54 @@ export default function CommandPaletteModal() {
                 );
               })
             ) : (
-              <div role="status" aria-live="polite" className="p-8 text-center text-xs text-ink-muted">
-                No matching workspace records or commands found for "{query}".
+              <div role="status" aria-live="polite" className="p-6 text-center">
+                <div className="mx-auto w-9 h-9 rounded-full bg-surface-soft border border-border flex items-center justify-center text-ink-subtle mb-3">
+                  <Search className="w-4 h-4" />
+                </div>
+                <p className="text-sm font-semibold text-ink">No matching records for &ldquo;{query}&rdquo;</p>
+                <p className="mt-1 text-xs text-ink-muted max-w-sm mx-auto">
+                  Try searching by module, channel, or use one of the quick actions below:
+                </p>
+                <div className="mt-4 flex flex-col gap-2 max-w-md mx-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveModule('chat');
+                      closeSearchPalette();
+                    }}
+                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-surface-soft hover:bg-surface-hover border border-border text-xs text-ink transition-colors cursor-pointer text-left"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Sparkles className="w-3.5 h-3.5 text-brand-text" />
+                      <span>Ask Ukin AI in Spaces Chat</span>
+                    </span>
+                    <span className="text-[10px] font-mono text-ink-subtle">⌘1</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveModule('tasks');
+                      closeSearchPalette();
+                    }}
+                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-surface-soft hover:bg-surface-hover border border-border text-xs text-ink transition-colors cursor-pointer text-left"
+                  >
+                    <span className="flex items-center gap-2">
+                      <CheckSquare className="w-3.5 h-3.5 text-amber-500" />
+                      <span>Create Task in Sprint Board</span>
+                    </span>
+                    <span className="text-[10px] font-mono text-ink-subtle">⌘7</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuery('');
+                      inputRef.current?.focus();
+                    }}
+                    className="text-[11px] text-brand-text hover:underline mt-1 font-medium cursor-pointer"
+                  >
+                    Clear search query
+                  </button>
+                </div>
               </div>
             )}
           </div>

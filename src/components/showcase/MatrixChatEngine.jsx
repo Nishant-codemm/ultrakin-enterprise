@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   Send,
   Shield,
@@ -137,6 +137,35 @@ export default function MatrixChatEngine() {
       setShowNewMessagesPill(true);
     }
   }, [activeMessages, activeChannel, isAgentTyping]);
+
+  const channelSuggestions = useMemo(() => {
+    switch (activeChannel) {
+      case 'client-escalations':
+        return [
+          { label: '@ukin check VIP SLA status', text: '@ukin check VIP client SLA status on EU cluster' },
+          { label: '/task triage customer ticket', text: '/task create P1 triage ticket for client escalations' },
+          { label: 'Notify on-call lead', text: 'Paging on-call lead for urgent customer escalation review.' },
+        ];
+      case 'incident-war-room':
+        return [
+          { label: '@ukin run latency check', text: '@ukin run cluster latency diagnostic' },
+          { label: '/task create hotfix', text: '/task create hotfix PR #1042 deployment' },
+          { label: 'Ping on Huddle', text: 'Can someone ping Sara on the Huddle call?' },
+        ];
+      case 'product-architecture':
+        return [
+          { label: '@ukin summarize RFC-891', text: '@ukin summarize RFC-891 status and architectural decisions' },
+          { label: '/task link spec to sprint', text: '/task link RFC-891 architectural checklist to Sprint 24' },
+          { label: 'Export to Living Docs', text: 'Documenting consensus decisions to Living Docs.' },
+        ];
+      default:
+        return [
+          { label: '@ukin status overview', text: '@ukin status overview across all active workspace channels' },
+          { label: '/task view sprint backlog', text: '/task show Sprint 24 roadmap and blocker items' },
+          { label: 'Start team sync', text: 'Starting quick sync on the team huddle chamber.' },
+        ];
+    }
+  }, [activeChannel]);
 
   return (
     <div className="flex flex-col h-full bg-obsidian-canvas text-slate-200">
@@ -503,27 +532,16 @@ export default function MatrixChatEngine() {
         <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider flex-shrink-0">
           Suggestions:
         </span>
-        <button
-          type="button"
-          onClick={() => sendMessage('@ukin run cluster latency diagnostic')}
-          className="px-2.5 py-0.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] hover:text-white text-slate-300 border border-white/[0.08] text-[11px] flex-shrink-0 transition-colors cursor-pointer"
-        >
-          @ukin run latency check
-        </button>
-        <button
-          type="button"
-          onClick={() => sendMessage('/task create hotfix PR #1042 deployment')}
-          className="px-2.5 py-0.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] hover:text-white text-slate-300 border border-white/[0.08] text-[11px] flex-shrink-0 transition-colors cursor-pointer"
-        >
-          /task create hotfix
-        </button>
-        <button
-          type="button"
-          onClick={() => sendMessage('Can someone ping Sara on the Huddle call?')}
-          className="px-2.5 py-0.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] hover:text-white text-slate-300 border border-white/[0.08] text-[11px] flex-shrink-0 transition-colors cursor-pointer"
-        >
-          Ping on Huddle
-        </button>
+        {channelSuggestions.map((sug) => (
+          <button
+            key={sug.label}
+            type="button"
+            onClick={() => sendMessage(sug.text)}
+            className="px-2.5 py-0.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] hover:text-white text-slate-300 border border-white/[0.08] text-[11px] flex-shrink-0 transition-colors cursor-pointer"
+          >
+            {sug.label}
+          </button>
+        ))}
       </div>
 
       {/* Message Input Box */}
