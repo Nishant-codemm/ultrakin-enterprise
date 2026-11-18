@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight, Sparkles } from 'lucide-react';
 import { cn } from '../lib/cn';
@@ -8,7 +8,7 @@ import { CATEGORIES, INTEGRATIONS, PRODUCT_ICON_CONFIG } from '../data/integrati
 import OrbitalTopologyMap from '../components/showcase/OrbitalTopologyMap';
 import IntegrationSurfacePreview from '../components/showcase/IntegrationSurfacePreview';
 
-export default function IntegrationsSection() {
+function IntegrationsSection() {
   const [selectedCat, setSelectedCat] = useState('Built in');
   const [selected, setSelected] = useState('Spaces');
   const [hoveredNode, setHoveredNode] = useState(null);
@@ -166,3 +166,5 @@ export default function IntegrationsSection() {
     </section>
   );
 }
+
+export default memo(IntegrationsSection);

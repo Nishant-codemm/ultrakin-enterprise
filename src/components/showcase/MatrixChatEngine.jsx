@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo, memo } from 'react';
 import {
   Send,
   Shield,
@@ -18,7 +18,7 @@ import { cn } from '../../lib/cn';
 
 const QUICK_EMOJIS = ['👍', '🚀', '❤️', '👀'];
 
-export default function MatrixChatEngine() {
+function MatrixChatEngine() {
   const {
     activeChannel,
     channels,
@@ -610,3 +610,5 @@ export default function MatrixChatEngine() {
     </div>
   );
 }
+
+export default memo(MatrixChatEngine);

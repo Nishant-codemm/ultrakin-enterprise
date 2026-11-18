@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, FileCheck2, Globe, KeyRound, Lock, MapPinned, Plus, Server, ShieldCheck } from 'lucide-react';
 import { cn } from '../lib/cn';
@@ -28,19 +28,21 @@ const TOPICS = [
   },
 ];
 
-export default function SecuritySection() {
+const COMPLIANCE_BADGES = [
+  { icon: ShieldCheck, label: 'SOC 2 Type II' },
+  { icon: KeyRound, label: 'SSO / SAML' },
+  { icon: Globe, label: 'GDPR Ready' },
+  { icon: Lock, label: 'AES-256 Encryption' },
+  { icon: FileCheck2, label: 'Audit Logs' },
+  { icon: Server, label: 'Data Residency' },
+];
+
+function SecuritySection() {
   const [active, setActive] = useState('assurance');
   const [sectionRef, inView] = useReveal({ threshold: 0.12 });
   const reduceMotion = useReducedMotion();
 
-  const complianceBadges = [
-    { icon: ShieldCheck, label: 'SOC 2 Type II' },
-    { icon: KeyRound, label: 'SSO / SAML' },
-    { icon: Globe, label: 'GDPR Ready' },
-    { icon: Lock, label: 'AES-256 Encryption' },
-    { icon: FileCheck2, label: 'Audit Logs' },
-    { icon: Server, label: 'Data Residency' },
-  ];
+  const complianceBadges = COMPLIANCE_BADGES;
 
   return (
     <section ref={sectionRef} id="security" className="divider-hairline relative overflow-hidden bg-transparent py-20 text-ink md:py-28">
@@ -185,3 +187,5 @@ export default function SecuritySection() {
     </section>
   );
 }
+
+export default memo(SecuritySection);

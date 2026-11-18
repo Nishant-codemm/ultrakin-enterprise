@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useReveal } from '../lib/useReveal';
 import { getSectionHeaderMotion } from '../lib/motion';
@@ -126,7 +126,7 @@ const BRAND_LOGOS = [
   { id: 'helix', component: HelixLabsWordmark },
 ];
 
-export default function TrustStrip() {
+function TrustStrip() {
   const [sectionRef, inView] = useReveal({ threshold: 0.15 });
   const reduceMotion = useReducedMotion();
 
@@ -209,3 +209,5 @@ export default function TrustStrip() {
     </section>
   );
 }
+
+export default memo(TrustStrip);

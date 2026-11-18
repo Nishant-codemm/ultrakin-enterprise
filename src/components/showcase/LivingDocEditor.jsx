@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
 import {
   FileText,
   CheckCircle2,
@@ -21,7 +21,7 @@ import {
 import { useWorkspace } from '../../context/useWorkspace';
 import { cn } from '../../lib/cn';
 
-export default function LivingDocEditor() {
+function LivingDocEditor() {
   const {
     docChecklists,
     toggleChecklist,
@@ -776,3 +776,5 @@ export default function LivingDocEditor() {
     </div>
   );
 }
+
+export default memo(LivingDocEditor);

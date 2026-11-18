@@ -225,7 +225,7 @@ const SolutionMenuItem = memo(function SolutionMenuItem({ item, onSelect }) {
   );
 });
 
-export default function Navbar() {
+function Navbar() {
   const {
     setActiveModule,
     isHeroVisible,
@@ -868,3 +868,5 @@ export default function Navbar() {
     </nav>
   );
 }
+
+export default memo(Navbar);

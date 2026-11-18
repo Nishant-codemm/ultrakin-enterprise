@@ -1,4 +1,4 @@
-import React, { useId, useState } from 'react';
+import React, { useId, useState, memo } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
@@ -126,7 +126,7 @@ const FAQS = [
   },
 ];
 
-export default function FAQSection() {
+function FAQSection() {
   const [openIdx, setOpenIdx] = useState(0); // First question open by default for immediate context
   const [selectedCategory, setSelectedCategory] = useState('all');
   const baseId = useId();
@@ -310,3 +310,5 @@ export default function FAQSection() {
     </section>
   );
 }
+
+export default memo(FAQSection);

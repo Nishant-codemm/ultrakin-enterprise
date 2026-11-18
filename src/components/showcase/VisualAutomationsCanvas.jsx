@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import {
   GitBranch,
   Play,
@@ -48,7 +48,7 @@ function getNodeHeaderColor(type) {
   return NODE_HEADER_COLORS[type] || 'bg-slate-500/15 border-slate-500/30 text-slate-300';
 }
 
-export default function VisualAutomationsCanvas() {
+function VisualAutomationsCanvas() {
   const {
     automationsWorkflows,
     activeWorkflowId,
@@ -409,3 +409,5 @@ export default function VisualAutomationsCanvas() {
     </div>
   );
 }
+
+export default memo(VisualAutomationsCanvas);

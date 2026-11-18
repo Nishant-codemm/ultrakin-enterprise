@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { memo } from 'react';
 import UltrakinLogo from '../components/primitives/UltrakinLogo';
 import { ArrowUpRight, ShieldCheck } from 'lucide-react';
 import { navigate } from '../lib/navigate';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
-export default function Footer() {
+function Footer() {
   return (
     <footer className="divider-hairline bg-transparent py-14 text-ink-muted sm:py-16">
       <div className="mx-auto max-w-7xl px-5 lg:px-8">
@@ -231,3 +231,5 @@ export default function Footer() {
     </footer>
   );
 }
+
+export default memo(Footer);

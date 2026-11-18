@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { ArrowRight, Calendar, Lock, ShieldCheck, Sparkles } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useReveal } from '../lib/useReveal';
@@ -6,7 +6,7 @@ import { getSectionHeaderMotion } from '../lib/motion';
 import { useWorkspace } from '../context/useWorkspace';
 import { navigate } from '../lib/navigate';
 
-export default function CTASection() {
+function CTASection() {
   const [sectionRef, inView] = useReveal({ threshold: 0.12 });
   const reduceMotion = useReducedMotion();
   const { openDemoDrawer } = useWorkspace();
@@ -80,3 +80,5 @@ export default function CTASection() {
     </section>
   );
 }
+
+export default memo(CTASection);

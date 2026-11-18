@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, memo } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
@@ -254,7 +254,7 @@ function BoundariesView() {
   );
 }
 
-export default function PlatformLensSection() {
+function PlatformLensSection() {
   const [active, setActive] = useState('memory');
   const tabRefs = useRef([]);
   const [sectionRef, inView] = useReveal({ threshold: 0.12 });
@@ -413,3 +413,5 @@ export default function PlatformLensSection() {
     </section>
   );
 }
+
+export default memo(PlatformLensSection);

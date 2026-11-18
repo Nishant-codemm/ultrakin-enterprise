@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, memo } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   ArrowRight,
@@ -356,7 +356,7 @@ function StagePill({ stage, isActive, isSelected, onClick, progress = 0 }) {
   );
 }
 
-export default function WorkflowSpotlight() {
+function WorkflowSpotlight() {
   const [activeStageIdx, setActiveStageIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -708,3 +708,5 @@ export default function WorkflowSpotlight() {
     </section>
   );
 }
+
+export default memo(WorkflowSpotlight);

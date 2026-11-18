@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { ArrowRight, Building2, Compass } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useReveal } from '../lib/useReveal';
@@ -32,7 +32,7 @@ const PATHS = [
   },
 ];
 
-export default function EvaluationSection() {
+function EvaluationSection() {
   const [sectionRef, inView] = useReveal({ threshold: 0.12 });
   const reduceMotion = useReducedMotion();
 
@@ -130,3 +130,5 @@ export default function EvaluationSection() {
     </section>
   );
 }
+
+export default memo(EvaluationSection);

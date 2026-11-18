@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useWorkspace } from '../../context/useWorkspace';
 import { HuddleHeader } from './huddle/HuddleHeader';
@@ -81,7 +81,7 @@ const PARTICIPANTS = [
  * Enterprise WebRTC Huddle surface demonstrating real-time voice, multiplayer collaboration,
  * and autonomous AI commitment synthesis directly within team workspaces.
  */
-export default function HuddleSimulator() {
+function HuddleSimulator() {
   const reduceMotion = useReducedMotion();
   const {
     huddleMuted,
@@ -313,3 +313,5 @@ export default function HuddleSimulator() {
     </div>
   );
 }
+
+export default memo(HuddleSimulator);

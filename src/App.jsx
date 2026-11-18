@@ -130,6 +130,7 @@ export default function App() {
   const storyProgress = reduceMotion ? 0 : scrollYProgress;
   const threadX = useMotionValue('82%');
   const threadY = useMotionValue('0%');
+  const pathLengthRef = useRef(0);
 
   useEffect(() => {
     const syncPathname = () => setPathname(window.location.pathname.replace(/\/$/, '') || '/');
@@ -170,7 +171,10 @@ export default function App() {
   useMotionValueEvent(scrollYProgress, 'change', (progress) => {
     const path = routePathRef.current;
     if (!path || reduceMotion) return;
-    const point = path.getPointAtLength(path.getTotalLength() * progress);
+    if (!pathLengthRef.current) {
+      pathLengthRef.current = path.getTotalLength();
+    }
+    const point = path.getPointAtLength(pathLengthRef.current * progress);
     threadX.set(`${point.x}%`);
     threadY.set(`${point.y / 10}%`);
   });

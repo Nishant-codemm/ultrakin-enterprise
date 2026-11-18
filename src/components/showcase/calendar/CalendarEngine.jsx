@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, memo } from 'react';
 import { useWorkspace } from '../../../context/useWorkspace';
 import CalendarHeader from './CalendarHeader';
 import CalendarWeekView from './CalendarWeekView';
@@ -8,7 +8,7 @@ import CalendarAgendaView from './CalendarAgendaView';
 import EventInspectorDrawer from './EventInspectorDrawer';
 import NewEventModal from './NewEventModal';
 
-export default function CalendarEngine() {
+function CalendarEngine() {
   const {
     calendarEvents,
     calendarView,
@@ -161,3 +161,5 @@ export default function CalendarEngine() {
     </div>
   );
 }
+
+export default memo(CalendarEngine);

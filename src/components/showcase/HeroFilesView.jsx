@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, memo } from 'react';
 import {
   ArrowRight,
   Check,
@@ -16,7 +16,7 @@ import { cn } from '../../lib/cn';
 import { useWorkspace } from '../../context/useWorkspace';
 import { FOCUS_RING_OBSIDIAN } from '../../lib/interaction';
 
-export default function HeroFilesView() {
+function HeroFilesView() {
   const { setActiveModule, docChecklists, kanbanTasks } = useWorkspace();
   const [selectedFile, setSelectedFile] = useState('RFC-891');
   const [copied, setCopied] = useState(false);
@@ -29,7 +29,7 @@ export default function HeroFilesView() {
     };
   }, []);
 
-  const files = [
+  const files = useMemo(() => [
     {
       id: 'RFC-891',
       name: 'Launch plan & token refresh notes',
@@ -90,7 +90,7 @@ export default function HeroFilesView() {
       summary:
         'Live synchronization with Jira and GitHub project boards for rapid deployment verification.',
     },
-  ];
+  ], [docChecklists.length, kanbanTasks]);
 
   const handleCopyLink = () => {
     if (!selected) return;
@@ -313,3 +313,5 @@ export default function HeroFilesView() {
     </div>
   );
 }
+
+export default memo(HeroFilesView);

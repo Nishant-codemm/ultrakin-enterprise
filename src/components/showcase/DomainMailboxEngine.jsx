@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback, memo } from 'react';
 import {
   Mail,
   Shield,
@@ -15,7 +15,7 @@ import { useWorkspace } from '../../context/useWorkspace';
 import { useFocusTrap } from '../../lib/useFocusTrap';
 import { cn } from '../../lib/cn';
 
-export default function DomainMailboxEngine() {
+function DomainMailboxEngine() {
   const {
     emails,
     activeEmail,
@@ -644,3 +644,5 @@ export default function DomainMailboxEngine() {
     </div>
   );
 }
+
+export default memo(DomainMailboxEngine);

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, memo } from 'react';
 import { motion, useSpring } from 'framer-motion';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import Button from '../components/primitives/Button';
@@ -230,6 +230,8 @@ function HeroWorkspaceContent() {
   );
 }
 
-export default function HeroSection() {
+function HeroSection() {
   return <HeroWorkspaceContent />;
 }
+
+export default memo(HeroSection);

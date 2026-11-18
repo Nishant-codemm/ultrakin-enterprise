@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import {
   CheckSquare,
   Clock,
@@ -33,7 +33,7 @@ function getTaskCol(task) {
   return task.column || 'backlog';
 }
 
-export default function KanbanTaskBoard() {
+function KanbanTaskBoard() {
   const {
     kanbanTasks,
     moveKanbanTask,
@@ -711,3 +711,5 @@ export default function KanbanTaskBoard() {
     </div>
   );
 }
+
+export default memo(KanbanTaskBoard);

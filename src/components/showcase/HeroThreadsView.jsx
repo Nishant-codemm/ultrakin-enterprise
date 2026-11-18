@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import {
   AtSign,
   ArrowRight,
@@ -15,7 +15,7 @@ import { cn } from '../../lib/cn';
 import { useWorkspace } from '../../context/useWorkspace';
 import { FOCUS_RING_OBSIDIAN } from '../../lib/interaction';
 
-export default function HeroThreadsView() {
+function HeroThreadsView() {
   const {
     activeChannel,
     activeMessages,
@@ -373,3 +373,5 @@ export default function HeroThreadsView() {
     </div>
   );
 }
+
+export default memo(HeroThreadsView);
