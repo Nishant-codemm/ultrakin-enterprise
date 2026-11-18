@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import {
   Mail,
   Shield,
@@ -24,6 +24,7 @@ export default function DomainMailboxEngine() {
     sendEmailReply,
     composeNewEmail,
     discussEmailInSpace,
+    addToast,
   } = useWorkspace();
 
   const [showSecurityModal, setShowSecurityModal] = useState(false);
@@ -62,6 +63,26 @@ export default function DomainMailboxEngine() {
   const [replyText, setReplyText] = useState('');
   const [isReplying, setIsReplying] = useState(false);
   const [draftSavedTime, setDraftSavedTime] = useState(null);
+  const [isAiDrafting, setIsAiDrafting] = useState(false);
+
+  const handleAiDraftReply = useCallback(() => {
+    if (!activeEmail) return;
+    setIsAiDrafting(true);
+    setIsReplying(true);
+    setTimeout(() => {
+      setIsAiDrafting(false);
+      const contextualReply =
+        activeEmail.id === 'em_1'
+          ? `Hi David,\n\nWe have traced the intermittent SSL handshake timeouts on cluster-eu-04 to a Redis Sentinel token cache invalidation loop.\n\nPR #1042 has been deployed to staging and hotfixed to production. Latency metrics have stabilized below 14ms across all European ingress nodes.\n\nPlease confirm if your telemetry reflects the fix.\n\nBest regards,\nSara Chen & Ukin Automated Sentinel`
+          : `Hi ${activeEmail.sender.split('@')[0]},\n\nThank you for reaching out. We have synthesized your request across our workspace. Relevant compliance and telemetry specifications have been linked to RFC-891.\n\nOur team is actively reviewing this and will follow up with verified documentation.\n\nBest regards,\nSara Chen`;
+      setReplyText(contextualReply);
+      addToast(
+        'AI Reply Drafted',
+        `Generated contextual response for ${activeEmail.sender} with PR #1042 context.`,
+        'ai'
+      );
+    }, 450);
+  }, [activeEmail, addToast]);
 
   const [prevEmailId, setPrevEmailId] = useState(activeEmail?.id);
 
@@ -346,6 +367,17 @@ export default function DomainMailboxEngine() {
                 <Send className="w-3.5 h-3.5 text-sky-400" />
                 <span>{isReplying ? 'Close Reply' : 'Draft Reply'}</span>
               </button>
+
+              <button
+                type="button"
+                onClick={handleAiDraftReply}
+                disabled={isAiDrafting}
+                className="py-1.5 px-3 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 hover:text-indigo-200 text-xs border border-indigo-500/30 flex items-center gap-1.5 cursor-pointer transition-all active:scale-95 disabled:opacity-60"
+                title="Ask Ukin Copilot to draft a response referencing hotfix PR #1042"
+              >
+                <Sparkles className={cn('w-3.5 h-3.5 text-indigo-400', isAiDrafting && 'animate-spin')} />
+                <span>{isAiDrafting ? 'Drafting with Ukin...' : 'AI Draft Reply'}</span>
+              </button>
             </div>
           </div>
 
@@ -366,6 +398,17 @@ export default function DomainMailboxEngine() {
                   {draftSavedTime || 'Auto-saving draft...'}
                 </span>
               </div>
+
+              {isAiDrafting && (
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className="p-2.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-200 flex items-center gap-2 animate-in fade-in duration-150"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-indigo-400 animate-spin shrink-0" />
+                  <span>Ukin Copilot is synthesizing thread history & PR #1042...</span>
+                </div>
+              )}
 
               <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400 border-b border-obsidian-border-soft pb-2">
                 <span>To: <strong className="text-white">{activeEmail.sender}</strong></span>

@@ -24,6 +24,7 @@ export default function HeroThreadsView() {
     huddleTranscript,
     setActiveModule,
     sendMessage,
+    addToast,
   } = useWorkspace();
 
   const channel = channels.find((item) => item.id === activeChannel) || channels[0];
@@ -32,6 +33,22 @@ export default function HeroThreadsView() {
   });
   const [filterQuery, setFilterQuery] = useState('');
   const [replyText, setReplyText] = useState('');
+  const [isAiSummarizing, setIsAiSummarizing] = useState(false);
+
+  const handleAiDraftUpdate = () => {
+    setIsAiSummarizing(true);
+    setTimeout(() => {
+      setIsAiSummarizing(false);
+      setReplyText(
+        'Incident Status Update: Root cause isolated to Redis Sentinel failover loop. PR #1042 hotfix validated across European ingress nodes. Telemetry is fully stable.'
+      );
+      addToast(
+        'AI Status Drafted',
+        'Prepared incident status update based on channel consensus.',
+        'ai'
+      );
+    }, 400);
+  };
 
   const toggleReaction = (msgId, type) => {
     const key = `${msgId}_${type}`;
@@ -295,12 +312,21 @@ export default function HeroThreadsView() {
 
           {/* Quick reply bar dock */}
           <div className="mt-4 border-t border-obsidian-border pt-3">
-            <div className="mb-1.5 flex items-center justify-between px-1">
+            <div className="mb-2 flex items-center justify-between px-1">
               <span className="flex items-center gap-1.5 font-mono text-[9.5px] text-slate-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 <span>Sara Chen is active in #{channel.name}</span>
               </span>
-              <span className="font-mono text-[9px] text-obsidian-muted">End-to-end encrypted</span>
+              <button
+                type="button"
+                onClick={handleAiDraftUpdate}
+                disabled={isAiSummarizing}
+                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-[10px] font-mono transition-colors cursor-pointer disabled:opacity-60"
+                title="Ask Ukin Copilot to draft a stakeholder status update"
+              >
+                <Sparkles className={cn('w-2.5 h-2.5 text-indigo-400', isAiSummarizing && 'animate-spin')} />
+                <span>{isAiSummarizing ? 'Synthesizing...' : '✨ AI Draft Status'}</span>
+              </button>
             </div>
             <div className="flex items-center gap-2 rounded-xl border border-obsidian-border bg-obsidian-base/60 p-2 focus-within:border-indigo-400/40">
               <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-obsidian-muted hover:text-slate-200 cursor-pointer">

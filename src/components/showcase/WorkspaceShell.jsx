@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState, useEffect, useRef } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useRef, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   Activity,
@@ -17,9 +17,9 @@ import {
   MessageSquare,
   Minimize2,
   Radio,
-  Search,
   Settings,
   Shield,
+  Sparkles,
   Video,
 } from 'lucide-react';
 import UltrakinLogo from '../primitives/UltrakinLogo';
@@ -83,6 +83,26 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
   if (!visitedModules.includes(activeModule)) {
     setVisitedModules((prev) => (prev.includes(activeModule) ? prev : [...prev, activeModule]));
   }
+
+  // Contextual AI prompt indicator for Command Bar
+  const aiSearchPrompt = useMemo(() => {
+    switch (activeModule) {
+      case 'docs':
+        return 'Ask Ukin about RFC-891...';
+      case 'mail':
+        return 'Ask Ukin to draft reply...';
+      case 'tasks':
+        return 'Ask Ukin to triage tasks...';
+      case 'calendar':
+        return 'Ask Ukin to schedule debrief...';
+      case 'threads':
+        return 'Ask Ukin to summarize thread...';
+      case 'chat':
+        return 'Ask Ukin in #incident-war-room...';
+      default:
+        return 'Search or ask Ukin...';
+    }
+  }, [activeModule]);
 
   const mainCanvasRef = useRef(null);
   const prevModuleRef = useRef(activeModule);
@@ -236,10 +256,11 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
           type="button"
           onClick={openSearchPalette}
           className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.035] border border-white/[0.08] text-xs text-obsidian-muted hover:text-slate-200 hover:border-white/[0.16] hover:bg-white/[0.06] transition-all duration-150 cursor-pointer max-w-[280px] w-full justify-between"
+          title={`${aiSearchPrompt} (⌘K)`}
         >
           <div className="flex items-center gap-2 truncate">
-            <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            <span className="truncate text-[11.5px]">Search or ask Ukin...</span>
+            <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+            <span className="truncate text-[11.5px] text-slate-300">{aiSearchPrompt}</span>
           </div>
           <kbd className="font-mono text-[9.5px] px-1.5 py-0.5 rounded bg-white/[0.08] border border-white/[0.1] text-slate-300 shrink-0">
             ⌘K

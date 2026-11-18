@@ -14,6 +14,7 @@ import {
   Layers,
   Search,
   Check,
+  Sparkles,
 } from 'lucide-react';
 import { useWorkspace } from '../../context/useWorkspace';
 import { cn } from '../../lib/cn';
@@ -52,7 +53,28 @@ export default function KanbanTaskBoard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPriority, setFilterPriority] = useState('ALL');
   const [newSubtaskText, setNewSubtaskText] = useState('');
+  const [isAiDecomposing, setIsAiDecomposing] = useState(false);
   const drawerRef = useRef(null);
+
+  const handleAiDecompose = () => {
+    if (!selectedKanbanTask) return;
+    setIsAiDecomposing(true);
+    setTimeout(() => {
+      setIsAiDecomposing(false);
+      const generatedSubtasks = [
+        { id: `st_ai_${Date.now()}_1`, text: 'Verify Sentinel heartbeat threshold on ingress', done: false },
+        { id: `st_ai_${Date.now()}_2`, text: 'Execute Canary traffic verification 5% -> 100%', done: false },
+      ];
+      updateKanbanTask(selectedKanbanTask.id, {
+        subtasks: [...(selectedKanbanTask.subtasks || []), ...generatedSubtasks],
+      });
+      addToast(
+        'Subtasks Generated',
+        `Ukin decomposed #${selectedKanbanTask.id} into 2 verification subtasks.`,
+        'ai'
+      );
+    }, 450);
+  };
 
   // Close task inspector drawer on outside click or Escape key
   useEffect(() => {
@@ -589,6 +611,16 @@ export default function KanbanTaskBoard() {
                 <span className="text-[10px] font-mono uppercase text-slate-400">
                   Execution Subtasks ({(selectedKanbanTask.subtasks || []).filter((s) => s.done).length}/{(selectedKanbanTask.subtasks || []).length})
                 </span>
+                <button
+                  type="button"
+                  onClick={handleAiDecompose}
+                  disabled={isAiDecomposing}
+                  className="inline-flex items-center gap-1 text-[10px] font-mono text-indigo-400 hover:text-indigo-300 transition-colors cursor-pointer disabled:opacity-50"
+                  title="Ask Ukin Copilot to decompose this task into execution steps"
+                >
+                  <Sparkles className={cn('w-3 h-3 text-indigo-400', isAiDecomposing && 'animate-spin')} />
+                  <span>{isAiDecomposing ? 'Decomposing...' : 'AI Decompose'}</span>
+                </button>
               </div>
               <div className="space-y-1.5">
                 {(selectedKanbanTask.subtasks || []).map((st) => (

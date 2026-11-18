@@ -32,10 +32,18 @@ export default function CommandPaletteModal() {
     openDemoDrawer,
     testAutomationsWorkflow,
     setIsKeyboardModalOpen,
+    activeModule = 'chat',
+    activeEmail,
+    addToast,
+    convertEmailToTask,
+    updateKanbanTask,
+    sendMessage,
+    createCalendarEvent,
   } = useWorkspace();
 
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [aiGeneratingState, setAiGeneratingState] = useState(null);
   const inputRef = useRef(null);
   const dialogRef = useRef(null);
   const resultRefs = useRef([]);
@@ -48,9 +56,293 @@ export default function CommandPaletteModal() {
     onEscape: closeSearchPalette,
   });
 
+  const executeAiAction = useCallback((statusMessage, callback) => {
+    setAiGeneratingState(statusMessage);
+    setTimeout(() => {
+      setAiGeneratingState(null);
+      callback();
+      closeSearchPalette();
+    }, 450);
+  }, [closeSearchPalette]);
+
+  // Context-aware AI Copilot Actions based on the active screen
+  const aiContextActions = useMemo(() => {
+    switch (activeModule) {
+      case 'docs':
+        return [
+          {
+            id: 'ai_docs_summarize',
+            type: 'ai',
+            category: 'AI Copilot · Living Docs',
+            title: 'Summarize RFC-891 specification',
+            subtitle: 'Extract architecture invariants, failover SLAs, and consensus points',
+            icon: Sparkles,
+            action: () =>
+              executeAiAction('Synthesizing RFC-891 invariants...', () => {
+                addToast(
+                  'AI Spec Summary Generated',
+                  'DOC-891 key invariants and failover SLAs extracted for executive review.',
+                  'ai'
+                );
+              }),
+            badge: 'AI Summarize',
+            badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+          },
+          {
+            id: 'ai_docs_checklist',
+            type: 'ai',
+            category: 'AI Copilot · Living Docs',
+            title: 'Export RFC checklist to Sprint 24 Kanban',
+            subtitle: 'Sync remaining verification items into tracked engineering tasks',
+            icon: Sparkles,
+            action: () =>
+              executeAiAction('Syncing RFC checklist items to Kanban...', () => {
+                setActiveModule('tasks');
+                addToast(
+                  'Checklist Synced to Kanban',
+                  '3 operational verification tasks queued in Sprint 24.',
+                  'success'
+                );
+              }),
+            badge: 'AI Sync',
+            badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+          },
+        ];
+      case 'mail':
+        return [
+          {
+            id: 'ai_mail_draft',
+            type: 'ai',
+            category: 'AI Copilot · Domain Mail',
+            title: 'Draft AI response to david@acmecorp.com',
+            subtitle: 'Explain SSL timeout mitigation and reference hotfix PR #1042',
+            icon: Sparkles,
+            action: () =>
+              executeAiAction('Drafting verified email response...', () => {
+                setActiveModule('mail');
+                addToast(
+                  'AI Reply Drafted',
+                  'Context from PR #1042 attached to reply composer in Domain Mailbox.',
+                  'ai'
+                );
+              }),
+            badge: 'AI Draft',
+            badgeColor: 'bg-sky-50 text-sky-800 border-sky-200',
+          },
+          {
+            id: 'ai_mail_triage',
+            type: 'ai',
+            category: 'AI Copilot · Domain Mail',
+            title: 'Convert email escalation into P1 Sprint task',
+            subtitle: 'Auto-extract SLA deadline and link customer sender context',
+            icon: Sparkles,
+            action: () =>
+              executeAiAction('Converting email to tracked task...', () => {
+                convertEmailToTask?.(activeEmail?.id || 'em_1');
+                addToast(
+                  'Escalation Converted',
+                  'Task #tsk_1 created and assigned to Sara Chen.',
+                  'success'
+                );
+              }),
+            badge: 'AI Triage',
+            badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+          },
+        ];
+      case 'tasks':
+        return [
+          {
+            id: 'ai_tasks_subtasks',
+            type: 'ai',
+            category: 'AI Copilot · Sprint Board',
+            title: 'Decompose task #tsk_1 into execution subtasks',
+            subtitle: 'Generate implementation checklist from linked RFC-891',
+            icon: Sparkles,
+            action: () =>
+              executeAiAction('Decomposing task with Ukin...', () => {
+                updateKanbanTask?.('tsk_1', {
+                  subtasks: [
+                    { id: 'st_ai_1', text: 'Verify Sentinel heartbeat threshold on ingress', done: false },
+                    { id: 'st_ai_2', text: 'Execute Canary traffic verification 5% -> 100%', done: false },
+                  ],
+                });
+                addToast(
+                  'Subtasks Generated',
+                  '2 implementation steps added to task #tsk_1.',
+                  'ai'
+                );
+              }),
+            badge: 'AI Decompose',
+            badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+          },
+          {
+            id: 'ai_tasks_triage',
+            type: 'ai',
+            category: 'AI Copilot · Sprint Board',
+            title: 'Triage Sprint 24 backlog by priority & dependencies',
+            subtitle: 'Re-rank in-progress items based on live cluster telemetry',
+            icon: Sparkles,
+            action: () =>
+              executeAiAction('Triaging backlog with Ukin...', () => {
+                addToast(
+                  'Backlog Triaged',
+                  'P0 and P1 tickets prioritized based on cluster SLA.',
+                  'ai'
+                );
+              }),
+            badge: 'AI Triage',
+            badgeColor: 'bg-sky-50 text-sky-800 border-sky-200',
+          },
+        ];
+      case 'calendar':
+        return [
+          {
+            id: 'ai_cal_debrief',
+            type: 'ai',
+            category: 'AI Copilot · Team Calendar',
+            title: 'Schedule incident debrief follow-up',
+            subtitle: 'Find optimal 30-min window for Sara Chen & Alex Mercer',
+            icon: Sparkles,
+            action: () =>
+              executeAiAction('Scheduling post-mortem debrief...', () => {
+                createCalendarEvent?.({
+                  title: 'Incident Post-Mortem & Sentinel Hardening Review',
+                  category: 'architecture',
+                  startTime: '14:00',
+                  durationMinutes: 45,
+                  date: '2026-10-21',
+                  attendees: ['Sara Chen', 'Alex Mercer'],
+                });
+                addToast('Debrief Scheduled', 'Incident debrief added to Team Calendar.', 'ai');
+              }),
+            badge: 'AI Schedule',
+            badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+          },
+          {
+            id: 'ai_cal_export',
+            type: 'ai',
+            category: 'AI Copilot · Team Calendar',
+            title: 'Extract meeting decisions to Living Doc RFC',
+            subtitle: 'Sync consensus and action items into RFC-891',
+            icon: Sparkles,
+            action: () =>
+              executeAiAction('Extracting meeting consensus...', () => {
+                setActiveModule('docs');
+                addToast('Decisions Exported', 'Meeting consensus synced to Living Doc RFC-891.', 'ai');
+              }),
+            badge: 'AI Export',
+            badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+          },
+        ];
+      case 'threads':
+        return [
+          {
+            id: 'ai_threads_bridge',
+            type: 'ai',
+            category: 'AI Copilot · Incident Threads',
+            title: 'Synthesize incident thread into Living Doc',
+            subtitle: 'Bridge thread resolution notes into RFC-891',
+            icon: Sparkles,
+            action: () =>
+              executeAiAction('Bridging thread notes to RFC-891...', () => {
+                setActiveModule('docs');
+                addToast('Thread Synthesized', 'Consensus exported to Living Doc RFC-891.', 'ai');
+              }),
+            badge: 'AI Bridge',
+            badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+          },
+          {
+            id: 'ai_threads_update',
+            type: 'ai',
+            category: 'AI Copilot · Incident Threads',
+            title: 'Draft thread update for stakeholders',
+            subtitle: 'Generate executive status message regarding cluster stability',
+            icon: Sparkles,
+            action: () =>
+              executeAiAction('Drafting stakeholder update...', () => {
+                addToast('Status Update Drafted', 'Ready for review in #incident-review thread.', 'ai');
+              }),
+            badge: 'AI Draft',
+            badgeColor: 'bg-sky-50 text-sky-800 border-sky-200',
+          },
+        ];
+      case 'chat':
+      default:
+        return [
+          {
+            id: 'ai_chat_diag',
+            type: 'ai',
+            category: 'AI Copilot · Spaces Chat',
+            title: 'Ask Ukin to diagnose cluster latency',
+            subtitle: 'Inspect p99 latency spike on cluster-eu-04 ingress nodes',
+            icon: Sparkles,
+            action: () =>
+              executeAiAction('Running cluster diagnostic in #incident-war-room...', () => {
+                setActiveModule('chat');
+                sendMessage?.('@ukin run cluster latency diagnostic');
+                addToast(
+                  'AI Diagnostic Dispatched',
+                  'Ukin is analyzing workspace telemetry in #incident-war-room.',
+                  'ai'
+                );
+              }),
+            badge: 'AI Diagnostic',
+            badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+          },
+          {
+            id: 'ai_chat_summary',
+            type: 'ai',
+            category: 'AI Copilot · Spaces Chat',
+            title: 'Summarize #incident-war-room decisions',
+            subtitle: 'Extract rollout consensus and agreed mitigation timeline',
+            icon: Sparkles,
+            action: () =>
+              executeAiAction('Summarizing channel decisions...', () => {
+                addToast('Incident Decisions Summarized', 'Consensus linked to Living Doc RFC-891.', 'ai');
+              }),
+            badge: 'AI Summary',
+            badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+          },
+        ];
+    }
+  }, [
+    activeModule,
+    activeEmail,
+    executeAiAction,
+    addToast,
+    setActiveModule,
+    convertEmailToTask,
+    updateKanbanTask,
+    createCalendarEvent,
+    sendMessage,
+  ]);
+
+  // Context-aware placeholder for keyboard-first invocation
+  const contextualPlaceholder = useMemo(() => {
+    switch (activeModule) {
+      case 'docs':
+        return 'Ask Ukin about RFC-891, summarize spec, or search... (⌘K)';
+      case 'mail':
+        return 'Ask Ukin to draft reply, convert email, or search... (⌘K)';
+      case 'tasks':
+        return 'Ask Ukin to decompose tasks, triage backlog, or search... (⌘K)';
+      case 'calendar':
+        return 'Ask Ukin to schedule debrief, extract agenda, or search... (⌘K)';
+      case 'threads':
+        return 'Ask Ukin to summarize thread, or search... (⌘K)';
+      case 'chat':
+        return 'Ask Ukin in #incident-war-room, or search... (⌘K)';
+      default:
+        return "Type a command, ask Ukin, or search... (prefix '>' for commands)";
+    }
+  }, [activeModule]);
+
   // All searchable entities across the unified workspace kernel (memoized to prevent reallocation on search keystrokes)
   const entities = useMemo(
     () => [
+      // Contextual AI Copilot Actions for active module
+      ...aiContextActions,
+
       // Commands
       {
         id: 'cmd_chat',
@@ -293,7 +585,14 @@ export default function CommandPaletteModal() {
         badgeColor: 'bg-rose-50 text-rose-800 border-rose-200',
       },
     ],
-    [setActiveModule, setActiveChannel, openDemoDrawer, testAutomationsWorkflow, setIsKeyboardModalOpen]
+    [
+      aiContextActions,
+      setActiveModule,
+      setActiveChannel,
+      openDemoDrawer,
+      testAutomationsWorkflow,
+      setIsKeyboardModalOpen,
+    ]
   );
 
   // Filtering matching items
@@ -409,7 +708,7 @@ export default function CommandPaletteModal() {
               aria-expanded="true"
               aria-controls="command-palette-results"
               aria-activedescendant={filtered[selectedIndex] ? `command-option-${filtered[selectedIndex].id}` : undefined}
-              placeholder="Type a command or search anything... (prefix '>' for commands)"
+              placeholder={contextualPlaceholder}
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -435,6 +734,22 @@ export default function CommandPaletteModal() {
               ESC
             </kbd>
           </div>
+
+          {/* Inline AI Progress Banner */}
+          {aiGeneratingState && (
+            <div
+              role="status"
+              aria-live="polite"
+              className="flex items-center gap-2.5 px-4 py-2.5 bg-indigo-500/10 border-b border-indigo-500/20 text-indigo-300 text-xs font-mono animate-in fade-in duration-150"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-indigo-400 animate-spin" />
+              <span className="font-semibold text-white">Ukin Copilot:</span>
+              <span>{aiGeneratingState}</span>
+              <span className="ml-auto text-[10px] text-indigo-400/80 hidden sm:inline">
+                Synthesizing context
+              </span>
+            </div>
+          )}
 
           {/* Results List */}
           <div id="command-palette-results" role="listbox" aria-label="Search results" className="max-h-[380px] overflow-y-auto p-2 space-y-1">
