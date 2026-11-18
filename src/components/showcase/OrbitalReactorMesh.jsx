@@ -1,4 +1,4 @@
-import React, { memo, useId } from 'react';
+import React, { memo, useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion, useTime, useTransform } from 'framer-motion';
 import { cn } from '../../lib/cn';
 import UltrakinLogo from '../primitives/UltrakinLogo';
@@ -18,7 +18,7 @@ const RAW_BUILT_IN_CONFIGS = {
   Mail: {
     ring: 1,
     a: 138,
-    b: 64,
+    b: 60,
     tilt: -14,
     period: 54,
     initialPhase: 260, // North quadrant
@@ -28,7 +28,7 @@ const RAW_BUILT_IN_CONFIGS = {
   Docs: {
     ring: 1,
     a: 138,
-    b: 64,
+    b: 60,
     tilt: -14,
     period: 54,
     initialPhase: 80, // South quadrant
@@ -39,8 +39,8 @@ const RAW_BUILT_IN_CONFIGS = {
   // Mid Equatorial Orbit β (Tilt: +12°, Tau: 72s, Opposition delta: 180°)
   Spaces: {
     ring: 2,
-    a: 208,
-    b: 92,
+    a: 196,
+    b: 86,
     tilt: 12,
     period: 72,
     initialPhase: 185, // West quadrant
@@ -49,8 +49,8 @@ const RAW_BUILT_IN_CONFIGS = {
   },
   Tasks: {
     ring: 2,
-    a: 208,
-    b: 92,
+    a: 196,
+    b: 86,
     tilt: 12,
     period: 72,
     initialPhase: 5, // East quadrant
@@ -61,8 +61,8 @@ const RAW_BUILT_IN_CONFIGS = {
   // Outer Inclined Orbit γ (Tilt: -24°, Tau: 92s, Trine constellation: 120° equidistant)
   Meetings: {
     ring: 3,
-    a: 268,
-    b: 118,
+    a: 246,
+    b: 106,
     tilt: -24,
     period: 92,
     initialPhase: 40, // North-East
@@ -71,8 +71,8 @@ const RAW_BUILT_IN_CONFIGS = {
   },
   'Ukin agent': {
     ring: 3,
-    a: 268,
-    b: 118,
+    a: 246,
+    b: 106,
     tilt: -24,
     period: 92,
     initialPhase: 160, // South-West
@@ -81,8 +81,8 @@ const RAW_BUILT_IN_CONFIGS = {
   },
   Calendar: {
     ring: 3,
-    a: 268,
-    b: 118,
+    a: 246,
+    b: 106,
     tilt: -24,
     period: 92,
     initialPhase: 280, // South-East
@@ -97,7 +97,7 @@ const RAW_EXTENSION_CONFIGS = {
   GitHub: {
     ring: 1,
     a: 138,
-    b: 64,
+    b: 60,
     tilt: -14,
     period: 56,
     initialPhase: 260, // North quadrant
@@ -107,7 +107,7 @@ const RAW_EXTENSION_CONFIGS = {
   Journeys: {
     ring: 1,
     a: 138,
-    b: 64,
+    b: 60,
     tilt: -14,
     period: 56,
     initialPhase: 80, // South quadrant
@@ -118,8 +118,8 @@ const RAW_EXTENSION_CONFIGS = {
   // Mid Equatorial Orbit β (Tilt: +12°, Tau: 74s, Opposition delta: 180°)
   Lists: {
     ring: 2,
-    a: 208,
-    b: 92,
+    a: 196,
+    b: 86,
     tilt: 12,
     period: 74,
     initialPhase: 185, // West quadrant
@@ -128,8 +128,8 @@ const RAW_EXTENSION_CONFIGS = {
   },
   'MCP tools': {
     ring: 2,
-    a: 208,
-    b: 92,
+    a: 196,
+    b: 86,
     tilt: 12,
     period: 74,
     initialPhase: 5, // East quadrant
@@ -140,8 +140,8 @@ const RAW_EXTENSION_CONFIGS = {
   // Outer Inclined Orbit γ (Tilt: -24°, Tau: 92s, Opposition delta: 180°)
   PostHog: {
     ring: 3,
-    a: 268,
-    b: 118,
+    a: 246,
+    b: 106,
     tilt: -24,
     period: 92,
     initialPhase: 40, // North-East
@@ -150,8 +150,8 @@ const RAW_EXTENSION_CONFIGS = {
   },
   Forms: {
     ring: 3,
-    a: 268,
-    b: 118,
+    a: 246,
+    b: 106,
     tilt: -24,
     period: 92,
     initialPhase: 220, // South-West
@@ -211,6 +211,7 @@ function SatelliteNode({
         scale,
         opacity,
         zIndex,
+        transformOrigin: '50% 19px',
       }}
       className="pointer-events-auto"
     >
@@ -219,19 +220,22 @@ function SatelliteNode({
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}
         transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-        style={{ transform: 'translate(-50%, -50%)' }}
       >
-        <button
-          type="button"
-          aria-pressed={isSelected}
-          aria-label={`${item.name} (${item.badge || item.category || 'Integration'})`}
-          onClick={onClick}
-          onMouseEnter={onHover}
-          onMouseLeave={onLeave}
-          onFocus={onHover}
-          onBlur={onLeave}
-          className="group relative flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 rounded-full cursor-pointer"
+        <div
+          style={{ transform: 'translate(-50%, -19px)' }}
+          className="will-change-transform flex flex-col items-center"
         >
+          <button
+            type="button"
+            aria-pressed={isSelected}
+            aria-label={`${item.name} (${item.badge || item.category || 'Integration'})`}
+            onClick={onClick}
+            onMouseEnter={onHover}
+            onMouseLeave={onLeave}
+            onFocus={onHover}
+            onBlur={onLeave}
+            className="group relative flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 rounded-full cursor-pointer"
+          >
           {/* Concentric Telemetry Orbit Halo */}
           <span
             aria-hidden="true"
@@ -282,6 +286,7 @@ function SatelliteNode({
             {item.name}
           </span>
         </button>
+        </div>
       </motion.div>
     </motion.div>
   );
@@ -333,6 +338,25 @@ function OrbitalReactorMesh({
   const id = useId();
   const reduceMotion = useReducedMotion();
   const time = useTime();
+  const containerRef = useRef(null);
+  const [stageScale, setStageScale] = useState(1);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+
+    const observer = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) return;
+      const width = entry.contentRect.width;
+      if (width > 0) {
+        setStageScale(Math.min(1, width / 620));
+      }
+    });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const isExtension = selectedCat === 'Extension examples';
   const defaultTarget = isExtension ? 'GitHub' : 'Spaces';
@@ -344,6 +368,7 @@ function OrbitalReactorMesh({
 
   return (
     <div
+      ref={containerRef}
       className={cn(
         'relative h-[430px] w-full overflow-hidden select-none flex items-center justify-center transition-colors duration-500',
         isExtension
@@ -352,11 +377,18 @@ function OrbitalReactorMesh({
       )}
     >
       {/* ── Fixed Aspect-Ratio Orbital Stage Canvas (Guarantees SVG & DOM 1:1 lock) ── */}
-      <div className="relative w-full max-w-[620px] h-[420px] shrink-0">
+      <div
+        className="relative shrink-0"
+        style={{
+          width: 620,
+          height: 420,
+          transform: `scale(${stageScale})`,
+          transformOrigin: 'center center',
+        }}
+      >
         {/* ── SVG LAYER: Scientific Coordinate System & Orbital Rails ── */}
         <svg
           viewBox="0 0 620 420"
-          preserveAspectRatio="xMidYMid meet"
           className="absolute inset-0 h-full w-full pointer-events-none"
           role="img"
           aria-label={
@@ -412,8 +444,8 @@ function OrbitalReactorMesh({
             <ellipse
               cx="310"
               cy="210"
-              rx="268"
-              ry="118"
+              rx="246"
+              ry="106"
               fill="none"
               stroke={targetConfig?.ring === 3 ? 'rgba(56,189,248,0.48)' : 'rgba(56,189,248,0.2)'}
               strokeWidth={targetConfig?.ring === 3 ? '1.25' : '0.8'}
@@ -421,8 +453,8 @@ function OrbitalReactorMesh({
             />
             {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
               const rad = (deg * Math.PI) / 180;
-              const tx = 310 + 268 * Math.cos(rad);
-              const ty = 210 + 118 * Math.sin(rad);
+              const tx = 310 + 246 * Math.cos(rad);
+              const ty = 210 + 106 * Math.sin(rad);
               return (
                 <circle
                   key={`r3-tick-${deg}`}
@@ -440,8 +472,8 @@ function OrbitalReactorMesh({
             <ellipse
               cx="310"
               cy="210"
-              rx="208"
-              ry="92"
+              rx="196"
+              ry="86"
               fill="none"
               stroke={
                 targetConfig?.ring === 2
@@ -457,8 +489,8 @@ function OrbitalReactorMesh({
             />
             {[0, 60, 120, 180, 240, 300].map((deg) => {
               const rad = (deg * Math.PI) / 180;
-              const tx = 310 + 208 * Math.cos(rad);
-              const ty = 210 + 92 * Math.sin(rad);
+              const tx = 310 + 196 * Math.cos(rad);
+              const ty = 210 + 86 * Math.sin(rad);
               return (
                 <circle
                   key={`r2-tick-${deg}`}
@@ -477,7 +509,7 @@ function OrbitalReactorMesh({
               cx="310"
               cy="210"
               rx="138"
-              ry="64"
+              ry="60"
               fill="none"
               stroke={
                 targetConfig?.ring === 1
@@ -494,7 +526,7 @@ function OrbitalReactorMesh({
             {[0, 90, 180, 270].map((deg) => {
               const rad = (deg * Math.PI) / 180;
               const tx = 310 + 138 * Math.cos(rad);
-              const ty = 210 + 64 * Math.sin(rad);
+              const ty = 210 + 60 * Math.sin(rad);
               return (
                 <circle
                   key={`r1-tick-${deg}`}
