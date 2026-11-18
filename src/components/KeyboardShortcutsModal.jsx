@@ -26,6 +26,7 @@ const SHORTCUT_GROUPS = [
       { keys: ['⌘', '6'], label: 'Switch to WebRTC Huddle Chamber' },
       { keys: ['⌘', '7'], label: 'Switch to Sprint Kanban Board' },
       { keys: ['⌘', '8'], label: 'Switch to Files & Evidence' },
+      { keys: ['⌘', '9'], label: 'Switch to Workflow Automations' },
     ],
   },
   {

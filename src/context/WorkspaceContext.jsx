@@ -411,18 +411,68 @@ function hasDirectedPath(fromId, toId, edges) {
   return false;
 }
 
+const VALID_WORKSPACE_MODULES = [
+  'chat',
+  'threads',
+  'mail',
+  'docs',
+  'calendar',
+  'huddle',
+  'tasks',
+  'files',
+  'automations',
+];
+
 export function WorkspaceProvider({ children }) {
-  // Navigation & Active Module
-  const [activeModule, setActiveModule] = useState(() => {
+  // Navigation & Active Module with bidirectional URL query and popstate synchronization
+  const [activeModule, setActiveModuleState] = useState(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const mod = params.get('module');
-      if (mod && ['chat', 'threads', 'mail', 'docs', 'calendar', 'huddle', 'tasks', 'files', 'automations'].includes(mod)) {
+      if (mod && VALID_WORKSPACE_MODULES.includes(mod)) {
         return mod;
       }
     }
     return 'chat';
   });
+
+  const setActiveModule = useCallback((moduleOrFn) => {
+    setActiveModuleState((prev) => {
+      const next = typeof moduleOrFn === 'function' ? moduleOrFn(prev) : moduleOrFn;
+      if (!VALID_WORKSPACE_MODULES.includes(next)) return prev;
+      if (next === prev) return prev;
+
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        if (url.searchParams.get('module') !== next) {
+          url.searchParams.set('module', next);
+          window.history.pushState({ module: next }, '', url.toString());
+        }
+      }
+      return next;
+    });
+  }, []);
+
+  // Synchronize active module with browser history Back/Forward (popstate)
+  useEffect(() => {
+    const handlePopState = (event) => {
+      const stateModule = event.state?.module;
+      if (stateModule && VALID_WORKSPACE_MODULES.includes(stateModule)) {
+        setActiveModuleState(stateModule);
+        return;
+      }
+      const params = new URLSearchParams(window.location.search);
+      const queryMod = params.get('module');
+      if (queryMod && VALID_WORKSPACE_MODULES.includes(queryMod)) {
+        setActiveModuleState(queryMod);
+      } else {
+        setActiveModuleState('chat');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
   const [activeChannel, setActiveChannel] = useState('general-arch');
 
   // Enterprise Demo & Sales Drawer State (Week 5 Deliverable)
@@ -1073,7 +1123,7 @@ export function WorkspaceProvider({ children }) {
     }));
 
     addToast('Message linked', `Added the email context to #${channelId} in the sample workspace.`, 'info');
-  }, [addToast]);
+  }, [addToast, setActiveModule]);
 
   const addDocComment = useCallback((nodeId, text) => {
     if (!text?.trim()) return;
@@ -1122,15 +1172,43 @@ export function WorkspaceProvider({ children }) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setIsSearchPaletteOpen((prev) => !prev);
+        return;
       }
       if ((e.metaKey || e.ctrlKey) && (e.key === '/' || e.code === 'Slash' || e.key === '?')) {
         e.preventDefault();
         setIsKeyboardModalOpen((prev) => !prev);
+        return;
+      }
+
+      // Linear/Slack-grade module quick-switch hotkeys (⌘1 - ⌘9 / Ctrl+1 - Ctrl+9)
+      if ((e.metaKey || e.ctrlKey) && !e.altKey && !e.shiftKey) {
+        const activeTag = document.activeElement?.tagName;
+        const isEditing =
+          ['INPUT', 'TEXTAREA', 'SELECT'].includes(activeTag) ||
+          document.activeElement?.isContentEditable;
+        if (!isEditing) {
+          const SHORTCUT_TO_MODULE = {
+            '1': 'chat',
+            '2': 'threads',
+            '3': 'mail',
+            '4': 'docs',
+            '5': 'calendar',
+            '6': 'huddle',
+            '7': 'tasks',
+            '8': 'files',
+            '9': 'automations',
+          };
+          const target = SHORTCUT_TO_MODULE[e.key];
+          if (target) {
+            e.preventDefault();
+            setActiveModule(target);
+          }
+        }
       }
     };
     window.addEventListener('keydown', handleGlobalShortcuts);
     return () => window.removeEventListener('keydown', handleGlobalShortcuts);
-  }, []);
+  }, [setActiveModule]);
 
   // Navigation Morph & Section Scroll-Spy
   const [activeSection, setActiveSection] = useState('hero');
@@ -1271,6 +1349,7 @@ export function WorkspaceProvider({ children }) {
     scrollToSection,
   }), [
     activeModule,
+    setActiveModule,
     activeChannel,
     channels,
     activeMessages,

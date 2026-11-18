@@ -286,6 +286,7 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
           { id: 'calendar', label: 'Calendar', icon: CalendarIcon },
           { id: 'huddle', label: 'Huddle', icon: Video },
           { id: 'tasks', label: 'Tasks', icon: CheckSquare, badge: kanbanTasks.length },
+          { id: 'files', label: 'Files', icon: FolderOpen },
           { id: 'automations', label: 'Agents', icon: Bot },
         ].map((item) => {
           const Icon = item.icon;
@@ -430,27 +431,6 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
 
           <button
             type="button"
-            onClick={() => setActiveModule('files')}
-            className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
-              activeModule === 'files'
-                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
-                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
-            )}
-            title="Files & Evidence"
-            aria-label="Files"
-          >
-            {activeModule === 'files' && (
-              <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                aria-hidden="true"
-              />
-            )}
-            <FolderOpen className="w-5 h-5" />
-          </button>
-
-          <button
-            type="button"
             onClick={() => setActiveModule('calendar')}
             onMouseEnter={() => prefetch(loadCalendar)}
             onFocus={() => prefetch(loadCalendar)}
@@ -524,6 +504,27 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
 
           <button
             type="button"
+            onClick={() => setActiveModule('files')}
+            className={cn(
+              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+              activeModule === 'files'
+                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
+            )}
+            title="Files & Evidence (⌘8)"
+            aria-label="Files"
+          >
+            {activeModule === 'files' && (
+              <span
+                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                aria-hidden="true"
+              />
+            )}
+            <FolderOpen className="w-5 h-5" />
+          </button>
+
+          <button
+            type="button"
             onClick={() => setActiveModule('automations')}
             onMouseEnter={() => prefetch(loadAutomations)}
             onFocus={() => prefetch(loadAutomations)}
@@ -533,7 +534,7 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
                 ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
                 : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
             )}
-            title="Workflow Automations & Agents (⌘8)"
+            title="Workflow Automations & Agents (⌘9)"
             aria-label="Automations and Agents"
           >
             {activeModule === 'automations' && (
