@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   ArrowRight,
   Check,
@@ -21,6 +21,13 @@ export default function HeroFilesView() {
   const [selectedFile, setSelectedFile] = useState('RFC-891');
   const [copied, setCopied] = useState(false);
   const [searchFilter, setSearchFilter] = useState('');
+  const copyTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
 
   const files = [
     {
@@ -86,8 +93,13 @@ export default function HeroFilesView() {
   ];
 
   const handleCopyLink = () => {
+    if (!selected) return;
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(`${window.location.origin}/workspace/acme-corp/files#${selected.id}`);
+    }
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
   };
 
   const filteredFiles = files.filter(
@@ -97,8 +109,8 @@ export default function HeroFilesView() {
       f.owner.toLowerCase().includes(searchFilter.toLowerCase()),
   );
 
-  const selected = files.find((file) => file.id === selectedFile) || files[0];
-  const FileIcon = selected.icon;
+  const selected = filteredFiles.find((file) => file.id === selectedFile) || filteredFiles[0] || null;
+  const FileIcon = selected?.icon || FileText;
 
   return (
     <div className="flex min-h-[580px] flex-col bg-obsidian-canvas text-slate-200">
@@ -143,55 +155,69 @@ export default function HeroFilesView() {
             <span className="hidden sm:block">Owner</span>
           </div>
 
-          <div className="space-y-1 overflow-y-auto">
-            {filteredFiles.map((file) => {
-              const Icon = file.icon;
-              const isSelected = selectedFile === file.id;
-              return (
+          <div className="space-y-1 overflow-y-auto flex-1">
+            {filteredFiles.length === 0 ? (
+              <div className="flex flex-col items-center justify-center p-8 text-center my-auto h-48">
+                <Search className="w-5 h-5 text-slate-500 mb-2" />
+                <p className="text-xs font-medium text-slate-300">No artifacts match "{searchFilter}"</p>
                 <button
-                  key={file.id}
                   type="button"
-                  onClick={() => setSelectedFile(file.id)}
-                  aria-pressed={isSelected}
-                  className={cn(
-                    'grid w-full grid-cols-[minmax(0,1fr)_72px] items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all cursor-pointer sm:grid-cols-[minmax(0,1fr)_84px_90px]',
-                    FOCUS_RING_OBSIDIAN,
-                    isSelected
-                      ? 'border-sky-500/30 bg-sky-500/[0.08] shadow-sm'
-                      : 'border-transparent hover:border-white/5 hover:bg-white/[0.02]',
-                  )}
+                  onClick={() => setSearchFilter('')}
+                  className="mt-2 text-[11px] font-mono text-sky-400 hover:text-sky-300 transition-colors cursor-pointer"
                 >
-                  <div className="flex min-w-0 items-center gap-2.5">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-obsidian-surface text-slate-300 border border-white/[0.08]">
-                      <Icon className="h-3.5 w-3.5 text-sky-400" />
-                    </span>
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="truncate text-xs font-medium text-slate-100">
-                          {file.name}
-                        </span>
-                        <span
-                          className={cn(
-                            'hidden rounded px-1.5 py-0.2 font-mono text-[9px] font-semibold border sm:inline-block',
-                            file.formatColor,
-                          )}
-                        >
-                          {file.format}
+                  Clear search filter
+                </button>
+              </div>
+            ) : (
+              filteredFiles.map((file) => {
+                const Icon = file.icon;
+                const isSelected = selected?.id === file.id;
+                return (
+                  <button
+                    key={file.id}
+                    type="button"
+                    onClick={() => setSelectedFile(file.id)}
+                    aria-pressed={isSelected}
+                    className={cn(
+                      'grid w-full grid-cols-[minmax(0,1fr)_72px] items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all cursor-pointer sm:grid-cols-[minmax(0,1fr)_84px_90px]',
+                      FOCUS_RING_OBSIDIAN,
+                      isSelected
+                        ? 'border-sky-500/30 bg-sky-500/[0.08] shadow-sm'
+                        : 'border-transparent hover:border-white/5 hover:bg-white/[0.02]',
+                    )}
+                  >
+                    <div className="flex min-w-0 items-center gap-2.5">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-obsidian-surface text-slate-300 border border-white/[0.08]">
+                        <Icon className="h-3.5 w-3.5 text-sky-400" />
+                      </span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="truncate text-xs font-medium text-slate-100">
+                            {file.name}
+                          </span>
+                          <span
+                            className={cn(
+                              'hidden rounded px-1.5 py-0.2 font-mono text-[9px] font-semibold border sm:inline-block',
+                              file.formatColor,
+                            )}
+                          >
+                            {file.format}
+                          </span>
+                        </div>
+                        <span className="mt-0.5 block truncate font-mono text-[10px] text-obsidian-muted">
+                          {file.type} · {file.updated}
                         </span>
                       </div>
-                      <span className="mt-0.5 block truncate font-mono text-[10px] text-obsidian-muted">
-                        {file.type} · {file.updated}
-                      </span>
                     </div>
-                  </div>
 
-                  <span className="font-mono text-[10px] text-obsidian-muted">{file.size}</span>
-                  <span className="hidden truncate text-[10px] text-slate-300 sm:block">
-                    {file.owner}
-                  </span>
-                </button>
-              );
-            })}
+                    <span className="font-mono text-[10px] text-obsidian-muted">{file.size}</span>
+                    <span className="hidden truncate text-[10px] text-slate-300 sm:block">
+                      {file.owner}
+                    </span>
+                  </button>
+                );
+              })
+            )}
           </div>
         </div>
 
@@ -201,78 +227,87 @@ export default function HeroFilesView() {
             Artifact Inspector
           </p>
 
-          <div className="mt-3 rounded-xl border border-white/[0.08] bg-obsidian-surface/60 p-4 shadow-sm">
-            <div className="flex items-center gap-3 border-b border-obsidian-border pb-3.5">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
-                <FileIcon className="h-5 w-5" />
-              </span>
-              <div className="min-w-0">
-                <p className="truncate text-xs font-semibold text-white">{selected.name}</p>
-                <div className="mt-1 flex items-center gap-1.5">
-                  <span
-                    className={cn(
-                      'rounded px-1.5 py-0.2 font-mono text-[9px] font-semibold border',
-                      selected.formatColor,
-                    )}
-                  >
-                    {selected.format}
+          {selected ? (
+            <>
+              <div className="mt-3 rounded-xl border border-white/[0.08] bg-obsidian-surface/60 p-4 shadow-sm">
+                <div className="flex items-center gap-3 border-b border-obsidian-border pb-3.5">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                    <FileIcon className="h-5 w-5" />
                   </span>
-                  <span className="font-mono text-[10px] text-obsidian-muted">{selected.size}</span>
+                  <div className="min-w-0">
+                    <p className="truncate text-xs font-semibold text-white">{selected.name}</p>
+                    <div className="mt-1 flex items-center gap-1.5">
+                      <span
+                        className={cn(
+                          'rounded px-1.5 py-0.2 font-mono text-[9px] font-semibold border',
+                          selected.formatColor,
+                        )}
+                      >
+                        {selected.format}
+                      </span>
+                      <span className="font-mono text-[10px] text-obsidian-muted">{selected.size}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="mt-3 text-xs leading-relaxed text-slate-300">{selected.summary}</p>
+
+                <div className="mt-3.5 space-y-2 rounded-lg border border-white/[0.06] bg-white/[0.02] p-2.5 font-mono text-[10px]">
+                  <div className="flex items-center justify-between text-obsidian-muted">
+                    <span>Check:</span>
+                    <span className="text-slate-200">{selected.hash}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-obsidian-muted">
+                    <span>Owner:</span>
+                    <span className="text-slate-200">{selected.owner}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-obsidian-muted">
+                    <span>Updated:</span>
+                    <span className="text-slate-200">{selected.updated}</span>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between gap-2 border-t border-obsidian-border pt-3">
+                  <button
+                    type="button"
+                    onClick={handleCopyLink}
+                    className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-slate-300 transition-colors hover:bg-white/[0.08] hover:text-white cursor-pointer"
+                  >
+                    {copied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                    <span>{copied ? 'Copied' : 'Copy link'}</span>
+                  </button>
+
+                  <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-medium">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> SOC 2 Synced
+                  </span>
                 </div>
               </div>
-            </div>
 
-            <p className="mt-3 text-xs leading-relaxed text-slate-300">{selected.summary}</p>
-
-            <div className="mt-3.5 space-y-2 rounded-lg border border-white/[0.06] bg-white/[0.02] p-2.5 font-mono text-[10px]">
-              <div className="flex items-center justify-between text-obsidian-muted">
-                <span>Check:</span>
-                <span className="text-slate-200">{selected.hash}</span>
-              </div>
-              <div className="flex items-center justify-between text-obsidian-muted">
-                <span>Owner:</span>
-                <span className="text-slate-200">{selected.owner}</span>
-              </div>
-              <div className="flex items-center justify-between text-obsidian-muted">
-                <span>Updated:</span>
-                <span className="text-slate-200">{selected.updated}</span>
-              </div>
-            </div>
-
-            <div className="mt-4 flex items-center justify-between gap-2 border-t border-obsidian-border pt-3">
               <button
                 type="button"
-                onClick={handleCopyLink}
-                className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-xs text-slate-300 transition-colors hover:bg-white/[0.08] hover:text-white cursor-pointer"
+                onClick={() => setActiveModule(selected.destination)}
+                className={cn(
+                  'mt-auto inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 hover:bg-sky-500 py-2.5 px-4 text-xs font-semibold text-white transition-all cursor-pointer shadow-sm active:scale-95',
+                  FOCUS_RING_OBSIDIAN,
+                )}
               >
-                {copied ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
-                <span>{copied ? 'Copied' : 'Copy link'}</span>
+                <span>
+                  Open linked{' '}
+                  {selected.destination === 'huddle'
+                    ? 'Huddle'
+                    : selected.destination === 'docs'
+                    ? 'Doc'
+                    : 'Task'}
+                </span>
+                <ArrowRight className="h-3.5 w-3.5" />
               </button>
-
-              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-medium">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> SOC 2 Synced
-              </span>
+            </>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center text-center p-6 text-slate-500 text-xs">
+              <FolderOpen className="w-8 h-8 text-slate-600 mb-2 stroke-[1.5]" />
+              <span>No artifact selected. Clear your search filter to inspect workspace artifacts.</span>
             </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setActiveModule(selected.destination)}
-            className={cn(
-              'mt-auto inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 hover:bg-sky-500 py-2.5 px-4 text-xs font-semibold text-white transition-all cursor-pointer shadow-sm active:scale-95',
-              FOCUS_RING_OBSIDIAN,
-            )}
-          >
-            <span>
-              Open linked{' '}
-              {selected.destination === 'huddle'
-                ? 'Huddle'
-                : selected.destination === 'docs'
-                ? 'Doc'
-                : 'Task'}
-            </span>
-            <ArrowRight className="h-3.5 w-3.5" />
-          </button>
+          )}
         </aside>
       </div>
     </div>
