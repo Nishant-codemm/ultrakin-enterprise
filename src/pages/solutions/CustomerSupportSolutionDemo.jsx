@@ -104,10 +104,12 @@ export default function CustomerSupportSolutionDemo() {
     [threadMessages, selectedThreadId]
   );
 
-  // Scroll to bottom when messages update
+  // Scroll to bottom of container when messages update without scrolling window
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
-  }, [messages, reduceMotion]);
+    if (messagesEndRef.current?.parentElement) {
+      messagesEndRef.current.parentElement.scrollTop = messagesEndRef.current.parentElement.scrollHeight;
+    }
+  }, [messages]);
 
   // Keyboard navigation between inbox threads
   const handleKeyDown = useCallback((e) => {

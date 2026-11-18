@@ -20,9 +20,9 @@ import { useWorkspace } from '../../context/useWorkspace';
 import { cn } from '../../lib/cn';
 
 const NODE_HEADER_COLORS = {
-  trigger: 'bg-emerald-500/15 border-emerald-500/30 text-emerald-300',
-  condition: 'bg-amber-500/15 border-amber-500/30 text-amber-300',
-  action: 'bg-indigo-500/15 border-indigo-500/30 text-indigo-300',
+  trigger: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
+  condition: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
+  action: 'bg-sky-500/10 border-sky-500/20 text-sky-400',
 };
 
 const NODE_ICONS = {
@@ -30,9 +30,9 @@ const NODE_ICONS = {
   Radio: { icon: Radio, color: 'text-emerald-400' },
   Shield: { icon: Shield, color: 'text-amber-400' },
   Sparkles: { icon: Sparkles, color: 'text-amber-400' },
-  CheckSquare: { icon: CheckSquare, color: 'text-indigo-400' },
-  MessageSquare: { icon: MessageSquare, color: 'text-indigo-400' },
-  FileText: { icon: FileText, color: 'text-indigo-400' },
+  CheckSquare: { icon: CheckSquare, color: 'text-sky-400' },
+  MessageSquare: { icon: MessageSquare, color: 'text-sky-400' },
+  FileText: { icon: FileText, color: 'text-sky-400' },
 };
 
 function getNodeIcon(iconName) {
@@ -66,7 +66,8 @@ export default function VisualAutomationsCanvas() {
   const activeWorkflow =
     automationsWorkflows.find((w) => w.id === activeWorkflowId) || automationsWorkflows[0];
 
-  const selectedNode = activeWorkflow.nodes.find((n) => n.id === selectedNodeId);
+  const selectedNode =
+    activeWorkflow.nodes.find((n) => n.id === selectedNodeId) || activeWorkflow.nodes[0] || null;
 
   // SVG Bezier Curve Generator between two nodes
   const renderEdgePath = (edge) => {
@@ -95,25 +96,24 @@ export default function VisualAutomationsCanvas() {
 
     return (
       <g key={edge.id}>
-        {/* Background glow path */}
+        {/* Background path */}
         <path
           d={pathData}
           fill="none"
-          stroke={isStepActive ? 'rgba(99, 102, 241, 0.4)' : 'rgba(255, 255, 255, 0.05)'}
-          strokeWidth={isStepActive ? '6' : '3'}
+          stroke={isStepActive ? 'rgba(56, 189, 248, 0.3)' : 'rgba(255, 255, 255, 0.04)'}
+          strokeWidth={isStepActive ? '4' : '2'}
         />
-        {/* Foreground sharp path */}
+        {/* Foreground clean path */}
         <path
           d={pathData}
           fill="none"
-          stroke={isStepActive ? '#818CF8' : '#6366F1'}
-          strokeWidth="2"
+          stroke={isStepActive ? '#38BDF8' : '#475569'}
+          strokeWidth="1.5"
           strokeDasharray={isStepActive ? '6 4' : 'none'}
-          className={isStepActive ? 'animate-pulse' : ''}
         />
-        {/* Terminal arrow point */}
-        <circle cx={endX} cy={endY} r="3" fill="#818CF8" />
-        <circle cx={startX} cy={startY} r="3" fill="#6366F1" />
+        {/* Terminal arrow points */}
+        <circle cx={endX} cy={endY} r="3" fill={isStepActive ? '#38BDF8' : '#64748B'} />
+        <circle cx={startX} cy={startY} r="3" fill={isStepActive ? '#38BDF8' : '#64748B'} />
       </g>
     );
   };
@@ -136,11 +136,14 @@ export default function VisualAutomationsCanvas() {
               <button
                 key={wf.id}
                 type="button"
-                onClick={() => setActiveWorkflowId(wf.id)}
+                onClick={() => {
+                  setActiveWorkflowId(wf.id);
+                  setSelectedNodeId(wf.nodes[0]?.id || null);
+                }}
                 className={cn(
                   'px-2.5 py-1 rounded-md text-xs font-medium transition-all cursor-pointer truncate max-w-[180px] active:scale-95',
                   activeWorkflowId === wf.id
-                    ? 'bg-emerald-600/20 text-emerald-300 border border-emerald-500/30'
+                    ? 'bg-white/10 text-white font-semibold'
                     : 'text-slate-400 hover:text-white'
                 )}
               >
@@ -156,13 +159,17 @@ export default function VisualAutomationsCanvas() {
           <button
             type="button"
             onClick={() => {
-              // Attempt to link Action -> Trigger (which creates a directed cycle)
-              addWorkflowEdge('n_action_1', 'n_trigger_1');
+              // Attempt to link Action -> Trigger dynamically for current workflow to test cycle rejection
+              const actionNode = activeWorkflow.nodes.find((n) => n.type === 'action');
+              const triggerNode = activeWorkflow.nodes.find((n) => n.type === 'trigger');
+              if (actionNode && triggerNode) {
+                addWorkflowEdge(actionNode.id, triggerNode.id);
+              }
             }}
-            className="flex items-center gap-1.5 px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 text-rose-300 rounded-lg text-xs font-mono transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-1.5 px-2.5 py-1 bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] text-slate-300 rounded-lg text-xs font-mono transition-all cursor-pointer active:scale-95"
             title="Attempts to link Action to Trigger to test Tarjan Cycle Rejection"
           >
-            <AlertTriangle className="w-3.5 h-3.5 text-rose-400" />
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
             <span className="hidden sm:inline">Test Cycle Rejection</span>
           </button>
 
@@ -172,13 +179,13 @@ export default function VisualAutomationsCanvas() {
             disabled={isAutomationsTesting}
             onClick={testAutomationsWorkflow}
             className={cn(
-              'flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-all shadow-md cursor-pointer active:scale-95',
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95',
               isAutomationsTesting
-                ? 'bg-amber-500/30 text-amber-200 border border-amber-500/40 animate-pulse'
-                : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20'
+                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                : 'bg-sky-600 hover:bg-sky-500 text-white'
             )}
           >
-            <Play className="w-3.5 h-3.5 fill-current" />
+            <Play className="w-3 h-3 fill-current" />
             <span>{isAutomationsTesting ? 'Executing DAG...' : 'Test Workflow'}</span>
           </button>
         </div>
@@ -213,7 +220,7 @@ export default function VisualAutomationsCanvas() {
           {/* Nodes Container */}
           <div className="absolute inset-0 min-w-[1200px] min-h-[800px] z-20 p-8">
             {activeWorkflow.nodes.map((node) => {
-              const isSelected = selectedNodeId === node.id;
+              const isSelected = selectedNode?.id === node.id;
               const isExecuting =
                 (activeExecutionStep === 'trigger' && node.type === 'trigger') ||
                 (activeExecutionStep === 'condition' && node.type === 'condition') ||
@@ -230,17 +237,17 @@ export default function VisualAutomationsCanvas() {
                     width: '260px',
                   }}
                   className={cn(
-                    'rounded-lg border bg-obsidian-surface shadow-lg transition-all duration-200 cursor-pointer select-none',
+                    'rounded-xl border bg-obsidian-surface shadow-md transition-all duration-200 cursor-pointer select-none',
                     isSelected
-                      ? 'ring-2 ring-indigo-500 border-indigo-400 shadow-indigo-500/20'
-                      : 'border-obsidian-border-medium hover:border-white/20',
-                    isExecuting && 'ring-2 ring-emerald-400 shadow-emerald-500/30 scale-[1.02]'
+                      ? 'ring-1 ring-sky-400 border-sky-400 shadow-sm'
+                      : 'border-white/[0.08] hover:border-white/[0.16]',
+                    isExecuting && 'ring-1 ring-emerald-400 border-emerald-400 scale-[1.01]'
                   )}
                 >
                   {/* Node Header */}
                   <div
                     className={cn(
-                      'px-3 py-2 rounded-t-lg border-b flex items-center justify-between text-xs font-semibold',
+                      'px-3 py-2 rounded-t-xl border-b flex items-center justify-between text-xs font-semibold',
                       getNodeHeaderColor(node.type)
                     )}
                   >
@@ -254,7 +261,7 @@ export default function VisualAutomationsCanvas() {
                   </div>
 
                   {/* Node Body */}
-                  <div className="p-3 text-[11px] space-y-1.5 text-slate-300 bg-obsidian-canvas/90 rounded-b-lg">
+                  <div className="p-3 text-[11px] space-y-1.5 text-slate-300 bg-obsidian-canvas/90 rounded-b-xl">
                     {Object.entries(node.config).map(([key, val]) => (
                       <div key={key} className="flex items-start justify-between gap-2 font-mono">
                         <span className="text-slate-500 capitalize">{key}:</span>
@@ -268,19 +275,19 @@ export default function VisualAutomationsCanvas() {
                   {/* Input Port (Left) */}
                   {node.type !== 'trigger' && (
                     <div
-                      className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-obsidian-surface border-2 border-indigo-400 flex items-center justify-center hover:scale-125 transition-transform"
+                      className="absolute -left-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-obsidian-surface border-2 border-slate-500 flex items-center justify-center hover:scale-125 transition-transform"
                       title="Input Connection Port"
                     >
-                      <div className="w-1.5 h-1.5 rounded-full bg-indigo-300" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                     </div>
                   )}
 
                   {/* Output Port (Right) */}
                   <div
-                    className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-obsidian-surface border-2 border-emerald-400 flex items-center justify-center hover:scale-125 transition-transform"
+                    className="absolute -right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-obsidian-surface border-2 border-sky-400 flex items-center justify-center hover:scale-125 transition-transform"
                     title="Output Connection Port"
                   >
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-300" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-sky-300" />
                   </div>
                 </div>
               );

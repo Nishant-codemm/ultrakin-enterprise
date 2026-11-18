@@ -3,7 +3,6 @@ import { useReducedMotion } from 'framer-motion';
 import { cn } from '../../lib/cn';
 import BrowserFrame from '../BrowserFrame';
 import OrbitalReactorMesh from './OrbitalReactorMesh';
-import AdaptiveMeshIntelligence from './AdaptiveMeshIntelligence';
 
 /* ─── 3D Tilt Context for synchronized perspective parallax ─── */
 const TiltContext = createContext({ rx: 0, ry: 0, gx: 50, gy: 50, active: false });
@@ -49,7 +48,9 @@ function TiltCard({ children, className }) {
       >
         <div
           style={{
-            transform: tilt.active
+            transform: reduceMotion
+              ? 'none'
+              : tilt.active
               ? `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) scale(1.006)`
               : 'rotateX(0.8deg) rotateY(-1deg) scale(1)',
             transition: tilt.active
@@ -100,27 +101,16 @@ function OrbitalTopologyMap({
         address="workspace.ultrakin.app/topology/mesh"
         tabTitle="Ultrakin · Connected Tools & Integrations Topology"
       >
-        {selectedCat === 'Extension examples' ? (
-          <AdaptiveMeshIntelligence
-            visible={visible}
-            current={current}
-            activeNode={activeNode}
-            hoveredNode={hoveredNode}
-            setHoveredNode={setHoveredNode}
-            setSelected={setSelected}
-            inView={inView}
-          />
-        ) : (
-          <OrbitalReactorMesh
-            visible={visible}
-            current={current}
-            activeNode={activeNode}
-            hoveredNode={hoveredNode}
-            setHoveredNode={setHoveredNode}
-            setSelected={setSelected}
-            inView={inView}
-          />
-        )}
+        <OrbitalReactorMesh
+          visible={visible}
+          current={current}
+          selectedCat={selectedCat}
+          activeNode={activeNode}
+          hoveredNode={hoveredNode}
+          setHoveredNode={setHoveredNode}
+          setSelected={setSelected}
+          inView={inView}
+        />
       </BrowserFrame>
     </TiltCard>
   );

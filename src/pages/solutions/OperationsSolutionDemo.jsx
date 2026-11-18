@@ -5,23 +5,17 @@
  * Procurement Request -> Automated Threshold Branching -> Executive Signoff -> Immutable Asset Ledger.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Workflow,
   CheckCircle2,
-  AlertCircle,
-  FileText,
-  DollarSign,
   ShieldCheck,
   ArrowRight,
-  Sliders,
   Sparkles,
 } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
 
 export default function OperationsSolutionDemo() {
-  const reduceMotion = useReducedMotion();
   const [approved, setApproved] = useState(false);
 
   return (

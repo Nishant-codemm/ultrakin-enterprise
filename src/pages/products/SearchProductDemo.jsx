@@ -56,7 +56,7 @@ export default function SearchProductDemo() {
     const parts = text.split(new RegExp(`(${term})`, 'gi'));
     return parts.map((part, i) =>
       part.toLowerCase() === term.toLowerCase() ? (
-        <span key={i} className="bg-indigo-500/30 text-indigo-200 font-bold px-0.5 rounded">
+        <span key={i} className="bg-sky-500/20 text-sky-200 font-semibold px-0.5 rounded">
           {part}
         </span>
       ) : (
@@ -72,7 +72,7 @@ export default function SearchProductDemo() {
     >
       {/* ── Search Input Bar ── */}
       <div className="h-12 shrink-0 border-b border-white/[0.08] bg-[#0B0F19] px-4 flex items-center gap-2.5">
-        <Search size={15} className="text-indigo-400 shrink-0" />
+        <Search size={15} className="text-sky-400 shrink-0" />
         <input
           ref={inputRef}
           type="text"
@@ -124,11 +124,11 @@ export default function SearchProductDemo() {
                   aria-pressed={isSelected}
                   className={`flex w-full items-center gap-2.5 p-2 rounded-lg text-left text-xs cursor-pointer transition-all ${
                     isSelected
-                      ? 'bg-indigo-600/25 border border-indigo-500/40 text-slate-100 shadow-xs'
-                      : 'text-slate-300 hover:bg-white/[0.04] border border-transparent'
+                      ? 'bg-white/[0.08] border border-white/[0.12] text-slate-100 shadow-xs'
+                      : 'text-slate-300 hover:bg-white/[0.03] border border-transparent'
                   }`}
                 >
-                  <div className="h-6 w-6 rounded-md bg-white/[0.06] flex items-center justify-center text-indigo-400 shrink-0">
+                  <div className="h-6 w-6 rounded-md bg-white/[0.06] flex items-center justify-center text-sky-400 shrink-0">
                     <Icon size={12} />
                   </div>
 
@@ -147,7 +147,7 @@ export default function SearchProductDemo() {
                   </div>
 
                   {isSelected && (
-                    <CornerDownLeft size={10} className="text-indigo-400 shrink-0 opacity-70" />
+                    <CornerDownLeft size={10} className="text-sky-400 shrink-0 opacity-70" />
                   )}
                 </button>
               );
@@ -163,7 +163,7 @@ export default function SearchProductDemo() {
         <div className="w-[180px] sm:w-[210px] shrink-0 bg-[#0B0F19] p-3 flex flex-col justify-between">
           {selectedItem ? (
             <div>
-              <span className="text-[9px] font-mono uppercase tracking-wider text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded-full inline-block mb-2">
+              <span className="text-[9px] font-mono uppercase tracking-wider text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 rounded-full inline-block mb-2">
                 {SEARCH_DATA.typeLabels[selectedItem.type] || 'Item'}
               </span>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   CheckSquare,
   Clock,
@@ -19,10 +19,10 @@ import { useWorkspace } from '../../context/useWorkspace';
 import { cn } from '../../lib/cn';
 
 const COLUMNS = [
-  { id: 'backlog', title: 'Backlog', accent: 'border-slate-500/40 text-slate-300', dot: 'bg-slate-400' },
-  { id: 'in_progress', title: 'In Progress', accent: 'border-indigo-500/40 text-indigo-300', dot: 'bg-indigo-400' },
-  { id: 'review', title: 'Review', accent: 'border-violet-500/40 text-violet-300', dot: 'bg-violet-400' },
-  { id: 'done', title: 'Done', accent: 'border-emerald-500/40 text-emerald-300', dot: 'bg-emerald-400' },
+  { id: 'backlog', title: 'Backlog', dot: 'bg-slate-400' },
+  { id: 'in_progress', title: 'In Progress', dot: 'bg-sky-400' },
+  { id: 'review', title: 'In Review', dot: 'bg-amber-400' },
+  { id: 'done', title: 'Done', dot: 'bg-emerald-400' },
 ];
 
 export default function KanbanTaskBoard() {
@@ -45,6 +45,35 @@ export default function KanbanTaskBoard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPriority, setFilterPriority] = useState('ALL');
   const [newSubtaskText, setNewSubtaskText] = useState('');
+  const drawerRef = useRef(null);
+
+  // Close task inspector drawer on outside click or Escape key
+  useEffect(() => {
+    if (!isTaskDrawerOpen) return;
+
+    const handlePointerDown = (e) => {
+      if (drawerRef.current && !drawerRef.current.contains(e.target)) {
+        if (e.target.closest('[data-kanban-card]')) return;
+        closeTaskDrawer();
+      }
+    };
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        closeTaskDrawer();
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isTaskDrawerOpen, closeTaskDrawer]);
 
   // Drag-and-drop handlers
   const handleDragStart = (e, taskId) => {
@@ -120,13 +149,13 @@ export default function KanbanTaskBoard() {
   const getPriorityBadgeClass = (priority) => {
     switch (priority) {
       case 'P0':
-        return 'bg-rose-500/15 text-rose-300 border-rose-500/30';
+        return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
       case 'P1':
-        return 'bg-amber-500/15 text-amber-300 border-amber-500/30';
+        return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
       case 'P2':
-        return 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30';
+        return 'bg-sky-500/10 text-sky-400 border-sky-500/20';
       default:
-        return 'bg-slate-500/15 text-slate-300 border-slate-500/30';
+        return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
     }
   };
 
@@ -136,9 +165,9 @@ export default function KanbanTaskBoard() {
       <div className="h-14 px-4 bg-obsidian-canvas border-b border-obsidian-border flex flex-wrap items-center justify-between gap-3 shrink-0">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <CheckSquare className="w-4 h-4 text-indigo-400" />
+            <CheckSquare className="w-4 h-4 text-sky-400" />
             <span className="font-semibold text-white text-xs sm:text-sm">Sprint 24 Board</span>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-indigo-500/15 border border-indigo-500/25 text-indigo-300">
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-300">
               {kanbanTasks.length} Active Tasks
             </span>
           </div>
@@ -153,7 +182,7 @@ export default function KanbanTaskBoard() {
                 className={cn(
                   'px-2 py-0.5 rounded text-[10px] font-mono transition-colors cursor-pointer',
                   filterPriority === p
-                    ? 'bg-indigo-600 text-white font-bold'
+                    ? 'bg-white/15 text-white font-medium'
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
                 )}
               >
@@ -173,7 +202,7 @@ export default function KanbanTaskBoard() {
               placeholder="Search tasks..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-32 sm:w-48 pl-8 pr-3 py-1 bg-obsidian-surface border border-obsidian-border-medium rounded-md text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/60 transition-colors"
+              className="w-32 sm:w-48 pl-8 pr-3 py-1 bg-obsidian-surface border border-obsidian-border rounded-md text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500/50 transition-colors"
             />
           </div>
 
@@ -181,12 +210,12 @@ export default function KanbanTaskBoard() {
             type="button"
             onClick={() => {
               addToast(
-                'Task Creation Modal',
+                'Task Creation',
                 'Pre-configured template: P1 triage card with cross-module bindings ready.',
                 'info'
               );
             }}
-            className="flex items-center gap-1.5 px-3 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-all cursor-pointer active:scale-95"
+            className="flex items-center gap-1.5 px-3 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-semibold shadow-sm transition-all cursor-pointer active:scale-95"
           >
             <Plus className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">New Task</span>
@@ -229,7 +258,7 @@ export default function KanbanTaskBoard() {
                 'w-[280px] sm:w-[310px] shrink-0 flex flex-col rounded-xl border transition-all duration-200',
                 'bg-obsidian-canvas/80 backdrop-blur-sm',
                 isOver
-                  ? 'border-indigo-500/60 bg-indigo-500/10 ring-1 ring-indigo-500/30'
+                  ? 'border-sky-500/50 bg-sky-500/[0.05] ring-1 ring-sky-500/20'
                   : 'border-obsidian-border-soft hover:border-obsidian-border-medium'
               )}
             >
@@ -240,7 +269,7 @@ export default function KanbanTaskBoard() {
                   <span className="font-semibold text-xs text-white uppercase tracking-wider">
                     {col.title}
                   </span>
-                  <span className="text-[10px] font-mono font-bold text-slate-400 bg-white/5 border border-obsidian-border px-1.5 py-0.2 rounded-full">
+                  <span className="text-[10px] font-mono font-semibold text-slate-400 bg-white/5 border border-white/[0.08] px-1.5 py-0.2 rounded-full">
                     {colTasks.length}
                   </span>
                 </div>
@@ -269,23 +298,24 @@ export default function KanbanTaskBoard() {
                   return (
                     <div
                       key={task.id}
+                      data-kanban-card="true"
                       draggable
                       onDragStart={(e) => handleDragStart(e, task.id)}
                       onDragEnd={handleDragEnd}
                       onClick={() => openTaskDrawer(task)}
                       className={cn(
-                        'p-3.5 rounded-lg border bg-obsidian-surface transition-all duration-150 cursor-grab active:cursor-grabbing group relative select-none',
-                        'hover:border-indigo-500/40 hover:bg-[#131D33]',
+                        'p-3.5 rounded-xl border bg-obsidian-surface transition-all duration-150 cursor-grab active:cursor-grabbing group relative select-none',
+                        'hover:border-white/[0.14] hover:bg-[#0F1626]',
                         isDragging
-                          ? 'rotate-[1.5deg] scale-[1.02] shadow-[0_0_0_1px_rgba(99,102,241,0.35),0_12px_28px_-4px_rgba(0,0,0,0.75)] border-indigo-500 opacity-90'
-                          : 'border-obsidian-border shadow-sm'
+                          ? 'rotate-[1deg] scale-[1.01] shadow-[0_12px_28px_-4px_rgba(0,0,0,0.75)] border-sky-500 opacity-90'
+                          : 'border-white/[0.08] shadow-sm'
                       )}
                     >
                       {/* Top Badges Row */}
                       <div className="flex items-center justify-between gap-1.5 mb-2">
                         <span
                           className={cn(
-                            'text-[10px] font-mono font-bold px-2 py-0.5 rounded border',
+                            'text-[10px] font-mono font-semibold px-2 py-0.5 rounded border',
                             getPriorityBadgeClass(task.priority)
                           )}
                         >
@@ -305,7 +335,7 @@ export default function KanbanTaskBoard() {
                               setActiveChannel('client-escalations');
                             }
                           }}
-                          className="flex items-center gap-1 text-[10px] font-mono text-slate-400 bg-white/5 hover:bg-white/10 px-1.5 py-0.5 rounded border border-obsidian-border-soft transition-colors cursor-pointer"
+                          className="flex items-center gap-1 text-[10px] font-mono text-slate-400 bg-white/[0.03] hover:bg-white/[0.08] px-1.5 py-0.5 rounded border border-white/[0.06] transition-colors cursor-pointer"
                           title="Polymorphic Link: Click to jump to source surface"
                         >
                           {getSourceIcon(task.sourceType)}
@@ -421,18 +451,22 @@ export default function KanbanTaskBoard() {
         })}
       </div>
 
-      {/* =========================================================================
-          380px CONTEXTUAL TASK INSPECTOR DRAWER (Phase 6 & 7 Section 10.4 Standard)
-         ========================================================================= */}
+      {/* 380px CONTEXTUAL TASK INSPECTOR DRAWER */}
       {isTaskDrawerOpen && selectedKanbanTask && (
-        <div className="absolute inset-y-0 right-0 w-full sm:w-[380px] bg-obsidian-surface border-l border-obsidian-border-strong shadow-[0_0_50px_rgba(0,0,0,0.85)] z-40 flex flex-col backdrop-blur-2xl">
+        <div
+          ref={drawerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Task Inspector: ${selectedKanbanTask.title}`}
+          className="absolute inset-y-0 right-0 w-full sm:w-[380px] bg-obsidian-surface/95 border-l border-white/[0.08] shadow-[0_0_50px_rgba(0,0,0,0.85)] z-40 flex flex-col backdrop-blur-2xl"
+        >
           {/* Drawer Header */}
           <div className="p-4 border-b border-obsidian-border flex items-center justify-between bg-obsidian-canvas">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold text-indigo-400">
+              <span className="font-mono text-xs font-semibold text-sky-400">
                 #{selectedKanbanTask.id}
               </span>
-              <span className="text-slate-400">·</span>
+              <span className="text-slate-500">·</span>
               <span className="text-xs text-slate-300 font-medium">Task Inspector</span>
             </div>
             <button
@@ -449,7 +483,7 @@ export default function KanbanTaskBoard() {
             {/* Title & Column Picker */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-[10px] font-mono uppercase text-slate-400">Pipeline Stage</label>
+                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-400">Pipeline Stage</label>
                 <div className="flex items-center gap-1">
                   {COLUMNS.map((c) => (
                     <button
@@ -459,8 +493,8 @@ export default function KanbanTaskBoard() {
                       className={cn(
                         'px-2 py-0.5 rounded-md text-[10px] font-mono transition-colors cursor-pointer active:scale-95',
                         selectedKanbanTask.col === c.id
-                          ? 'bg-indigo-600 text-white font-bold'
-                          : 'bg-obsidian-elevated text-slate-400 hover:text-white'
+                          ? 'bg-sky-600 text-white font-medium'
+                          : 'bg-white/[0.04] text-slate-400 hover:text-white'
                       )}
                     >
                       {c.title}
@@ -499,7 +533,7 @@ export default function KanbanTaskBoard() {
               <div>
                 <span className="text-[10px] font-mono uppercase text-slate-400 block mb-1">Assignee</span>
                 <div className="flex items-center gap-1.5 text-white font-medium">
-                  <div className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold flex items-center justify-center text-[10px] border border-indigo-500/30">
+                  <div className="w-5 h-5 rounded-full bg-sky-500/10 text-sky-400 font-semibold flex items-center justify-center text-[10px] border border-sky-500/20">
                     {selectedKanbanTask.assigneeAvatar || 'SC'}
                   </div>
                   <span className="truncate">{selectedKanbanTask.assignee}</span>
@@ -509,7 +543,7 @@ export default function KanbanTaskBoard() {
 
             {/* Cross-Module Linked Context Card */}
             <div>
-              <span className="text-[10px] font-mono uppercase text-slate-400 block mb-1.5">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1.5">
                 Polymorphic Entity Binding
               </span>
               <div className="p-3 bg-obsidian-base rounded-lg border border-obsidian-border-soft space-y-2">
@@ -529,7 +563,7 @@ export default function KanbanTaskBoard() {
                       }
                       closeTaskDrawer();
                     }}
-                    className="text-[10px] text-indigo-400 hover:text-indigo-300 font-mono underline cursor-pointer"
+                    className="text-[10px] text-sky-400 hover:text-sky-300 font-mono underline cursor-pointer"
                   >
                     Open Source ↗
                   </button>
@@ -590,7 +624,7 @@ export default function KanbanTaskBoard() {
                         setNewSubtaskText('');
                       }
                     }}
-                    className="flex-1 px-2.5 py-1.5 bg-obsidian-base border border-obsidian-border rounded text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/60"
+                    className="flex-1 px-2.5 py-1.5 bg-obsidian-base border border-obsidian-border rounded text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500/50"
                   />
                   <button
                     type="button"
@@ -603,7 +637,7 @@ export default function KanbanTaskBoard() {
                         setNewSubtaskText('');
                       }
                     }}
-                    className="px-2.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-xs font-semibold cursor-pointer"
+                    className="px-2.5 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded text-xs font-semibold cursor-pointer"
                   >
                     Add
                   </button>

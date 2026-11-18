@@ -8,11 +8,47 @@ import { useFocusTrap } from '../lib/useFocusTrap';
 
 const SHORTCUT_GROUPS = [
   {
-    category: 'Available shortcuts',
+    category: 'Global Navigation',
     shortcuts: [
-      { keys: ['Ctrl / ⌘', 'K'], label: 'Open or close Universal Search' },
-      { keys: ['Ctrl / ⌘', '/'], label: 'Open or close this shortcuts panel' },
-      { keys: ['Esc'], label: 'Close an open menu, dialog, or drawer' },
+      { keys: ['Ctrl / ⌘', 'K'], label: 'Open Command Palette & Semantic Search' },
+      { keys: ['Ctrl / ⌘', '/'], label: 'Open Keyboard Shortcuts Cheatsheet' },
+      { keys: ['Esc'], label: 'Close active drawer, modal, or popover' },
+    ],
+  },
+  {
+    category: 'Workspace Modules',
+    shortcuts: [
+      { keys: ['⌘', '1'], label: 'Switch to Spaces Chat' },
+      { keys: ['⌘', '2'], label: 'Switch to Incident Threads' },
+      { keys: ['⌘', '3'], label: 'Switch to Custom Domain Mail' },
+      { keys: ['⌘', '4'], label: 'Switch to Living Docs' },
+      { keys: ['⌘', '5'], label: 'Switch to Team Calendar & Events' },
+      { keys: ['⌘', '6'], label: 'Switch to WebRTC Huddle Chamber' },
+      { keys: ['⌘', '7'], label: 'Switch to Sprint Kanban Board' },
+      { keys: ['⌘', '8'], label: 'Switch to Files & Evidence' },
+    ],
+  },
+  {
+    category: 'Calendar & Scheduling',
+    shortcuts: [
+      { keys: ['W'], label: 'Switch to Week View' },
+      { keys: ['M'], label: 'Switch to Month View' },
+      { keys: ['D'], label: 'Switch to Day View' },
+      { keys: ['A'], label: 'Switch to Agenda View' },
+      { keys: ['N'], label: 'Schedule New Event' },
+      { keys: ['T'], label: 'Reset view to Today / Current Week' },
+      { keys: ['G'], label: 'RSVP Going (when event is open)' },
+      { keys: ['X'], label: 'RSVP Decline (when event is open)' },
+    ],
+  },
+  {
+    category: 'Living Docs & Collaboration',
+    shortcuts: [
+      { keys: ['/'], label: 'Open inline block insertion menu' },
+      { keys: ['Ctrl / ⌘', 'B'], label: 'Toggle Bold format' },
+      { keys: ['Ctrl / ⌘', 'I'], label: 'Toggle Italic format' },
+      { keys: ['Ctrl / ⌘', 'E'], label: 'Toggle inline code format' },
+      { keys: ['Ctrl / ⌘', '↵'], label: 'Submit reply or post comment' },
     ],
   },
 ];

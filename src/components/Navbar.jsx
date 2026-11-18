@@ -36,9 +36,15 @@ import UltrakinLogo from './primitives/UltrakinLogo';
 import Button from './primitives/Button';
 import { useWorkspace } from '../context/useWorkspace';
 import { navigate } from '../lib/navigate';
+import { prefetch } from '../lib/prefetch';
 import { SMOOTH_EASE } from '../lib/motion';
 
 const APP_URL = 'https://app.ultrakin.com';
+
+const loadSecurity = () => import('../pages/SecurityPage');
+const loadPricing = () => import('../pages/PricingPage');
+const loadSolutions = () => import('../pages/SolutionsOverviewPage');
+const loadResources = () => import('../pages/ResourcesPage');
 
 function UltrakinIcon({ size = 18 }) {
   return <UltrakinLogo size={size} className="shrink-0" />;
@@ -449,8 +455,24 @@ export default function Navbar() {
               {name}<ChevronDown size={14} className={`text-ink-subtle transition-transform duration-200 ${openMenu === name ? 'rotate-180' : ''}`} />
             </button>
           ))}
-          <a href="/security" onClick={(e) => { e.preventDefault(); navigate('/security'); }} className="rounded-lg px-3.5 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">Security</a>
-          <a href="/pricing" onClick={(e) => { e.preventDefault(); navigate('/pricing'); }} className="rounded-lg px-3.5 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">Pricing</a>
+          <a
+            href="/security"
+            onClick={(e) => { e.preventDefault(); navigate('/security'); }}
+            onMouseEnter={() => prefetch(loadSecurity, 'pages/SecurityPage')}
+            onFocus={() => prefetch(loadSecurity, 'pages/SecurityPage')}
+            className="rounded-lg px-3.5 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70"
+          >
+            Security
+          </a>
+          <a
+            href="/pricing"
+            onClick={(e) => { e.preventDefault(); navigate('/pricing'); }}
+            onMouseEnter={() => prefetch(loadPricing, 'pages/PricingPage')}
+            onFocus={() => prefetch(loadPricing, 'pages/PricingPage')}
+            className="rounded-lg px-3.5 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70"
+          >
+            Pricing
+          </a>
         </div>
 
         <div className="hidden shrink-0 items-center gap-2.5 lg:flex">
@@ -656,6 +678,8 @@ export default function Navbar() {
                       setOpenMenu(null);
                       navigate('/solutions');
                     }}
+                    onMouseEnter={() => prefetch(loadSolutions, 'pages/SolutionsOverviewPage')}
+                    onFocus={() => prefetch(loadSolutions, 'pages/SolutionsOverviewPage')}
                     className="font-semibold text-brand hover:text-brand-hover transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>See all solutions</span>
@@ -724,6 +748,8 @@ export default function Navbar() {
                       setOpenMenu(null);
                       navigate('/resources');
                     }}
+                    onMouseEnter={() => prefetch(loadResources, 'pages/ResourcesPage')}
+                    onFocus={() => prefetch(loadResources, 'pages/ResourcesPage')}
                     className="font-semibold text-brand hover:text-brand-hover transition-colors flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>Browse all resources</span>

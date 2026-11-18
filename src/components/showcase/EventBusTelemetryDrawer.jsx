@@ -11,6 +11,7 @@ import {
   Play,
   Copy,
   Check,
+  X,
 } from 'lucide-react';
 import { useWorkspace } from '../../context/useWorkspace';
 import { cn } from '../../lib/cn';
@@ -20,6 +21,7 @@ const MODULE_SWITCHERS = [
   { id: 'chat', label: 'CHAT', activeClass: 'bg-indigo-600 text-white' },
   { id: 'mail', label: 'MAIL', activeClass: 'bg-sky-600 text-white' },
   { id: 'docs', label: 'DOCS', activeClass: 'bg-emerald-600 text-white' },
+  { id: 'calendar', label: 'EVENTS', activeClass: 'bg-indigo-600 text-white' },
   { id: 'huddle', label: 'CALL', activeClass: 'bg-violet-600 text-white' },
   { id: 'tasks', label: 'KANBAN', activeClass: 'bg-amber-600 text-white' },
   { id: 'automations', label: 'DAG', activeClass: 'bg-emerald-600 text-white' },
@@ -93,7 +95,7 @@ const SAMPLE_EVENTS = [
   },
 ];
 
-function EventBusTelemetryDrawer() {
+function EventBusTelemetryDrawer({ onClose }) {
   const {
     activeModule,
     setActiveModule,
@@ -119,7 +121,7 @@ function EventBusTelemetryDrawer() {
   };
 
   return (
-    <div className="hidden lg:flex flex-col h-full bg-obsidian-base border-l border-obsidian-border select-none p-3.5 space-y-3.5 text-slate-200">
+    <div className="flex flex-col h-full bg-obsidian-base border-l border-obsidian-border select-none p-3.5 space-y-3.5 text-slate-200">
       {/* ── Top Header Bar with Dual-Mode Segmented Tabs (Phase 6 Inspector Standard) ── */}
       <div className="flex items-center justify-between pb-2.5 border-b border-obsidian-border">
         {/* Mode Switcher */}
@@ -152,7 +154,7 @@ function EventBusTelemetryDrawer() {
           </button>
         </div>
 
-        {/* Live Status Diode + Pause Button */}
+        {/* Live Status Diode + Pause Button + Close Button */}
         <div className="flex items-center gap-2">
           <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400">
             <span className={cn('w-1.5 h-1.5 rounded-full bg-emerald-400', !isPaused && 'animate-pulse')} />
@@ -167,6 +169,17 @@ function EventBusTelemetryDrawer() {
           >
             {isPaused ? <Play className="w-2.5 h-2.5 text-emerald-400" /> : <Pause className="w-2.5 h-2.5" />}
           </button>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close telemetry drawer"
+              title="Close drawer"
+              className="p-1 rounded bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 hover:text-white transition-colors cursor-pointer ml-1"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          )}
         </div>
       </div>
 

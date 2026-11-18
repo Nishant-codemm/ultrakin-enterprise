@@ -687,7 +687,7 @@ export default function WorkflowSpotlight() {
         </motion.div>
 
         {/* ── Micro-CTA: Inter-section discovery ── */}
-        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-border/70 pt-6 text-center sm:flex-row sm:text-left">
+        <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-border/70 pt-6 text-center sm:flex-row sm:text-left lg:col-span-2">
           <div className="flex items-center gap-2 text-xs text-ink-muted">
             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
             <span>Telemetry and context streams connect natively across workspaces, tools, and autonomous agents.</span>

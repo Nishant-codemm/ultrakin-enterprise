@@ -70,7 +70,7 @@ export default function CallsProductDemo() {
           <span className="text-[10px] font-mono text-slate-400 bg-white/[0.05] px-2 py-0.5 rounded border border-white/[0.08] tabular-nums">
             {inCall ? `● REC ${formatTimer(seconds)}` : 'Call ended'}
           </span>
-          <span className="text-[10px] font-mono text-indigo-400 flex items-center gap-1 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+          <span className="text-[10px] font-mono text-sky-400 flex items-center gap-1 bg-sky-500/10 px-2 py-0.5 rounded border border-sky-500/20">
             <Sparkles size={11} /> AI Transcribing
           </span>
         </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight,
@@ -50,20 +50,19 @@ export default function EnterpriseDemoDrawer() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { copied: copiedEmail, copy: copyEmail } = useClipboard({ timeout: 2200 });
 
+  const handleClose = useCallback(() => {
+    setIsSubmitted(false);
+    setIsSubmitting(false);
+    closeDemoDrawer();
+  }, [closeDemoDrawer]);
+
   // Standardized accessible focus trap & escape dismissal
   useFocusTrap({
     isOpen: isDemoDrawerOpen,
     containerRef: dialogRef,
     initialFocusRef: closeButtonRef,
-    onEscape: closeDemoDrawer,
+    onEscape: handleClose,
   });
-
-  useEffect(() => {
-    if (!isDemoDrawerOpen) {
-      setIsSubmitted(false);
-      setIsSubmitting(false);
-    }
-  }, [isDemoDrawerOpen]);
 
   const handleCopyEmail = useCallback(() => {
     copyEmail('sales@ultrakin.com');
@@ -91,7 +90,7 @@ export default function EnterpriseDemoDrawer() {
           <motion.button
         type="button"
         aria-label="Close evaluation panel"
-        onClick={closeDemoDrawer}
+        onClick={handleClose}
         {...scrimMotion}
         className="absolute inset-0 cursor-default bg-slate-900/40 backdrop-blur-sm transition-opacity"
       />
@@ -135,7 +134,7 @@ export default function EnterpriseDemoDrawer() {
             <button
               ref={closeButtonRef}
               type="button"
-              onClick={closeDemoDrawer}
+              onClick={handleClose}
               aria-label="Close evaluation panel"
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-ink-subtle transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus cursor-pointer"
             >

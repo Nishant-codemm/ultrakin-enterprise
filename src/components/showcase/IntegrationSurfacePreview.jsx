@@ -23,7 +23,7 @@ function IntegrationSurfacePreview({ item }) {
     <BrowserFrame
       address={`workspace.ultrakin.app/integrations/${item.name.toLowerCase().replaceAll(' ', '-')}`}
       tabTitle={`Ultrakin · ${item.name} Connector`}
-      className="mt-6 max-w-md"
+      className="mt-6 w-full max-w-md"
     >
       <div className="overflow-hidden bg-[#0d1118]/90 shadow-[0_18px_44px_-34px_rgba(0,0,0,.55),inset_0_1px_0_rgba(255,255,255,.035)]">
         {/* Surface Header */}

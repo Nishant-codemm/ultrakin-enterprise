@@ -384,10 +384,10 @@ export default function SolutionPage() {
 
             {/* Right: interactive demo widget */}
             <motion.div variants={rightVariants} className="relative">
-              {/* Subtle glow behind demo */}
+              {/* Subtle ambient fill behind demo */}
               <div
-                className="absolute -inset-4 rounded-3xl opacity-30 blur-2xl pointer-events-none"
-                style={{ background: `radial-gradient(ellipse at 50% 50%, ${meta.color}22, transparent 70%)` }}
+                className="absolute -inset-4 rounded-3xl opacity-10 blur-xl pointer-events-none"
+                style={{ background: `radial-gradient(ellipse at 50% 50%, ${meta.color}20, transparent 70%)` }}
               />
               <DemoWindowFrame
                 height="h-[430px]"
@@ -404,10 +404,10 @@ export default function SolutionPage() {
 
               {/* Floating solution badge */}
               <div
-                className="absolute -bottom-3 -right-3 flex items-center gap-2 rounded-full border border-[#e7e4de] bg-white px-3 py-1.5 shadow-md"
+                className="absolute -bottom-3 -right-3 flex items-center gap-2 rounded-full border border-[#e7e4de] bg-white px-3 py-1.5 shadow-sm"
               >
                 <span
-                  className="h-2 w-2 rounded-full animate-pulse"
+                  className="h-2 w-2 rounded-full"
                   style={{ backgroundColor: meta.color }}
                 />
                 <span className="text-[11px] font-semibold text-[#374151]">{meta.badgeText || meta.name}</span>
@@ -452,6 +452,11 @@ export default function SolutionPage() {
           productColor={meta.color}
         />
       )}
+
+      {/* Closing CTA */}
+      <section className="mx-auto max-w-7xl px-5 lg:px-8 mt-16 mb-20">
+        <ProductCTARow accentColor={meta.color} />
+      </section>
     </div>
   );
 }

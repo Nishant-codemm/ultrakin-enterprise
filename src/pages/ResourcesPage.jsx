@@ -4,9 +4,10 @@
  * Features live reactive search, category filtering, interactive featured paper,
  * responsive resource grid, and an interactive full-text article reader modal.
  */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useClipboard } from '../lib/useClipboard';
+import { useFocusTrap } from '../lib/useFocusTrap';
 import {
   Search,
   Clock,
@@ -50,6 +51,16 @@ export default function ResourcesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeArticle, setActiveArticle] = useState(null);
   const { copied: copiedLink, copy: copyShareUrl } = useClipboard({ timeout: 2000 });
+  const readerModalRef = useRef(null);
+  const readerCloseButtonRef = useRef(null);
+
+  // WAI-ARIA Accessible Focus Trap & Escape Dismissal
+  useFocusTrap({
+    isOpen: Boolean(activeArticle),
+    containerRef: readerModalRef,
+    initialFocusRef: readerCloseButtonRef,
+    onEscape: () => setActiveArticle(null),
+  });
 
   // Filter resources based on active category & search query
   const filteredResources = useMemo(() => {
@@ -77,6 +88,18 @@ export default function ResourcesPage() {
       copyShareUrl(shareUrl);
     }
   };
+
+  // Lock body scroll when article reader modal is active
+  useEffect(() => {
+    if (activeArticle) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [activeArticle]);
 
   return (
     <div className="min-h-screen bg-[#faf9f7] text-[#111827] select-none font-sans pt-24 pb-20">
@@ -128,8 +151,8 @@ export default function ResourcesPage() {
         </div>
 
         {/* ─── Horizontal Category Filter Tabs ─────────────────────────────── */}
-        <div className="border-b border-[#e5e2dc] pb-4 mb-10 overflow-x-auto scrollbar-none">
-          <div className="flex items-center gap-2 min-w-max">
+        <div className="border-b border-border pb-4 mb-10 overflow-x-auto scrollbar-none">
+          <div role="tablist" aria-label="Resource Categories" className="flex items-center gap-2 min-w-max">
             {RESOURCE_CATEGORIES.map((cat) => {
               const Icon = CATEGORY_ICONS[cat.icon] || Layers;
               const isActive = activeCategory === cat.id;
@@ -137,19 +160,22 @@ export default function ResourcesPage() {
               return (
                 <button
                   key={cat.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
                   onClick={() => setActiveCategory(cat.id)}
-                  className={`relative flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer ${
+                  className={`relative flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand ${
                     isActive
-                      ? 'text-[#111827] bg-white shadow-2xs border border-[#e5e2dc]'
-                      : 'text-[#667085] hover:text-[#111827] hover:bg-white/60'
+                      ? 'text-ink bg-surface-raised shadow-2xs border border-border'
+                      : 'text-ink-muted hover:text-ink hover:bg-surface-hover'
                   }`}
                 >
-                  <Icon size={14} className={isActive ? 'text-[#2563eb]' : 'text-[#9ca3af]'} />
+                  <Icon size={14} className={isActive ? 'text-brand' : 'text-ink-subtle'} aria-hidden="true" />
                   <span>{cat.label}</span>
                   {isActive && (
                     <motion.div
                       layoutId="active-resource-tab"
-                      className="absolute inset-0 rounded-lg border-2 border-[#2563eb] pointer-events-none"
+                      className="absolute inset-0 rounded-lg border-2 border-brand pointer-events-none"
                       transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                     />
                   )}
@@ -162,7 +188,19 @@ export default function ResourcesPage() {
         {/* ─── Featured Architecture Showcase Card ─────────────────────────── */}
         {activeCategory === 'all' && !searchQuery && (
           <div className="mb-14">
-            <div className="rounded-2xl border border-[#e5e2dc] bg-gradient-to-br from-white via-white to-[#faf9f7] p-6 sm:p-8 shadow-xs relative overflow-hidden group">
+            <article
+              role="button"
+              tabIndex={0}
+              aria-label={`Featured Paper: ${FEATURED_RESOURCE.title}`}
+              onClick={() => setActiveArticle(FEATURED_RESOURCE)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setActiveArticle(FEATURED_RESOURCE);
+                }
+              }}
+              className="rounded-2xl border border-border bg-gradient-to-br from-surface-raised via-surface-raised to-surface p-6 sm:p-8 shadow-xs relative overflow-hidden group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-page"
+            >
               <div className="absolute top-0 right-0 h-48 w-48 bg-gradient-to-bl from-indigo-500/10 via-transparent to-transparent pointer-events-none rounded-bl-full" />
 
               <div className="flex flex-col lg:flex-row items-start justify-between gap-6">
@@ -171,16 +209,16 @@ export default function ResourcesPage() {
                     <span className="rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 px-2.5 py-0.5 text-[10.5px] font-semibold font-mono">
                       {FEATURED_RESOURCE.badge}
                     </span>
-                    <span className="text-[11px] font-mono text-[#9ca3af]">
+                    <span className="text-[11px] font-mono text-ink-subtle">
                       {FEATURED_RESOURCE.date} · {FEATURED_RESOURCE.readTime}
                     </span>
                   </div>
 
-                  <h2 className="font-serif text-2xl sm:text-3xl font-normal tracking-tight text-[#111827] group-hover:text-[#2563eb] transition-colors">
+                  <h2 className="font-serif text-2xl sm:text-3xl font-normal tracking-tight text-ink group-hover:text-brand-text transition-colors">
                     {FEATURED_RESOURCE.title}
                   </h2>
 
-                  <p className="text-xs sm:text-sm text-[#4b5563] leading-relaxed">
+                  <p className="text-xs sm:text-sm text-ink-soft leading-relaxed">
                     {FEATURED_RESOURCE.subtitle}
                   </p>
 
@@ -188,7 +226,7 @@ export default function ResourcesPage() {
                     {FEATURED_RESOURCE.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="rounded bg-[#f4f2ee] border border-[#e5e2dc] px-2 py-0.5 text-[10px] font-mono text-[#4b5563]"
+                        className="rounded bg-surface-soft border border-border px-2 py-0.5 text-[10px] font-mono text-ink-soft"
                       >
                         #{tag}
                       </span>
@@ -202,10 +240,10 @@ export default function ResourcesPage() {
                       size="sm"
                     />
                     <div>
-                      <p className="text-xs font-semibold text-[#111827]">
+                      <p className="text-xs font-semibold text-ink">
                         {FEATURED_RESOURCE.author.name}
                       </p>
-                      <p className="text-[10.5px] text-[#6b7280]">
+                      <p className="text-[10.5px] text-ink-muted">
                         {FEATURED_RESOURCE.author.role} · {FEATURED_RESOURCE.author.company}
                       </p>
                     </div>
@@ -222,15 +260,18 @@ export default function ResourcesPage() {
 
                   <button
                     type="button"
-                    onClick={() => setActiveArticle(FEATURED_RESOURCE)}
-                    className="mt-4 lg:mt-0 flex items-center gap-2 rounded-lg bg-[#111827] text-white px-4 py-2.5 text-xs font-semibold hover:bg-black transition-all cursor-pointer shadow-sm group-hover:bg-[#2563eb]"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveArticle(FEATURED_RESOURCE);
+                    }}
+                    className="mt-4 lg:mt-0 flex items-center gap-2 rounded-lg bg-ink text-white px-4 py-2.5 text-xs font-semibold hover:bg-black transition-all cursor-pointer shadow-sm group-hover:bg-brand"
                   >
                     <span>Read Technical Paper</span>
-                    <ArrowRight size={14} />
+                    <ArrowRight size={14} aria-hidden="true" />
                   </button>
                 </div>
               </div>
-            </div>
+            </article>
           </div>
         )}
 
@@ -271,10 +312,19 @@ export default function ResourcesPage() {
                   CATEGORY_COLORS[res.category] || 'text-slate-700 bg-slate-50 border-slate-200';
 
                 return (
-                  <div
+                  <article
                     key={res.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${res.title} (${res.categoryLabel}, ${res.readTime})`}
                     onClick={() => setActiveArticle(res)}
-                    className="flex flex-col justify-between rounded-xl border border-[#e5e2dc] bg-white p-5 hover:border-[#2563eb]/40 hover:shadow-md transition-all cursor-pointer group select-none"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setActiveArticle(res);
+                      }
+                    }}
+                    className="flex flex-col justify-between rounded-xl border border-border bg-surface-raised p-5 hover:border-brand/40 hover:shadow-md transition-all cursor-pointer group select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-page"
                   >
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
@@ -283,17 +333,17 @@ export default function ResourcesPage() {
                         >
                           {res.categoryLabel}
                         </span>
-                        <span className="flex items-center gap-1 font-mono text-[10px] text-[#9ca3af]">
-                          <Clock size={10} />
+                        <span className="flex items-center gap-1 font-mono text-[10px] text-ink-subtle">
+                          <Clock size={10} aria-hidden="true" />
                           {res.readTime}
                         </span>
                       </div>
 
-                      <h3 className="font-semibold text-sm sm:text-base text-[#111827] group-hover:text-[#2563eb] transition-colors leading-snug">
+                      <h3 className="font-semibold text-sm sm:text-base text-ink group-hover:text-brand-text transition-colors leading-snug">
                         {res.title}
                       </h3>
 
-                      <p className="text-xs text-[#4b5563] line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-ink-soft line-clamp-2 leading-relaxed">
                         {res.description}
                       </p>
 
@@ -301,7 +351,7 @@ export default function ResourcesPage() {
                         {res.tags.map((t) => (
                           <span
                             key={t}
-                            className="rounded bg-[#faf9f7] border border-[#f0ede8] px-1.5 py-0.2 text-[9.5px] font-mono text-[#667085]"
+                            className="rounded bg-surface-soft border border-border/70 px-1.5 py-0.2 text-[9.5px] font-mono text-ink-muted"
                           >
                             #{t}
                           </span>
@@ -309,7 +359,7 @@ export default function ResourcesPage() {
                       </div>
                     </div>
 
-                    <div className="mt-5 pt-4 border-t border-[#f0ede8] flex items-center justify-between">
+                    <div className="mt-5 pt-4 border-t border-border/70 flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <AvatarChip
                           name={res.author.name}
@@ -317,19 +367,19 @@ export default function ResourcesPage() {
                           size="xs"
                         />
                         <div>
-                          <p className="text-[11px] font-medium text-[#111827]">
+                          <p className="text-[11px] font-medium text-ink">
                             {res.author.name}
                           </p>
-                          <p className="text-[9.5px] text-[#9ca3af]">{res.date}</p>
+                          <p className="text-[9.5px] text-ink-subtle">{res.date}</p>
                         </div>
                       </div>
 
-                      <span className="flex items-center gap-1 text-[11px] font-semibold text-[#2563eb] group-hover:translate-x-0.5 transition-transform">
+                      <span className="flex items-center gap-1 text-[11px] font-semibold text-brand-text group-hover:translate-x-0.5 transition-transform">
                         <span>Read</span>
-                        <ArrowRight size={12} />
+                        <ArrowRight size={12} aria-hidden="true" />
                       </span>
                     </div>
-                  </div>
+                  </article>
                 );
               })}
             </div>
@@ -372,6 +422,10 @@ export default function ResourcesPage() {
         {activeArticle && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/40 backdrop-blur-xs">
             <motion.div
+              ref={readerModalRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="reader-article-title"
               initial={reduceMotion ? false : { opacity: 0, scale: 0.96, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 10 }}
@@ -397,8 +451,10 @@ export default function ResourcesPage() {
                     <span>{copiedLink ? 'Copied' : 'Share'}</span>
                   </button>
                   <button
+                    ref={readerCloseButtonRef}
                     type="button"
                     onClick={() => setActiveArticle(null)}
+                    aria-label="Close document reader"
                     className="flex h-7 w-7 items-center justify-center rounded-md border border-[#e5e2dc] text-[#6b7280] hover:text-[#111827] hover:bg-[#f0ede8] transition-colors cursor-pointer"
                   >
                     <X size={15} />
@@ -409,7 +465,7 @@ export default function ResourcesPage() {
               {/* Reader Body */}
               <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-xs sm:text-sm text-[#374151] leading-relaxed">
                 <div>
-                  <h2 className="font-serif text-2xl sm:text-3xl font-normal text-[#111827] leading-tight">
+                  <h2 id="reader-article-title" className="font-serif text-2xl sm:text-3xl font-normal text-[#111827] leading-tight">
                     {activeArticle.title}
                   </h2>
                   <p className="mt-2 text-xs sm:text-sm text-[#667085]">

@@ -36,7 +36,7 @@ const PARTICIPANTS = [
   {
     id: 'sara',
     name: 'Sara Chen',
-    role: 'Principal Infra Engineer',
+    role: 'Principal Infra Lead',
     initials: 'SC',
     color: 'from-emerald-600 via-teal-600 to-emerald-500',
     speaking: true,
@@ -66,7 +66,7 @@ const PARTICIPANTS = [
   {
     id: 'ukin',
     name: 'Ukin AI Scribe',
-    role: 'Autonomous Huddle Observer',
+    role: 'Autonomous Observer',
     initials: 'UK',
     color: 'from-cyan-500 via-indigo-600 to-violet-600',
     isAgent: true,
@@ -105,6 +105,7 @@ export default function HuddleSimulator() {
   const [floatingReactions, setFloatingReactions] = useState([]);
   const [callSeconds, setCallSeconds] = useState(504); // 08:24
   const reactionIdRef = useRef(0);
+  const reactionTimersRef = useRef(new Set());
 
   // Live session timer tick
   useEffect(() => {
@@ -114,80 +115,44 @@ export default function HuddleSimulator() {
     return () => clearInterval(timer);
   }, []);
 
+  // Cleanup pending reaction timers on unmount
+  useEffect(() => {
+    const timers = reactionTimersRef.current;
+    return () => {
+      timers.forEach((t) => clearTimeout(t));
+      timers.clear();
+    };
+  }, []);
+
   const formattedCallTime = `${String(Math.floor(callSeconds / 60)).padStart(2, '0')}:${String(
     callSeconds % 60,
   ).padStart(2, '0')}`;
 
-  // Keyboard shortcut listener for power users (M, V, S, H)
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
-
-      if (e.key === 'm' || e.key === 'M') {
-        e.preventDefault();
-        setHuddleMuted((m) => {
-          const next = !m;
-          addToast('Microphone', next ? 'Muted local microphone.' : 'Unmuted. Voice streaming.', 'info');
-          return next;
-        });
-      } else if (e.key === 'v' || e.key === 'V') {
-        e.preventDefault();
-        setCameraEnabled((c) => {
-          const next = !c;
-          addToast('Camera', next ? 'Camera video feed enabled (HD 1080p).' : 'Camera disabled (Voice avatar mode).', 'info');
-          return next;
-        });
-      } else if (e.key === 's' || e.key === 'S') {
-        e.preventDefault();
-        setHuddleScreenShareActive((s) => {
-          const next = !s;
-          addToast('Screen Share', next ? 'Presenting screen to room.' : 'Stopped presentation.', 'info');
-          return next;
-        });
-      } else if (e.key === 'h' || e.key === 'H') {
-        e.preventDefault();
-        setHandRaised((h) => {
-          const next = !h;
-          if (next) {
-            handleReaction('✋');
-            addToast('Hand Raised', 'Sara Chen raised hand to speak.', 'info');
-          }
-          return next;
-        });
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [addToast, setHuddleMuted, setHuddleScreenShareActive]);
-
-  const handleSimulateNextSpeech = useCallback(() => {
-    const scenario = SPEECH_SCENARIOS[speechPromptIdx % SPEECH_SCENARIOS.length];
-    simulateHuddleUtterance(scenario.speaker, scenario.text);
-    setActiveSpeaker(scenario.speaker);
-    setSpeechPromptIdx((prev) => prev + 1);
-  }, [speechPromptIdx, simulateHuddleUtterance]);
-
   const handleReaction = useCallback((emoji) => {
     reactionIdRef.current += 1;
     const newId = reactionIdRef.current;
-    const randX = 35 + Math.random() * 30; // 35% - 65% width
-    setFloatingReactions((prev) => [...prev, { id: newId, emoji, left: randX }]);
+    // Anchor reactions gracefully to the right margin to never obscure canvas text
+    const randRight = 24 + Math.random() * 32;
+    setFloatingReactions((prev) => [...prev, { id: newId, emoji, right: randRight }]);
     addToast('Huddle Reaction', `Sent ${emoji} to room participants`, 'info');
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       setFloatingReactions((prev) => prev.filter((r) => r.id !== newId));
+      reactionTimersRef.current.delete(timer);
     }, 2200);
+    reactionTimersRef.current.add(timer);
   }, [addToast]);
 
   const toggleHandRaise = useCallback(() => {
     setHandRaised((prev) => {
       const nextState = !prev;
-      if (nextState) {
-        handleReaction('✋');
-        addToast('Hand Raised', 'Sara Chen raised her hand to speak.', 'info');
-      } else {
-        addToast('Hand Lowered', 'Sara Chen lowered her hand.', 'info');
-      }
+      queueMicrotask(() => {
+        if (nextState) {
+          handleReaction('✋');
+          addToast('Hand Raised', 'Sara Chen raised her hand to speak.', 'info');
+        } else {
+          addToast('Hand Lowered', 'Sara Chen lowered her hand.', 'info');
+        }
+      });
       return nextState;
     });
   }, [handleReaction, addToast]);
@@ -216,12 +181,45 @@ export default function HuddleSimulator() {
     });
   }, [setHuddleScreenShareActive, addToast]);
 
+  // Keyboard shortcut listener for power users (M, V, S, H)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      if (e.key === 'm' || e.key === 'M') {
+        e.preventDefault();
+        handleToggleMute();
+      } else if (e.key === 'v' || e.key === 'V') {
+        e.preventDefault();
+        handleToggleCamera();
+      } else if (e.key === 's' || e.key === 'S') {
+        e.preventDefault();
+        handleToggleScreenShare();
+      } else if (e.key === 'h' || e.key === 'H') {
+        e.preventDefault();
+        toggleHandRaise();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleToggleMute, handleToggleCamera, handleToggleScreenShare, toggleHandRaise]);
+
+  const handleSimulateNextSpeech = useCallback(() => {
+    const nextIdx = (speechPromptIdx + 1) % SPEECH_SCENARIOS.length;
+    const scenario = SPEECH_SCENARIOS[nextIdx];
+    simulateHuddleUtterance(scenario.speaker, scenario.text);
+    setActiveSpeaker(scenario.speaker);
+    setSpeechPromptIdx(nextIdx);
+  }, [speechPromptIdx, simulateHuddleUtterance]);
+
   const handleLeaveCall = useCallback(() => {
     setActiveModule('chat');
     addToast('Huddle Concluded', 'Left session. Full meeting transcript linked in #architecture-rfc.', 'info');
   }, [setActiveModule, addToast]);
 
-  const currentScenario = SPEECH_SCENARIOS[(speechPromptIdx + SPEECH_SCENARIOS.length - 1) % SPEECH_SCENARIOS.length];
+  const currentScenario = SPEECH_SCENARIOS[speechPromptIdx % SPEECH_SCENARIOS.length];
 
   return (
     <div className="flex flex-col h-full bg-[#07090E] text-slate-200 relative overflow-hidden select-none font-sans">
@@ -281,17 +279,17 @@ export default function HuddleSimulator() {
           onNavigateToDocs={() => setActiveModule('docs')}
         />
 
-        {/* Floating Reactions Layer */}
+        {/* Floating Reactions Layer — Anchored to Right Margin for Visual Calm */}
         <AnimatePresence>
           {floatingReactions.map((r) => (
             <motion.div
               key={r.id}
-              initial={{ opacity: 1, y: 0, scale: 0.8 }}
-              animate={{ opacity: 0, y: -160, scale: 1.35 }}
+              initial={{ opacity: 1, y: 0, scale: 0.85 }}
+              animate={{ opacity: 0, y: -140, scale: 1.25 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 1.8, ease: 'easeOut' }}
-              style={{ left: `${r.left}%`, bottom: '60px' }}
-              className="pointer-events-none absolute text-3xl z-40 drop-shadow-xl"
+              style={{ right: `${r.right}px`, bottom: '65px' }}
+              className="pointer-events-none absolute text-2xl z-40 drop-shadow-lg"
             >
               {r.emoji}
             </motion.div>

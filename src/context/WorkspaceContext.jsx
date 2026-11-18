@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { WorkspaceContext } from './WorkspaceContextStore';
+import { INITIAL_CALENDAR_EVENTS, CALENDAR_PERSONAS } from '../data/calendarData';
 
 let toastSeq = 0;
 
@@ -412,7 +413,16 @@ function hasDirectedPath(fromId, toId, edges) {
 
 export function WorkspaceProvider({ children }) {
   // Navigation & Active Module
-  const [activeModule, setActiveModule] = useState('chat');
+  const [activeModule, setActiveModule] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const mod = params.get('module');
+      if (mod && ['chat', 'threads', 'mail', 'docs', 'calendar', 'huddle', 'tasks', 'files', 'automations'].includes(mod)) {
+        return mod;
+      }
+    }
+    return 'chat';
+  });
   const [activeChannel, setActiveChannel] = useState('general-arch');
 
   // Enterprise Demo & Sales Drawer State (Week 5 Deliverable)
@@ -477,6 +487,28 @@ export function WorkspaceProvider({ children }) {
     }, 4000);
   }, []);
 
+  // Real-time Client Network Connectivity State Machine
+  const [isOnline, setIsOnline] = useState(() => (typeof navigator !== 'undefined' ? navigator.onLine : true));
+
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true);
+      addToast('Connection restored', 'Live workspace synchronization active.', 'success');
+    };
+    const handleOffline = () => {
+      setIsOnline(false);
+      addToast('Offline mode', 'Local caching active. Changes will sync upon reconnecting.', 'warning');
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, [addToast]);
+
   const moveKanbanTask = useCallback((taskId, targetCol) => {
     const audit = {
       time: 'Just now',
@@ -532,6 +564,205 @@ export function WorkspaceProvider({ children }) {
     setSelectedKanbanTask((prev) => (prev && prev.id === taskId ? updater(prev) : prev));
   }, []);
 
+  // ── Authenticated Events & Calendar Ecosystem State ──────────────────────
+  const [calendarEvents, setCalendarEvents] = useState(INITIAL_CALENDAR_EVENTS);
+  const [activeCalendarEventId, setActiveCalendarEventId] = useState('evt_1');
+  const [isEventDrawerOpen, setIsEventDrawerOpen] = useState(true);
+  const [calendarView, setCalendarView] = useState('week'); // 'week' | 'month' | 'day' | 'agenda'
+  const [isNewEventModalOpen, setIsNewEventModalOpen] = useState(false);
+  const [calendarCategoryFilter, setCalendarCategoryFilter] = useState({
+    engineering: true,
+    client: true,
+    standup: true,
+    design: true,
+  });
+
+  const activeCalendarEvent = useMemo(
+    () => calendarEvents.find((e) => e.id === activeCalendarEventId) || calendarEvents[0] || null,
+    [calendarEvents, activeCalendarEventId]
+  );
+
+  const openEventDrawer = useCallback((eventOrId) => {
+    const id = typeof eventOrId === 'string' ? eventOrId : eventOrId?.id;
+    if (id) setActiveCalendarEventId(id);
+    setIsEventDrawerOpen(true);
+  }, []);
+
+  const closeEventDrawer = useCallback(() => {
+    setIsEventDrawerOpen(false);
+  }, []);
+
+  const openNewEventModal = useCallback(() => {
+    setIsNewEventModalOpen(true);
+  }, []);
+
+  const closeNewEventModal = useCallback(() => {
+    setIsNewEventModalOpen(false);
+  }, []);
+
+  const updateEventRsvp = useCallback((eventId, rsvpStatus) => {
+    setCalendarEvents((prev) =>
+      prev.map((evt) => {
+        if (evt.id !== eventId) return evt;
+        const updatedAttendees = evt.attendees.map((att) =>
+          att.id === 'usr_sara' ? { ...att, rsvp: rsvpStatus } : att
+        );
+        return {
+          ...evt,
+          userRsvp: rsvpStatus,
+          attendees: updatedAttendees,
+        };
+      })
+    );
+    addToast(
+      `RSVP: ${rsvpStatus.toUpperCase()}`,
+      `Your attendance response has been synchronized across the workspace.`,
+      'success'
+    );
+  }, [addToast]);
+
+  const createCalendarEvent = useCallback((newEvent) => {
+    const id = 'evt_' + Date.now();
+    const event = {
+      ...newEvent,
+      id,
+      userRsvp: 'going',
+      isHuddle: newEvent.isHuddle ?? true,
+      isHuddleActive: false,
+      huddleRoom: `/workspace/acme/events/${id}/session`,
+      huddleParticipantsCount: 0,
+      discussion: [],
+      aiSummary: null,
+      attendees: newEvent.attendees || [
+        { ...CALENDAR_PERSONAS.sara, rsvp: 'going', isOrganizer: true },
+      ],
+    };
+    setCalendarEvents((prev) => [event, ...prev]);
+    setActiveCalendarEventId(id);
+    setIsEventDrawerOpen(true);
+    setIsNewEventModalOpen(false);
+    addToast(
+      'Event scheduled',
+      `"${event.title}" created with native Huddle bridge.`,
+      'success'
+    );
+  }, [addToast]);
+
+  const rescheduleCalendarEvent = useCallback((eventId, newDay, newStartHour) => {
+    setCalendarEvents((prev) =>
+      prev.map((evt) => {
+        if (evt.id !== eventId) return evt;
+        return {
+          ...evt,
+          day: newDay,
+          startHour: Math.max(8, Math.min(18.5, newStartHour)),
+        };
+      })
+    );
+    addToast(
+      'Event rescheduled',
+      'Start time and slot updated across workspace.',
+      'info'
+    );
+  }, [addToast]);
+
+  const addEventAttendee = useCallback((eventId, attendee) => {
+    setCalendarEvents((prev) =>
+      prev.map((evt) => {
+        if (evt.id !== eventId) return evt;
+        if (evt.attendees.some((a) => a.id === attendee.id || a.email === attendee.email)) return evt;
+        return {
+          ...evt,
+          attendees: [...evt.attendees, { ...attendee, rsvp: 'pending', isOrganizer: false }],
+        };
+      })
+    );
+    addToast(
+      'Guest invited',
+      `${attendee.name || attendee.email} added to event roster.`,
+      'success'
+    );
+  }, [addToast]);
+
+  const addEventDiscussionReply = useCallback((eventId, text) => {
+    setCalendarEvents((prev) =>
+      prev.map((evt) => {
+        if (evt.id !== eventId) return evt;
+        const newMsg = {
+          id: 'disc_' + Date.now(),
+          sender: CALENDAR_PERSONAS.sara,
+          time: 'Just now',
+          text,
+        };
+        return {
+          ...evt,
+          discussion: [...(evt.discussion || []), newMsg],
+        };
+      })
+    );
+  }, []);
+
+  const toggleEventActionItem = useCallback((eventId, actionItemId) => {
+    setCalendarEvents((prev) =>
+      prev.map((evt) => {
+        if (evt.id !== eventId || !evt.aiSummary) return evt;
+        return {
+          ...evt,
+          aiSummary: {
+            ...evt.aiSummary,
+            actionItems: evt.aiSummary.actionItems.map((item) =>
+              item.id === actionItemId ? { ...item, completed: !item.completed } : item
+            ),
+          },
+        };
+      })
+    );
+  }, []);
+
+  const syncEventActionsToKanban = useCallback((event) => {
+    if (!event) return;
+    const actionItems = event.aiSummary?.actionItems || [
+      { text: `Follow-up from ${event.title}`, assignee: 'Sara Chen' }
+    ];
+    const newTasks = actionItems.map((item, idx) => ({
+      id: `tsk_evt_${Date.now()}_${idx}`,
+      title: item.text.replace(/^@[a-zA-Z]+:\s*/, ''),
+      column: 'in-progress',
+      priority: 'P1',
+      assignee: item.assignee || 'Sara Chen',
+      source: `Event: ${event.title}`,
+      sourceType: 'event',
+      sourceId: event.id,
+      subtasks: [
+        { id: 'st_1', text: 'Review meeting transcript and agenda', done: true },
+        { id: 'st_2', text: 'Implement required architectural change', done: false },
+      ],
+      auditLog: [
+        {
+          time: 'Just now',
+          actor: 'Ukin AI Agent',
+          action: `Extracted action item from Huddle transcript`,
+        },
+      ],
+    }));
+
+    setKanbanTasks((prev) => [...newTasks, ...prev]);
+    addToast(
+      'Action items synced to Kanban',
+      `Dispatched ${newTasks.length} task${newTasks.length > 1 ? 's' : ''} to Sprint 24 Board.`,
+      'success'
+    );
+  }, [addToast]);
+
+  const exportEventToLivingDoc = useCallback((event) => {
+    if (!event) return;
+    addToast(
+      'Exported to Living Doc',
+      `Created collaborative RFC: "/documents/${event.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}".`,
+      'success'
+    );
+  }, [addToast]);
+
   // Sprint Week 6: Visual Automations State (DAG Engine & Cycle Rejection)
   const [automationsWorkflows, setAutomationsWorkflows] = useState(INITIAL_AUTOMATIONS_WORKFLOWS);
   const [activeWorkflowId, setActiveWorkflowId] = useState('wf_p0_triage');
@@ -562,8 +793,15 @@ export function WorkspaceProvider({ children }) {
 
   const testAutomationsWorkflow = useCallback(() => {
     if (isAutomationsTesting) return;
+    const activeWf = automationsWorkflows.find((w) => w.id === activeWorkflowId);
+    const wfName = activeWf?.name || 'Auto-Triage P0 Escalations';
+    const wfSummary =
+      activeWf?.id === 'wf_huddle_doc'
+        ? 'Huddle notes summarized → Shared document updated'
+        : 'Sample urgent message reviewed → Task created → Space updated';
+
     setIsAutomationsTesting(true);
-    addToast('Workflow simulation started', 'Testing the sample workflow with a simulated urgent message.', 'info');
+    addToast('Workflow simulation started', `Testing ${wfName} with simulated events.`, 'info');
 
     // Step 1: Trigger fires
     setActiveExecutionStep('trigger');
@@ -581,10 +819,10 @@ export function WorkspaceProvider({ children }) {
           const newLog = {
             id: 'ex_' + Date.now(),
             time: 'Just now',
-            workflow: 'Auto-Triage P0 Escalations',
+            workflow: wfName,
             duration: 'Sample run',
             status: 'SUCCESS',
-            summary: 'Sample urgent message reviewed → Task created → Space updated',
+            summary: wfSummary,
           };
           setExecutionLogs((prev) => [newLog, ...prev]);
 
@@ -593,7 +831,7 @@ export function WorkspaceProvider({ children }) {
         }, 800);
       }, 800);
     }, 800);
-  }, [isAutomationsTesting, addToast]);
+  }, [isAutomationsTesting, automationsWorkflows, activeWorkflowId, addToast]);
 
   // Actions
   const sendMessage = useCallback((text, channelId = activeChannel) => {
@@ -975,6 +1213,29 @@ export function WorkspaceProvider({ children }) {
     moveKanbanTask,
     updateKanbanTask,
     toggleKanbanSubtask,
+    calendarEvents,
+    setCalendarEvents,
+    activeCalendarEventId,
+    setActiveCalendarEventId,
+    activeCalendarEvent,
+    isEventDrawerOpen,
+    openEventDrawer,
+    closeEventDrawer,
+    calendarView,
+    setCalendarView,
+    isNewEventModalOpen,
+    openNewEventModal,
+    closeNewEventModal,
+    calendarCategoryFilter,
+    setCalendarCategoryFilter,
+    updateEventRsvp,
+    createCalendarEvent,
+    rescheduleCalendarEvent,
+    addEventAttendee,
+    addEventDiscussionReply,
+    toggleEventActionItem,
+    syncEventActionsToKanban,
+    exportEventToLivingDoc,
     automationsWorkflows,
     activeWorkflowId,
     setActiveWorkflowId,
@@ -995,6 +1256,7 @@ export function WorkspaceProvider({ children }) {
     closeSearchPalette,
     isKeyboardModalOpen,
     setIsKeyboardModalOpen,
+    isOnline,
     activeSection,
     setActiveSection,
     isHeroVisible,
@@ -1036,6 +1298,29 @@ export function WorkspaceProvider({ children }) {
     moveKanbanTask,
     updateKanbanTask,
     toggleKanbanSubtask,
+    calendarEvents,
+    setCalendarEvents,
+    activeCalendarEventId,
+    setActiveCalendarEventId,
+    activeCalendarEvent,
+    isEventDrawerOpen,
+    openEventDrawer,
+    closeEventDrawer,
+    calendarView,
+    setCalendarView,
+    isNewEventModalOpen,
+    openNewEventModal,
+    closeNewEventModal,
+    calendarCategoryFilter,
+    setCalendarCategoryFilter,
+    updateEventRsvp,
+    createCalendarEvent,
+    rescheduleCalendarEvent,
+    addEventAttendee,
+    addEventDiscussionReply,
+    toggleEventActionItem,
+    syncEventActionsToKanban,
+    exportEventToLivingDoc,
     automationsWorkflows,
     activeWorkflowId,
     isAutomationsTesting,
@@ -1053,6 +1338,7 @@ export function WorkspaceProvider({ children }) {
     openSearchPalette,
     closeSearchPalette,
     isKeyboardModalOpen,
+    isOnline,
     activeSection,
     isHeroVisible,
     scrollToSection,

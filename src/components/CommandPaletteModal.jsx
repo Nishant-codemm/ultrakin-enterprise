@@ -14,6 +14,7 @@ import {
   X,
   Keyboard,
   Shield,
+  Calendar,
 } from 'lucide-react';
 import { useWorkspace } from '../context/useWorkspace';
 import { cn } from '../lib/cn';
@@ -49,6 +50,17 @@ export default function CommandPaletteModal() {
   const entities = useMemo(
     () => [
       // Commands
+      {
+        id: 'cmd_calendar',
+        type: 'command',
+        category: 'Commands',
+        title: 'Open Team Calendar & Schedule',
+        subtitle: 'View multi-timezone calendar and upcoming architecture sessions',
+        icon: Calendar,
+        action: () => setActiveModule('calendar'),
+        badge: 'Calendar',
+        badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+      },
       {
         id: 'cmd_huddle',
         type: 'command',
@@ -257,6 +269,17 @@ export default function CommandPaletteModal() {
     );
   });
 
+  const [prevIsOpen, setPrevIsOpen] = useState(isSearchPaletteOpen);
+
+  // Synchronously reset query and selection during render when modal closes (React recommended pattern)
+  if (prevIsOpen !== isSearchPaletteOpen) {
+    setPrevIsOpen(isSearchPaletteOpen);
+    if (!isSearchPaletteOpen) {
+      setQuery('');
+      setSelectedIndex(0);
+    }
+  }
+
   // Global Keyboard Navigation inside modal
   useEffect(() => {
     if (!isSearchPaletteOpen) return;
@@ -271,16 +294,19 @@ export default function CommandPaletteModal() {
 
       if (e.key === 'Escape') {
         e.preventDefault();
+        e.stopPropagation();
         closeSearchPalette();
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
         const nextIndex = filtered.length ? (selectedIndex + 1) % filtered.length : 0;
         setSelectedIndex(nextIndex);
+        resultRefs.current[nextIndex]?.scrollIntoView({ block: 'nearest' });
         if (document.activeElement !== inputRef.current) resultRefs.current[nextIndex]?.focus();
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         const nextIndex = filtered.length ? (selectedIndex - 1 + filtered.length) % filtered.length : 0;
         setSelectedIndex(nextIndex);
+        resultRefs.current[nextIndex]?.scrollIntoView({ block: 'nearest' });
         if (document.activeElement !== inputRef.current) resultRefs.current[nextIndex]?.focus();
       } else if (e.key === 'Enter') {
         e.preventDefault();
@@ -349,7 +375,11 @@ export default function CommandPaletteModal() {
               <button
                 type="button"
                 aria-label="Clear search"
-                onClick={() => setQuery('')}
+                onClick={() => {
+                  setQuery('');
+                  setSelectedIndex(0);
+                  inputRef.current?.focus();
+                }}
                 className="cursor-pointer p-1 text-ink-subtle transition-colors hover:text-ink"
               >
                 <X className="w-4 h-4" />

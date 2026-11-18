@@ -15,9 +15,8 @@ function HuddleHeaderComponent({
     <header className="h-12 px-4 border-b border-white/[0.08] bg-[#0B0F19]/90 backdrop-blur-md flex items-center justify-between select-none relative z-20">
       {/* Left: Active Room & Session Duration */}
       <div className="flex items-center gap-2.5 min-w-0">
-        <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_#10b981]" />
+        <span className="relative flex h-2 w-2" aria-hidden="true">
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
         </span>
         <div className="flex items-center gap-1.5 truncate">
           <span className="font-semibold text-xs text-white truncate">
@@ -32,10 +31,10 @@ function HuddleHeaderComponent({
           </span>
         </div>
         <span 
-          className="hidden md:inline-flex items-center gap-1 text-[10px] font-mono text-indigo-300 bg-indigo-500/15 border border-indigo-500/25 px-2 py-0.5 rounded"
+          className="hidden md:inline-flex items-center gap-1 text-[10px] font-mono text-sky-300 bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 rounded"
           title="Audio Engine: 48kHz Stereo Opus HD Codec"
         >
-          <Wifi className="w-3 h-3 text-indigo-400" />
+          <Wifi className="w-3 h-3 text-sky-400" />
           Opus 48kHz HD
         </span>
       </div>

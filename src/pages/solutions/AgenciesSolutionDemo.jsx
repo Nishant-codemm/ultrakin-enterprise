@@ -5,21 +5,11 @@
  * Branded Client Guest Channel -> Design Deliverable Review -> Scope Guard Change Order Approval.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import {
-  Palette,
-  CheckCircle2,
-  FileCheck,
-  MessageSquare,
-  ShieldAlert,
-  Sparkles,
-  ExternalLink,
-} from 'lucide-react';
+import { Palette, CheckCircle2 } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
 
 export default function AgenciesSolutionDemo() {
-  const reduceMotion = useReducedMotion();
   const [scopeApproved, setScopeApproved] = useState(false);
 
   return (

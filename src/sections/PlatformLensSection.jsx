@@ -367,7 +367,7 @@ export default function PlatformLensSection() {
                 id="lens-panel"
                 role="tabpanel"
                 aria-labelledby={`lens-tab-${active}`}
-                className="relative isolate min-h-[400px] overflow-hidden bg-[#0b0e14] py-6 shadow-[0_18px_42px_-34px_rgba(0,0,0,.72),inset_0_1px_0_rgba(255,255,255,.055)] sm:py-8 lg:min-h-[430px] lg:px-10 lg:py-9"
+                className="relative isolate min-h-[400px] overflow-hidden bg-[#0b0e14] px-4 py-6 shadow-[0_18px_42px_-34px_rgba(0,0,0,.72),inset_0_1px_0_rgba(255,255,255,.055)] sm:px-6 sm:py-8 lg:min-h-[430px] lg:px-10 lg:py-9"
               >
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_76%_44%,rgba(105,111,200,.12),transparent_56%),linear-gradient(132deg,rgba(255,255,255,.035),transparent_28%,transparent_74%,rgba(146,151,255,.035))]" />
                 <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />

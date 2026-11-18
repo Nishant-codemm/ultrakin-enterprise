@@ -1,16 +1,24 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import {
+  Activity,
   AtSign,
   Bot,
+  Calendar as CalendarIcon,
+  Check,
   CheckSquare,
   ChevronDown,
   FileText,
   FolderOpen,
   GitBranch,
+  HelpCircle,
+  LogOut,
   Mail,
   MessageSquare,
+  Minimize2,
   Radio,
   Search,
+  Settings,
+  Shield,
   Video,
 } from 'lucide-react';
 import UltrakinLogo from '../primitives/UltrakinLogo';
@@ -20,16 +28,35 @@ import MatrixChatEngine from './MatrixChatEngine';
 import EventBusTelemetryDrawer from './EventBusTelemetryDrawer';
 import WorkspaceToastContainer from './WorkspaceToastContainer';
 import WorkspaceModuleSkeleton from './WorkspaceModuleSkeleton';
+import ErrorBoundary from '../common/ErrorBoundary';
 import HeroThreadsView from './HeroThreadsView';
 import HeroFilesView from './HeroFilesView';
+import { prefetch } from '../../lib/prefetch';
 
-const DomainMailboxEngine = lazy(() => import('./DomainMailboxEngine'));
-const LivingDocEditor = lazy(() => import('./LivingDocEditor'));
-const HuddleSimulator = lazy(() => import('./HuddleSimulator'));
-const KanbanTaskBoard = lazy(() => import('./KanbanTaskBoard'));
-const VisualAutomationsCanvas = lazy(() => import('./VisualAutomationsCanvas'));
+const loadMail = () => import('./DomainMailboxEngine');
+const loadDocs = () => import('./LivingDocEditor');
+const loadHuddle = () => import('./HuddleSimulator');
+const loadTasks = () => import('./KanbanTaskBoard');
+const loadAutomations = () => import('./VisualAutomationsCanvas');
+const loadCalendar = () => import('./calendar/CalendarEngine');
 
-export default function WorkspaceShell({ className = '' }) {
+const DomainMailboxEngine = lazy(loadMail);
+const LivingDocEditor = lazy(loadDocs);
+const HuddleSimulator = lazy(loadHuddle);
+const KanbanTaskBoard = lazy(loadTasks);
+const VisualAutomationsCanvas = lazy(loadAutomations);
+const CalendarEngine = lazy(loadCalendar);
+
+const MODULE_PREFETCH_MAP = {
+  mail: loadMail,
+  docs: loadDocs,
+  calendar: loadCalendar,
+  huddle: loadHuddle,
+  tasks: loadTasks,
+  automations: loadAutomations,
+};
+
+export default function WorkspaceShell({ className = '', onExitFullscreen }) {
   const {
     activeModule,
     setActiveModule,
@@ -39,46 +66,118 @@ export default function WorkspaceShell({ className = '' }) {
     unreadEmailCount,
     kanbanTasks,
     openSearchPalette,
+    setIsKeyboardModalOpen,
+    isOnline = true,
   } = useWorkspace();
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [orgMenuOpen, setOrgMenuOpen] = useState(false);
+  const [userStatus, setUserStatus] = useState('online');
+
+  const orgMenuRef = useRef(null);
+  const profileMenuRef = useRef(null);
+
+  useEffect(() => {
+    if (!orgMenuOpen && !profileMenuOpen) return;
+
+    const handlePointerDown = (event) => {
+      if (orgMenuOpen && orgMenuRef.current && !orgMenuRef.current.contains(event.target)) {
+        setOrgMenuOpen(false);
+      }
+      if (profileMenuOpen && profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setProfileMenuOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setOrgMenuOpen(false);
+        setProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [orgMenuOpen, profileMenuOpen]);
 
   return (
     <div
       className={cn(
-        'relative overflow-hidden bg-obsidian-canvas text-slate-200 select-none transition-transform duration-700 ease-out hover:rotate-x-0 group/showcase',
+        'relative overflow-hidden bg-obsidian-canvas text-slate-200 select-none border border-obsidian-border rounded-xl shadow-2xl',
         className,
       )}
-      style={{
-        transformStyle: 'preserve-3d',
-        boxShadow:
-          '0 18px 48px -36px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06)',
-      }}
     >
-      {/* Specular Screen Glass Reflection */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-44 z-20 opacity-[0.16] select-none overflow-hidden"
-        style={{
-          background:
-            'linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 30%, transparent 100%)',
-        }}
-      />
-
       {/* ── Workspace Application Command Bar ── */}
-      <div className="h-11 px-3 sm:px-4 bg-obsidian-surface/95 border-b border-obsidian-border flex items-center justify-between select-none relative z-20 backdrop-blur-md">
+      <div className="h-11 px-3 sm:px-4 bg-obsidian-surface/95 border-b border-obsidian-border flex items-center justify-between select-none relative z-30 backdrop-blur-md">
         {/* Left: Organization & Active Context Breadcrumb */}
-        <div className="flex items-center gap-2 min-w-0">
-          <div
-            className="flex items-center gap-2 px-2 py-1 rounded-md bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] transition-colors cursor-pointer shrink-0"
+        <div ref={orgMenuRef} className="flex items-center gap-2 min-w-0 relative">
+          <button
+            type="button"
+            onClick={() => {
+              setOrgMenuOpen((prev) => !prev);
+              setProfileMenuOpen(false);
+            }}
+            className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] hover:text-white transition-colors cursor-pointer shrink-0 text-left"
             title="Switch organization"
+            aria-expanded={orgMenuOpen}
           >
-            <div className="w-4 h-4 rounded bg-indigo-500/20 text-indigo-300 flex items-center justify-center font-bold text-[9.5px]">
+            <div className="w-4 h-4 rounded bg-indigo-500/25 text-indigo-300 flex items-center justify-center font-bold text-[9.5px]">
               A
             </div>
             <span className="text-xs font-semibold tracking-tight text-white hidden sm:inline">
               Acme Corp
             </span>
             <ChevronDown className="w-3 h-3 text-slate-400" />
-          </div>
+          </button>
+
+          {/* Org Switcher Dropdown */}
+          {orgMenuOpen && (
+            <div
+              className="absolute left-0 top-full mt-1.5 w-60 rounded-xl bg-obsidian-surface border border-obsidian-border p-2 shadow-2xl z-40 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
+              role="menu"
+            >
+              <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-obsidian-muted border-b border-obsidian-border-soft mb-1">
+                Select Organization
+              </div>
+              <button
+                type="button"
+                onClick={() => setOrgMenuOpen(false)}
+                className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs bg-indigo-600/15 text-indigo-200 border border-indigo-500/30 font-medium cursor-pointer"
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <div className="w-4 h-4 rounded bg-indigo-500 text-white font-bold text-[9px] flex items-center justify-center">
+                    A
+                  </div>
+                  <span className="truncate">Acme Corp (Primary)</span>
+                </div>
+                <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setOrgMenuOpen(false)}
+                className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs text-slate-400 hover:text-slate-200 hover:bg-white/[0.04] transition-colors cursor-pointer mt-0.5"
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <div className="w-4 h-4 rounded bg-slate-700 text-slate-300 font-bold text-[9px] flex items-center justify-center">
+                    S
+                  </div>
+                  <span className="truncate">Acme Security Staging</span>
+                </div>
+              </button>
+              <div className="mt-1 pt-1 border-t border-obsidian-border-soft">
+                <span className="text-[10px] text-slate-500 px-2 py-0.5 block">
+                  Enterprise Plan · SOC 2 Type II
+                </span>
+              </div>
+            </div>
+          )}
+
           <span className="text-obsidian-border text-xs hidden sm:inline" aria-hidden="true">
             /
           </span>
@@ -91,6 +190,8 @@ export default function WorkspaceShell({ className = '' }) {
               ? 'Inbox'
               : activeModule === 'docs'
               ? 'Living Docs'
+              : activeModule === 'calendar'
+              ? 'Team Calendar'
               : activeModule === 'huddle'
               ? 'Live Huddle'
               : activeModule === 'tasks'
@@ -105,7 +206,7 @@ export default function WorkspaceShell({ className = '' }) {
         <button
           type="button"
           onClick={openSearchPalette}
-          className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.035] border border-white/[0.08] text-xs text-obsidian-muted hover:text-slate-200 hover:border-white/[0.16] hover:bg-white/[0.06] transition-all duration-200 cursor-pointer max-w-[280px] w-full justify-between"
+          className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.035] border border-white/[0.08] text-xs text-obsidian-muted hover:text-slate-200 hover:border-white/[0.16] hover:bg-white/[0.06] transition-all duration-150 cursor-pointer max-w-[280px] w-full justify-between"
         >
           <div className="flex items-center gap-2 truncate">
             <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
@@ -119,24 +220,59 @@ export default function WorkspaceShell({ className = '' }) {
         {/* Right: Real-time Presence & Sync Status */}
         <div className="flex items-center gap-3 shrink-0">
           <div className="hidden md:flex items-center -space-x-1.5" title="Active in workspace">
-            <span className="w-5 h-5 rounded-full bg-indigo-500/25 border border-obsidian-surface text-[9px] font-semibold text-indigo-200 flex items-center justify-center">
+            <span className="w-5 h-5 rounded-full bg-indigo-500/30 border border-obsidian-surface text-[9px] font-semibold text-indigo-200 flex items-center justify-center">
               SC
             </span>
-            <span className="w-5 h-5 rounded-full bg-emerald-500/25 border border-obsidian-surface text-[9px] font-semibold text-emerald-200 flex items-center justify-center">
+            <span className="w-5 h-5 rounded-full bg-emerald-500/30 border border-obsidian-surface text-[9px] font-semibold text-emerald-200 flex items-center justify-center">
               EL
             </span>
-            <span className="w-5 h-5 rounded-full bg-violet-500/25 border border-obsidian-surface text-[9px] font-semibold text-violet-200 flex items-center justify-center">
+            <span className="w-5 h-5 rounded-full bg-violet-500/30 border border-obsidian-surface text-[9px] font-semibold text-violet-200 flex items-center justify-center">
               UK
             </span>
           </div>
           <span className="hidden md:inline h-3 w-px bg-white/10" aria-hidden="true" />
-          <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-40 motion-reduce:hidden" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+          {isOnline ? (
+            <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5" title="Live real-time sync active">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span className="hidden lg:inline text-[10.5px]">3 agents synced</span>
             </span>
-            <span className="hidden lg:inline text-[10.5px]">3 agents synced</span>
-          </span>
+          ) : (
+            <span
+              className="px-2 py-0.5 rounded-full text-[10px] font-mono font-medium bg-amber-500/15 text-amber-300 border border-amber-400/30 flex items-center gap-1.5"
+              title="Client is offline. Workspace changes are cached locally."
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+              <span>Offline (Cached)</span>
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={() => setDrawerOpen((prev) => !prev)}
+            title={drawerOpen ? 'Collapse Event Bus Drawer' : 'Show Event Bus & Telemetry Drawer'}
+            aria-label="Toggle Event Bus Drawer"
+            aria-pressed={drawerOpen}
+            className={cn(
+              'hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10.5px] font-mono border transition-all cursor-pointer',
+              drawerOpen
+                ? 'bg-indigo-600/25 text-indigo-300 border-indigo-500/40 shadow-xs'
+                : 'bg-white/[0.04] text-slate-400 border-white/[0.08] hover:text-slate-200 hover:bg-white/[0.08]',
+            )}
+          >
+            <Activity className="w-3 h-3 text-indigo-400" />
+            <span>Telemetry</span>
+          </button>
+          {onExitFullscreen && (
+            <button
+              type="button"
+              onClick={onExitFullscreen}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10.5px] font-mono border border-white/[0.08] bg-white/[0.04] text-slate-300 hover:text-white hover:bg-white/[0.08] transition-colors cursor-pointer"
+              title="Exit Fullscreen (Esc)"
+            >
+              <Minimize2 className="w-3 h-3 text-slate-400" />
+              <span className="hidden sm:inline">Exit Fullscreen</span>
+              <kbd className="px-1 py-0.2 rounded bg-white/[0.08] text-[9px] font-mono text-slate-400">Esc</kbd>
+            </button>
+          )}
         </div>
       </div>
 
@@ -147,6 +283,7 @@ export default function WorkspaceShell({ className = '' }) {
           { id: 'threads', label: 'Threads', icon: AtSign },
           { id: 'mail', label: 'Mail', icon: Mail, badge: unreadEmailCount > 0 ? unreadEmailCount : null },
           { id: 'docs', label: 'Docs', icon: FileText },
+          { id: 'calendar', label: 'Calendar', icon: CalendarIcon },
           { id: 'huddle', label: 'Huddle', icon: Video },
           { id: 'tasks', label: 'Tasks', icon: CheckSquare, badge: kanbanTasks.length },
           { id: 'automations', label: 'Agents', icon: Bot },
@@ -158,6 +295,9 @@ export default function WorkspaceShell({ className = '' }) {
               key={item.id}
               type="button"
               onClick={() => setActiveModule(item.id)}
+              onMouseEnter={() => MODULE_PREFETCH_MAP[item.id] && prefetch(MODULE_PREFETCH_MAP[item.id])}
+              onFocus={() => MODULE_PREFETCH_MAP[item.id] && prefetch(MODULE_PREFETCH_MAP[item.id])}
+              onTouchStart={() => MODULE_PREFETCH_MAP[item.id] && prefetch(MODULE_PREFETCH_MAP[item.id])}
               className={cn(
                 'flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium whitespace-nowrap transition-all shrink-0 cursor-pointer',
                 isActive
@@ -177,36 +317,41 @@ export default function WorkspaceShell({ className = '' }) {
         })}
       </div>
 
-      {/* ── Multi-Column Application Shell (64px Rail + 220px Sidebar + Main Viewport + 340px Drawer) ── */}
-      <div className="grid grid-cols-1 md:grid-cols-[64px_220px_1fr] lg:grid-cols-[64px_220px_1fr_340px] min-h-[620px] bg-obsidian-base">
-        {/* 1. 64px Workspace Left Rail */}
-        <div className="hidden md:flex flex-col items-center py-4 bg-obsidian-base border-r border-obsidian-border-soft gap-4 select-none">
+      {/* ── Multi-Column Application Shell (56px Rail + 210px Sidebar + Main Canvas + Optional 320px Drawer) ── */}
+      <div
+        className={cn(
+          'grid grid-cols-1 md:grid-cols-[56px_210px_1fr] min-h-[620px] flex-1 min-h-0 bg-obsidian-base transition-all duration-300',
+          drawerOpen ? 'xl:grid-cols-[56px_210px_1fr_320px]' : '',
+        )}
+      >
+        {/* 1. 56px Workspace Left Rail */}
+        <div className="hidden md:flex flex-col items-center py-3 bg-obsidian-base border-r border-obsidian-border-soft gap-2 select-none relative">
           {/* Active Workspace Squircle */}
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer transition-transform hover:scale-105 drop-shadow-[0_0_12px_rgba(99,102,241,0.5)]"
+            className="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer transition-transform hover:scale-105"
             title="Ultrakin Enterprise Workspace"
           >
-            <UltrakinLogo size={36} />
+            <UltrakinLogo size={32} />
           </div>
 
-          <div className="w-8 h-[1px] bg-white/10" />
+          <div className="w-7 h-[1px] bg-white/10 my-1" />
 
-          {/* Module Quick Switchers with Tactile Active Indicator (Linear/Slack Craftsmanship) */}
+          {/* Module Quick Switchers (Linear/Slack Craftsmanship: Restrained, Pixel-Aligned) */}
           <button
             type="button"
             onClick={() => setActiveModule('chat')}
             className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
+              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
               activeModule === 'chat'
-                ? 'bg-white/15 text-indigo-400 border border-indigo-400/30 shadow-[0_2px_10px_rgba(99,102,241,0.2)]'
-                : 'text-slate-400 hover:text-white hover:bg-white/5',
+                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
             )}
-            title="Spaces Chat"
+            title="Spaces Chat (⌘1)"
             aria-label="Spaces Chat"
           >
             {activeModule === 'chat' && (
               <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]"
+                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
                 aria-hidden="true"
               />
             )}
@@ -217,17 +362,17 @@ export default function WorkspaceShell({ className = '' }) {
             type="button"
             onClick={() => setActiveModule('threads')}
             className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
+              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
               activeModule === 'threads'
-                ? 'bg-white/15 text-indigo-300 border border-indigo-400/30 shadow-[0_2px_10px_rgba(99,102,241,0.2)]'
-                : 'text-slate-400 hover:text-white hover:bg-white/5',
+                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
             )}
-            title="Threads"
+            title="Threads (⌘2)"
             aria-label="Threads"
           >
             {activeModule === 'threads' && (
               <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]"
+                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
                 aria-hidden="true"
               />
             )}
@@ -237,18 +382,20 @@ export default function WorkspaceShell({ className = '' }) {
           <button
             type="button"
             onClick={() => setActiveModule('mail')}
+            onMouseEnter={() => prefetch(loadMail)}
+            onFocus={() => prefetch(loadMail)}
             className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
+              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
               activeModule === 'mail'
-                ? 'bg-white/15 text-sky-400 border border-sky-400/30 shadow-[0_2px_10px_rgba(56,189,248,0.2)]'
-                : 'text-slate-400 hover:text-white hover:bg-white/5',
+                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
             )}
-            title="Custom Domain Email"
+            title="Custom Domain Email (⌘3)"
             aria-label="Custom Domain Email"
           >
             {activeModule === 'mail' && (
               <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]"
+                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
                 aria-hidden="true"
               />
             )}
@@ -261,18 +408,20 @@ export default function WorkspaceShell({ className = '' }) {
           <button
             type="button"
             onClick={() => setActiveModule('docs')}
+            onMouseEnter={() => prefetch(loadDocs)}
+            onFocus={() => prefetch(loadDocs)}
             className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
+              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
               activeModule === 'docs'
-                ? 'bg-white/15 text-emerald-400 border border-emerald-400/30 shadow-[0_2px_10px_rgba(52,211,153,0.2)]'
-                : 'text-slate-400 hover:text-white hover:bg-white/5',
+                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
             )}
-            title="TipTap Living Docs"
+            title="TipTap Living Docs (⌘4)"
             aria-label="TipTap Living Docs"
           >
             {activeModule === 'docs' && (
               <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"
+                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
                 aria-hidden="true"
               />
             )}
@@ -283,17 +432,17 @@ export default function WorkspaceShell({ className = '' }) {
             type="button"
             onClick={() => setActiveModule('files')}
             className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
+              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
               activeModule === 'files'
-                ? 'bg-white/15 text-indigo-300 border border-indigo-400/30 shadow-[0_2px_10px_rgba(99,102,241,0.2)]'
-                : 'text-slate-400 hover:text-white hover:bg-white/5',
+                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
             )}
-            title="Files"
+            title="Files & Evidence"
             aria-label="Files"
           >
             {activeModule === 'files' && (
               <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.8)]"
+                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
                 aria-hidden="true"
               />
             )}
@@ -302,41 +451,68 @@ export default function WorkspaceShell({ className = '' }) {
 
           <button
             type="button"
-            onClick={() => setActiveModule('huddle')}
+            onClick={() => setActiveModule('calendar')}
+            onMouseEnter={() => prefetch(loadCalendar)}
+            onFocus={() => prefetch(loadCalendar)}
             className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
-              activeModule === 'huddle'
-                ? 'bg-white/15 text-violet-400 border border-violet-400/30 shadow-[0_2px_10px_rgba(167,139,250,0.2)]'
-                : 'text-slate-400 hover:text-white hover:bg-white/5',
+              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+              activeModule === 'calendar'
+                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
             )}
-            title="Huddle"
+            title="Team Calendar & Events (⌘5)"
+            aria-label="Team Calendar & Events"
+          >
+            {activeModule === 'calendar' && (
+              <span
+                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                aria-hidden="true"
+              />
+            )}
+            <CalendarIcon className="w-5 h-5" />
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveModule('huddle')}
+            onMouseEnter={() => prefetch(loadHuddle)}
+            onFocus={() => prefetch(loadHuddle)}
+            className={cn(
+              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+              activeModule === 'huddle'
+                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
+            )}
+            title="Huddle Video Chamber (⌘6)"
             aria-label="Huddle"
           >
             {activeModule === 'huddle' && (
               <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-violet-400 shadow-[0_0_8px_rgba(167,139,250,0.8)]"
+                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
                 aria-hidden="true"
               />
             )}
             <Video className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-400" />
           </button>
 
           <button
             type="button"
             onClick={() => setActiveModule('tasks')}
+            onMouseEnter={() => prefetch(loadTasks)}
+            onFocus={() => prefetch(loadTasks)}
             className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
+              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
               activeModule === 'tasks'
-                ? 'bg-white/15 text-amber-400 border border-amber-400/30 shadow-[0_2px_10px_rgba(251,191,36,0.2)]'
-                : 'text-slate-400 hover:text-white hover:bg-white/5',
+                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
             )}
-            title="Sprint Kanban Board"
-            aria-label="Sprint Kanban Board"
+            title="Tasks & Sprint Board (⌘7)"
+            aria-label="Tasks Kanban Board"
           >
             {activeModule === 'tasks' && (
               <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]"
+                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
                 aria-hidden="true"
               />
             )}
@@ -349,31 +525,140 @@ export default function WorkspaceShell({ className = '' }) {
           <button
             type="button"
             onClick={() => setActiveModule('automations')}
+            onMouseEnter={() => prefetch(loadAutomations)}
+            onFocus={() => prefetch(loadAutomations)}
             className={cn(
-              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer',
+              'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
               activeModule === 'automations'
-                ? 'bg-white/15 text-emerald-400 border border-emerald-400/30 shadow-[0_2px_10px_rgba(52,211,153,0.2)]'
-                : 'text-slate-400 hover:text-white hover:bg-white/5',
+                ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
             )}
-            title="Workflow automation"
-            aria-label="Workflow automation"
+            title="Workflow Automations & Agents (⌘8)"
+            aria-label="Automations and Agents"
           >
             {activeModule === 'automations' && (
               <span
-                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]"
+                className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
                 aria-hidden="true"
               />
             )}
             <GitBranch className="w-5 h-5" />
           </button>
 
-          <div className="mt-auto flex flex-col items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-full bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-xs font-semibold border border-indigo-500/30"
-              title="Sara Chen (Principal Infra Engineer)"
+          {/* User Profile Avatar with Floating Settings Menu */}
+          <div ref={profileMenuRef} className="mt-auto relative flex flex-col items-center">
+            <button
+              type="button"
+              onClick={() => {
+                setProfileMenuOpen((prev) => !prev);
+                setOrgMenuOpen(false);
+              }}
+              aria-expanded={profileMenuOpen}
+              aria-label="User profile and settings menu"
+              className="relative w-9 h-9 rounded-xl bg-indigo-600/30 text-indigo-200 hover:bg-indigo-600/40 flex items-center justify-center text-xs font-semibold border border-indigo-500/30 transition-all cursor-pointer"
+              title="Sara Chen (Principal Infra Lead) · Settings"
             >
-              SC
-            </div>
+              <span>SC</span>
+              <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-obsidian-base" />
+            </button>
+
+            {/* Floating Profile & Settings Menu */}
+            {profileMenuOpen && (
+              <div
+                className="absolute left-full bottom-0 ml-3 w-64 rounded-xl bg-obsidian-surface border border-obsidian-border p-2.5 shadow-2xl z-50 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
+                role="menu"
+              >
+                {/* User Info Header */}
+                <div className="p-2 border-b border-obsidian-border-soft mb-2">
+                  <div className="font-semibold text-white text-xs">Sara Chen</div>
+                  <div className="text-[11px] font-mono text-slate-400 truncate">sara@acme.corp</div>
+                  <div className="text-[10px] text-indigo-300 font-medium mt-0.5">Principal Infra Lead</div>
+                </div>
+
+                {/* Status Selector */}
+                <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-obsidian-muted mb-1">
+                  Status
+                </div>
+                <div className="grid grid-cols-2 gap-1 mb-2">
+                  {[
+                    { id: 'online', label: 'Online', dot: 'bg-emerald-400' },
+                    { id: 'huddle', label: 'In Huddle', dot: 'bg-amber-400' },
+                    { id: 'busy', label: 'Do Not Disturb', dot: 'bg-rose-400' },
+                    { id: 'offline', label: 'Offline', dot: 'bg-slate-500' },
+                  ].map((st) => (
+                    <button
+                      key={st.id}
+                      type="button"
+                      onClick={() => setUserStatus(st.id)}
+                      className={cn(
+                        'flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] transition-colors cursor-pointer text-left',
+                        userStatus === st.id
+                          ? 'bg-white/[0.08] text-white font-medium'
+                          : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-200'
+                      )}
+                    >
+                      <span className={cn('w-1.5 h-1.5 rounded-full shrink-0', st.dot)} />
+                      <span className="truncate">{st.label}</span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Navigation Links */}
+                <div className="border-t border-obsidian-border-soft pt-1.5 space-y-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      setIsKeyboardModalOpen(true);
+                    }}
+                    className="w-full flex items-center justify-between px-2 py-1.5 rounded-md text-xs text-slate-300 hover:bg-white/[0.06] hover:text-white transition-colors cursor-pointer text-left"
+                  >
+                    <div className="flex items-center gap-2">
+                      <HelpCircle className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Keyboard Shortcuts</span>
+                    </div>
+                    <kbd className="font-mono text-[9px] text-slate-400 bg-white/[0.06] px-1 py-0.2 rounded border border-white/[0.08]">
+                      ⌘/
+                    </kbd>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProfileMenuOpen(false);
+                      openSearchPalette();
+                    }}
+                    className="w-full flex items-center justify-between px-2 py-1.5 rounded-md text-xs text-slate-300 hover:bg-white/[0.06] hover:text-white transition-colors cursor-pointer text-left"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Settings className="w-3.5 h-3.5 text-slate-400" />
+                      <span>Workspace Preferences</span>
+                    </div>
+                    <kbd className="font-mono text-[9px] text-slate-400 bg-white/[0.06] px-1 py-0.2 rounded border border-white/[0.08]">
+                      ⌘,
+                    </kbd>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-slate-300 hover:bg-white/[0.06] hover:text-white transition-colors cursor-pointer text-left"
+                  >
+                    <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Security &amp; Audit Logs</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setProfileMenuOpen(false)}
+                    className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-rose-300 hover:bg-rose-500/15 transition-colors cursor-pointer text-left"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -503,6 +788,32 @@ export default function WorkspaceShell({ className = '' }) {
             </button>
           </div>
 
+          {/* Calendar Navigation */}
+          <div className="mt-3 pt-3 border-t border-obsidian-border-soft space-y-1">
+            <div className="px-2 py-1 text-[11px] font-mono uppercase tracking-wider text-obsidian-muted flex items-center justify-between">
+              <span>Calendar</span>
+              <span className="text-[10px] text-indigo-400 font-bold font-mono">
+                Today
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveModule('calendar')}
+              className={cn(
+                'w-full flex items-center justify-between px-2.5 py-1.5 rounded-md font-medium text-left truncate transition-colors cursor-pointer',
+                activeModule === 'calendar'
+                  ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5',
+              )}
+            >
+              <div className="flex items-center gap-2 truncate">
+                <CalendarIcon className="w-3.5 h-3.5 shrink-0 text-indigo-400" />
+                <span className="truncate">Team Schedule</span>
+              </div>
+              <span className="text-[9.5px] font-mono text-emerald-400 shrink-0">1 live</span>
+            </button>
+          </div>
+
           {/* Kanban Tasks Navigation */}
           <div className="mt-3 pt-3 border-t border-obsidian-border-soft space-y-1">
             <div className="px-2 py-1 text-[11px] font-mono uppercase tracking-wider text-obsidian-muted flex items-center justify-between">
@@ -574,21 +885,24 @@ export default function WorkspaceShell({ className = '' }) {
         </div>
 
         {/* 3. Main Multi-Mode Interactive Canvas (Engines) */}
-        <div className="flex flex-col bg-obsidian-base min-h-[580px] overflow-hidden relative">
-          <Suspense fallback={<WorkspaceModuleSkeleton />}>
-            {activeModule === 'chat' && <MatrixChatEngine />}
-            {activeModule === 'threads' && <HeroThreadsView />}
-            {activeModule === 'mail' && <DomainMailboxEngine />}
-            {activeModule === 'docs' && <LivingDocEditor />}
-            {activeModule === 'files' && <HeroFilesView />}
-            {activeModule === 'huddle' && <HuddleSimulator />}
-            {activeModule === 'tasks' && <KanbanTaskBoard />}
-            {activeModule === 'automations' && <VisualAutomationsCanvas />}
-          </Suspense>
+        <div className="flex flex-col bg-obsidian-base min-h-[580px] flex-1 min-h-0 overflow-hidden relative">
+          <ErrorBoundary name={activeModule.charAt(0).toUpperCase() + activeModule.slice(1)}>
+            <Suspense fallback={<WorkspaceModuleSkeleton />}>
+              {activeModule === 'chat' && <MatrixChatEngine />}
+              {activeModule === 'threads' && <HeroThreadsView />}
+              {activeModule === 'mail' && <DomainMailboxEngine />}
+              {activeModule === 'docs' && <LivingDocEditor />}
+              {activeModule === 'files' && <HeroFilesView />}
+              {activeModule === 'calendar' && <CalendarEngine />}
+              {activeModule === 'huddle' && <HuddleSimulator />}
+              {activeModule === 'tasks' && <KanbanTaskBoard />}
+              {activeModule === 'automations' && <VisualAutomationsCanvas />}
+            </Suspense>
+          </ErrorBoundary>
         </div>
 
-        {/* 4. 340px Contextual Secondary Drawer: Kernel Telemetry & Ukin Action Engine */}
-        <EventBusTelemetryDrawer />
+        {/* 4. Contextual Secondary Drawer: Kernel Telemetry & Ukin Action Engine */}
+        {drawerOpen && <EventBusTelemetryDrawer onClose={() => setDrawerOpen(false)} />}
       </div>
 
       {/* Reactive Telemetry Toast Container */}

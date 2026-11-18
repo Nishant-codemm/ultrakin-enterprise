@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react';
 import { ArrowRight, Bot, CheckCircle2, CircleDot, ShieldCheck, Sparkles } from 'lucide-react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useReducedMotion } from 'framer-motion';
 import VisualAutomationsCanvas from '../components/showcase/VisualAutomationsCanvas';
 import UkinActionProposalCard from '../components/showcase/UkinActionProposalCard';
 import BrowserFrame from '../components/BrowserFrame';

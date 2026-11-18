@@ -1,10 +1,6 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { motion, useReducedMotion, useSpring } from 'framer-motion';
 import {
-  MessageSquare,
-  FileText,
-  Sparkles,
-  CheckSquare,
   Pause,
   Play,
 } from 'lucide-react';
@@ -12,48 +8,79 @@ import UltrakinLogo from '../primitives/UltrakinLogo';
 import { cn } from '../../lib/cn';
 import { WORKFLOW_SIGNALS } from '../../data/heroSignals';
 
-/* ── Conduit 1: 4 Curved Bezier Laser Lines connecting Left Buttons to Center Core ── */
+/* ── Conduit 1: 4 Curved Bezier Laser Lines connecting Left Signal Buttons to Center Core ── */
 export function LaserConduit1({ activeIndex, reduceMotion }) {
+  // Coordinates mapped precisely to the 4 button centers at y: 20, 68, 116, 164 -> converging at core entry (32, 92)
   const paths = [
-    'M 0 18 C 20 18, 16 84, 36 84',
-    'M 0 62 C 20 62, 16 84, 36 84',
-    'M 0 106 C 20 106, 16 84, 36 84',
-    'M 0 150 C 20 150, 16 84, 36 84',
+    'M 0 20 C 18 20, 14 92, 32 92',
+    'M 0 68 C 18 68, 14 92, 32 92',
+    'M 0 116 C 18 116, 14 92, 32 92',
+    'M 0 164 C 18 164, 14 92, 32 92',
+  ];
+
+  // Ambient staggered parameters for background multi-signal convergence (Siva's feedback: signals from meetings, mail, chat converging simultaneously)
+  const ambientPulses = [
+    { index: 0, color: '#3b82f6', duration: 1.8, delay: 0.2 },
+    { index: 1, color: '#0ea5e9', duration: 2.2, delay: 0.7 },
+    { index: 2, color: '#6366f1', duration: 1.6, delay: 0.4 }, // Huddle / Meetings
+    { index: 3, color: '#10b981', duration: 2.4, delay: 1.0 }, // Docs
   ];
 
   return (
     <svg
-      viewBox="0 0 36 168"
-      className="h-[168px] w-[36px] shrink-0 overflow-visible select-none pointer-events-none"
+      viewBox="0 0 32 184"
+      className="h-[184px] w-[32px] shrink-0 overflow-visible select-none pointer-events-none"
+      aria-hidden="true"
     >
       <defs>
         <filter id="conduit-laser-glow-left" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2.2" result="blur" />
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
         <linearGradient id="laser-grad-active" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#0284c7" />
-          <stop offset="50%" stopColor="#2563eb" />
-          <stop offset="100%" stopColor="#6366f1" />
+          <stop offset="0%" stopColor="#2563eb" />
+          <stop offset="60%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#1d4ed8" />
         </linearGradient>
       </defs>
 
-      {/* Inactive guide paths */}
+      {/* Inactive & guide paths */}
       {paths.map((d, i) => (
         <path
           key={`base-${i}`}
           d={d}
           fill="none"
-          stroke={i === activeIndex ? 'url(#laser-grad-active)' : '#93c5fd'}
-          strokeWidth={i === activeIndex ? 2.2 : 1}
-          strokeOpacity={i === activeIndex ? 0.95 : 0.35}
+          stroke={i === activeIndex ? 'url(#laser-grad-active)' : '#cbd5e1'}
+          strokeWidth={i === activeIndex ? 1.8 : 1}
+          strokeOpacity={i === activeIndex ? 0.9 : 0.45}
           strokeLinecap="round"
           className="transition-all duration-300"
         />
       ))}
+
+      {/* Ambient background signal pulses (Simultaneous convergence from meetings, mail, docs) */}
+      {!reduceMotion &&
+        ambientPulses.map(({ index, color, duration, delay }) => {
+          if (index === activeIndex) return null;
+          return (
+            <motion.path
+              key={`ambient-${index}`}
+              d={paths[index]}
+              fill="none"
+              stroke={color}
+              strokeWidth={1.5}
+              strokeOpacity={0.65}
+              strokeLinecap="round"
+              strokeDasharray="10 166"
+              filter="url(#conduit-laser-glow-left)"
+              animate={{ strokeDashoffset: [176, -176] }}
+              transition={{ duration, repeat: Infinity, ease: 'linear', delay }}
+            />
+          );
+        })}
 
       {/* Active laser glow underlay */}
       {paths.map((d, i) => (
@@ -62,8 +89,8 @@ export function LaserConduit1({ activeIndex, reduceMotion }) {
             key={`glow-${i}`}
             d={d}
             fill="none"
-            stroke="#3b82f6"
-            strokeWidth={4.5}
+            stroke="#93c5fd"
+            strokeWidth={3.5}
             strokeOpacity={0.4}
             strokeLinecap="round"
             filter="url(#conduit-laser-glow-left)"
@@ -71,35 +98,49 @@ export function LaserConduit1({ activeIndex, reduceMotion }) {
         )
       ))}
 
-      {/* Traveling photon beam for active channel */}
+      {/* Primary focused signal packet on active path */}
       {!reduceMotion && (
-        <motion.path
-          key={`photon-${activeIndex}`}
-          d={paths[activeIndex]}
-          fill="none"
-          stroke="#ffffff"
-          strokeWidth={2.4}
-          strokeLinecap="round"
-          strokeDasharray="14 150"
-          filter="url(#conduit-laser-glow-left)"
-          animate={{ strokeDashoffset: [164, -164] }}
-          transition={{ duration: 1.1, repeat: Infinity, ease: 'linear' }}
-        />
+        <>
+          <motion.path
+            key={`photon-outer-${activeIndex}`}
+            d={paths[activeIndex]}
+            fill="none"
+            stroke="#2563eb"
+            strokeWidth={2.4}
+            strokeLinecap="round"
+            strokeDasharray="18 158"
+            filter="url(#conduit-laser-glow-left)"
+            animate={{ strokeDashoffset: [176, -176] }}
+            transition={{ duration: 1.15, repeat: Infinity, ease: 'linear' }}
+          />
+          <motion.path
+            key={`photon-core-${activeIndex}`}
+            d={paths[activeIndex]}
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth={1.4}
+            strokeLinecap="round"
+            strokeDasharray="8 168"
+            animate={{ strokeDashoffset: [176, -176] }}
+            transition={{ duration: 1.15, repeat: Infinity, ease: 'linear' }}
+          />
+        </>
       )}
 
-      {/* Entry junction node at (36, 84) */}
-      <circle cx="36" cy="84" r="3" fill="#2563eb" />
+      {/* Intake convergence aperture at (32, 92) into Ultrakin Core */}
+      <circle cx="32" cy="92" r="3.2" fill="#2563eb" />
+      <circle cx="32" cy="92" r="6" fill="#2563eb" fillOpacity="0.12" />
       {!reduceMotion && (
         <motion.circle
-          cx="36"
-          cy="84"
-          r="3"
+          cx="32"
+          cy="92"
+          r="3.2"
           fill="none"
-          stroke="#60a5fa"
-          strokeWidth="1.5"
-          animate={{ scale: [1, 2.5], opacity: [0.9, 0] }}
+          stroke="#2563eb"
+          strokeWidth="1.2"
+          animate={{ scale: [1, 2.4], opacity: [0.75, 0] }}
           transition={{ duration: 1.4, repeat: Infinity, ease: 'easeOut' }}
-          style={{ transformOrigin: '36px 84px' }}
+          style={{ transformOrigin: '32px 92px' }}
         />
       )}
     </svg>
@@ -110,296 +151,214 @@ export function LaserConduit1({ activeIndex, reduceMotion }) {
 export function LaserConduit2({ reduceMotion }) {
   return (
     <svg
-      viewBox="0 0 26 168"
-      className="h-[168px] w-[26px] shrink-0 overflow-visible select-none pointer-events-none"
+      viewBox="0 0 24 184"
+      className="h-[184px] w-[24px] shrink-0 overflow-visible select-none pointer-events-none"
+      aria-hidden="true"
     >
       <defs>
         <filter id="conduit-laser-glow-right" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="2.2" result="blur" />
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
           <feMerge>
             <feMergeNode in="blur" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
         <linearGradient id="laser-grad-out" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stopColor="#6366f1" />
-          <stop offset="50%" stopColor="#2563eb" />
-          <stop offset="100%" stopColor="#0284c7" />
+          <stop offset="0%" stopColor="#2563eb" />
+          <stop offset="50%" stopColor="#3b82f6" />
+          <stop offset="100%" stopColor="#0ea5e9" />
         </linearGradient>
       </defs>
 
       {/* Guide line */}
       <line
         x1="0"
-        y1="84"
-        x2="26"
-        y2="84"
+        y1="92"
+        x2="24"
+        y2="92"
         stroke="url(#laser-grad-out)"
-        strokeWidth="2.2"
-        strokeOpacity="0.85"
+        strokeWidth="1.8"
+        strokeOpacity={0.8}
         strokeLinecap="round"
       />
       <line
         x1="0"
-        y1="84"
-        x2="26"
-        y2="84"
-        stroke="#3b82f6"
-        strokeWidth={4.5}
-        strokeOpacity={0.35}
+        y1="92"
+        x2="24"
+        y2="92"
+        stroke="#93c5fd"
+        strokeWidth={3.5}
+        strokeOpacity={0.3}
         filter="url(#conduit-laser-glow-right)"
       />
 
       {/* Traveling photon pulse */}
       {!reduceMotion && (
-        <motion.line
-          x1="0"
-          y1="84"
-          x2="26"
-          y2="84"
-          stroke="#ffffff"
-          strokeWidth={2.4}
-          strokeLinecap="round"
-          strokeDasharray="10 26"
-          animate={{ strokeDashoffset: [36, -36] }}
-          transition={{ duration: 0.85, repeat: Infinity, ease: 'linear' }}
-        />
+        <>
+          <motion.line
+            x1="0"
+            y1="92"
+            x2="24"
+            y2="92"
+            stroke="#2563eb"
+            strokeWidth={2.4}
+            strokeLinecap="round"
+            strokeDasharray="10 22"
+            animate={{ strokeDashoffset: [32, -32] }}
+            transition={{ duration: 0.85, repeat: Infinity, ease: 'linear' }}
+          />
+          <motion.line
+            x1="0"
+            y1="92"
+            x2="24"
+            y2="92"
+            stroke="#ffffff"
+            strokeWidth={1.3}
+            strokeLinecap="round"
+            strokeDasharray="5 27"
+            animate={{ strokeDashoffset: [32, -32] }}
+            transition={{ duration: 0.85, repeat: Infinity, ease: 'linear' }}
+          />
+        </>
       )}
 
       {/* Exit & entry junction dots */}
-      <circle cx="0" cy="84" r="2.5" fill="#6366f1" />
-      <circle cx="26" cy="84" r="2.5" fill="#0284c7" />
+      <circle cx="0" cy="92" r="2.5" fill="#2563eb" />
+      <circle cx="24" cy="92" r="2.5" fill="#0ea5e9" />
     </svg>
   );
 }
 
-/* ── Center: Deep Obsidian Intelligence Core Card ── */
-export function NeuralCoreCard({ activeSignal, reduceMotion }) {
+/* ── Center: Light-Mode Enterprise Intelligence Core Card with Official Ultrakin Logo ── */
+export function NeuralCoreCard({ activeSignal }) {
   return (
     <div
-      className="relative flex h-[196px] w-[172px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl p-3 select-none"
-      style={{
-        background: 'linear-gradient(155deg, #090e1d 0%, #060914 100%)',
-        border: '1px solid rgba(147, 197, 253, 0.35)',
-        boxShadow: '0 16px 36px -10px rgba(15, 23, 42, 0.4), 0 0 20px -4px rgba(56, 189, 248, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
-      }}
+      className="relative flex h-[204px] w-[190px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl p-3.5 select-none bg-white border border-slate-200/90 shadow-[0_12px_28px_-8px_rgba(15,23,42,0.08),0_2px_6px_-1px_rgba(15,23,42,0.04),inset_0_1px_0_rgba(255,255,255,1)]"
     >
-      {/* Top specular reflection rim */}
-      <span className="pointer-events-none absolute inset-x-0 top-0 h-1/3 rounded-t-2xl bg-gradient-to-b from-white/[0.09] to-transparent" />
-      <span className="pointer-events-none absolute -left-6 top-1/2 h-16 w-16 rounded-full bg-blue-500/20 blur-xl" />
+      {/* Specular subtle highlight rim */}
+      <span className="pointer-events-none absolute inset-x-0 top-0 h-1/3 rounded-t-2xl bg-gradient-to-b from-blue-50/50 to-transparent" />
 
-      {/* Header: Chip badge + telemetry status */}
-      <div className="relative z-10 flex items-center justify-between border-b border-white/[0.08] pb-1.5">
+      {/* Header: Official Ultrakin Logo + Telemetry Status */}
+      <div className="relative z-10 flex items-center justify-between border-b border-slate-100 pb-2">
         <div className="flex items-center gap-1.5">
-          <span className="flex h-4.5 w-4.5 items-center justify-center rounded-md bg-blue-500/25 ring-1 ring-blue-400/40">
-            <Sparkles className="h-2.5 w-2.5 text-cyan-300" />
-          </span>
-          <span className="text-[9.5px] font-semibold tracking-wide text-white">Ukin Core</span>
+          <UltrakinLogo size={18} />
+          <span className="text-[11.5px] font-semibold tracking-tight text-slate-900">Ultrakin Core</span>
         </div>
-        <div className="flex items-center gap-1 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-1.5 py-0.5 text-[7.5px] font-mono text-emerald-300">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-          <span>LIVE</span>
+        <div className="flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] font-mono text-emerald-700 font-medium">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+          <span>SYNTHESIZING</span>
         </div>
       </div>
 
-      {/* Middle: Frequency Waveform Equalizer + Dynamic Context */}
-      <div className="relative z-10 space-y-1.5 py-0.5">
-        <div className="flex items-center justify-between px-0.5">
-          <div className="flex items-end gap-1 h-4">
-            {[0.4, 0.9, 0.6, 1.0, 0.5, 0.8].map((scale, idx) => (
-              <motion.span
-                key={idx}
-                className="w-1 rounded-full bg-gradient-to-t from-blue-500 to-cyan-400"
-                animate={reduceMotion ? undefined : {
-                  height: [5 * scale, 16 * scale, 8 * scale, 18 * scale, 5 * scale],
-                }}
-                transition={reduceMotion ? undefined : {
-                  duration: 1.1 + idx * 0.15,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-                style={{ height: 12 * scale }}
-              />
-            ))}
-          </div>
-          <span className="text-[7.5px] font-mono uppercase tracking-wider text-slate-400">Streaming</span>
-        </div>
-
-        {/* Dynamic Channel Tag */}
+      {/* Middle: Clear Real-World Context & Intent Correlation */}
+      <div className="relative z-10 space-y-1.5 py-1">
+        {/* Dynamic Channel Badge */}
         <div className="flex items-center gap-1.5">
-          <span className={cn('rounded px-1.5 py-0.5 text-[7.5px] font-mono font-medium border truncate max-w-[140px]', activeSignal.pillBg)}>
+          <span className="rounded px-1.5 py-0.5 text-[9.5px] font-mono font-medium border truncate max-w-[160px] bg-slate-50 border-slate-200 text-slate-700">
             {activeSignal.channel}
           </span>
         </div>
 
-        {/* Dynamic Title & Action */}
+        {/* Dynamic Signal Title */}
         <div className="min-w-0">
-          <p className="truncate text-[9px] font-semibold text-slate-100 leading-snug">
+          <p className="text-xs font-semibold text-slate-900 leading-snug line-clamp-2">
             {activeSignal.title}
           </p>
-          <p className="mt-0.5 truncate text-[7.5px] text-sky-200/90 leading-tight">
-            {activeSignal.desc}
+        </div>
+
+        {/* Knowledge Graph Correlation String */}
+        <div className="rounded-md bg-slate-50 border border-slate-200/80 p-1.5">
+          <p className="text-[10px] text-slate-600 font-mono leading-tight">
+            ⚡ {activeSignal.contextEngine}
           </p>
         </div>
       </div>
 
-      {/* Bottom: Gradient Progress Energy Sweep */}
-      <div className="relative z-10">
-        <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/[0.08]">
-          <motion.div
-            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400"
-            animate={reduceMotion ? undefined : {
-              width: ['40%', '85%', '55%', '95%'],
-            }}
-            transition={reduceMotion ? undefined : {
-              duration: 3.2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-            style={{ width: '65%' }}
-          />
-        </div>
-        <div className="mt-1 flex items-center justify-between text-[7px] font-mono text-slate-400">
-          <span>Synthesized</span>
-          <span className="text-cyan-300 font-medium">12ms latency</span>
+      {/* Bottom: Progress & Confidence Metrics */}
+      <div className="relative z-10 pt-1 border-t border-slate-100">
+        <div className="flex items-center justify-between text-[9px] font-mono text-slate-500">
+          <span className="text-emerald-700 font-semibold">{activeSignal.confidence} match</span>
+          <span className="text-slate-600 font-medium">{activeSignal.latency} latency</span>
         </div>
       </div>
     </div>
   );
 }
 
-/* ── Right: Deep Obsidian One Workspace Output Card (M-09 dynamic status) ── */
+/* ── Right: Light-Mode Enterprise One Workspace Output Card ── */
 export function WorkspaceOutcomeCard({ activeSignal }) {
-  const signalId = activeSignal?.id || 'chat';
-
-  // Dynamic context and active count derived from active signal (M-09)
-  const metaBySignal = {
-    chat: {
-      countBadge: '4 active',
-      badgeColor: 'border-emerald-400/20 bg-emerald-400/10 text-emerald-300',
-      dotColor: 'bg-emerald-400',
-      rows: [
-        { icon: MessageSquare, color: '#818cf8', label: 'Incident thread', sub: '4 replies linked', active: true },
-        { icon: FileText,      color: '#34d399', label: 'Living brief',    sub: 'Post-mortem drafted', active: false },
-        { icon: CheckSquare,   color: '#fbbf24', label: 'Assign next step', sub: 'DevOps on-call · Assigned', active: false },
-      ],
-    },
-    email: {
-      countBadge: '2 active',
-      badgeColor: 'border-sky-400/20 bg-sky-400/10 text-sky-300',
-      dotColor: 'bg-sky-400',
-      rows: [
-        { icon: MessageSquare, color: '#818cf8', label: 'Legal thread',    sub: 'SOC-2 audit trail', active: false },
-        { icon: FileText,      color: '#34d399', label: 'Agreement brief', sub: 'Obligations extracted', active: true },
-        { icon: CheckSquare,   color: '#fbbf24', label: 'Security sign-off', sub: 'CISO review ready', active: false },
-      ],
-    },
-    huddle: {
-      countBadge: '5 queued',
-      badgeColor: 'border-purple-400/20 bg-purple-400/10 text-purple-300',
-      dotColor: 'bg-purple-400',
-      rows: [
-        { icon: MessageSquare, color: '#818cf8', label: 'Retro synthesis', sub: 'Action items parsed', active: false },
-        { icon: FileText,      color: '#34d399', label: 'Sprint doc',      sub: 'Commitments mapped', active: false },
-        { icon: CheckSquare,   color: '#fbbf24', label: 'Assign backlog',  sub: '5 Jira tickets created', active: true },
-      ],
-    },
-    docs: {
-      countBadge: '3 synced',
-      badgeColor: 'border-emerald-400/20 bg-emerald-400/10 text-emerald-300',
-      dotColor: 'bg-emerald-400',
-      rows: [
-        { icon: MessageSquare, color: '#818cf8', label: 'RFC discussion',  sub: 'Tech lead approved', active: false },
-        { icon: FileText,      color: '#34d399', label: 'Living RFC-402',  sub: 'TTL schema v2.4', active: true },
-        { icon: CheckSquare,   color: '#fbbf24', label: 'Deployment task', sub: 'Rollout checklist', active: false },
-      ],
-    },
-  };
-
-  const currentMeta = metaBySignal[signalId] || metaBySignal.chat;
-
   return (
     <div
-      className="relative flex h-[196px] w-[146px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl p-3 select-none"
-      style={{
-        background: 'linear-gradient(155deg, #0a0f20 0%, #060914 100%)',
-        border: '1px solid rgba(255, 255, 255, 0.14)',
-        boxShadow: '0 16px 36px -10px rgba(15, 23, 42, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.15)',
-      }}
+      className="relative flex h-[204px] w-[170px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl p-3.5 select-none bg-white border border-slate-200/90 shadow-[0_12px_28px_-8px_rgba(15,23,42,0.08),0_2px_6px_-1px_rgba(15,23,42,0.04),inset_0_1px_0_rgba(255,255,255,1)]"
     >
-      {/* Top specular reflection rim */}
-      <span className="pointer-events-none absolute inset-x-0 top-0 h-1/4 rounded-t-2xl bg-gradient-to-b from-white/[0.07] to-transparent" />
+      {/* Specular subtle highlight rim */}
+      <span className="pointer-events-none absolute inset-x-0 top-0 h-1/4 rounded-t-2xl bg-gradient-to-b from-blue-50/40 to-transparent" />
 
       {/* Header */}
-      <div className="relative z-10 flex items-center justify-between border-b border-white/[0.08] pb-1.5">
+      <div className="relative z-10 flex items-center justify-between border-b border-slate-100 pb-2">
         <div className="flex items-center gap-1.5">
-          <UltrakinLogo size={13} />
-          <span className="truncate text-[9px] font-semibold text-white/95">One workspace</span>
+          <UltrakinLogo size={14} />
+          <span className="truncate text-[11px] font-semibold text-slate-900">One workspace</span>
         </div>
-        <span
-          className={cn(
-            'flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[7.5px] font-mono font-medium transition-all duration-300',
-            currentMeta.badgeColor
-          )}
-        >
-          <span className={cn('h-1 w-1 rounded-full animate-pulse', currentMeta.dotColor)} />
-          <span>{currentMeta.countBadge}</span>
+        <span className="flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] font-mono font-medium text-emerald-700">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          <span>{activeSignal.outcomeCount}</span>
         </span>
       </div>
 
-      {/* Dynamic Rows */}
-      <div className="relative z-10 space-y-1 py-0.5">
-        {currentMeta.rows.map(({ icon: Icon, color, label, sub, active }) => (
+      {/* Dynamic Concrete Deliverable Rows */}
+      <div className="relative z-10 space-y-1.5 py-0.5">
+        {activeSignal.deliverables.map(({ icon: Icon, color, label, sub, active }) => (
           <div
             key={label}
             className={cn(
-              'flex items-start gap-1.5 rounded-lg px-1.5 py-1 transition-all duration-300',
+              'flex items-start gap-2 rounded-lg px-2 py-1.5 transition-all duration-200',
               active
-                ? 'bg-white/[0.12] ring-1 ring-sky-400/40 shadow-[0_2px_8px_rgba(0,0,0,0.3)]'
-                : 'opacity-70 hover:opacity-100'
+                ? 'bg-blue-50/80 border border-blue-200/80 shadow-2xs'
+                : 'opacity-70 hover:opacity-100 hover:bg-slate-50'
             )}
           >
-            <Icon style={{ color }} className="mt-0.5 h-3 w-3 shrink-0" />
+            <Icon style={{ color }} className="mt-0.5 h-3.5 w-3.5 shrink-0" />
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between">
-                <p className="truncate text-[8px] font-medium text-white/95">{label}</p>
+                <p className="truncate text-[10.5px] font-medium text-slate-800">{label}</p>
                 {active && (
-                  <span className={cn('h-1.5 w-1.5 rounded-full', currentMeta.dotColor)} />
+                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600 shrink-0" />
                 )}
               </div>
-              <p className="truncate text-[7px] text-white/50">{sub}</p>
+              <p className="truncate text-[9.5px] text-slate-500 font-mono">{sub}</p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Bottom row */}
-      <div className="relative z-10 border-t border-white/[0.06] pt-1">
-        <div className="flex items-center justify-between text-[7px] text-white/50">
+      {/* Bottom Row */}
+      <div className="relative z-10 border-t border-slate-100 pt-1">
+        <div className="flex items-center justify-between text-[9px] text-slate-500 font-mono">
           <span>Connected</span>
-          <span className="font-mono text-sky-300 text-[7.5px] font-medium">100% in sync</span>
+          <span className="text-blue-700 font-medium">100% in sync</span>
         </div>
       </div>
     </div>
   );
 }
 
-/* ── HeroInteractiveStage: Next-Level 3D Interactive Stage in Celestial Sky Theme ── */
+/* ── HeroInteractiveStage: 3D Interactive Stage in Celestial Sky Theme ── */
 export default function HeroInteractiveStage() {
   const reduceMotion = useReducedMotion();
   const [activeId, setActiveId] = useState('chat');
   const [isPaused, setIsPaused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 260, y: 150 });
+  const [mousePos, setMousePos] = useState({ x: 280, y: 160 });
   const cardRef = useRef(null);
 
-  // Framer Motion physics springs for butter-smooth physical momentum
-  const springConfig = { stiffness: 150, damping: 20, mass: 0.35 };
+  // Framer Motion physics springs for butter-smooth physical momentum (calibrated, dignified tilt)
+  const springConfig = { stiffness: 140, damping: 24, mass: 0.35 };
   const rotateX = useSpring(0, springConfig);
   const rotateY = useSpring(0, springConfig);
   const scale = useSpring(1, springConfig);
 
-  // Auto-cycle through signals every 3.2 seconds when not hovered
+  // Auto-cycle through signals every 3.6 seconds when not paused/hovered
   useEffect(() => {
     if (isPaused || reduceMotion) return;
     const timer = setInterval(() => {
@@ -408,14 +367,14 @@ export default function HeroInteractiveStage() {
         const nextIndex = (currentIndex + 1) % WORKFLOW_SIGNALS.length;
         return WORKFLOW_SIGNALS[nextIndex].id;
       });
-    }, 3200);
+    }, 3600);
     return () => clearInterval(timer);
   }, [isPaused, reduceMotion]);
 
   const activeIndex = WORKFLOW_SIGNALS.findIndex((s) => s.id === activeId);
   const activeSignal = WORKFLOW_SIGNALS[activeIndex] || WORKFLOW_SIGNALS[0];
 
-  // Mousemove 3D perspective physics with live spring interpolation
+  // Mousemove 3D perspective physics with restrained, premium angles (max ±4 degrees)
   const handleMouseMove = useCallback((e) => {
     if (reduceMotion) return;
     const el = cardRef.current;
@@ -427,9 +386,9 @@ export default function HeroInteractiveStage() {
     const normY = y / rect.height - 0.5;
 
     // Organic spring-driven 3D tilt
-    rotateX.set(-normY * 10);
-    rotateY.set(normX * 10);
-    scale.set(1.02);
+    rotateX.set(-normY * 5);
+    rotateY.set(normX * 5);
+    scale.set(1.01);
 
     setMousePos({ x, y });
   }, [reduceMotion, rotateX, rotateY, scale]);
@@ -448,13 +407,13 @@ export default function HeroInteractiveStage() {
   }, [rotateX, rotateY, scale]);
 
   return (
-    <div className="relative mx-auto w-full max-w-[560px] lg:max-w-[580px] select-none py-2 flex justify-center frame-perspective-3d">
+    <div className="relative mx-auto w-full max-w-[580px] lg:max-w-[600px] select-none py-2 flex justify-center frame-perspective-3d">
 
-      {/* ── Atmospheric Ambient Brand Backglow (Soft & Elegant) ── */}
-      <div className="pointer-events-none absolute -inset-6 rounded-[36px] bg-[radial-gradient(ellipse_at_center,rgba(49,86,207,0.11),transparent_65%)] blur-2xl" />
-      <div className="pointer-events-none absolute left-[28%] top-[12%] h-[75%] w-[45%] rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.07),transparent_60%)] blur-2xl" />
+      {/* Atmospheric Ambient Brand Backglow */}
+      <div className="pointer-events-none absolute -inset-6 rounded-[36px] bg-[radial-gradient(ellipse_at_center,rgba(49,86,207,0.12),transparent_65%)] blur-2xl" />
+      <div className="pointer-events-none absolute left-[28%] top-[12%] h-[75%] w-[45%] rounded-full bg-[radial-gradient(circle,rgba(99,102,241,0.08),transparent_60%)] blur-2xl" />
 
-      {/* ── Framer Motion 3D Physics Magnetic Card Container ── */}
+      {/* Framer Motion 3D Physics Magnetic Card Container */}
       <motion.div
         ref={cardRef}
         onMouseMove={handleMouseMove}
@@ -469,27 +428,28 @@ export default function HeroInteractiveStage() {
         }}
         className="relative w-full rounded-2xl p-[1px] transition-shadow duration-300"
       >
-        {/* Dynamic Cursor-Following Spotlight Border Glow */}
+        {/* Cursor-Following Spotlight Border Glow */}
         <div
           className="pointer-events-none absolute -inset-[1px] rounded-2xl transition-opacity duration-300 z-10"
           style={{
-            opacity: isHovered ? 1 : 0.4,
+            opacity: isHovered ? 1 : 0.45,
             background: isHovered
-              ? `radial-gradient(360px circle at ${mousePos.x}px ${mousePos.y}px, rgba(49,86,207,0.32), rgba(99,102,241,0.16) 40%, transparent 68%)`
-              : 'linear-gradient(135deg, rgba(226,232,240,0.8) 0%, rgba(203,213,225,0.5) 50%, rgba(226,232,240,0.8) 100%)',
+              ? `radial-gradient(380px circle at ${mousePos.x}px ${mousePos.y}px, rgba(49,86,207,0.35), rgba(99,102,241,0.18) 40%, transparent 68%)`
+              : 'linear-gradient(135deg, rgba(226,232,240,0.85) 0%, rgba(203,213,225,0.6) 50%, rgba(226,232,240,0.85) 100%)',
           }}
         />
 
-        {/* Card Body Container: Luminous Pearl-Sky Frosted Surface */}
+        {/* Card Body Container */}
         <div
           className="relative rounded-2xl p-1 shadow-[0_20px_48px_-16px_rgba(15,23,42,0.08),0_4px_16px_-4px_rgba(49,86,207,0.05),inset_0_1px_0_rgba(255,255,255,1)]"
           style={{
-            background: 'linear-gradient(160deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 250, 254, 0.95) 50%, rgba(240, 246, 253, 0.98) 100%)',
+            background:
+              'linear-gradient(160deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 250, 254, 0.95) 50%, rgba(240, 246, 253, 0.98) 100%)',
             border: '1px solid rgba(219, 234, 254, 0.75)',
             transformStyle: 'preserve-3d',
           }}
         >
-          {/* ── Browser Window Header Bar (Crisp Frosted Pearl-Sky) ── */}
+          {/* Browser Window Header Bar */}
           <div
             className="flex h-9 items-center justify-between rounded-t-xl border-b border-slate-200/70 bg-white/95 px-3 backdrop-blur-md"
             style={{ transform: 'translateZ(14px)' }}
@@ -499,40 +459,41 @@ export default function HeroInteractiveStage() {
               <span className="h-2.5 w-2.5 rounded-full bg-rose-400 ring-1 ring-rose-500/25 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
               <span className="h-2.5 w-2.5 rounded-full bg-amber-400 ring-1 ring-amber-500/25 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
               <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 ring-1 ring-emerald-500/25 transition-transform duration-200 hover:scale-125 cursor-pointer shadow-sm" />
-              <div className="ml-2 hidden sm:flex items-center gap-1.5 rounded-md border border-slate-200/80 bg-slate-50/80 px-2 py-0.5 text-[9.5px] font-mono text-slate-600 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
+              <div className="ml-2 hidden sm:flex items-center gap-1.5 rounded-md border border-slate-200/80 bg-slate-50/80 px-2 py-0.5 text-[10px] font-mono text-slate-600 shadow-[inset_0_1px_2px_rgba(0,0,0,0.02)]">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 <span>app.ultrakin.com · workflow engine</span>
               </div>
             </div>
 
             {/* Right: Active context badge */}
-            <div className="flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand/[0.07] px-2.5 py-0.5 text-[9px] font-mono font-medium text-brand-text shadow-sm">
+            <div className="flex items-center gap-1.5 rounded-full border border-brand/20 bg-brand/[0.07] px-2.5 py-0.5 text-[9.5px] font-mono font-medium text-brand-text shadow-sm">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand" />
               <span>Active context</span>
             </div>
           </div>
 
-          {/* ── Window Body: Interactive Workflow Pipeline ── */}
+          {/* Window Body: Interactive Workflow Pipeline */}
           <div
-            className="relative overflow-hidden rounded-b-xl p-3 backdrop-blur-sm"
+            className="relative overflow-hidden rounded-b-xl p-3.5 backdrop-blur-sm"
             style={{
-              background: 'linear-gradient(165deg, rgba(255, 255, 255, 0.6) 0%, rgba(241, 246, 254, 0.75) 100%)',
+              background:
+                'linear-gradient(165deg, rgba(255, 255, 255, 0.6) 0%, rgba(241, 246, 254, 0.75) 100%)',
               transformStyle: 'preserve-3d',
             }}
           >
-            {/* Subtle, Organic Ambient Sheen */}
+            {/* Ambient Sheen */}
             {isHovered && !reduceMotion && (
               <div
                 className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-300"
                 style={{
-                  background: `radial-gradient(320px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255, 255, 255, 0.14) 0%, rgba(56, 189, 248, 0.04) 40%, transparent 65%)`,
+                  background: `radial-gradient(340px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255, 255, 255, 0.16) 0%, rgba(56, 189, 248, 0.05) 40%, transparent 65%)`,
                 }}
               />
             )}
 
             {/* Stage Top Bar: Telemetry Header */}
             <div
-              className="relative z-10 mb-2.5 flex items-center justify-between px-1 text-[9px] font-mono uppercase tracking-wider"
+              className="relative z-10 mb-2.5 flex items-center justify-between px-1 text-[10px] font-mono uppercase tracking-wider"
               style={{ transform: 'translateZ(12px)' }}
             >
               <div className="flex items-center gap-1.5 font-bold text-slate-800">
@@ -546,14 +507,14 @@ export default function HeroInteractiveStage() {
               </div>
             </div>
 
-            {/* 5-Column Precision Pipeline Layout with Z-depth Parallax */}
+            {/* 5-Column Precision Pipeline Layout */}
             <div
               className="relative z-10 flex items-center justify-between gap-0 w-full"
               style={{ transform: 'translateZ(24px)', transformStyle: 'preserve-3d' }}
             >
-              {/* Column 1: Left Signals Column (4 Buttons spanning 168px) */}
+              {/* Column 1: Left Signals Column (4 Buttons spanning 184px) */}
               <div
-                className="flex h-[168px] w-[116px] shrink-0 flex-col justify-between"
+                className="flex h-[184px] w-[124px] shrink-0 flex-col justify-between"
                 style={{ transform: 'translateZ(10px)' }}
               >
                 {WORKFLOW_SIGNALS.map((signal) => {
@@ -563,31 +524,32 @@ export default function HeroInteractiveStage() {
                     <button
                       key={signal.id}
                       type="button"
+                      aria-pressed={isActive}
                       onClick={() => setActiveId(signal.id)}
                       onMouseEnter={() => {
                         setActiveId(signal.id);
                         setIsPaused(true);
                       }}
                       className={cn(
-                        'relative flex h-9 w-full items-center gap-1.5 rounded-xl border px-2 text-left transition-all duration-200 cursor-pointer shadow-sm',
+                        'relative flex h-10 w-full items-center gap-2 rounded-xl border px-2.5 text-left transition-all duration-200 cursor-pointer shadow-sm',
                         isActive
                           ? 'border-blue-600 bg-white text-blue-700 font-semibold ring-2 ring-blue-500/20 shadow-[0_4px_14px_rgba(37,99,235,0.18)]'
                           : 'border-sky-200/80 bg-white/90 text-slate-700 hover:border-blue-400 hover:bg-white hover:text-slate-900'
                       )}
                     >
                       <Icon
-                        className={cn('h-3.5 w-3.5 shrink-0 transition-transform duration-200', isActive && 'scale-110')}
+                        className={cn('h-4 w-4 shrink-0 transition-transform duration-200', isActive && 'scale-110')}
                         style={{ color: isActive ? signal.accentColor : '#64748b' }}
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[10.5px] font-semibold leading-tight">{signal.label}</p>
-                        <p className="truncate text-[9.5px] text-slate-500 font-mono leading-none mt-0.5">{signal.channel}</p>
+                        <p className="truncate text-xs font-semibold leading-tight">{signal.label}</p>
+                        <p className="truncate text-[10px] text-slate-500 font-mono leading-none mt-0.5">{signal.channel}</p>
                       </div>
 
                       {/* Right-edge diode anchor port */}
                       <span
                         className={cn(
-                          'absolute -right-1 h-2 w-2 rounded-full border border-white transition-all duration-300',
+                          'absolute -right-1 h-2.5 w-2.5 rounded-full border border-white transition-all duration-300',
                           isActive
                             ? 'bg-blue-600 shadow-[0_0_8px_#2563eb] scale-125 ring-2 ring-blue-400/50'
                             : 'bg-slate-300 opacity-60'
@@ -598,33 +560,33 @@ export default function HeroInteractiveStage() {
                 })}
               </div>
 
-              {/* Column 2: SVG Laser Conduit 1 (Height 168px, Width 36px) */}
+              {/* Column 2: SVG Laser Conduit 1 (Height 184px, Width 32px) */}
               <div style={{ transform: 'translateZ(16px)' }}>
                 <LaserConduit1 activeIndex={activeIndex} reduceMotion={reduceMotion} />
               </div>
 
-              {/* Column 3: Center Neural Core Card (Width 172px) */}
+              {/* Column 3: Center Neural Core Card (Width 190px) */}
               <div style={{ transform: 'translateZ(28px)' }}>
                 <NeuralCoreCard activeSignal={activeSignal} reduceMotion={reduceMotion} />
               </div>
 
-              {/* Column 4: SVG Laser Conduit 2 (Height 168px, Width 26px) */}
+              {/* Column 4: SVG Laser Conduit 2 (Height 184px, Width 24px) */}
               <div style={{ transform: 'translateZ(16px)' }}>
                 <LaserConduit2 reduceMotion={reduceMotion} />
               </div>
 
-              {/* Column 5: Right One Workspace Card (Width 146px) */}
+              {/* Column 5: Right One Workspace Card (Width 170px) */}
               <div style={{ transform: 'translateZ(22px)' }}>
                 <WorkspaceOutcomeCard activeSignal={activeSignal} />
               </div>
             </div>
 
-            {/* ── Bottom Telemetry Status Pill with Pause/Resume Control (M-07) ── */}
+            {/* Bottom Status Pill with Pause/Resume Control */}
             <div
               className="relative z-10 mt-3 flex items-center justify-center gap-2"
               style={{ transform: 'translateZ(18px)' }}
             >
-              <div className="flex items-center gap-2 rounded-full border border-sky-200/90 bg-white/95 px-3 py-1 text-[10px] font-semibold text-slate-800 shadow-[0_2px_8px_rgba(37,99,235,0.06)] backdrop-blur-sm">
+              <div className="flex items-center gap-2 rounded-full border border-sky-200/90 bg-white/95 px-3.5 py-1 text-[10.5px] font-semibold text-slate-800 shadow-[0_2px_8px_rgba(37,99,235,0.06)] backdrop-blur-sm">
                 <span className="flex h-2 w-2 items-center justify-center">
                   <span className="absolute h-2 w-2 animate-ping rounded-full bg-emerald-400 opacity-60" />
                   <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-500" />

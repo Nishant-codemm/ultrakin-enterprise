@@ -5,21 +5,15 @@
  * Inbound Customer Exchange Email -> Real-Time Shopify Sync -> 1-Click Return Slip & Inventory Hold.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   ShoppingBag,
-  CheckCircle2,
-  Package,
-  Truck,
   RotateCcw,
-  ExternalLink,
   Sparkles,
 } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
 
 export default function EcommerceSolutionDemo() {
-  const reduceMotion = useReducedMotion();
   const [returnIssued, setReturnIssued] = useState(false);
 
   return (

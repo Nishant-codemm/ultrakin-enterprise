@@ -60,26 +60,39 @@ export default function IntegrationsSection() {
 
         {/* Filter tabs */}
         <div className="mt-12 border-y border-border py-4">
-          <div role="group" aria-label="Explore workspace surfaces and extensions" className="flex gap-1.5 overflow-x-auto pb-1">
-            {CATEGORIES.map((category) => (
-              <button
-                key={category}
-                type="button"
-                aria-pressed={selectedCat === category}
-                onClick={() => selectCategory(category)}
-                className={cn(
-                  'shrink-0 rounded-full px-3 py-1.5 text-[10px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus cursor-pointer',
-                  selectedCat === category ? 'bg-brand-soft text-brand-text font-medium' : 'text-ink-subtle hover:bg-surface-hover hover:text-ink-soft',
-                )}
-              >
-                {category}
-              </button>
-            ))}
+          <div role="tablist" aria-label="Explore workspace surfaces and extensions" className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+            {CATEGORIES.map((category) => {
+              const isSelected = selectedCat === category;
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  role="tab"
+                  id={`integration-tab-${category.toLowerCase().replace(/\s+/g, '-')}`}
+                  aria-selected={isSelected}
+                  aria-controls="integration-tabpanel"
+                  onClick={() => selectCategory(category)}
+                  className={cn(
+                    'shrink-0 rounded-full px-3.5 py-1.5 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus cursor-pointer',
+                    isSelected
+                      ? 'bg-brand-soft text-brand-text font-medium'
+                      : 'text-ink-subtle hover:bg-surface-hover hover:text-ink-soft'
+                  )}
+                >
+                  {category}
+                </button>
+              );
+            })}
           </div>
         </div>
 
         {/* Orbit map + detail */}
-        <div className="grid gap-8 pt-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(250px,.8fr)] lg:items-center lg:gap-12 relative">
+        <div
+          id="integration-tabpanel"
+          role="tabpanel"
+          aria-labelledby={`integration-tab-${selectedCat.toLowerCase().replace(/\s+/g, '-')}`}
+          className="grid gap-8 pt-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(250px,.8fr)] lg:items-center lg:gap-12 relative"
+        >
 
           {/* ── Orbit Map Component (Modularized) ── */}
           <OrbitalTopologyMap
@@ -94,9 +107,9 @@ export default function IntegrationsSection() {
           />
 
           {/* ── Detail panel ── */}
-          <div className="relative min-h-[250px] border-l border-border pl-6 sm:pl-8 lg:min-h-[290px] lg:pl-10">
+          <div className="relative min-h-[250px] border-t border-border pt-8 pl-0 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-10 lg:min-h-[290px]">
             {/* Top border hairline accent */}
-            <div aria-hidden="true" className="absolute -left-px top-0 h-8 w-px bg-brand/70" />
+            <div aria-hidden="true" className="hidden lg:block absolute -left-px top-0 h-8 w-px bg-brand/70" />
 
             {/* Optical receiver bead aligned with incoming trajectory from vector diagram */}
             <div

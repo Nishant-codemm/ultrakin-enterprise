@@ -102,7 +102,12 @@ export default function MatrixChatEngine() {
   };
 
   const scrollToBottom = (behavior = 'smooth') => {
-    messagesEndRef.current?.scrollIntoView({ behavior });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior,
+      });
+    }
     setShowNewMessagesPill(false);
     isNearBottomRef.current = true;
   };
@@ -112,7 +117,9 @@ export default function MatrixChatEngine() {
     if (activeChannel !== prevChannelRef.current) {
       prevChannelRef.current = activeChannel;
       isNearBottomRef.current = true;
-      messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+      }
       return;
     }
 
@@ -120,7 +127,12 @@ export default function MatrixChatEngine() {
     prevMessagesLengthRef.current = activeMessages.length;
 
     if (isNearBottomRef.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTo({
+          top: scrollContainerRef.current.scrollHeight,
+          behavior: 'smooth',
+        });
+      }
     } else if (isNewMessage) {
       setShowNewMessagesPill(true);
     }
@@ -333,7 +345,7 @@ export default function MatrixChatEngine() {
 
                 {/* Embedded Ukin Action Proposal Card if present */}
                 {msg.proposalId && (
-                  <div className="mt-3 p-3.5 rounded-xl border border-indigo-500/30 bg-obsidian-surface/90 shadow-lg shadow-indigo-500/10 space-y-3">
+                  <div className="mt-2.5 p-3.5 rounded-xl border border-white/[0.08] bg-white/[0.025] space-y-2.5 shadow-sm">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Bot className="w-4 h-4 text-indigo-400" />
@@ -344,7 +356,7 @@ export default function MatrixChatEngine() {
                           'text-[10px] font-mono px-2 py-0.5 rounded-full uppercase tracking-wider font-semibold',
                           proposalStatus === 'approved'
                             ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
-                            : 'bg-amber-500/15 text-amber-300 border border-amber-500/30 animate-pulse'
+                            : 'bg-amber-500/15 text-amber-300 border border-amber-500/30'
                         )}
                       >
                         {proposalStatus === 'approved' ? '✓ Approved & Executed' : 'Awaiting Confirmation'}
@@ -374,14 +386,14 @@ export default function MatrixChatEngine() {
                           <button
                             type="button"
                             onClick={approveProposal}
-                            className="flex-1 py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md shadow-indigo-500/25 cursor-pointer"
+                            className="flex-1 py-1.5 px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
                           >
                             <Check className="w-3.5 h-3.5" /> Approve &amp; Execute (1-Click)
                           </button>
                           <button
                             type="button"
                             onClick={() => setActiveModule('docs')}
-                            className="py-1.5 px-3 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 text-xs border border-obsidian-border cursor-pointer"
+                            className="py-1.5 px-3 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 text-xs border border-white/[0.08] transition-colors cursor-pointer"
                           >
                             Inspect RFC
                           </button>
@@ -486,29 +498,29 @@ export default function MatrixChatEngine() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Quick Prompt Chips */}
+      {/* Contextual Action Suggestions */}
       <div className="px-4 py-2 border-t border-obsidian-border-soft bg-obsidian-base/60 flex items-center gap-2 overflow-x-auto text-xs">
         <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider flex-shrink-0">
-          QUICK SIM:
+          Suggestions:
         </span>
         <button
           type="button"
           onClick={() => sendMessage('@ukin run cluster latency diagnostic')}
-          className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-indigo-600/30 text-indigo-300 border border-obsidian-border hover:border-indigo-500/40 text-[11px] flex-shrink-0 transition-all cursor-pointer"
+          className="px-2.5 py-0.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] hover:text-white text-slate-300 border border-white/[0.08] text-[11px] flex-shrink-0 transition-colors cursor-pointer"
         >
           @ukin run latency check
         </button>
         <button
           type="button"
           onClick={() => sendMessage('/task create hotfix PR #1042 deployment')}
-          className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-indigo-600/30 text-indigo-300 border border-obsidian-border hover:border-indigo-500/40 text-[11px] flex-shrink-0 transition-all cursor-pointer"
+          className="px-2.5 py-0.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] hover:text-white text-slate-300 border border-white/[0.08] text-[11px] flex-shrink-0 transition-colors cursor-pointer"
         >
           /task create hotfix
         </button>
         <button
           type="button"
           onClick={() => sendMessage('Can someone ping Sara on the Huddle call?')}
-          className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-white/10 text-slate-300 border border-obsidian-border text-[11px] flex-shrink-0 transition-all cursor-pointer"
+          className="px-2.5 py-0.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] hover:text-white text-slate-300 border border-white/[0.08] text-[11px] flex-shrink-0 transition-colors cursor-pointer"
         >
           Ping on Huddle
         </button>
@@ -522,18 +534,18 @@ export default function MatrixChatEngine() {
             aria-label={`Message #${currentChannelObj.name}`}
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder={`Message #${currentChannelObj.name} or type @ukin for autonomous actions...`}
-            className="flex-1 bg-obsidian-base border border-obsidian-border-medium focus:border-indigo-500/60 rounded-lg px-3.5 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500/40 transition-all font-sans"
+            placeholder={`Message #${currentChannelObj.name} or type @ukin for actions...`}
+            className="flex-1 bg-obsidian-base border border-white/[0.1] focus:border-indigo-500/50 rounded-lg px-3.5 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition-all font-sans"
           />
           <button
             aria-label="Send message"
             type="submit"
             disabled={!inputText.trim()}
             className={cn(
-              'p-2.5 rounded-lg transition-all flex items-center justify-center cursor-pointer active:scale-95',
+              'p-2 rounded-lg transition-colors flex items-center justify-center cursor-pointer',
               inputText.trim()
-                ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-500/25'
-                : 'bg-white/5 text-slate-400 cursor-not-allowed'
+                ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-xs'
+                : 'bg-white/5 text-slate-500 cursor-not-allowed'
             )}
           >
             <Send className="w-4 h-4" />

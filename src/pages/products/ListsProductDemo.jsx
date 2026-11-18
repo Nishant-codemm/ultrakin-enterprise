@@ -200,7 +200,7 @@ export default function ListsProductDemo() {
 
             {/* Auto-Linked Context Beacon */}
             <span className="hidden md:inline-flex items-center gap-1.5 text-[10px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
               Live Workspace Sync
             </span>
           </div>

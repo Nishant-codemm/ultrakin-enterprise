@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { ChevronLeft, ChevronRight, Lock, RotateCw, X, Plus } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Lock, RotateCw, X, Plus, Maximize2 } from 'lucide-react';
 import UltrakinLogo from './primitives/UltrakinLogo';
 
 function BrowserFrame({
@@ -11,6 +11,7 @@ function BrowserFrame({
   showControls = true,
   statusLabel = 'TLS 1.3 · E2EE',
   tabTitle,
+  onToggleFullscreen,
 }) {
   // Format address into protocol, host, and path
   const cleanAddress = address.replace(/^https?:\/\//, '');
@@ -37,10 +38,20 @@ function BrowserFrame({
         {/* Left: Window Dots + Active Tab Strip */}
         <div className="flex items-center gap-3">
           {/* macOS Window Controls */}
-          <div aria-hidden="true" className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12)]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12)]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#28c840] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12)]" />
+          <div className="flex items-center gap-1.5">
+            <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-[#ff5f57] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12)]" />
+            <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-[#febc2e] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12)]" />
+            {onToggleFullscreen ? (
+              <button
+                type="button"
+                onClick={onToggleFullscreen}
+                className="h-2.5 w-2.5 rounded-full bg-[#28c840] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12)] cursor-pointer hover:opacity-80 transition-opacity"
+                title="Enter fullscreen (F)"
+                aria-label="Enter fullscreen"
+              />
+            ) : (
+              <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-[#28c840] shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12)]" />
+            )}
           </div>
 
           {/* Active Tab */}
@@ -68,8 +79,19 @@ function BrowserFrame({
         </div>
 
         {/* Right: Window Status Minimap */}
-        <div className="hidden items-center gap-2 text-[9px] font-mono text-ink-subtle/70 sm:flex">
-          <span>Enterprise Preview</span>
+        <div className="flex items-center gap-2 text-[9px] font-mono text-ink-subtle/70">
+          <span className="hidden sm:inline">Enterprise Preview</span>
+          {onToggleFullscreen && (
+            <button
+              type="button"
+              onClick={onToggleFullscreen}
+              className="flex items-center gap-1 rounded border border-border/80 bg-surface px-1.5 py-0.5 text-[9.5px] font-sans font-medium text-ink-muted hover:bg-surface-raised hover:text-ink cursor-pointer transition-colors"
+              title="Fullscreen mode (F)"
+            >
+              <Maximize2 className="h-2.5 w-2.5 text-ink-subtle" />
+              <span>Fullscreen</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -104,7 +126,7 @@ function BrowserFrame({
         <div className="flex items-center justify-end">
           {statusLabel ? (
             <span className="hidden items-center gap-1.5 rounded-full border border-border-hairline bg-surface px-2 py-0.5 font-mono text-[9.5px] font-medium text-ink-subtle md:inline-flex">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
               {statusLabel}
             </span>
           ) : (

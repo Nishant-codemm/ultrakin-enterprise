@@ -14,6 +14,7 @@ import Footer from './sections/Footer';
 import EnterpriseDemoDrawer from './components/showcase/EnterpriseDemoDrawer';
 import CommandPaletteModal from './components/CommandPaletteModal';
 import KeyboardShortcutsModal from './components/KeyboardShortcutsModal';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import { WorkspaceProvider } from './context/WorkspaceContext';
 
 // High-craft, continuous serpentine story thread following the page gutter.
@@ -102,6 +103,9 @@ const ROUTE_PAGES = {
   '/solutions':     SolutionsOverviewPage,
   '/resources':     ResourcesPage,
   '/products':      UniversalProductPage,
+  '/events':        UniversalProductPage,
+  '/calendar':      UniversalProductPage,
+  '/events/calendar': UniversalProductPage,
   ...Object.fromEntries(
     PRODUCT_SLUGS.map(slug => [
       `/products/${slug}`,
@@ -184,9 +188,11 @@ export default function App() {
         </a>
         {RoutePage ? (
           <main id="main_content" tabIndex={-1} className="min-h-screen">
-            <Suspense fallback={<div className="min-h-screen" aria-busy="true"><span className="sr-only" role="status">Loading page…</span></div>}>
-              <RoutePage />
-            </Suspense>
+            <ErrorBoundary name="Page">
+              <Suspense fallback={<div className="min-h-screen" aria-busy="true"><span className="sr-only" role="status">Loading page…</span></div>}>
+                <RoutePage />
+              </Suspense>
+            </ErrorBoundary>
           </main>
         ) : <main ref={storyRef} id="main_content" tabIndex={-1} className="relative isolate overflow-hidden bg-page">
           {/* Ambient atmospheric depth layers */}
@@ -255,6 +261,32 @@ export default function App() {
                 filter="url(#thread-glow)"
                 pathLength={storyProgress}
               />
+
+              {/* Architectural section milestone anchor nodes (Section-to-section storytelling continuity) */}
+              {[
+                { cx: 70, cy: 100, label: 'Workspace' },
+                { cx: 44, cy: 210, label: 'Workflows' },
+                { cx: 36, cy: 470, label: 'Intelligence' },
+                { cx: 58, cy: 740, label: 'Integrations' },
+                { cx: 38, cy: 870, label: 'Security' },
+              ].map((node) => (
+                <g key={node.label}>
+                  <circle
+                    cx={node.cx}
+                    cy={node.cy}
+                    r="2.2"
+                    fill="#3156cf"
+                    fillOpacity="0.08"
+                  />
+                  <circle
+                    cx={node.cx}
+                    cy={node.cy}
+                    r="1.1"
+                    fill="#4f46e5"
+                    fillOpacity="0.35"
+                  />
+                </g>
+              ))}
             </svg>
 
             {/* Traveling Luminous Pearl Photon Bead — refined 2px pearl node */}

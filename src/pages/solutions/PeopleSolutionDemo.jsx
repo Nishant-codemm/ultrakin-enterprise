@@ -5,15 +5,13 @@
  * Offer Accepted -> Automated IT Tasks -> Welcome Hub -> 30-Day Check-in Pulse.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   Users,
   CheckCircle2,
   Calendar,
   Laptop,
   Mail,
-  Shield,
-  Clock,
   Sparkles,
 } from 'lucide-react';
 import AvatarChip from '../../components/product/AvatarChip';

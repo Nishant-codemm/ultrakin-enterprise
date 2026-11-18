@@ -5,14 +5,10 @@
  * Inbound Emergency Service Call -> Smart Dispatcher Assignment -> Live GPS Status -> Mobile Signoff.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Truck,
   CheckCircle2,
-  MapPin,
-  Clock,
-  PhoneCall,
-  UserCheck,
   Wrench,
   Navigation,
 } from 'lucide-react';
@@ -20,7 +16,6 @@ import AvatarChip from '../../components/product/AvatarChip';
 import StatusBadge from '../../components/product/StatusBadge';
 
 export default function FieldServicesSolutionDemo() {
-  const reduceMotion = useReducedMotion();
   const [jobStatus, setJobStatus] = useState('in_route'); // 'unassigned', 'in_route', 'on_site', 'completed'
 
   const handleNextStatus = () => {

@@ -27,6 +27,12 @@ const FOCUSABLE_SELECTOR = [
  */
 export function useFocusTrap({ isOpen, containerRef, initialFocusRef, onEscape }) {
   const restoreFocusRef = useRef(null);
+  const onEscapeRef = useRef(onEscape);
+
+  // Synchronize onEscape callback without triggering effect re-execution
+  useEffect(() => {
+    onEscapeRef.current = onEscape;
+  }, [onEscape]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -47,9 +53,9 @@ export function useFocusTrap({ isOpen, containerRef, initialFocusRef, onEscape }
 
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
-        if (onEscape) {
+        if (onEscapeRef.current) {
           event.preventDefault();
-          onEscape();
+          onEscapeRef.current();
         }
         return;
       }
@@ -92,11 +98,15 @@ export function useFocusTrap({ isOpen, containerRef, initialFocusRef, onEscape }
 
       const target = restoreFocusRef.current;
       if (target?.isConnected && !target.hasAttribute('disabled') && target.getClientRects().length > 0) {
-        target.focus();
+        window.requestAnimationFrame(() => {
+          if (target.isConnected) {
+            target.focus();
+          }
+        });
       }
       restoreFocusRef.current = null;
     };
-  }, [isOpen, containerRef, initialFocusRef, onEscape]);
+  }, [isOpen, containerRef, initialFocusRef]);
 }
 
 export default useFocusTrap;

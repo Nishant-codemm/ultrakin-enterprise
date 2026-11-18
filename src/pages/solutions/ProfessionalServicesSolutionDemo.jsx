@@ -5,22 +5,15 @@
  * Encrypted Client Vault -> Zero-Data-Retention AI Analysis -> Cryptographic Audit Trail.
  */
 import React, { useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Scale,
   ShieldCheck,
   Lock,
   FileText,
-  Clock,
-  Eye,
-  CheckCircle2,
   Sparkles,
 } from 'lucide-react';
-import AvatarChip from '../../components/product/AvatarChip';
-import StatusBadge from '../../components/product/StatusBadge';
 
 export default function ProfessionalServicesSolutionDemo() {
-  const reduceMotion = useReducedMotion();
   const [showAuditModal, setShowAuditModal] = useState(false);
 
   return (

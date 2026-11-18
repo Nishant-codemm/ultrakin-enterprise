@@ -24,7 +24,7 @@ export default function AgentsProductDemo() {
       {/* ── Agent Profile Header ── */}
       <div className="rounded-xl border border-white/[0.08] bg-[#0F172A] p-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-xl bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 flex items-center justify-center">
+          <div className="h-9 w-9 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center">
             <Bot size={18} />
           </div>
           <div>
@@ -42,7 +42,7 @@ export default function AgentsProductDemo() {
               key={t.name}
               className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
                 t.status === 'approval'
-                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                  ? 'bg-amber-500/10 border-amber-500/20 text-amber-300'
                   : 'bg-white/[0.04] border-white/[0.08] text-slate-400'
               }`}
             >
@@ -58,7 +58,7 @@ export default function AgentsProductDemo() {
         <div className="rounded-xl border border-white/[0.08] bg-[#0B0F19] p-3 flex flex-col justify-between overflow-y-auto">
           <div>
             <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase text-slate-400 mb-2 pb-1.5 border-b border-white/[0.08]">
-              <Terminal size={12} className="text-indigo-400" />
+              <Terminal size={12} className="text-sky-400" />
               <span>Real-time Agent Telemetry</span>
             </div>
 
@@ -67,7 +67,7 @@ export default function AgentsProductDemo() {
                 <div key={log.id} className="text-xs p-2 rounded-lg bg-white/[0.03] border border-white/[0.04]">
                   <div className="flex items-center justify-between text-[10px] font-mono text-slate-500 mb-1">
                     <span>{log.time}</span>
-                    <span className="text-indigo-400">{log.type}</span>
+                    <span className="text-sky-400">{log.type}</span>
                   </div>
                   <p className="text-slate-300 text-[11.5px] leading-relaxed">{log.text}</p>
                 </div>
@@ -82,7 +82,7 @@ export default function AgentsProductDemo() {
         </div>
 
         {/* Right: Human Approval Gate Card */}
-        <div className="rounded-xl border border-indigo-500/30 bg-[#0F172A] p-3.5 flex flex-col justify-between shadow-lg">
+        <div className="rounded-xl border border-white/[0.08] bg-[#0F172A] p-3.5 flex flex-col justify-between shadow-lg">
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">

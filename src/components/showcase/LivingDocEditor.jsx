@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   FileText,
   CheckCircle2,
@@ -51,13 +51,76 @@ export default function LivingDocEditor() {
   // Custom inserted blocks
   const [insertedBlocks, setInsertedBlocks] = useState([]);
   const blockIdRef = useRef(0);
+  const slashMenuRef = useRef(null);
+  const commentDrawerRef = useRef(null);
 
   const completedCount = docChecklists.filter((c) => c.checked).length;
   const progressPct = docChecklists.length > 0 ? Math.round((completedCount / docChecklists.length) * 100) : 0;
 
-  const toggleFormat = (key) => {
+  const toggleFormat = useCallback((key) => {
     setActiveFormats((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
+  }, []);
+
+  // Dismiss slash menu on outside click, and dismiss active overlay on Escape
+  useEffect(() => {
+    if (!showSlashMenu && !activeCommentNode) return;
+
+    const handlePointerDown = (e) => {
+      if (showSlashMenu && slashMenuRef.current && !slashMenuRef.current.contains(e.target)) {
+        setShowSlashMenu(false);
+      }
+    };
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (showSlashMenu) {
+          e.preventDefault();
+          setShowSlashMenu(false);
+        } else if (activeCommentNode) {
+          e.preventDefault();
+          setActiveCommentNode(null);
+        }
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showSlashMenu, activeCommentNode]);
+
+  // Document formatting & insertion shortcuts (⌘B, ⌘I, ⌘E, /) matching global cheatsheet
+  useEffect(() => {
+    const handleDocumentShortcuts = (e) => {
+      const isInput = ['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName);
+
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'b' || e.key === 'B')) {
+        e.preventDefault();
+        toggleFormat('bold');
+        return;
+      }
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'i' || e.key === 'I')) {
+        e.preventDefault();
+        toggleFormat('italic');
+        return;
+      }
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'e' || e.key === 'E')) {
+        e.preventDefault();
+        toggleFormat('code');
+        return;
+      }
+      if (!isInput && !e.metaKey && !e.ctrlKey && e.key === '/') {
+        e.preventDefault();
+        setShowSlashMenu((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleDocumentShortcuts);
+    return () => window.removeEventListener('keydown', handleDocumentShortcuts);
+  }, [toggleFormat]);
 
   const handleInsertBlock = (type) => {
     setShowSlashMenu(false);
@@ -110,12 +173,12 @@ export default function LivingDocEditor() {
     <div className="flex flex-col h-full bg-obsidian-canvas text-slate-200 relative overflow-hidden font-sans">
       {/* Document header with collaborator presence */}
       <div className="h-12 px-4 border-b border-obsidian-border bg-obsidian-surface/80 flex items-center justify-between select-none shrink-0">
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-2.5 min-w-0">
           <FileText className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span className="text-slate-400 text-xs hidden md:inline truncate">Acme Architecture / RFCs /</span>
-          <span className="font-semibold text-xs sm:text-sm text-white truncate">RFC-891: Redis Sentinel</span>
-          <span className="inline-flex items-center gap-1 text-[10px] font-mono text-emerald-300 bg-emerald-500/15 border border-emerald-500/20 px-2 py-0.5 rounded shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-slate-400 text-xs hidden md:inline truncate">Architecture / RFCs /</span>
+          <span className="font-semibold text-xs sm:text-sm text-white truncate">RFC-891: Redis Sentinel Latency Hardening</span>
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
             <span className="hidden sm:inline">Synced</span>
           </span>
         </div>
@@ -124,19 +187,19 @@ export default function LivingDocEditor() {
         <div className="flex items-center gap-3">
           <div className="flex items-center -space-x-1.5">
             <div
-              className="w-6 h-6 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-[10px] text-white ring-2 ring-[#0B0F19]"
-              title="Sara Chen (Editing Section 2...)"
+              className="w-6 h-6 rounded-full bg-emerald-600/90 border border-obsidian-surface flex items-center justify-center font-bold text-[10px] text-white"
+              title="Sara Chen (Editing Section 2)"
             >
               SC
             </div>
             <div
-              className="w-6 h-6 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-[10px] text-white ring-2 ring-[#0B0F19]"
+              className="w-6 h-6 rounded-full bg-indigo-600/90 border border-obsidian-surface flex items-center justify-center font-bold text-[10px] text-white"
               title="Alex Mercer (Viewing Section 1)"
             >
               AM
             </div>
             <div
-              className="w-6 h-6 rounded-full bg-violet-600 flex items-center justify-center font-bold text-[10px] text-white ring-2 ring-[#0B0F19]"
+              className="w-6 h-6 rounded-full bg-violet-600/90 border border-obsidian-surface flex items-center justify-center font-bold text-[10px] text-white"
               title="Marcus Lindqvist (Viewing PR #1042)"
             >
               ML
@@ -146,17 +209,17 @@ export default function LivingDocEditor() {
         </div>
       </div>
 
-      {/* Floating Formatting Toolbar (Sprint 4 ProseMirror Controls) */}
-      <div className="h-10 px-4 border-b border-obsidian-border-soft bg-obsidian-base/80 flex items-center justify-between select-none shrink-0 text-xs text-slate-400">
+      {/* Floating Formatting Toolbar (ProseMirror Controls) */}
+      <div className="h-10 px-4 border-b border-obsidian-border bg-obsidian-base/60 flex items-center justify-between select-none shrink-0 text-xs text-slate-400">
         <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => toggleFormat('bold')}
             className={cn(
               'p-1.5 rounded transition-colors cursor-pointer',
-              activeFormats.bold ? 'bg-indigo-600 text-white font-bold' : 'hover:bg-white/10 hover:text-white'
+              activeFormats.bold ? 'bg-white/15 text-white font-bold' : 'hover:bg-white/10 hover:text-white'
             )}
-            title="Bold (Ctrl+B)"
+            title="Bold (⌘B)"
           >
             <Bold className="w-3.5 h-3.5" />
           </button>
@@ -165,9 +228,9 @@ export default function LivingDocEditor() {
             onClick={() => toggleFormat('italic')}
             className={cn(
               'p-1.5 rounded transition-colors cursor-pointer',
-              activeFormats.italic ? 'bg-indigo-600 text-white italic' : 'hover:bg-white/10 hover:text-white'
+              activeFormats.italic ? 'bg-white/15 text-white italic' : 'hover:bg-white/10 hover:text-white'
             )}
-            title="Italic (Ctrl+I)"
+            title="Italic (⌘I)"
           >
             <Italic className="w-3.5 h-3.5" />
           </button>
@@ -176,9 +239,9 @@ export default function LivingDocEditor() {
             onClick={() => toggleFormat('code')}
             className={cn(
               'p-1.5 rounded transition-colors cursor-pointer',
-              activeFormats.code ? 'bg-indigo-600 text-white' : 'hover:bg-white/10 hover:text-white'
+              activeFormats.code ? 'bg-white/15 text-white font-mono' : 'hover:bg-white/10 hover:text-white'
             )}
-            title="Inline Code (Ctrl+E)"
+            title="Inline Code (⌘E)"
           >
             <Code2 className="w-3.5 h-3.5" />
           </button>
@@ -187,21 +250,23 @@ export default function LivingDocEditor() {
             onClick={() => toggleFormat('strike')}
             className={cn(
               'p-1.5 rounded transition-colors cursor-pointer',
-              activeFormats.strike ? 'bg-indigo-600 text-white' : 'hover:bg-white/10 hover:text-white'
+              activeFormats.strike ? 'bg-white/15 text-white' : 'hover:bg-white/10 hover:text-white'
             )}
             title="Strikethrough"
           >
             <Strikethrough className="w-3.5 h-3.5" />
           </button>
 
-          <div className="w-[1px] h-4 bg-white/10 mx-1" />
+          <div className="w-[1px] h-4 bg-white/10 mx-1.5" />
 
           {/* Slash Command Dropdown Trigger */}
-          <div className="relative">
+          <div ref={slashMenuRef} className="relative">
             <button
               type="button"
               onClick={() => setShowSlashMenu(!showSlashMenu)}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 border border-obsidian-border text-slate-300 text-[11px] font-medium transition-colors cursor-pointer"
+              aria-expanded={showSlashMenu}
+              aria-haspopup="menu"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 text-[11px] font-medium transition-colors cursor-pointer"
             >
               <Plus className="w-3 h-3 text-emerald-400" />
               <span>Insert Block (/)</span>
@@ -300,12 +365,12 @@ export default function LivingDocEditor() {
         </div>
 
         {/* Sprint Completion Progress Bar */}
-        <div className="p-4 rounded-xl border border-obsidian-border bg-obsidian-surface/60 space-y-2">
+        <div className="p-3.5 rounded-xl border border-white/[0.08] bg-white/[0.02] space-y-2">
           <div className="flex items-center justify-between text-xs font-mono">
-            <span className="text-slate-300">EXECUTION PROGRESS</span>
-            <span className="text-emerald-400 font-bold">{progressPct}% COMPLETED</span>
+            <span className="text-slate-400 text-[11px] tracking-wide uppercase font-semibold">Execution Progress</span>
+            <span className="text-emerald-400 font-semibold">{progressPct}% Complete</span>
           </div>
-          <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-1.5 w-full bg-white/[0.06] rounded-full overflow-hidden">
             <div
               style={{ width: `${progressPct}%` }}
               className="h-full bg-emerald-500 rounded-full transition-all duration-300"
@@ -327,37 +392,37 @@ export default function LivingDocEditor() {
             <button
               type="button"
               onClick={() => setActiveCommentNode(activeCommentNode === 'node_p1' ? null : 'node_p1')}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/25 transition-all cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-sky-500/10 border border-sky-500/20 text-sky-300 hover:bg-sky-500/20 transition-all cursor-pointer"
             >
-              <MessageSquare className="w-3 h-3 text-indigo-400" />
+              <MessageSquare className="w-3 h-3 text-sky-400" />
               <span>{docComments.node_p1?.length || 0} Comments</span>
             </button>
           </div>
 
           <p>
-            During the launch rehearsal, the team noticed intermittent timeouts in the sample environment.{' '}
+            During the launch rehearsal, the team identified intermittent timeouts on the EU gateway cluster.{' '}
             {/* Real multiplayer text selection flag (Alex Mercer) */}
-            <span className="relative inline bg-indigo-500/20 text-indigo-100 rounded px-1 py-0.5 border-b border-indigo-400">
+            <span className="relative inline bg-sky-500/15 text-sky-100 rounded px-1.5 py-0.5 border-b border-sky-400">
               They linked the related discussion and token refresh change
-              <span className="absolute -top-3.5 right-0 px-1 py-0.2 rounded text-[9px] font-semibold bg-indigo-600 text-white shadow-xs select-none pointer-events-none whitespace-nowrap">
+              <span className="absolute -top-3.5 right-0 px-1 py-0.2 rounded text-[9px] font-semibold bg-sky-600 text-white shadow-xs select-none pointer-events-none whitespace-nowrap">
                 Alex Mercer
               </span>
             </span>
-            , then captured the agreed follow-up checks below.
+            , then captured the agreed follow-up verification checks below.
           </p>
         </div>
 
         {/* Section 2: Interactive Operational Checklist (node_checklist) */}
         <div
           id="node_checklist"
-          className="space-y-3 p-4 rounded-xl border border-indigo-500/25 bg-obsidian-surface/80 relative"
+          className="space-y-3 p-4 rounded-xl border border-white/[0.08] bg-white/[0.02] relative"
         >
-          <div className="flex items-center justify-between text-xs font-semibold text-indigo-300 uppercase font-mono tracking-wider">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
             <div className="flex items-center gap-2">
-              <span>2. Operational Verification Checklist</span>
+              <span className="text-xs uppercase font-mono tracking-wider text-slate-400 font-semibold">2. Operational Checklist</span>
               {/* Real multiplayer live cursor flag (Sara Chen) */}
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-sans font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 normal-case">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-sans font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                 Sara Chen editing
               </span>
             </div>
@@ -368,16 +433,16 @@ export default function LivingDocEditor() {
                 onClick={() =>
                   setActiveCommentNode(activeCommentNode === 'node_checklist' ? null : 'node_checklist')
                 }
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 transition-all cursor-pointer lowercase"
+                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-sky-500/10 border border-sky-500/20 text-sky-300 hover:bg-sky-500/20 transition-all cursor-pointer"
               >
-                <MessageSquare className="w-3 h-3 text-indigo-400" />
+                <MessageSquare className="w-3 h-3 text-sky-400" />
                 <span>{docComments.node_checklist?.length || 0} comments</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setShowAddChecklist(true)}
-                className="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white cursor-pointer"
+                className="p-1 rounded-md bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 hover:text-white cursor-pointer"
                 title="Add checklist item"
               >
                 <Plus className="w-3.5 h-3.5" />
@@ -385,20 +450,20 @@ export default function LivingDocEditor() {
             </div>
           </div>
 
-          <div className="space-y-2 text-xs sm:text-sm">
+          <div className="space-y-1.5 text-xs sm:text-sm">
             {docChecklists.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => toggleChecklist(item.id)}
-                className="w-full flex items-start gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors text-left cursor-pointer"
+                className="w-full flex items-start gap-3 p-2 rounded-lg hover:bg-white/[0.04] transition-colors text-left cursor-pointer"
               >
                 <div
                   className={cn(
                     'w-4 h-4 rounded border flex items-center justify-center mt-0.5 transition-all flex-shrink-0',
                     item.checked
                       ? 'bg-emerald-600 border-emerald-500 text-white'
-                      : 'border-slate-500 bg-transparent'
+                      : 'border-slate-600 bg-transparent'
                   )}
                 >
                   {item.checked && <CheckCircle2 className="w-3.5 h-3.5" />}
@@ -406,7 +471,7 @@ export default function LivingDocEditor() {
                 <span
                   className={cn(
                     'flex-1 text-xs sm:text-[13px]',
-                    item.checked ? 'line-through text-slate-400' : 'text-slate-200'
+                    item.checked ? 'line-through text-slate-500' : 'text-slate-200'
                   )}
                 >
                   {item.text}
@@ -423,12 +488,18 @@ export default function LivingDocEditor() {
                 autoFocus
                 value={newChecklistText}
                 onChange={(e) => setNewChecklistText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    e.preventDefault();
+                    setShowAddChecklist(false);
+                  }
+                }}
                 placeholder="New verification step (e.g. Test Redis sentinel quorum)..."
-                className="flex-1 bg-obsidian-base border border-obsidian-border-medium rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+                className="flex-1 bg-obsidian-base border border-obsidian-border-medium rounded-lg px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500/50"
               />
               <button
                 type="submit"
-                className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold cursor-pointer"
+                className="px-3 py-1.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-semibold cursor-pointer"
               >
                 Add
               </button>
@@ -444,18 +515,18 @@ export default function LivingDocEditor() {
         </div>
 
         {/* Section 3: GitHub PR & Commit Synchronizer Card */}
-        <div className="p-4 rounded-xl border border-obsidian-border-medium bg-obsidian-surface/90 space-y-3">
+        <div className="p-4 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:border-white/[0.12] transition-colors space-y-3">
           <div className="flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2 text-indigo-300 font-mono font-bold">
-              <GitPullRequest className="w-4 h-4 text-indigo-400" />
-              <span>LINKED GITHUB PULL REQUEST #1042</span>
+            <div className="flex items-center gap-2 text-white font-mono font-semibold">
+              <GitPullRequest className="w-4 h-4 text-violet-400" />
+              <span>Pull Request #1042</span>
               {/* Multiplayer viewing indicator */}
-              <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-sans font-medium bg-violet-500/20 text-violet-300 border border-violet-500/30 normal-case">
+              <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-sans font-medium bg-violet-500/10 text-violet-300 border border-violet-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-violet-400" />
-                Marcus Lindqvist viewing
+                Marcus viewing
               </span>
             </div>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/20 font-semibold">
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">
               ✓ Merged &amp; Deployed
             </span>
           </div>
@@ -481,12 +552,12 @@ export default function LivingDocEditor() {
 
           <div className="pt-2 border-t border-obsidian-border-soft flex items-center justify-between text-xs">
             <span className="text-[11px] text-slate-400 font-mono">
-              Sample checks: ready for team review
+              Branch status: merged into main
             </span>
             <button
               type="button"
               onClick={() => setActiveModule('chat')}
-              className="text-indigo-400 hover:text-indigo-300 font-medium underline cursor-pointer text-xs"
+              className="text-sky-400 hover:text-sky-300 font-medium underline cursor-pointer text-xs"
             >
               Discuss commit in #general-arch &rarr;
             </button>
@@ -497,7 +568,7 @@ export default function LivingDocEditor() {
         {insertedBlocks.map((blk) => (
           <div key={blk.id} className="relative">
             {blk.type === 'callout' && (
-              <div className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-xs text-slate-200 space-y-1">
+              <div className="p-3.5 rounded-xl border border-amber-500/20 bg-amber-500/5 text-xs text-slate-200 space-y-1">
                 <div className="font-semibold text-amber-300 flex items-center gap-1.5">
                   <AlertCircle className="w-3.5 h-3.5 text-amber-400" />
                   {blk.title}
@@ -506,9 +577,9 @@ export default function LivingDocEditor() {
               </div>
             )}
             {blk.type === 'code' && (
-              <div className="rounded-xl border border-obsidian-border bg-obsidian-base p-3 font-mono text-xs text-indigo-200">
-                <div className="text-slate-500 pb-1 border-b border-obsidian-border-soft mb-2">{blk.title}</div>
-                <pre className="overflow-x-auto text-[11px] leading-relaxed">
+              <div className="rounded-xl border border-white/[0.08] bg-obsidian-base p-3 font-mono text-xs text-slate-200">
+                <div className="text-slate-400 pb-1 border-b border-obsidian-border-soft mb-2 font-mono text-[11px]">{blk.title}</div>
+                <pre className="overflow-x-auto text-[11px] leading-relaxed text-sky-200">
                   <code>{blk.code}</code>
                 </pre>
               </div>
@@ -517,10 +588,10 @@ export default function LivingDocEditor() {
         ))}
 
         {/* Section 4: Live Huddle Transcription Citation */}
-        <div className="p-3.5 rounded-xl border border-emerald-500/20 bg-emerald-500/5 text-xs text-slate-300 space-y-1">
-          <div className="font-semibold text-emerald-300 flex items-center gap-1.5">
+        <div className="p-3.5 rounded-xl border border-white/[0.08] bg-white/[0.02] text-xs text-slate-300 space-y-1.5">
+          <div className="font-medium text-emerald-400 flex items-center gap-1.5 text-xs">
             <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            Synchronized from Live Huddle #18 (10:42 AM)
+            <span>Synchronized from Live Huddle #18 (10:42 AM)</span>
           </div>
           <p className="text-[12px] text-slate-400 italic">
             &ldquo;Token cache TTL expired prematurely under peak load. I have reverted the cache TTL to 3600s in PR #1042.&rdquo; &mdash; Sara Chen
@@ -528,17 +599,23 @@ export default function LivingDocEditor() {
         </div>
       </div>
 
-      {/* Paragraph Anchored Matrix Discussion Drawer (Sprint 4 Core Feature) */}
+      {/* Paragraph Anchored Discussion Drawer */}
       {activeCommentNode && (
-        <div className="absolute right-0 top-12 bottom-0 w-80 bg-obsidian-surface border-l border-obsidian-border-medium shadow-2xl flex flex-col z-30 select-none">
+        <div
+          ref={commentDrawerRef}
+          role="complementary"
+          aria-label={`Discussion for ${activeCommentNode}`}
+          className="absolute right-0 top-12 bottom-0 w-80 bg-obsidian-surface/95 backdrop-blur-md border-l border-obsidian-border shadow-2xl flex flex-col z-30 select-none"
+        >
           <div className="h-11 px-4 border-b border-obsidian-border flex items-center justify-between bg-obsidian-base/60 text-xs">
             <div className="flex items-center gap-2 font-semibold text-white">
-              <MessageSquare className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Matrix Thread: #{activeCommentNode}</span>
+              <MessageSquare className="w-3.5 h-3.5 text-sky-400" />
+              <span>Discussion: #{activeCommentNode}</span>
             </div>
             <button
               type="button"
               onClick={() => setActiveCommentNode(null)}
+              aria-label="Close discussion drawer"
               className="p-1 rounded hover:bg-white/10 text-slate-400 hover:text-white cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
@@ -546,16 +623,16 @@ export default function LivingDocEditor() {
           </div>
 
           {/* Comment Stream */}
-          <div className="flex-1 overflow-y-auto p-3 space-y-3 text-xs">
+          <div className="flex-1 overflow-y-auto p-3 space-y-2.5 text-xs">
             {activeComments.length === 0 ? (
-              <div className="text-center text-slate-500 py-6">
+              <div className="text-center text-slate-500 py-6 text-xs">
                 No comments on this paragraph yet. Start the discussion!
               </div>
             ) : (
               activeComments.map((cm) => (
                 <div key={cm.id} className="p-2.5 rounded-lg bg-obsidian-base border border-obsidian-border-soft space-y-1">
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-indigo-300">{cm.author}</span>
+                    <span className="font-semibold text-sky-300">{cm.author}</span>
                     <span className="text-[10px] text-slate-500 font-mono">{cm.time}</span>
                   </div>
                   <div className="text-[10px] text-slate-400 font-mono">{cm.role}</div>
@@ -572,8 +649,14 @@ export default function LivingDocEditor() {
               aria-label="Add a document comment"
               value={newCommentText}
               onChange={(e) => setNewCommentText(e.target.value)}
-              placeholder="Comment on this paragraph..."
-              className="flex-1 bg-obsidian-surface border border-obsidian-border-medium rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-sans"
+              onKeyDown={(e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                  e.preventDefault();
+                  handlePostComment(e);
+                }
+              }}
+              placeholder="Comment on this paragraph... (⌘↵)"
+              className="flex-1 bg-obsidian-surface border border-obsidian-border-medium rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-sky-500/50 font-sans"
             />
             <button
               type="submit"
@@ -581,7 +664,7 @@ export default function LivingDocEditor() {
               className={cn(
                 'p-1.5 rounded-lg transition-all cursor-pointer',
                 newCommentText.trim()
-                  ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm'
+                  ? 'bg-sky-600 hover:bg-sky-500 text-white shadow-sm'
                   : 'bg-white/5 text-slate-500 cursor-not-allowed'
               )}
             >

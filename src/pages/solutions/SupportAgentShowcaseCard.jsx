@@ -43,7 +43,7 @@ export default function SupportAgentShowcaseCard() {
       </ol>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#f0ede8] px-5 py-3">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-[#475467">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-[#475467]">
           <span>Source · support@northwind.shop</span>
           <span>Owner · Dana Lee</span>
           <span className="inline-flex items-center gap-1.5"><span className="h-1.5 w-1.5 rounded-full bg-amber-500" />Needs review</span>

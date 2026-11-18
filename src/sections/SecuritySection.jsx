@@ -131,7 +131,7 @@ export default function SecuritySection() {
                       aria-expanded={isOpen}
                       aria-controls={isOpen ? panelId : undefined}
                       onClick={() => setActive(isOpen ? null : topic.id)}
-                      className="group flex min-h-[76px] w-full items-center gap-4 px-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus sm:gap-5 sm:px-4"
+                      className="group flex min-h-[76px] w-full items-center gap-4 px-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus sm:gap-5 sm:px-4 cursor-pointer"
                     >
                       <span className={cn('w-7 font-mono text-[10.5px] font-semibold transition-colors', isOpen ? 'text-brand-text' : 'text-ink-subtle')}>
                         {topic.number}

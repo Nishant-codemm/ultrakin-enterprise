@@ -54,7 +54,7 @@ function HuddleControlBarComponent({
           className={cn(
             'h-8 px-2.5 rounded-lg border text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer',
             handRaised
-              ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.25)]'
+              ? 'bg-amber-500/20 border-amber-500/40 text-amber-300'
               : 'bg-white/[0.04] border-white/[0.08] text-slate-300 hover:bg-white/[0.08]',
           )}
         >
@@ -76,7 +76,7 @@ function HuddleControlBarComponent({
           className={cn(
             'p-2 sm:px-3 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold',
             huddleMuted
-              ? 'bg-rose-500/20 border-rose-500/40 text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.2)]'
+              ? 'bg-rose-500/20 border-rose-500/40 text-rose-300'
               : 'bg-white/[0.06] border-white/[0.1] text-white hover:bg-white/[0.1]',
           )}
         >
@@ -99,12 +99,12 @@ function HuddleControlBarComponent({
           className={cn(
             'p-2 sm:px-3 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold',
             cameraEnabled
-              ? 'bg-indigo-600/30 border-indigo-500 text-indigo-300 shadow-[0_0_12px_rgba(99,102,241,0.25)]'
+              ? 'bg-sky-500/20 border-sky-500/40 text-sky-300'
               : 'bg-white/[0.06] border-white/[0.1] text-white hover:bg-white/[0.1]',
           )}
         >
           {cameraEnabled ? (
-            <Video className="w-4 h-4 text-indigo-400" />
+            <Video className="w-4 h-4 text-sky-400" />
           ) : (
             <VideoOff className="w-4 h-4 text-slate-400" />
           )}
@@ -122,7 +122,7 @@ function HuddleControlBarComponent({
           className={cn(
             'p-2 sm:px-3 rounded-xl border transition-all cursor-pointer flex items-center gap-1.5 text-xs font-semibold',
             screenShareActive
-              ? 'bg-indigo-600/30 border-indigo-500 text-indigo-300 shadow-[0_0_12px_rgba(99,102,241,0.25)]'
+              ? 'bg-sky-500/20 border-sky-500/40 text-sky-300'
               : 'bg-white/[0.06] border-white/[0.1] text-white hover:bg-white/[0.1]',
           )}
         >

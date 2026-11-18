@@ -1,22 +1,29 @@
 import React, { memo, useId } from 'react';
-import { motion, useReducedMotion, useTime, useTransform } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion, useTime, useTransform } from 'framer-motion';
+import { cn } from '../../lib/cn';
 import UltrakinLogo from '../primitives/UltrakinLogo';
 import { PRODUCT_ICON_CONFIG } from '../../data/integrationData';
+import {
+  ORBITAL_CENTER,
+  compileOrbitalConfig,
+  getOrbitalPosition,
+  getSatelliteScale,
+  getSatelliteOpacity,
+  getSatelliteZIndex,
+} from '../../lib/orbitalUtils';
 
-/* ─── Celestial Orbital Parameters for Built-In Satellites (Planetary Ecosystem) ─── */
-const CENTER = { x: 310, y: 210 };
-
-const BUILT_IN_ORBITAL_CONFIGS = {
-  // Inner Orbital Ring α (Tau = 54s, Tilt: -14°)
+/* ─── Built-in Satellites Configuration (Planetary Core Ecosystem) ─── */
+const RAW_BUILT_IN_CONFIGS = {
+  // Inner Transverse Orbit α (Tilt: -14°, Tau: 54s, Opposition delta: 180°)
   Mail: {
     ring: 1,
     a: 138,
     b: 64,
     tilt: -14,
-    period: 54, // seconds for full orbit
-    initialPhase: 260, // degrees (top-north quadrant)
+    period: 54,
+    initialPhase: 260, // North quadrant
     color: '#dc2626',
-    glow: 'rgba(220,38,38,0.5)',
+    glow: 'rgba(220,38,38,0.55)',
   },
   Docs: {
     ring: 1,
@@ -24,21 +31,21 @@ const BUILT_IN_ORBITAL_CONFIGS = {
     b: 64,
     tilt: -14,
     period: 54,
-    initialPhase: 80, // degrees (bottom-south quadrant)
+    initialPhase: 80, // South quadrant
     color: '#2563eb',
-    glow: 'rgba(37,99,235,0.5)',
+    glow: 'rgba(37,99,235,0.55)',
   },
 
-  // Mid Equatorial Operations Ring β (Tau = 72s, Tilt: +12°)
+  // Mid Equatorial Orbit β (Tilt: +12°, Tau: 72s, Opposition delta: 180°)
   Spaces: {
     ring: 2,
     a: 208,
     b: 92,
     tilt: 12,
     period: 72,
-    initialPhase: 185, // degrees (west quadrant)
+    initialPhase: 185, // West quadrant
     color: '#5c5bd6',
-    glow: 'rgba(92,91,214,0.5)',
+    glow: 'rgba(92,91,214,0.55)',
   },
   Tasks: {
     ring: 2,
@@ -46,31 +53,21 @@ const BUILT_IN_ORBITAL_CONFIGS = {
     b: 92,
     tilt: 12,
     period: 72,
-    initialPhase: 5, // degrees (east quadrant)
+    initialPhase: 5, // East quadrant
     color: '#10b981',
-    glow: 'rgba(16,185,129,0.5)',
+    glow: 'rgba(16,185,129,0.55)',
   },
 
-  // Outer Inclined Telemetry Ring γ (Tau = 92s, Tilt: -24°)
+  // Outer Inclined Orbit γ (Tilt: -24°, Tau: 92s, Trine constellation: 120° equidistant)
   Meetings: {
     ring: 3,
     a: 268,
     b: 118,
     tilt: -24,
     period: 92,
-    initialPhase: 40, // degrees (north-east quadrant)
+    initialPhase: 40, // North-East
     color: '#059669',
-    glow: 'rgba(5,150,105,0.5)',
-  },
-  Calendar: {
-    ring: 3,
-    a: 268,
-    b: 118,
-    tilt: -24,
-    period: 92,
-    initialPhase: 300, // degrees (south-east quadrant)
-    color: '#d97706',
-    glow: 'rgba(217,119,6,0.5)',
+    glow: 'rgba(5,150,105,0.55)',
   },
   'Ukin agent': {
     ring: 3,
@@ -78,34 +75,99 @@ const BUILT_IN_ORBITAL_CONFIGS = {
     b: 118,
     tilt: -24,
     period: 92,
-    initialPhase: 190, // degrees (south-west quadrant)
+    initialPhase: 160, // South-West
     color: '#8b5cf6',
-    glow: 'rgba(139,92,246,0.5)',
+    glow: 'rgba(139,92,246,0.55)',
+  },
+  Calendar: {
+    ring: 3,
+    a: 268,
+    b: 118,
+    tilt: -24,
+    period: 92,
+    initialPhase: 280, // South-East
+    color: '#d97706',
+    glow: 'rgba(217,119,6,0.55)',
   },
 };
 
-/* ─── Mathematical 3D-to-2D Coordinate Calculator ─── */
-function getOrbitalCoords(config, tSec) {
-  const { a, b, tilt, period, initialPhase } = config;
-  const omega = (2 * Math.PI) / period;
-  const radPhase = (initialPhase * Math.PI) / 180;
-  const theta = radPhase + omega * tSec;
+/* ─── Extension Satellites Configuration (Open Protocol Ecosystem) ─── */
+const RAW_EXTENSION_CONFIGS = {
+  // Inner Transverse Orbit α (Tilt: -14°, Tau: 56s, Opposition delta: 180°)
+  GitHub: {
+    ring: 1,
+    a: 138,
+    b: 64,
+    tilt: -14,
+    period: 56,
+    initialPhase: 260, // North quadrant
+    color: '#181d24',
+    glow: 'rgba(148,163,184,0.65)',
+  },
+  Journeys: {
+    ring: 1,
+    a: 138,
+    b: 64,
+    tilt: -14,
+    period: 56,
+    initialPhase: 80, // South quadrant
+    color: '#c026d3',
+    glow: 'rgba(192,38,211,0.65)',
+  },
 
-  // Un-rotated elliptical coordinates
-  const u = a * Math.cos(theta);
-  const v = b * Math.sin(theta);
+  // Mid Equatorial Orbit β (Tilt: +12°, Tau: 74s, Opposition delta: 180°)
+  Lists: {
+    ring: 2,
+    a: 208,
+    b: 92,
+    tilt: 12,
+    period: 74,
+    initialPhase: 185, // West quadrant
+    color: '#10b981',
+    glow: 'rgba(16,185,129,0.65)',
+  },
+  'MCP tools': {
+    ring: 2,
+    a: 208,
+    b: 92,
+    tilt: 12,
+    period: 74,
+    initialPhase: 5, // East quadrant
+    color: '#0284c7',
+    glow: 'rgba(2,132,199,0.65)',
+  },
 
-  // Rotate in 2D by orbital plane tilt angle
-  const radTilt = (tilt * Math.PI) / 180;
-  const cosT = Math.cos(radTilt);
-  const sinT = Math.sin(radTilt);
+  // Outer Inclined Orbit γ (Tilt: -24°, Tau: 92s, Opposition delta: 180°)
+  PostHog: {
+    ring: 3,
+    a: 268,
+    b: 118,
+    tilt: -24,
+    period: 92,
+    initialPhase: 40, // North-East
+    color: '#ea580c',
+    glow: 'rgba(234,88,12,0.65)',
+  },
+  Forms: {
+    ring: 3,
+    a: 268,
+    b: 118,
+    tilt: -24,
+    period: 92,
+    initialPhase: 220, // South-West
+    color: '#2563eb',
+    glow: 'rgba(37,99,235,0.65)',
+  },
+};
 
-  const x = CENTER.x + u * cosT - v * sinT;
-  const y = CENTER.y + u * sinT + v * cosT;
-  const z = Math.sin(theta); // Normalized depth [-1, 1]
-
-  return { x, y, z };
-}
+/* Precompile all orbital trigonometry at module evaluation time */
+const COMPILED_ORBITAL_CONFIGS = Object.freeze(
+  Object.fromEntries(
+    Object.entries({ ...RAW_BUILT_IN_CONFIGS, ...RAW_EXTENSION_CONFIGS }).map(
+      ([key, cfg]) => [key, compileOrbitalConfig(cfg)]
+    )
+  )
+);
 
 /* ─── Floating Service Satellite Node Component ─── */
 function SatelliteNode({
@@ -122,46 +184,28 @@ function SatelliteNode({
   const iconConfig = PRODUCT_ICON_CONFIG[item.name];
   const Icon = iconConfig?.icon;
 
-  const staticCoords = getOrbitalCoords(config, 0);
+  const staticPos = getOrbitalPosition(config, 0);
 
-  const x = useTransform(time, (ms) => {
-    if (reduceMotion) return staticCoords.x;
-    return getOrbitalCoords(config, ms / 1000).x;
+  // Single unified transform per satellite eliminates redundant calculations
+  const coords = useTransform(time, (ms) => {
+    if (reduceMotion) return staticPos;
+    return getOrbitalPosition(config, ms / 1000);
   });
 
-  const y = useTransform(time, (ms) => {
-    if (reduceMotion) return staticCoords.y;
-    return getOrbitalCoords(config, ms / 1000).y;
-  });
-
-  const scale = useTransform(time, (ms) => {
-    if (reduceMotion) return isHovered ? 1.12 : isSelected ? 1.06 : 1;
-    const { z } = getOrbitalCoords(config, ms / 1000);
-    const depthScale = 1.0 + z * 0.08;
-    const activeBoost = isHovered ? 1.12 : isSelected ? 1.06 : 1;
-    return depthScale * activeBoost;
-  });
-
-  const opacity = useTransform(time, (ms) => {
-    if (reduceMotion) return 1;
-    const { z } = getOrbitalCoords(config, ms / 1000);
-    return 0.75 + (z + 1) * 0.125; // range: [0.75, 1.0]
-  });
-
-  const zIndex = useTransform(time, (ms) => {
-    if (isSelected) return 35;
-    if (isHovered) return 30;
-    if (reduceMotion) return 22;
-    const { z } = getOrbitalCoords(config, ms / 1000);
-    return z > 0 ? 25 : 12; // Z-depth sorting: >0 in front of core (z=20), <0 behind core!
-  });
+  const x = useTransform(coords, (c) => c.deltaX);
+  const y = useTransform(coords, (c) => c.deltaY);
+  const scale = useTransform(coords, (c) => getSatelliteScale(c.z, isHovered, isSelected));
+  const opacity = useTransform(coords, (c) => getSatelliteOpacity(c.z, reduceMotion));
+  const zIndex = useTransform(coords, (c) =>
+    getSatelliteZIndex(c.z, isHovered, isSelected, reduceMotion)
+  );
 
   return (
     <motion.div
       style={{
         position: 'absolute',
-        left: 0,
-        top: 0,
+        left: '50%',
+        top: '50%',
         x,
         y,
         scale,
@@ -170,14 +214,23 @@ function SatelliteNode({
       }}
       className="pointer-events-auto"
     >
-      <div style={{ transform: 'translate(-50%, -50%)' }}>
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.8, opacity: 0 }}
+        transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+        style={{ transform: 'translate(-50%, -50%)' }}
+      >
         <button
           type="button"
           aria-pressed={isSelected}
+          aria-label={`${item.name} (${item.badge || item.category || 'Integration'})`}
           onClick={onClick}
           onMouseEnter={onHover}
           onMouseLeave={onLeave}
-          className="group relative flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 rounded-full cursor-pointer"
+          onFocus={onHover}
+          onBlur={onLeave}
+          className="group relative flex flex-col items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950 rounded-full cursor-pointer"
         >
           {/* Concentric Telemetry Orbit Halo */}
           <span
@@ -185,7 +238,7 @@ function SatelliteNode({
             className="pointer-events-none absolute -inset-2 rounded-full border transition-all duration-300"
             style={{
               borderColor: isSelected || isHovered ? config.glow : 'rgba(165,180,252,0.12)',
-              boxShadow: isSelected || isHovered ? `0 0 14px ${config.glow}` : 'none',
+              boxShadow: isSelected || isHovered ? `0 0 16px ${config.glow}` : 'none',
               borderStyle: isSelected || isHovered ? 'solid' : 'dashed',
             }}
           />
@@ -229,7 +282,7 @@ function SatelliteNode({
             {item.name}
           </span>
         </button>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -238,8 +291,8 @@ function SatelliteNode({
 function ActiveLaserBeam({ config, time, color, reduceMotion }) {
   const pathD = useTransform(time, (ms) => {
     const tSec = reduceMotion ? 0 : ms / 1000;
-    const { x, y } = getOrbitalCoords(config, tSec);
-    return `M ${x} ${y} L ${CENTER.x} ${CENTER.y}`;
+    const { x, y } = getOrbitalPosition(config, tSec);
+    return `M ${x} ${y} L ${ORBITAL_CENTER.x} ${ORBITAL_CENTER.y}`;
   });
 
   return (
@@ -266,10 +319,11 @@ function ActiveLaserBeam({ config, time, color, reduceMotion }) {
   );
 }
 
-/* ─── Main Orbital Reactor Mesh Component (Built-in Planetary Model) ─── */
+/* ─── Main Orbital Reactor Mesh Component ─── */
 function OrbitalReactorMesh({
   visible,
   current,
+  selectedCat = 'Built in',
   activeNode: _activeNode,
   hoveredNode,
   setHoveredNode,
@@ -280,210 +334,305 @@ function OrbitalReactorMesh({
   const reduceMotion = useReducedMotion();
   const time = useTime();
 
+  const isExtension = selectedCat === 'Extension examples';
+  const defaultTarget = isExtension ? 'GitHub' : 'Spaces';
+
   // Focus beam connects to hovered satellite if present, otherwise active/selected satellite
-  const targetNodeName = hoveredNode || current?.name || 'Spaces';
-  const targetConfig = BUILT_IN_ORBITAL_CONFIGS[targetNodeName];
+  const targetNodeName = hoveredNode || current?.name || defaultTarget;
+  const targetConfig =
+    COMPILED_ORBITAL_CONFIGS[targetNodeName] || COMPILED_ORBITAL_CONFIGS[defaultTarget];
 
   return (
-    <div className="relative h-[430px] w-full overflow-hidden select-none bg-[radial-gradient(ellipse_80%_75%_at_50%_50%,#111625_0%,#080b12_70%,#05070a_100%)]">
-      {/* ── SVG LAYER: Scientific Coordinate System & Orbital Rails ── */}
-      <svg
-        viewBox="0 0 620 420"
-        preserveAspectRatio="xMidYMid meet"
-        className="absolute inset-0 h-full w-full pointer-events-none"
-        role="img"
-        aria-label="Ultrakin Orbital Integration System"
-      >
-        <defs>
-          {/* Gravitational Core Flux Gradient */}
-          <radialGradient id={`core-flux-${id}`} cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#6366f1" stopOpacity="0.32" />
-            <stop offset="45%" stopColor="#4f46e5" stopOpacity="0.12" />
-            <stop offset="100%" stopColor="#4f46e5" stopOpacity="0" />
-          </radialGradient>
-
-          {/* Core Specular Sheen Gradient */}
-          <linearGradient id={`core-sheen-${id}`} x1="0" y1="0" x2="1" y2="1">
-            <stop stopColor="#1e2540" />
-            <stop offset="0.65" stopColor="#0d1118" />
-          </linearGradient>
-
-          {/* Coordinate Tick Filter */}
-          <filter id={`glow-${id}`} x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation="1.5" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-
-        {/* ── Layer 1: Celestial Sphere Grid & Latitude Reference Rails ── */}
-        <g opacity="0.08" stroke="rgba(165,180,252,0.8)" strokeWidth="0.6">
-          <line x1="310" y1="30" x2="310" y2="390" strokeDasharray="3 6" />
-          <line x1="60" y1="210" x2="560" y2="210" strokeDasharray="3 6" />
-          <circle cx="310" cy="210" r="195" fill="none" strokeDasharray="2 8" />
-        </g>
-
-        {/* ── Layer 2: 3 Inclined Orbital Rings with Precision Coordinate Ticks ── */}
-        {/* Ring 3: Outer Inclined Telemetry Orbit (Meetings, Calendar, Ukin Agent) */}
-        <g transform="rotate(-24 310 210)">
-          <ellipse
-            cx="310"
-            cy="210"
-            rx="268"
-            ry="118"
-            fill="none"
-            stroke={targetConfig?.ring === 3 ? 'rgba(56,189,248,0.45)' : 'rgba(56,189,248,0.2)'}
-            strokeWidth={targetConfig?.ring === 3 ? '1.2' : '0.8'}
-            className="transition-colors duration-300"
-          />
-          {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
-            const rad = (deg * Math.PI) / 180;
-            const tx = 310 + 268 * Math.cos(rad);
-            const ty = 210 + 118 * Math.sin(rad);
-            return (
-              <circle
-                key={`r3-tick-${deg}`}
-                cx={tx}
-                cy={ty}
-                r="1"
-                fill="rgba(56,189,248,0.3)"
-              />
-            );
-          })}
-        </g>
-
-        {/* Ring 2: Mid Equatorial Operations Orbit (Spaces, Tasks) */}
-        <g transform="rotate(12 310 210)">
-          <ellipse
-            cx="310"
-            cy="210"
-            rx="208"
-            ry="92"
-            fill="none"
-            stroke={targetConfig?.ring === 2 ? 'rgba(99,102,241,0.48)' : 'rgba(99,102,241,0.22)'}
-            strokeWidth={targetConfig?.ring === 2 ? '1.25' : '0.85'}
-            className="transition-colors duration-300"
-          />
-          {[0, 60, 120, 180, 240, 300].map((deg) => {
-            const rad = (deg * Math.PI) / 180;
-            const tx = 310 + 208 * Math.cos(rad);
-            const ty = 210 + 92 * Math.sin(rad);
-            return (
-              <circle
-                key={`r2-tick-${deg}`}
-                cx={tx}
-                cy={ty}
-                r="1.2"
-                fill="rgba(99,102,241,0.35)"
-              />
-            );
-          })}
-        </g>
-
-        {/* Ring 1: Inner Transverse Orbit (Mail, Docs) */}
-        <g transform="rotate(-14 310 210)">
-          <ellipse
-            cx="310"
-            cy="210"
-            rx="138"
-            ry="64"
-            fill="none"
-            stroke={targetConfig?.ring === 1 ? 'rgba(244,63,94,0.48)' : 'rgba(244,63,94,0.22)'}
-            strokeWidth={targetConfig?.ring === 1 ? '1.25' : '0.85'}
-            className="transition-colors duration-300"
-          />
-          {[0, 90, 180, 270].map((deg) => {
-            const rad = (deg * Math.PI) / 180;
-            const tx = 310 + 138 * Math.cos(rad);
-            const ty = 210 + 64 * Math.sin(rad);
-            return (
-              <circle
-                key={`r1-tick-${deg}`}
-                cx={tx}
-                cy={ty}
-                r="1.2"
-                fill="rgba(244,63,94,0.35)"
-              />
-            );
-          })}
-        </g>
-
-        {/* ── Layer 3: Active Optical Laser Chord Beam (Node to Center) ── */}
-        {targetConfig && (
-          <ActiveLaserBeam
-            config={targetConfig}
-            time={time}
-            color={targetConfig.color}
-            reduceMotion={reduceMotion}
-          />
-        )}
-
-        {/* ── Layer 4: Central Ambient Gravitational Flux ── */}
-        <circle
-          cx="310"
-          cy="210"
-          r={hoveredNode ? 115 : 95}
-          fill={`url(#core-flux-${id})`}
-          className="transition-all duration-500 ease-out"
-        />
-      </svg>
-
-      {/* ── LAYER 5: Fixed Central Ultrakin Core Reactor ── */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto">
-        <div
-          className="relative flex h-[82px] w-[82px] items-center justify-center rounded-[1.6rem] border shadow-[0_24px_50px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.18)] transition-all duration-300"
-          style={{
-            borderColor: hoveredNode
-              ? 'rgba(165,180,252,0.45)'
-              : 'rgba(255,255,255,0.16)',
-            background: 'linear-gradient(145deg, #182035, #0b0f16 70%)',
-            boxShadow: hoveredNode
-              ? '0 0 32px -4px rgba(99,102,241,0.45), 0 20px 40px -10px rgba(0,0,0,0.9)'
-              : '0 0 20px -6px rgba(99,102,241,0.25), 0 16px 36px -10px rgba(0,0,0,0.85)',
-          }}
+    <div
+      className={cn(
+        'relative h-[430px] w-full overflow-hidden select-none flex items-center justify-center transition-colors duration-500',
+        isExtension
+          ? 'bg-[radial-gradient(ellipse_80%_75%_at_50%_50%,#0e1726_0%,#080c14_70%,#040609_100%)]'
+          : 'bg-[radial-gradient(ellipse_80%_75%_at_50%_50%,#111625_0%,#080b12_70%,#05070a_100%)]'
+      )}
+    >
+      {/* ── Fixed Aspect-Ratio Orbital Stage Canvas (Guarantees SVG & DOM 1:1 lock) ── */}
+      <div className="relative w-full max-w-[620px] h-[420px] shrink-0">
+        {/* ── SVG LAYER: Scientific Coordinate System & Orbital Rails ── */}
+        <svg
+          viewBox="0 0 620 420"
+          preserveAspectRatio="xMidYMid meet"
+          className="absolute inset-0 h-full w-full pointer-events-none"
+          role="img"
+          aria-label={
+            isExtension
+              ? 'Ultrakin Extension Ecosystem Orbital Topology'
+              : 'Ultrakin Built-in Orbital Integration System'
+          }
         >
-          {/* Specular Sheen */}
-          <span className="pointer-events-none absolute inset-x-2 top-1.5 h-1/3 rounded-t-2xl bg-gradient-to-b from-white/[0.12] to-transparent" />
+          <defs>
+            {/* Gravitational Core Flux Gradient */}
+            <radialGradient id={`core-flux-${id}`} cx="50%" cy="50%" r="50%">
+              <stop
+                offset="0%"
+                stopColor={isExtension ? '#0284c7' : '#6366f1'}
+                stopOpacity="0.32"
+              />
+              <stop
+                offset="45%"
+                stopColor={isExtension ? '#38bdf8' : '#4f46e5'}
+                stopOpacity="0.12"
+              />
+              <stop
+                offset="100%"
+                stopColor={isExtension ? '#38bdf8' : '#4f46e5'}
+                stopOpacity="0"
+              />
+            </radialGradient>
 
-          {/* Central Ultrakin Core Icon */}
-          <UltrakinLogo size={36} />
+            {/* Coordinate Tick Filter */}
+            <filter id={`glow-${id}`} x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="1.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
 
-          {/* Active Reactor LED Status Light */}
-          <span className="absolute top-2.5 right-2.5 flex h-2 w-2 items-center justify-center">
-            <span className="absolute h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-            <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#34d399]" />
-          </span>
+          {/* ── Layer 1: Celestial Sphere Grid & Latitude Reference Rails ── */}
+          <g
+            opacity="0.08"
+            stroke={isExtension ? 'rgba(56,189,248,0.8)' : 'rgba(165,180,252,0.8)'}
+            strokeWidth="0.6"
+          >
+            <line x1="310" y1="30" x2="310" y2="390" strokeDasharray="3 6" />
+            <line x1="60" y1="210" x2="560" y2="210" strokeDasharray="3 6" />
+            <circle cx="310" cy="210" r="195" fill="none" strokeDasharray="2 8" />
+          </g>
 
-          {/* Telemetry Port Flanges */}
-          <span className="absolute -left-1.5 top-1/2 -translate-y-1/2 h-4 w-1.5 rounded-l-xs bg-indigo-500/50 border border-indigo-400/60" />
-          <span className="absolute -right-1.5 top-1/2 -translate-y-1/2 h-4 w-1.5 rounded-r-xs bg-indigo-500/50 border border-indigo-400/60" />
-          <span className="absolute left-1/2 -top-1.5 -translate-x-1/2 h-1.5 w-4 rounded-t-xs bg-indigo-500/50 border border-indigo-400/60" />
-          <span className="absolute left-1/2 -bottom-1.5 -translate-x-1/2 h-1.5 w-4 rounded-b-xs bg-indigo-500/50 border border-indigo-400/60" />
-        </div>
-      </div>
+          {/* ── Layer 2: 3 Inclined Orbital Rings with Precision Coordinate Ticks ── */}
+          {/* Ring 3: Outer Inclined Orbit */}
+          <g transform="rotate(-24 310 210)">
+            <ellipse
+              cx="310"
+              cy="210"
+              rx="268"
+              ry="118"
+              fill="none"
+              stroke={targetConfig?.ring === 3 ? 'rgba(56,189,248,0.48)' : 'rgba(56,189,248,0.2)'}
+              strokeWidth={targetConfig?.ring === 3 ? '1.25' : '0.8'}
+              className="transition-colors duration-300"
+            />
+            {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
+              const rad = (deg * Math.PI) / 180;
+              const tx = 310 + 268 * Math.cos(rad);
+              const ty = 210 + 118 * Math.sin(rad);
+              return (
+                <circle
+                  key={`r3-tick-${deg}`}
+                  cx={tx}
+                  cy={ty}
+                  r="1"
+                  fill="rgba(56,189,248,0.3)"
+                />
+              );
+            })}
+          </g>
 
-      {/* ── LAYER 6: The 7 Floating Service Satellites ── */}
-      {visible.map((item) => {
-        const config = BUILT_IN_ORBITAL_CONFIGS[item.name];
-        if (!config) return null;
+          {/* Ring 2: Mid Equatorial Orbit */}
+          <g transform="rotate(12 310 210)">
+            <ellipse
+              cx="310"
+              cy="210"
+              rx="208"
+              ry="92"
+              fill="none"
+              stroke={
+                targetConfig?.ring === 2
+                  ? isExtension
+                    ? 'rgba(14,165,233,0.52)'
+                    : 'rgba(99,102,241,0.48)'
+                  : isExtension
+                  ? 'rgba(14,165,233,0.22)'
+                  : 'rgba(99,102,241,0.22)'
+              }
+              strokeWidth={targetConfig?.ring === 2 ? '1.25' : '0.85'}
+              className="transition-colors duration-300"
+            />
+            {[0, 60, 120, 180, 240, 300].map((deg) => {
+              const rad = (deg * Math.PI) / 180;
+              const tx = 310 + 208 * Math.cos(rad);
+              const ty = 210 + 92 * Math.sin(rad);
+              return (
+                <circle
+                  key={`r2-tick-${deg}`}
+                  cx={tx}
+                  cy={ty}
+                  r="1.2"
+                  fill={isExtension ? 'rgba(14,165,233,0.35)' : 'rgba(99,102,241,0.35)'}
+                />
+              );
+            })}
+          </g>
 
-        return (
-          <SatelliteNode
-            key={item.name}
-            item={item}
-            config={config}
-            time={time}
-            isSelected={item.name === current.name}
-            isHovered={item.name === hoveredNode}
-            onHover={() => setHoveredNode(item.name)}
-            onLeave={() => setHoveredNode(null)}
-            onClick={() => setSelected(item.name)}
-            reduceMotion={reduceMotion}
+          {/* Ring 1: Inner Transverse Orbit */}
+          <g transform="rotate(-14 310 210)">
+            <ellipse
+              cx="310"
+              cy="210"
+              rx="138"
+              ry="64"
+              fill="none"
+              stroke={
+                targetConfig?.ring === 1
+                  ? isExtension
+                    ? 'rgba(168,85,247,0.52)'
+                    : 'rgba(244,63,94,0.48)'
+                  : isExtension
+                  ? 'rgba(168,85,247,0.22)'
+                  : 'rgba(244,63,94,0.22)'
+              }
+              strokeWidth={targetConfig?.ring === 1 ? '1.25' : '0.85'}
+              className="transition-colors duration-300"
+            />
+            {[0, 90, 180, 270].map((deg) => {
+              const rad = (deg * Math.PI) / 180;
+              const tx = 310 + 138 * Math.cos(rad);
+              const ty = 210 + 64 * Math.sin(rad);
+              return (
+                <circle
+                  key={`r1-tick-${deg}`}
+                  cx={tx}
+                  cy={ty}
+                  r="1.2"
+                  fill={isExtension ? 'rgba(168,85,247,0.35)' : 'rgba(244,63,94,0.35)'}
+                />
+              );
+            })}
+          </g>
+
+          {/* ── Layer 3: Active Optical Laser Chord Beam (Node to Center) ── */}
+          {targetConfig && (
+            <ActiveLaserBeam
+              config={targetConfig}
+              time={time}
+              color={targetConfig.color}
+              reduceMotion={reduceMotion}
+            />
+          )}
+
+          {/* ── Layer 4: Central Ambient Gravitational Flux ── */}
+          <circle
+            cx="310"
+            cy="210"
+            r={hoveredNode ? 115 : 95}
+            fill={`url(#core-flux-${id})`}
+            className="transition-all duration-500 ease-out"
           />
-        );
-      })}
+        </svg>
+
+        {/* ── LAYER 5: Fixed Central Ultrakin Core Reactor ── */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-auto">
+          <div
+            className="relative flex h-[82px] w-[82px] items-center justify-center rounded-[1.6rem] border shadow-[0_24px_50px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.18)] transition-all duration-300"
+            style={{
+              borderColor: hoveredNode
+                ? isExtension
+                  ? 'rgba(56,189,248,0.5)'
+                  : 'rgba(165,180,252,0.45)'
+                : 'rgba(255,255,255,0.16)',
+              background: isExtension
+                ? 'linear-gradient(145deg, #0e1e38, #070e1b 70%)'
+                : 'linear-gradient(145deg, #182035, #0b0f16 70%)',
+              boxShadow: hoveredNode
+                ? isExtension
+                  ? '0 0 32px -4px rgba(2,132,199,0.5), 0 20px 40px -10px rgba(0,0,0,0.9)'
+                  : '0 0 32px -4px rgba(99,102,241,0.45), 0 20px 40px -10px rgba(0,0,0,0.9)'
+                : isExtension
+                ? '0 0 20px -6px rgba(2,132,199,0.25), 0 16px 36px -10px rgba(0,0,0,0.85)'
+                : '0 0 20px -6px rgba(99,102,241,0.25), 0 16px 36px -10px rgba(0,0,0,0.85)',
+            }}
+          >
+            {/* Specular Sheen */}
+            <span className="pointer-events-none absolute inset-x-2 top-1.5 h-1/3 rounded-t-2xl bg-gradient-to-b from-white/[0.12] to-transparent" />
+
+            {/* Central Ultrakin Core Icon */}
+            <UltrakinLogo size={36} />
+
+            {/* Active Reactor LED Status Light */}
+            <span className="absolute top-2.5 right-2.5 flex h-2 w-2 items-center justify-center">
+              <span
+                className={cn(
+                  'absolute h-full w-full rounded-full opacity-60',
+                  !reduceMotion && 'animate-ping',
+                  isExtension ? 'bg-cyan-400' : 'bg-emerald-400'
+                )}
+              />
+              <span
+                className={cn(
+                  'relative h-1.5 w-1.5 rounded-full',
+                  isExtension
+                    ? 'bg-cyan-400 shadow-[0_0_6px_#38bdf8]'
+                    : 'bg-emerald-400 shadow-[0_0_6px_#34d399]'
+                )}
+              />
+            </span>
+
+            {/* Telemetry Port Flanges */}
+            <span
+              className={cn(
+                'absolute -left-1.5 top-1/2 -translate-y-1/2 h-4 w-1.5 rounded-l-xs border',
+                isExtension
+                  ? 'bg-cyan-500/50 border-cyan-400/60'
+                  : 'bg-indigo-500/50 border-indigo-400/60'
+              )}
+            />
+            <span
+              className={cn(
+                'absolute -right-1.5 top-1/2 -translate-y-1/2 h-4 w-1.5 rounded-r-xs border',
+                isExtension
+                  ? 'bg-cyan-500/50 border-cyan-400/60'
+                  : 'bg-indigo-500/50 border-indigo-400/60'
+              )}
+            />
+            <span
+              className={cn(
+                'absolute left-1/2 -top-1.5 -translate-x-1/2 h-1.5 w-4 rounded-t-xs border',
+                isExtension
+                  ? 'bg-cyan-500/50 border-cyan-400/60'
+                  : 'bg-indigo-500/50 border-indigo-400/60'
+              )}
+            />
+            <span
+              className={cn(
+                'absolute left-1/2 -bottom-1.5 -translate-x-1/2 h-1.5 w-4 rounded-b-xs border',
+                isExtension
+                  ? 'bg-cyan-500/50 border-cyan-400/60'
+                  : 'bg-indigo-500/50 border-indigo-400/60'
+              )}
+            />
+          </div>
+        </div>
+
+        {/* ── LAYER 6: The Floating Service Satellites ── */}
+        <AnimatePresence mode="popLayout">
+          {visible.map((item) => {
+            const config = COMPILED_ORBITAL_CONFIGS[item.name];
+            if (!config) return null;
+
+            return (
+              <SatelliteNode
+                key={item.name}
+                item={item}
+                config={config}
+                time={time}
+                isSelected={item.name === current.name}
+                isHovered={item.name === hoveredNode}
+                onHover={() => setHoveredNode(item.name)}
+                onLeave={() => setHoveredNode(null)}
+                onClick={() => setSelected(item.name)}
+                reduceMotion={reduceMotion}
+              />
+            );
+          })}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

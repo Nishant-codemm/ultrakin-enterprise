@@ -9,6 +9,7 @@ import {
   Video,
   Mail,
   FileText,
+  Calendar,
   CheckSquare,
   Workflow,
 } from 'lucide-react';
@@ -16,15 +17,20 @@ import AvatarChip from './AvatarChip';
 import UltrakinLogo from '../primitives/UltrakinLogo';
 import { cn } from '../../lib/cn';
 import { navigate } from '../../lib/navigate';
+import { prefetch } from '../../lib/prefetch';
 
 const APPS = [
   { id: 'chat', label: 'Chat', icon: MessageSquare, path: '/products/chat', color: '#5c5bd6' },
   { id: 'calls', label: 'Calls', icon: Video, path: '/products/calls', color: '#059669' },
   { id: 'mail', label: 'Mail', icon: Mail, path: '/products/mail', color: '#dc2626' },
   { id: 'docs', label: 'Docs', icon: FileText, path: '/products/docs', color: '#0284c7' },
+  { id: 'events', label: 'Events', icon: Calendar, path: '/products/events', color: '#d97706' },
   { id: 'lists', label: 'Lists', icon: CheckSquare, path: '/products/lists', color: '#10b981' },
   { id: 'automations', label: 'Automations', icon: Workflow, path: '/products/automations', color: '#c026d3' },
 ];
+
+const loadWorkspace = () => import('../../pages/WorkspacePage');
+const loadProduct = () => import('../../pages/ProductPage');
 
 export default function WorkspaceAppRail({
   activeApp = 'mail',
@@ -49,6 +55,8 @@ export default function WorkspaceAppRail({
         <button
           type="button"
           onClick={() => navigate('/workspace')}
+          onMouseEnter={() => prefetch(loadWorkspace, 'pages/WorkspacePage')}
+          onFocus={() => prefetch(loadWorkspace, 'pages/WorkspacePage')}
           title="Switch Workspace (Acme Studio)"
           className="h-7 w-7 rounded-lg bg-[#2563eb] text-white flex items-center justify-center shadow-xs hover:opacity-90 transition-opacity cursor-pointer focus:outline-none"
         >
@@ -67,6 +75,8 @@ export default function WorkspaceAppRail({
               key={app.id}
               type="button"
               onClick={() => navigate(app.path)}
+              onMouseEnter={() => prefetch(loadProduct, 'pages/ProductPage')}
+              onFocus={() => prefetch(loadProduct, 'pages/ProductPage')}
               title={`${app.label} · Ultrakin Workspace`}
               className={cn(
                 'h-7 w-7 rounded-full flex items-center justify-center transition-all cursor-pointer focus:outline-none',

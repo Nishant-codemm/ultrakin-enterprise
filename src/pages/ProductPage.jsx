@@ -89,7 +89,10 @@ function HeroH1({ title }) {
 // ─── Main ProductPage ─────────────────────────────────────────────────────────
 export default function ProductPage() {
   const reduceMotion = useReducedMotion();
-  const rawSlug = window.location.pathname.replace('/products/', '').replace('/products', '').replace(/\/$/, '');
+  const path = window.location.pathname.replace(/\/$/, '');
+  const rawSlug = path === '/events' || path === '/calendar' || path === '/events/calendar'
+    ? 'events'
+    : path.replace('/products/', '').replace('/products', '');
   const slug = rawSlug || 'chat';
   const meta = PRODUCT_META[slug];
 
@@ -154,7 +157,7 @@ export default function ProductPage() {
             {/* Right: demo widget */}
             <motion.div variants={rightVariants} className="relative">
               <DemoWindowFrame
-                height="h-[430px]"
+                height={slug === 'events' || slug === 'lists' ? 'h-[580px] sm:h-[640px]' : 'h-[430px]'}
                 className="relative"
               >
                 {Demo ? (

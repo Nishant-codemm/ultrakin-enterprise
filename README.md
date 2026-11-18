@@ -24,7 +24,10 @@ This repository contains the complete enterprise landing page and interactive pr
 ## Key Features
 
 - **Interactive Workspace Showcase:** Sample product experiences for Chat, Threads, Huddles, Docs, Files, Mail, Agents, and Tasks.
-- **Workflow Storytelling:** Interactive examples show how team discussion can carry context into documentation, assignments, and review.
+- **Speculative Dynamic Import Prefetching:** Non-blocking hover/idle preloading with idempotent Promise memoization for 0ms perceived module switching.
+- **WAI-ARIA Modal Focus Trap:** Accessible focus containment, keyboard cycling, and frame-deferred focus restoration compliant with WCAG 2.1 AA.
+- **Deployment Chunk Invalidation Recovery:** React Error Boundary with automatic single-attempt reload guards against post-deploy chunk 404s and localized failure isolation.
+- **Real-Time Network State Machine:** Synchronized client online/offline status monitoring with optimistic UI feedback and automatic telemetry notifications.
 - **In-Memory Event Bus Telemetry:** Live event ledger demonstrating real-time message ingestion, task generation, and automated cross-system updates.
 - **Dynamic Navigation Morph System:** A smart scroll-responsive top navigation bar that smoothly transitions between a full enterprise header and an elevated sticky command bar.
 - **Global Command Palette (`⌘K` / `Ctrl+K`):** Fast workspace switching, quick action dispatching, and fuzzy section search.

@@ -103,9 +103,9 @@ export default function HeroFilesView() {
   return (
     <div className="flex min-h-[580px] flex-col bg-obsidian-canvas text-slate-200">
       {/* ── Files Command Header ── */}
-      <div className="flex min-h-12 items-center justify-between border-b border-obsidian-border bg-obsidian-surface/70 px-4 sm:px-5">
+      <div className="flex min-h-12 items-center justify-between border-b border-obsidian-border bg-obsidian-surface/80 px-4 sm:px-5">
         <div className="flex items-center gap-2.5">
-          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-indigo-500/15 text-indigo-300">
+          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-sky-500/10 text-sky-400 border border-sky-500/20">
             <FolderOpen className="h-3.5 w-3.5" aria-hidden="true" />
           </span>
           <span className="text-xs font-semibold tracking-tight text-white">Files & Artifacts</span>
@@ -113,11 +113,11 @@ export default function HeroFilesView() {
             · Acme Platform Team / #infra-alerts
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="hidden items-center gap-1 rounded-full border border-sky-400/20 bg-sky-400/10 px-2 py-0.5 font-mono text-[9.5px] text-sky-200 sm:inline-flex">
-            <Lock className="h-2.5 w-2.5" /> AES-256 Scoped
+        <div className="flex items-center gap-2.5">
+          <span className="hidden items-center gap-1.5 rounded-md border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 font-mono text-[10px] text-slate-300 sm:inline-flex">
+            <Lock className="h-3 w-3 text-sky-400" /> AES-256 Scoped
           </span>
-          <span className="font-mono text-[10px] text-obsidian-muted">
+          <span className="font-mono text-[11px] text-obsidian-muted">
             {files.length} artifacts linked
           </span>
         </div>
@@ -154,16 +154,16 @@ export default function HeroFilesView() {
                   onClick={() => setSelectedFile(file.id)}
                   aria-pressed={isSelected}
                   className={cn(
-                    'grid w-full grid-cols-[minmax(0,1fr)_72px] items-center gap-3 rounded-xl border border-transparent px-2.5 py-3 text-left transition-all cursor-pointer sm:grid-cols-[minmax(0,1fr)_84px_90px]',
+                    'grid w-full grid-cols-[minmax(0,1fr)_72px] items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all cursor-pointer sm:grid-cols-[minmax(0,1fr)_84px_90px]',
                     FOCUS_RING_OBSIDIAN,
                     isSelected
-                      ? 'border-indigo-400/30 bg-indigo-500/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]'
-                      : 'hover:border-white/5 hover:bg-white/[0.03]',
+                      ? 'border-sky-500/30 bg-sky-500/[0.08] shadow-sm'
+                      : 'border-transparent hover:border-white/5 hover:bg-white/[0.02]',
                   )}
                 >
                   <div className="flex min-w-0 items-center gap-2.5">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-obsidian-base text-slate-300 ring-1 ring-white/10">
-                      <Icon className="h-3.5 w-3.5" />
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-obsidian-surface text-slate-300 border border-white/[0.08]">
+                      <Icon className="h-3.5 w-3.5 text-sky-400" />
                     </span>
                     <div className="min-w-0">
                       <div className="flex items-center gap-1.5">
@@ -172,7 +172,7 @@ export default function HeroFilesView() {
                         </span>
                         <span
                           className={cn(
-                            'hidden rounded px-1 py-0.2 font-mono text-[8.5px] font-bold border sm:inline-block',
+                            'hidden rounded px-1.5 py-0.2 font-mono text-[9px] font-semibold border sm:inline-block',
                             file.formatColor,
                           )}
                         >
@@ -197,21 +197,21 @@ export default function HeroFilesView() {
 
         {/* ── Right Inspector Panel: File Metadata & Link ── */}
         <aside className="flex flex-col p-4 sm:p-5 bg-obsidian-base/40">
-          <p className="font-mono text-[9.5px] font-semibold uppercase tracking-wider text-obsidian-muted">
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-wider text-obsidian-muted">
             Artifact Inspector
           </p>
 
-          <div className="mt-3 rounded-xl border border-obsidian-border bg-obsidian-base p-4 shadow-sm">
+          <div className="mt-3 rounded-xl border border-white/[0.08] bg-obsidian-surface/60 p-4 shadow-sm">
             <div className="flex items-center gap-3 border-b border-obsidian-border pb-3.5">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-300 ring-1 ring-indigo-400/20">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 text-sky-400 border border-sky-500/20">
                 <FileIcon className="h-5 w-5" />
               </span>
               <div className="min-w-0">
                 <p className="truncate text-xs font-semibold text-white">{selected.name}</p>
-                <div className="mt-0.5 flex items-center gap-1.5">
+                <div className="mt-1 flex items-center gap-1.5">
                   <span
                     className={cn(
-                      'rounded px-1.5 py-0.2 font-mono text-[8.5px] font-bold border',
+                      'rounded px-1.5 py-0.2 font-mono text-[9px] font-semibold border',
                       selected.formatColor,
                     )}
                   >
@@ -224,7 +224,7 @@ export default function HeroFilesView() {
 
             <p className="mt-3 text-xs leading-relaxed text-slate-300">{selected.summary}</p>
 
-            <div className="mt-3.5 space-y-2 rounded-lg border border-white/5 bg-white/[0.02] p-2.5 font-mono text-[10px]">
+            <div className="mt-3.5 space-y-2 rounded-lg border border-white/[0.06] bg-white/[0.02] p-2.5 font-mono text-[10px]">
               <div className="flex items-center justify-between text-obsidian-muted">
                 <span>Check:</span>
                 <span className="text-slate-200">{selected.hash}</span>
@@ -249,8 +249,8 @@ export default function HeroFilesView() {
                 <span>{copied ? 'Copied' : 'Copy link'}</span>
               </button>
 
-              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-300">
-                <ShieldCheck className="h-3.5 w-3.5" /> SOC 2 Synced
+              <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-medium">
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> SOC 2 Synced
               </span>
             </div>
           </div>
@@ -259,7 +259,7 @@ export default function HeroFilesView() {
             type="button"
             onClick={() => setActiveModule(selected.destination)}
             className={cn(
-              'mt-auto inline-flex items-center justify-center gap-2 rounded-xl border border-indigo-400/30 bg-indigo-500/15 py-2.5 px-4 text-xs font-semibold text-indigo-200 transition-all hover:bg-indigo-500/25 hover:text-white cursor-pointer shadow-xs',
+              'mt-auto inline-flex items-center justify-center gap-2 rounded-lg bg-sky-600 hover:bg-sky-500 py-2.5 px-4 text-xs font-semibold text-white transition-all cursor-pointer shadow-sm active:scale-95',
               FOCUS_RING_OBSIDIAN,
             )}
           >
