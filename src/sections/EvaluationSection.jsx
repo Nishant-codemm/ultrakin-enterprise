@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
-import { ArrowRight, Building2, Compass } from 'lucide-react';
+import { ArrowRight, Building2, Compass, Sparkles } from 'lucide-react';
 import { motion, useReducedMotion } from 'framer-motion';
+import { useWorkspace } from '../context/useWorkspace';
 import { useReveal } from '../lib/useReveal';
 import { getSectionHeaderMotion, getSectionContentMotion, DRAWER_SPRING } from '../lib/motion';
 import { handleSpotlightMove, FOCUS_RING } from '../lib/interaction';
@@ -30,9 +31,21 @@ const PATHS = [
     accent: 'rgba(49,86,207,0.07)',
     accentBorder: 'rgba(49,86,207,0.16)',
   },
+  {
+    icon: Sparkles,
+    eyebrow: 'Talk with us',
+    title: 'Enterprise evaluation briefing',
+    description: 'Schedule a tailored architecture walkthrough, custom security review, and dedicated deployment pilot with our founding team.',
+    action: 'Talk with our team',
+    href: 'drawer',
+    external: false,
+    accent: 'rgba(14,165,233,0.07)',
+    accentBorder: 'rgba(14,165,233,0.18)',
+  },
 ];
 
 function EvaluationSection() {
+  const { openDemoDrawer } = useWorkspace();
   const [sectionRef, inView] = useReveal({ threshold: 0.12 });
   const reduceMotion = useReducedMotion();
 
@@ -57,7 +70,7 @@ function EvaluationSection() {
         </motion.div>
 
         {/* Cards grid with Staggered Entrance & Cursor Spotlight */}
-        <div className="mt-12 grid gap-6 md:grid-cols-2">
+        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {PATHS.map(({ icon: Icon, eyebrow, title, description, action, href, external, accent, accentBorder }, index) => (
             <motion.div
               key={title}
@@ -96,7 +109,9 @@ function EvaluationSection() {
                     <button
                       type="button"
                       onClick={() => {
-                        if (external) {
+                        if (href === 'drawer') {
+                          if (openDemoDrawer) openDemoDrawer();
+                        } else if (external) {
                           window.open(href, '_blank', 'noreferrer,noopener');
                         } else {
                           navigate(href);

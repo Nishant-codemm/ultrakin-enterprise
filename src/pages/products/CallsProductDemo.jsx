@@ -151,7 +151,9 @@ export default function CallsProductDemo() {
 
                       {/* Status indicator in tile corner */}
                       <div className="absolute top-2 right-2 flex items-center gap-1 text-[10px] text-slate-400">
-                        {isUser && muted ? (
+                        {isSpeaking ? (
+                          <Mic size={11} className="text-emerald-400" />
+                        ) : isUser && muted ? (
                           <MicOff size={11} className="text-rose-400" />
                         ) : p.muted ? (
                           <MicOff size={11} className="text-slate-500" />

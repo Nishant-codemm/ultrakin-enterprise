@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useId, useRef, useState } from 'react';
+import React, { memo, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion, useTime, useTransform } from 'framer-motion';
 import { cn } from '../../lib/cn';
 import UltrakinLogo from '../primitives/UltrakinLogo';
@@ -292,24 +292,82 @@ function SatelliteNode({
   );
 }
 
-/* ─── Active Orbital Laser Chord Beam (Node to Center) ─── */
-function ActiveLaserBeam({ config, time, color, reduceMotion }) {
-  const pathD = useTransform(time, (ms) => {
-    const tSec = reduceMotion ? 0 : ms / 1000;
-    const { x, y } = getOrbitalPosition(config, tSec);
-    return `M ${x} ${y} L ${ORBITAL_CENTER.x} ${ORBITAL_CENTER.y}`;
-  });
+/* ─── Traversing Energy Photons on Active Orbital Ring ─── */
+function RingPhoton({ config, phaseOffset, time, size = 2.5 }) {
+  const photonConfig = useMemo(() => {
+    return compileOrbitalConfig({
+      ...config,
+      initialPhase: ((config.initialPhase || 0) + phaseOffset) % 360,
+      period: 7.2, // Brisk orbital energy traversal
+    });
+  }, [config, phaseOffset]);
+
+  const cx = useTransform(time, (ms) => getOrbitalPosition(photonConfig, ms / 1000).x);
+  const cy = useTransform(time, (ms) => getOrbitalPosition(photonConfig, ms / 1000).y);
 
   return (
     <g>
+      {/* Outer ambient energy halo */}
+      <motion.circle
+        cx={cx}
+        cy={cy}
+        r={size * 2.4}
+        fill={config.glow || config.color}
+        opacity={0.38}
+      />
+      {/* Crisp high-energy core */}
+      <motion.circle
+        cx={cx}
+        cy={cy}
+        r={size}
+        fill="#ffffff"
+        opacity={0.95}
+      />
+    </g>
+  );
+}
+
+function OrbitalRingPhotons({ targetConfig, time, reduceMotion }) {
+  if (reduceMotion || !targetConfig) return null;
+
+  return (
+    <g className="pointer-events-none">
+      {[0, 125, 245].map((phaseOffset, idx) => (
+        <RingPhoton
+          key={`photon-${targetConfig.ring}-${idx}`}
+          config={targetConfig}
+          phaseOffset={phaseOffset}
+          time={time}
+          size={idx === 0 ? 3.2 : 2.2}
+        />
+      ))}
+    </g>
+  );
+}
+
+/* ─── Active Orbital Laser Chord Beam (Fires Outward Center to Node) ─── */
+function ActiveLaserBeam({ config, time, color, reduceMotion, targetKey }) {
+  const pathD = useTransform(time, (ms) => {
+    const tSec = reduceMotion ? 0 : ms / 1000;
+    const { x, y } = getOrbitalPosition(config, tSec);
+    // Draw outward from central core to target satellite
+    return `M ${ORBITAL_CENTER.x} ${ORBITAL_CENTER.y} L ${x} ${y}`;
+  });
+
+  return (
+    <g key={targetKey}>
       {/* Outer Soft Ambient Beam Glow */}
       <motion.path
         d={pathD}
         fill="none"
         stroke={color}
         strokeWidth="3.2"
-        strokeOpacity="0.25"
+        strokeOpacity="0.3"
         strokeLinecap="round"
+        strokeDasharray="320"
+        initial={reduceMotion ? false : { strokeDashoffset: 320 }}
+        animate={{ strokeDashoffset: 0 }}
+        transition={{ duration: 0.14, ease: 'easeOut' }}
       />
       {/* Inner Crisp High-Energy Laser Core */}
       <motion.path
@@ -317,8 +375,12 @@ function ActiveLaserBeam({ config, time, color, reduceMotion }) {
         fill="none"
         stroke="#ffffff"
         strokeWidth="1.2"
-        strokeOpacity="0.85"
+        strokeOpacity="0.9"
         strokeLinecap="round"
+        strokeDasharray="320"
+        initial={reduceMotion ? false : { strokeDashoffset: 320 }}
+        animate={{ strokeDashoffset: 0 }}
+        transition={{ duration: 0.14, ease: 'easeOut' }}
       />
     </g>
   );
@@ -552,13 +614,23 @@ function OrbitalReactorMesh({
             })}
           </g>
 
-          {/* ── Layer 3: Active Optical Laser Chord Beam (Node to Center) ── */}
+          {/* ── Layer 3: Traversing Energy Photons on Active Orbital Ring ── */}
+          {targetConfig && (
+            <OrbitalRingPhotons
+              targetConfig={targetConfig}
+              time={time}
+              reduceMotion={reduceMotion}
+            />
+          )}
+
+          {/* ── Layer 4: Active Optical Laser Chord Beam (Outward Center to Node) ── */}
           {targetConfig && (
             <ActiveLaserBeam
               config={targetConfig}
               time={time}
               color={targetConfig.color}
               reduceMotion={reduceMotion}
+              targetKey={targetNodeName}
             />
           )}
 

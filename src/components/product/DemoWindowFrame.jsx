@@ -13,7 +13,7 @@ import { useClipboard } from '../../lib/useClipboard';
 
 export default function DemoWindowFrame({
   children,
-  url,
+  url = 'ultrakin-enterprise.vercel.app/workspace',
   className = '',
   innerClassName = '',
   height = 'h-[440px]',
@@ -21,8 +21,16 @@ export default function DemoWindowFrame({
 }) {
   const { copied, copy } = useClipboard({ timeout: 2000 });
 
+  // Point copyable mock URL from unresolvable workspace.ultrakin.app to live production route
+  const displayUrl = url ? url.replace(/workspace\.ultrakin\.app/g, 'ultrakin-enterprise.vercel.app') : 'ultrakin-enterprise.vercel.app/workspace';
+
   const handleCopyUrl = () => {
-    if (url) copy(`https://${url}`);
+    const clean = displayUrl.replace(/^https?:\/\//, '');
+    const path = clean.includes('/') ? clean.substring(clean.indexOf('/')) : '/workspace';
+    const origin = typeof window !== 'undefined' && window.location.origin && !window.location.origin.includes('localhost')
+      ? window.location.origin
+      : 'https://ultrakin-enterprise.vercel.app';
+    copy(`${origin}${path}`);
   };
 
   return (
@@ -51,7 +59,7 @@ export default function DemoWindowFrame({
             className="group flex items-center gap-1.5 rounded-md bg-white px-2.5 py-0.5 text-[11px] text-[#667085] hover:text-[#111827] font-mono border border-[#e7e4de] hover:border-[#d0cdc7] transition-all cursor-pointer shadow-2xs max-w-[280px] truncate"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            <span className="truncate">{url}</span>
+            <span className="truncate">{displayUrl}</span>
             {copied ? (
               <span className="flex items-center gap-0.5 text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1 rounded">
                 <Check size={9} /> Copied

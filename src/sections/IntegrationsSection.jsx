@@ -45,8 +45,10 @@ function IntegrationsSection() {
             </h2>
           </div>
           <div className="lg:justify-self-end lg:pb-1">
-            <p className="max-w-sm text-[15px] leading-7 text-ink-muted">
-              Chat, mail, meetings, calendar, tasks, docs, and Ukin are built into one workspace. External entries are illustrative examples.
+            <p className="max-w-sm text-[15px] leading-7 text-ink-muted transition-all duration-200 min-h-[56px]">
+              {selectedCat === 'Extension examples'
+                ? 'Connect third-party enterprise tools, webhooks, and MCP servers directly into the central context graph.'
+                : 'Chat, mail, meetings, calendar, tasks, docs, and Ukin are built into one workspace. External entries are illustrative examples.'}
             </p>
             <button
               type="button"
@@ -59,8 +61,8 @@ function IntegrationsSection() {
         </motion.div>
 
         {/* Filter tabs */}
-        <div className="mt-12 border-y border-border py-4">
-          <div role="tablist" aria-label="Explore workspace surfaces and extensions" className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+        <div className="mt-12 border-y border-border py-4 flex flex-wrap items-center justify-between gap-3">
+          <div role="tablist" aria-label="Explore workspace surfaces and extensions" className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             {CATEGORIES.map((category) => {
               const isSelected = selectedCat === category;
               return (
@@ -83,6 +85,12 @@ function IntegrationsSection() {
                 </button>
               );
             })}
+          </div>
+
+          {/* MCP Compatible Protocol Badge */}
+          <div className="flex items-center gap-1.5 rounded-full border border-indigo-500/25 bg-indigo-50/70 px-3 py-1 text-[11px] font-mono text-indigo-700 font-medium select-none shadow-2xs">
+            <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 animate-pulse" aria-hidden="true" />
+            <span>MCP Compatible</span>
           </div>
         </div>
 
