@@ -231,6 +231,7 @@ export function LaserConduit2({ reduceMotion }) {
 
 /* ── Center: Light-Mode Enterprise Intelligence Core Card with Official Ultrakin Logo ── */
 export function NeuralCoreCard({ activeSignal }) {
+  const reduceMotion = useReducedMotion();
   return (
     <div
       className="relative flex h-[204px] w-[190px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl p-3.5 select-none bg-white border border-slate-200/90 shadow-[0_12px_28px_-8px_rgba(15,23,42,0.08),0_2px_6px_-1px_rgba(15,23,42,0.04),inset_0_1px_0_rgba(255,255,255,1)]"
@@ -295,7 +296,8 @@ export function NeuralCoreCard({ activeSignal }) {
 }
 
 /* ── Right: Light-Mode Enterprise One Workspace Output Card ── */
-export function WorkspaceOutcomeCard({ activeSignal, reduceMotion }) {
+export function WorkspaceOutcomeCard({ activeSignal }) {
+  const reduceMotion = useReducedMotion();
   return (
     <div
       className="relative flex h-[204px] w-[170px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl p-3.5 select-none bg-white border border-slate-200/90 shadow-[0_12px_28px_-8px_rgba(15,23,42,0.08),0_2px_6px_-1px_rgba(15,23,42,0.04),inset_0_1px_0_rgba(255,255,255,1)]"
