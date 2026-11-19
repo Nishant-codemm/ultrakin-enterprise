@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo } from 'react';
+import React, { memo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useReveal } from '../lib/useReveal';
 import { getSectionHeaderMotion } from '../lib/motion';
@@ -8,43 +8,6 @@ const METRICS = [
   { target: 2.4, from: 0.0, decimals: 1, prefix: '', suffix: 'M+', display: '2.4M+', label: 'connected signals processed' },
   { target: 99.98, from: 95.0, decimals: 2, prefix: '', suffix: '%', display: '99.98%', label: 'verified platform uptime' },
 ];
-
-function AnimatedCounter({ target, from = 0, decimals = 0, prefix = '', suffix = '', display, inView, reduceMotion }) {
-  const [val, setVal] = useState(from);
-
-  useEffect(() => {
-    if (reduceMotion || !inView) return;
-
-    let startTimestamp = null;
-    const duration = 1400; // ms
-    let frameId;
-
-    const step = (timestamp) => {
-      if (!startTimestamp) startTimestamp = timestamp;
-      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-      // Ease out quartic
-      const ease = 1 - Math.pow(1 - progress, 4);
-      const current = from + ease * (target - from);
-      setVal(current);
-
-      if (progress < 1) {
-        frameId = requestAnimationFrame(step);
-      } else {
-        setVal(target);
-      }
-    };
-
-    frameId = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frameId);
-  }, [inView, reduceMotion, target, from]);
-
-  if (reduceMotion || !inView) {
-    return <span>{display || `${prefix}${target}${suffix}`}</span>;
-  }
-
-  const formatted = decimals > 0 ? val.toFixed(decimals) : Math.round(val).toString();
-  return <span>{prefix}{formatted}{suffix}</span>;
-}
 
 function VortexWordmark({ className = '' }) {
   return (
@@ -143,22 +106,13 @@ function TrustStrip() {
             Trusted across mission-critical engineering, data & operations workflows
           </p>
 
-          {/* Verified Performance Metrics */}
+          {/* Verified Performance Metrics — Pinned deterministic constants on frame 1 */}
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4 sm:gap-x-16">
             {METRICS.map((metric, index) => (
               <React.Fragment key={metric.label}>
                 <div className="flex flex-col items-center gap-1 select-none">
                   <span className="font-display text-[1.8rem] font-normal leading-none tracking-[-0.04em] text-ink tabular-nums">
-                    <AnimatedCounter
-                      target={metric.target}
-                      from={metric.from}
-                      decimals={metric.decimals}
-                      prefix={metric.prefix}
-                      suffix={metric.suffix}
-                      display={metric.display}
-                      inView={inView}
-                      reduceMotion={reduceMotion}
-                    />
+                    {metric.display}
                   </span>
                   <span className="text-[11px] font-medium text-ink-muted">{metric.label}</span>
                 </div>

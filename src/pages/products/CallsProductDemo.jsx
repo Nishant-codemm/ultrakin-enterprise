@@ -16,6 +16,25 @@ import WorkspaceAppRail from '../../components/product/WorkspaceAppRail';
 import TypewriterText from '../../components/product/TypewriterText';
 import { CALLS_DATA } from '../../data/productPageData';
 
+const SPEAKER_QUOTES = {
+  1: {
+    speaker: 'Priya K',
+    quote: '...let’s keep the checklist in the shared kickoff doc and assign an owner to each follow-up.',
+  },
+  2: {
+    speaker: 'Maya Chen',
+    quote: '...auth proxy token TTL is extended to 300s. Monitoring Frankfurt and Dublin ingress clusters.',
+  },
+  3: {
+    speaker: 'Dana Lee',
+    quote: '...client sign-off is confirmed. Launch readiness milestone is locked for Thursday.',
+  },
+  4: {
+    speaker: 'Sam Ortiz',
+    quote: '...compliance audit checks passed for EU tenant failover. Automated security alerts are active.',
+  },
+};
+
 function AudioWaveform({ reduceMotion }) {
   return (
     <div className="flex items-center gap-0.5 h-3 px-1.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30">
@@ -147,11 +166,15 @@ export default function CallsProductDemo() {
 
               {/* Live Streaming Speech Caption Ticker */}
               <div className="mt-2 px-3 py-1.5 rounded-lg bg-black/40 border border-white/[0.06] flex items-center justify-between text-[11px] text-slate-300">
-                <span className="flex items-center gap-1.5">
-                  <span className="text-emerald-400 font-bold font-mono text-[9px] uppercase">Priya K:</span>
-                  <span className="italic text-slate-200">"...let’s keep the checklist in the shared kickoff doc and assign an owner to each follow-up."</span>
+                <span className="flex items-center gap-1.5 truncate">
+                  <span className="text-emerald-400 font-bold font-mono text-[9px] uppercase shrink-0">
+                    {(SPEAKER_QUOTES[activeSpeaker] || SPEAKER_QUOTES[1]).speaker}:
+                  </span>
+                  <span className="italic text-slate-200 truncate">
+                    "{(SPEAKER_QUOTES[activeSpeaker] || SPEAKER_QUOTES[1]).quote}"
+                  </span>
                 </span>
-                <span className="text-[9px] font-mono text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">
+                <span className="text-[9px] font-mono text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20 shrink-0">
                   {sharingScreen ? 'Sharing screen' : 'Live'}
                 </span>
               </div>

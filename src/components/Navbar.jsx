@@ -39,7 +39,7 @@ import { navigate } from '../lib/navigate';
 import { prefetch } from '../lib/prefetch';
 import { SMOOTH_EASE } from '../lib/motion';
 
-const APP_URL = 'https://app.ultrakin.com';
+const APP_URL = '/workspace';
 
 const loadSecurity = () => import('../pages/SecurityPage');
 const loadPricing = () => import('../pages/PricingPage');
@@ -480,7 +480,14 @@ function Navbar() {
             <Search size={16} strokeWidth={1.8} />
           </button>
           <button type="button" onClick={openDemoDrawer} className="inline-flex h-9 items-center rounded-lg border border-border/40 px-3.5 text-[13px] font-medium text-ink-muted transition-all duration-150 hover:border-border/80 hover:bg-surface-soft/60 hover:text-ink active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 cursor-pointer">Talk with us</button>
-          <a href={APP_URL} target="_blank" rel="noreferrer" className="group inline-flex h-9 items-center gap-2 rounded-lg border border-brand/20 bg-brand px-4 text-[13px] font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_4px_14px_rgba(49,86,207,.18)] transition-all duration-150 hover:-translate-y-px hover:bg-brand-hover hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_7px_18px_rgba(49,86,207,.24)] active:translate-y-0 active:scale-[0.985] active:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_2px_8px_rgba(49,86,207,.20)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 cursor-pointer will-change-transform">
+          <a
+            href={APP_URL}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/workspace');
+            }}
+            className="group inline-flex h-9 items-center gap-2 rounded-lg border border-brand/20 bg-brand px-4 text-[13px] font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_4px_14px_rgba(49,86,207,.18)] transition-all duration-150 hover:-translate-y-px hover:bg-brand-hover hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_7px_18px_rgba(49,86,207,.24)] active:translate-y-0 active:scale-[0.985] active:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_2px_8px_rgba(49,86,207,.20)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 cursor-pointer will-change-transform"
+          >
             Open Ultrakin<ArrowRight size={14} className="transition-transform duration-150 group-hover:translate-x-0.5" />
           </a>
         </div>
@@ -552,7 +559,16 @@ function Navbar() {
           </div>
 
           <div className="flex shrink-0 items-center gap-2 justify-self-end">
-            <a href={APP_URL} target="_blank" rel="noreferrer" className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-brand/20 bg-brand px-3.5 text-[12px] font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_2px_8px_rgba(49,86,207,.16)] transition-all duration-150 hover:bg-brand-hover active:scale-[0.985] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 cursor-pointer">Open Ultrakin<ArrowRight size={13} /></a>
+            <a
+              href={APP_URL}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/workspace');
+              }}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-brand/20 bg-brand px-3.5 text-[12px] font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_2px_8px_rgba(49,86,207,.16)] transition-all duration-150 hover:bg-brand-hover active:scale-[0.985] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 cursor-pointer"
+            >
+              Open Ultrakin<ArrowRight size={13} />
+            </a>
             <button ref={mobileMenuToggleRef} type="button" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'} aria-expanded={mobileOpen} aria-controls="compact-mobile-navigation" className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink active:scale-[0.97] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 md:hidden">{mobileOpen ? <X size={17} /> : <Menu size={17} />}</button>
           </div>
 
@@ -883,7 +899,17 @@ function Navbar() {
             </div>
             <div className="mt-3 flex flex-col gap-2 border-t border-border pt-4">
               <Button variant="secondary" onClick={() => { closeMobileNavigation(); openDemoDrawer(); }} className="w-full">Talk with us</Button>
-              <a href={APP_URL} target="_blank" rel="noreferrer" onClick={closeMobileNavigation} className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-brand text-sm font-semibold text-white transition-colors hover:bg-brand-hover">Open Ultrakin<ArrowRight size={15} /></a>
+              <a
+                href={APP_URL}
+                onClick={(e) => {
+                  e.preventDefault();
+                  closeMobileNavigation();
+                  navigate('/workspace');
+                }}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-brand text-sm font-semibold text-white transition-colors hover:bg-brand-hover cursor-pointer"
+              >
+                Open Ultrakin<ArrowRight size={15} />
+              </a>
             </div>
           </motion.div>
         )}

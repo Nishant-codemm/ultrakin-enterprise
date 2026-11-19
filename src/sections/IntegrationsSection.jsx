@@ -137,25 +137,33 @@ function IntegrationsSection() {
             </AnimatePresence>
 
             {/* Mobile node list (accessible fallback) */}
-            <div className="mt-10 grid grid-cols-2 gap-x-4 gap-y-0 border-t border-border sm:hidden">
+            <div className="mt-10 grid grid-cols-2 gap-2 border-t border-border pt-3 sm:hidden">
               {visible.map((item) => {
                 const conf = PRODUCT_ICON_CONFIG[item.name];
                 const ItemIcon = conf?.icon || Sparkles;
+                const isSelected = item.name === current.name;
                 return (
                   <button
                     key={item.name}
                     type="button"
-                    aria-pressed={item.name === current.name}
+                    aria-pressed={isSelected}
                     onClick={() => setSelected(item.name)}
                     className={cn(
-                      'flex min-h-11 items-center gap-2 border-b border-border text-left text-[11px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus cursor-pointer',
-                      item.name === current.name ? 'text-brand-text font-medium' : 'text-ink-subtle hover:text-ink-soft',
+                      'flex min-h-11 items-center justify-between rounded-xl px-2.5 py-2 text-left text-[11px] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus cursor-pointer border',
+                      isSelected
+                        ? 'bg-brand/10 border-brand/30 text-brand font-semibold shadow-2xs'
+                        : 'border-border/60 bg-white/40 text-ink-subtle hover:text-ink-soft hover:bg-white/70',
                     )}
                   >
-                    <span className={cn('flex h-5 w-5 items-center justify-center rounded-md text-white', conf?.bg || 'bg-brand')}>
-                      <ItemIcon size={11} />
-                    </span>
-                    {item.name}
+                    <div className="flex items-center gap-2 truncate">
+                      <span className={cn('flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-white shadow-2xs', conf?.bg || 'bg-brand')}>
+                        <ItemIcon size={11} />
+                      </span>
+                      <span className="truncate">{item.name}</span>
+                    </div>
+                    {isSelected && (
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand" aria-hidden="true" />
+                    )}
                   </button>
                 );
               })}

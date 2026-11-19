@@ -275,6 +275,8 @@ function HuddleSimulator() {
         {/* Right Column (5 cols): Automated STT Transcription Stream */}
         <HuddleTranscriptFeed
           transcript={huddleTranscript}
+          activeSpeakerName={activeSpeaker}
+          isSpeaking={!huddleMuted}
           onSimulateNextSpeech={handleSimulateNextSpeech}
           onNavigateToDocs={() => setActiveModule('docs')}
         />

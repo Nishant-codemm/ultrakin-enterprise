@@ -1,5 +1,5 @@
-import React, { lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { MotionConfig, motion, useMotionValue, useMotionValueEvent, useReducedMotion, useScroll } from 'framer-motion';
+import React, { lazy, Suspense, useEffect, useState } from 'react';
+import { MotionConfig } from 'framer-motion';
 import Navbar from './components/Navbar';
 import HeroSection from './sections/HeroSection';
 import TrustStrip from './sections/TrustStrip';
@@ -17,11 +17,46 @@ import KeyboardShortcutsModal from './components/KeyboardShortcutsModal';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import { WorkspaceProvider } from './context/WorkspaceContext';
 
-// High-craft, continuous serpentine story thread following the page gutter.
-// Designed with C2 curvature continuity: smooth snake-like flow, zero card collisions,
-// zero wild horizontal swings, and perfectly framing every section's content.
-const STORY_THREAD_PATH =
-  'M 82 0 C 82 45, 74 65, 70 100 C 64 150, 48 165, 44 210 C 40 265, 60 280, 58 340 C 56 395, 38 415, 36 470 C 34 525, 56 550, 54 610 C 52 665, 62 690, 58 740 C 54 790, 42 815, 38 870 C 36 920, 48 955, 48 1000';
+function ProductRouteSkeleton() {
+  return (
+    <div className="min-h-screen bg-page pt-20 pb-16 animate-pulse select-none" aria-busy="true">
+      <div className="mx-auto max-w-7xl px-5 lg:px-8 pt-10">
+        <div className="flex items-center gap-2 mb-6">
+          <div className="h-4 w-16 bg-slate-200/80 rounded-md" />
+          <span className="text-slate-300">/</span>
+          <div className="h-4 w-28 bg-slate-200/80 rounded-md" />
+        </div>
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16 lg:items-center">
+          <div className="max-w-lg space-y-4">
+            <div className="h-10 bg-slate-200/80 rounded-lg w-4/5" />
+            <div className="h-10 bg-slate-200/80 rounded-lg w-3/5" />
+            <div className="pt-2 space-y-2">
+              <div className="h-4 bg-slate-200/60 rounded w-full" />
+              <div className="h-4 bg-slate-200/60 rounded w-5/6" />
+            </div>
+            <div className="pt-4 flex items-center gap-3">
+              <div className="h-11 w-32 bg-brand/20 rounded-xl" />
+              <div className="h-11 w-28 bg-slate-200/70 rounded-xl" />
+            </div>
+          </div>
+          <div className="h-[430px] rounded-2xl border border-slate-200/60 bg-white shadow-sm overflow-hidden flex flex-col">
+            <div className="h-9 border-b border-slate-100 bg-slate-50/70 flex items-center px-3.5 gap-1.5">
+              <div className="h-2.5 w-2.5 rounded-full bg-slate-200" />
+              <div className="h-2.5 w-2.5 rounded-full bg-slate-200" />
+              <div className="h-2.5 w-2.5 rounded-full bg-slate-200" />
+            </div>
+            <div className="flex-1 p-5 space-y-3">
+              <div className="h-4 bg-slate-100 rounded-full w-3/4" />
+              <div className="h-4 bg-slate-100 rounded-full w-1/2" />
+              <div className="h-4 bg-slate-100 rounded-full w-5/6" />
+              <div className="h-24 bg-slate-50 rounded-xl mt-4" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const PAGE_METADATA = {
   '/': {
@@ -93,7 +128,7 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const ROUTE_PAGES = {
   '/pricing':       lazy(() => import('./pages/PricingPage')),
   '/workspace':     lazy(() => import('./pages/WorkspacePage')),
-  '/agents':        lazy(() => import('./pages/AgentsPage')),
+  '/agents':        UniversalProductPage,
   '/security':      lazy(() => import('./pages/SecurityPage')),
   '/privacy':       LegalPage,
   '/terms':         LegalPage,
@@ -103,6 +138,7 @@ const ROUTE_PAGES = {
   '/solutions':     SolutionsOverviewPage,
   '/resources':     ResourcesPage,
   '/products':      UniversalProductPage,
+  '/products/tasks': UniversalProductPage,
   '/events':        UniversalProductPage,
   '/calendar':      UniversalProductPage,
   '/events/calendar': UniversalProductPage,
@@ -121,19 +157,26 @@ const ROUTE_PAGES = {
 };
 
 export default function App() {
-  const [pathname, setPathname] = useState(() => window.location.pathname.replace(/\/$/, '') || '/');
-  const storyRef = useRef(null);
-  const routePathRef = useRef(null);
-  const storyThreadPath = STORY_THREAD_PATH;
-  const reduceMotion = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: storyRef, offset: ['start start', 'end end'] });
-  const storyProgress = reduceMotion ? 0 : scrollYProgress;
-  const threadX = useMotionValue('82%');
-  const threadY = useMotionValue('0%');
-  const pathLengthRef = useRef(0);
+  const [pathname, setPathname] = useState(() => {
+    const raw = window.location.pathname.replace(/\/$/, '') || '/';
+    return raw === '/products/tasks' ? '/products/lists' : raw;
+  });
 
   useEffect(() => {
-    const syncPathname = () => setPathname(window.location.pathname.replace(/\/$/, '') || '/');
+    // Normalization guard: redirect /products/tasks alias to canonical /products/lists
+    if (window.location.pathname.replace(/\/$/, '') === '/products/tasks') {
+      window.history.replaceState({}, '', '/products/lists');
+    }
+
+    const syncPathname = () => {
+      const raw = window.location.pathname.replace(/\/$/, '') || '/';
+      const resolved = raw === '/products/tasks' ? '/products/lists' : raw;
+      if (raw === '/products/tasks') {
+        window.history.replaceState({}, '', '/products/lists');
+      }
+      setPathname(resolved);
+    };
+
     window.addEventListener('popstate', syncPathname);
     return () => window.removeEventListener('popstate', syncPathname);
   }, []);
@@ -168,17 +211,6 @@ export default function App() {
     document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', metadata.description);
   }, [pathname, isHome]);
 
-  useMotionValueEvent(scrollYProgress, 'change', (progress) => {
-    const path = routePathRef.current;
-    if (!path || reduceMotion) return;
-    if (!pathLengthRef.current) {
-      pathLengthRef.current = path.getTotalLength();
-    }
-    const point = path.getPointAtLength(pathLengthRef.current * progress);
-    threadX.set(`${point.x}%`);
-    threadY.set(`${point.y / 10}%`);
-  });
-
   return (
     <WorkspaceProvider>
       <MotionConfig reducedMotion="user">
@@ -193,122 +225,45 @@ export default function App() {
         {RoutePage ? (
           <main id="main_content" tabIndex={-1} className="min-h-screen">
             <ErrorBoundary name="Page">
-              <Suspense fallback={<div className="min-h-screen" aria-busy="true"><span className="sr-only" role="status">Loading page…</span></div>}>
+              <Suspense
+                fallback={
+                  pathname.startsWith('/products/') || pathname === '/agents' ? (
+                    <ProductRouteSkeleton />
+                  ) : (
+                    <div className="min-h-screen bg-page flex items-center justify-center" aria-busy="true">
+                      <div className="flex items-center gap-2 text-ink-subtle text-xs font-mono">
+                        <span className="h-2 w-2 rounded-full bg-brand animate-ping" />
+                        <span>Loading workspace…</span>
+                      </div>
+                    </div>
+                  )
+                }
+              >
                 <RoutePage />
               </Suspense>
             </ErrorBoundary>
           </main>
-        ) : <main ref={storyRef} id="main_content" tabIndex={-1} className="relative isolate overflow-hidden bg-page">
-          {/* Ambient atmospheric depth layers */}
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_72%_34rem_at_50%_-8rem,rgba(49,86,207,.035),transparent_76%),radial-gradient(ellipse_42%_34rem_at_92%_38%,rgba(169,155,132,.085),transparent_72%),radial-gradient(ellipse_44%_30rem_at_8%_72%,rgba(49,86,207,.02),transparent_74%)]" />
-          </div>
+        ) : (
+          <main id="main_content" tabIndex={-1} className="relative isolate overflow-hidden bg-page">
+            {/* Ambient atmospheric depth layers */}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_72%_34rem_at_50%_-8rem,rgba(49,86,207,.035),transparent_76%),radial-gradient(ellipse_42%_34rem_at_92%_38%,rgba(169,155,132,.085),transparent_72%),radial-gradient(ellipse_44%_30rem_at_8%_72%,rgba(49,86,207,.02),transparent_74%)]" />
+            </div>
 
-          {/* Main Page Content Layers */}
-          <div className="relative z-10">
-            <HeroSection />
-            <TrustStrip />
-            <WorkflowSpotlight />
-            <PlatformLensSection />
-            <IntegrationsSection />
-            <SecuritySection />
-            <EvaluationSection />
-            <FAQSection />
-            <CTASection />
-          </div>
-
-          {/* ── Continuous Luminous Story Thread & Traveling Photon Node (Floats gracefully behind cards at z-0) ── */}
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-            {/* Desktop Continuous Story Thread — Delicate Luminous Ray */}
-            <svg viewBox="0 0 100 1000" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
-              <defs>
-                <linearGradient id="ultrakin-story-thread" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#818cf8" stopOpacity="0.16" />
-                  <stop offset="25%" stopColor="#6366f1" stopOpacity="0.3" />
-                  <stop offset="50%" stopColor="#818cf8" stopOpacity="0.26" />
-                  <stop offset="75%" stopColor="#6366f1" stopOpacity="0.34" />
-                  <stop offset="100%" stopColor="#818cf8" stopOpacity="0.18" />
-                </linearGradient>
-                <linearGradient id="ultrakin-thread-active" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.35" />
-                  <stop offset="40%" stopColor="#6366f1" stopOpacity="0.6" />
-                  <stop offset="75%" stopColor="#818cf8" stopOpacity="0.75" />
-                  <stop offset="100%" stopColor="#c7d2fe" stopOpacity="0.85" />
-                </linearGradient>
-                <filter id="thread-glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="0.4" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-
-              {/* Base guide track — delicate, ultra-thin optical filament (0.65px) */}
-              <path
-                ref={routePathRef}
-                d={storyThreadPath}
-                fill="none"
-                stroke="url(#ultrakin-story-thread)"
-                strokeWidth="1.15"
-                vectorEffect="non-scaling-stroke"
-              />
-
-              {/* Active scroll progression light ray — ultra-thin (0.75px) */}
-              <motion.path
-                d={storyThreadPath}
-                fill="none"
-                stroke="url(#ultrakin-thread-active)"
-                strokeWidth="1.25"
-                strokeLinecap="round"
-                vectorEffect="non-scaling-stroke"
-                filter="url(#thread-glow)"
-                pathLength={storyProgress}
-              />
-
-              {/* Architectural section milestone anchor nodes (Section-to-section storytelling continuity) */}
-              {[
-                { cx: 70, cy: 100, label: 'Workspace' },
-                { cx: 44, cy: 210, label: 'Workflows' },
-                { cx: 36, cy: 470, label: 'Intelligence' },
-                { cx: 58, cy: 740, label: 'Integrations' },
-                { cx: 38, cy: 870, label: 'Security' },
-              ].map((node) => (
-                <g key={node.label}>
-                  <circle
-                    cx={node.cx}
-                    cy={node.cy}
-                    r="2.2"
-                    fill="#3156cf"
-                    fillOpacity="0.08"
-                  />
-                  <circle
-                    cx={node.cx}
-                    cy={node.cy}
-                    r="1.1"
-                    fill="#4f46e5"
-                    fillOpacity="0.35"
-                  />
-                </g>
-              ))}
-            </svg>
-
-            {/* Traveling Luminous Pearl Photon Bead — refined 2px pearl node */}
-            {!reduceMotion && (
-              <motion.div
-                aria-hidden="true"
-                style={{ left: threadX, top: threadY }}
-                className="absolute z-20 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center pointer-events-none"
-              >
-                {/* Subtle soft luminous aura */}
-                <span className="absolute h-4 w-4 rounded-full bg-indigo-400/15 blur-[1.5px]" />
-                {/* Pearl white photon bead matching reference screenshot */}
-                <span className="relative h-2 w-2 rounded-full bg-white ring-1 ring-white/80 shadow-[0_0_6px_rgba(255,255,255,0.9),0_0_10px_rgba(99,102,241,0.4)]" />
-              </motion.div>
-            )}
-
-          </div>
-        </main>}
+            {/* Main Page Content Layers */}
+            <div className="relative z-10">
+              <HeroSection />
+              <TrustStrip />
+              <WorkflowSpotlight />
+              <PlatformLensSection />
+              <IntegrationsSection />
+              <SecuritySection />
+              <EvaluationSection />
+              <FAQSection />
+              <CTASection />
+            </div>
+          </main>
+        )}
         <div className="relative z-10 bg-transparent"><Footer isHome={pathname === '/'} /></div>
         <EnterpriseDemoDrawer />
         <CommandPaletteModal />

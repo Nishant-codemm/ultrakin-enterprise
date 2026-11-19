@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { ArrowRight, Check, Minus } from 'lucide-react';
 import { handleSpotlightMove } from '../lib/interaction';
+import { navigate } from '../lib/navigate';
 
-const APP_URL = 'https://app.ultrakin.com';
+const APP_URL = '/workspace';
 const SALES_EMAIL = 'mailto:sales@ultrakin.com?subject=Ultrakin%20plan%20questions';
 
 const plans = [
@@ -106,7 +107,19 @@ export default function PricingPage() {
                 {!plan.custom && plan.price.annual > 0 && <p className="mt-1 min-h-[16px] text-[11px] text-ink-muted">Billed {annual ? 'annually' : 'monthly'}</p>}
                 {!plan.custom && plan.price.annual === 0 && <p className="mt-1 min-h-[16px] text-[11px] text-ink-muted">Free for up to 10 users</p>}
                 {plan.custom && <p className="mt-1 min-h-[16px] text-[11px] text-ink-muted">Tailored scale & custom SLA</p>}
-                <a href={plan.href} target={plan.href.startsWith('mailto:') ? undefined : '_blank'} rel={plan.href.startsWith('mailto:') ? undefined : 'noreferrer'} className={`mt-5 inline-flex w-full min-h-10 items-center justify-center gap-2 rounded-xl px-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${plan.popular ? 'bg-brand text-white hover:bg-brand-hover shadow-[0_4px_12px_rgba(49,86,207,0.3)]' : 'border border-border bg-surface text-ink-soft hover:bg-surface-hover'}`}>{plan.button}<ArrowRight size={13} /></a>
+                <a
+                  href={plan.href}
+                  onClick={(e) => {
+                    if (plan.href.startsWith('/')) {
+                      e.preventDefault();
+                      navigate(plan.href);
+                    }
+                  }}
+                  className={`mt-5 inline-flex w-full min-h-10 items-center justify-center gap-2 rounded-xl px-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus ${plan.popular ? 'bg-brand text-white hover:bg-brand-hover shadow-[0_4px_12px_rgba(49,86,207,0.3)]' : 'border border-border bg-surface text-ink-soft hover:bg-surface-hover'}`}
+                >
+                  {plan.button}
+                  <ArrowRight size={13} />
+                </a>
               </div>
               <ul className="mt-6 flex-1 space-y-3 border-t border-border pt-5">
                 {plan.features.map((feature) => <li key={feature} className="flex items-start gap-2 text-[11px] leading-[1.55] text-ink-muted"><Check size={13} className="mt-0.5 shrink-0 text-brand-text" />{feature}</li>)}

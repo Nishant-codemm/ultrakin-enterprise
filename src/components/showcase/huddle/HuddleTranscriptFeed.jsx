@@ -9,6 +9,8 @@ import { cn } from '../../../lib/cn';
  */
 function HuddleTranscriptFeedComponent({
   transcript,
+  activeSpeakerName,
+  isSpeaking = true,
   onSimulateNextSpeech,
   onNavigateToDocs,
 }) {
@@ -49,11 +51,15 @@ function HuddleTranscriptFeedComponent({
               <div className="flex items-center gap-1.5 truncate">
                 <span className="font-semibold text-white truncate text-xs">{t.speaker}</span>
                 <span className="text-[10px] text-slate-400 font-mono">({t.role})</span>
-                {!t.isAgent && (
+                {!t.isAgent && isSpeaking && t.speaker === activeSpeakerName ? (
                   <span className="text-[9px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.2 rounded border border-emerald-500/20">
                     Speaker
                   </span>
-                )}
+                ) : !t.isAgent ? (
+                  <span className="text-[9px] font-mono text-slate-500 bg-white/[0.03] px-1.5 py-0.2 rounded border border-white/[0.06]">
+                    Recorded
+                  </span>
+                ) : null}
               </div>
               <span className="text-[10px] font-mono text-slate-400 shrink-0">{t.time}</span>
             </div>

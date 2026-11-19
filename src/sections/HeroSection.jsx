@@ -133,7 +133,7 @@ function HeroWorkspaceContent() {
               </p>
 
               {/* ── CTA Buttons ── */}
-              <div className="mt-7 flex flex-col items-start gap-2.5 sm:flex-row sm:items-center">
+              <div className="mt-7 flex flex-col w-full max-w-sm sm:max-w-none items-stretch sm:items-center sm:flex-row gap-2.5">
                 <Button
                   variant="primary"
                   size="lg"
@@ -146,7 +146,7 @@ function HeroWorkspaceContent() {
                 <Button
                   variant="secondary"
                   size="lg"
-                  className="w-full sm:w-auto text-[15px] px-6 h-12"
+                  className="w-full sm:w-auto text-[15px] px-6 h-12 border border-border/80 shadow-2xs"
                   iconRight={ArrowRight}
                   onClick={() => document.getElementById('workspace-showcase')?.scrollIntoView({ behavior: 'smooth' })}
                 >

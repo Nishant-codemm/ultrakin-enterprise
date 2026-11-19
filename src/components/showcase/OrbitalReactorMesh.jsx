@@ -366,6 +366,19 @@ function OrbitalReactorMesh({
   const targetConfig =
     COMPILED_ORBITAL_CONFIGS[targetNodeName] || COMPILED_ORBITAL_CONFIGS[defaultTarget];
 
+  // 400ms reactive radial glow ping on satellite activation or focus change
+  const [corePing, setCorePing] = useState(false);
+  const prevTargetRef = useRef(targetNodeName);
+
+  useEffect(() => {
+    if (prevTargetRef.current !== targetNodeName) {
+      prevTargetRef.current = targetNodeName;
+      setCorePing(true);
+      const timer = setTimeout(() => setCorePing(false), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [targetNodeName]);
+
   return (
     <div
       ref={containerRef}
@@ -583,6 +596,26 @@ function OrbitalReactorMesh({
           >
             {/* Specular Sheen */}
             <span className="pointer-events-none absolute inset-x-2 top-1.5 h-1/3 rounded-t-2xl bg-gradient-to-b from-white/[0.12] to-transparent" />
+
+            {/* 400ms reactive radial glow ping on satellite activation */}
+            <AnimatePresence>
+              {corePing && !reduceMotion && (
+                <motion.span
+                  key="core-ping-pulse"
+                  initial={{ opacity: 0.85, scale: 0.92 }}
+                  animate={{ opacity: 0, scale: 1.45 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className={cn(
+                    'pointer-events-none absolute -inset-2 rounded-[2rem] border-2',
+                    isExtension
+                      ? 'border-cyan-400 shadow-[0_0_32px_rgba(56,189,248,0.85)]'
+                      : 'border-indigo-400 shadow-[0_0_32px_rgba(99,102,241,0.85)]'
+                  )}
+                  aria-hidden="true"
+                />
+              )}
+            </AnimatePresence>
 
             {/* Central Ultrakin Core Icon */}
             <UltrakinLogo size={36} />

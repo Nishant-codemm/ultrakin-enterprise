@@ -92,7 +92,7 @@ export default function ProductPage() {
   const path = window.location.pathname.replace(/\/$/, '');
   const rawSlug = path === '/events' || path === '/calendar' || path === '/events/calendar'
     ? 'events'
-    : path.replace('/products/', '').replace('/products', '');
+    : (path === '/products/tasks' ? 'lists' : (path === '/agents' ? 'agents' : path.replace('/products/', '').replace('/products', '')));
   const slug = rawSlug || 'chat';
   const meta = PRODUCT_META[slug];
 
