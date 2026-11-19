@@ -10,24 +10,36 @@ function HuddleHeaderComponent({
   formattedCallTime,
   handRaised = false,
   participantCount = 4,
+  isCallActive = true,
 }) {
   return (
     <header className="h-12 px-4 border-b border-white/[0.08] bg-[#0B0F19]/90 backdrop-blur-md flex items-center justify-between select-none relative z-20">
       {/* Left: Active Room & Session Duration */}
       <div className="flex items-center gap-2.5 min-w-0">
         <span className="relative flex h-2 w-2" aria-hidden="true">
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+          <span className={`relative inline-flex rounded-full h-2 w-2 ${isCallActive ? 'bg-emerald-400' : 'bg-slate-500'}`} />
         </span>
         <div className="flex items-center gap-1.5 truncate">
           <span className="font-semibold text-xs text-white truncate">
-            Live Huddle: {channelName}
+            {isCallActive ? `Live Huddle: ${channelName}` : `Concluded Huddle: ${channelName}`}
           </span>
           <span className="text-[10px] text-slate-500" aria-hidden="true">·</span>
           <span 
-            className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 tabular-nums"
-            title="Elapsed Call Time"
+            className={`inline-flex items-center gap-1.5 text-[10px] font-mono px-2 py-0.5 rounded border tabular-nums ${
+              isCallActive 
+                ? 'text-rose-300 bg-rose-500/10 border-rose-500/25' 
+                : 'text-slate-400 bg-white/[0.04] border-white/[0.08]'
+            }`}
+            title={isCallActive ? "Active Recording & Audio Stream" : "Call Concluded"}
           >
-            {formattedCallTime}
+            {isCallActive ? (
+              <>
+                <span className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" aria-hidden="true" />
+                ● REC {formattedCallTime}
+              </>
+            ) : (
+              '● Call ended'
+            )}
           </span>
         </div>
         <span 
@@ -41,7 +53,7 @@ function HuddleHeaderComponent({
 
       {/* Right: Security & Session Status Indicators */}
       <div className="flex items-center gap-2 shrink-0">
-        {handRaised && (
+        {isCallActive && handRaised && (
           <span className="inline-flex items-center gap-1 text-[10px] font-mono text-amber-300 bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 rounded animate-pulse">
             <Hand className="w-3 h-3 text-amber-400" /> 1 Hand Raised
           </span>
@@ -54,8 +66,10 @@ function HuddleHeaderComponent({
           E2EE 256-bit
         </span>
         <div className="flex items-center gap-1.5 pl-2 border-l border-white/[0.08]">
-          <span className="w-2 h-2 rounded-full bg-emerald-400" aria-hidden="true" />
-          <span className="text-xs text-slate-300 font-medium">{participantCount} in room</span>
+          <span className={`w-2 h-2 rounded-full ${isCallActive ? 'bg-emerald-400' : 'bg-slate-500'}`} aria-hidden="true" />
+          <span className="text-xs text-slate-300 font-medium">
+            {isCallActive ? `${participantCount} in room` : 'Session archived'}
+          </span>
         </div>
       </div>
     </header>

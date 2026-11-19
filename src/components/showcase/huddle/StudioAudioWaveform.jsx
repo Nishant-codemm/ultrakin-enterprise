@@ -41,31 +41,35 @@ function StudioAudioWaveformComponent({ isSpeaking, isMuted, reduceMotion }) {
     );
   }
 
-  // Balanced studio VU meter amplitude profile
-  const peaks = [6, 12, 16, 19, 16, 12, 6];
+  // Stochastic, frequency-varied VAD speech cadence profile
+  const speechBars = [
+    { keyframes: ['3px', '11px', '5px', '14px', '4px'], duration: 0.32, delay: 0.02 },
+    { keyframes: ['4px', '16px', '8px', '12px', '5px'], duration: 0.26, delay: 0.05 },
+    { keyframes: ['5px', '18px', '9px', '19px', '6px'], duration: 0.38, delay: 0.00 },
+    { keyframes: ['6px', '15px', '11px', '20px', '7px'], duration: 0.29, delay: 0.04 },
+    { keyframes: ['4px', '17px', '7px', '14px', '4px'], duration: 0.41, delay: 0.03 },
+    { keyframes: ['3px', '13px', '6px', '15px', '5px'], duration: 0.27, delay: 0.06 },
+    { keyframes: ['3px', '9px', '4px', '12px', '3px'], duration: 0.34, delay: 0.01 },
+  ];
 
   return (
     <div 
       className="flex items-center justify-center gap-0.5 h-4 px-2 rounded-full bg-emerald-500/10 border border-emerald-500/25"
       aria-hidden="true"
     >
-      {peaks.map((peak, idx) => (
+      {speechBars.map((bar, idx) => (
         <motion.span
           key={idx}
           className="w-0.5 rounded-full bg-emerald-400"
           animate={{
-            height: [
-              `${Math.max(3, peak * 0.35)}px`,
-              `${peak}px`,
-              `${Math.max(3, peak * 0.45)}px`,
-            ],
+            height: bar.keyframes,
           }}
           transition={{
-            duration: 0.65 + idx * 0.04,
+            duration: bar.duration,
             repeat: Infinity,
-            repeatType: 'reverse',
+            repeatType: 'mirror',
             ease: 'easeInOut',
-            delay: idx * 0.06,
+            delay: bar.delay,
           }}
         />
       ))}

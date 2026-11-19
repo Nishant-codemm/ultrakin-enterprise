@@ -644,20 +644,18 @@ function WorkflowSpotlight() {
                             </div>
                           </div>
 
-                          {/* Action button advancing narrative */}
+                          {/* Action button advancing narrative — Contained in-demo micro-CTA */}
                           <button
                             type="button"
                             onClick={() => setActiveStageIdx(currentStage.right.nextStage)}
                             className={cn(
-                              'mt-4 flex min-h-9 w-full items-center justify-center gap-2 rounded-md px-3 text-[11px] font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-obsidian-focus focus-visible:ring-offset-2 focus-visible:ring-offset-obsidian-base cursor-pointer',
+                              'mt-3.5 flex h-8 w-full items-center justify-center gap-1.5 rounded-lg px-3 text-[11px] font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 cursor-pointer active:scale-[0.99]',
                               activeStageIdx === 5
-                                ? 'bg-emerald-400/15 text-emerald-200 hover:bg-emerald-400/25 border border-emerald-400/30'
-                                : activeStageIdx === 3 || activeStageIdx === 4
-                                ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-[0_4px_12px_rgba(99,102,241,0.35)]'
-                                : 'bg-brand text-white hover:bg-brand-hover shadow-[0_4px_12px_rgba(49,86,207,0.3)]',
+                                ? 'border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'
+                                : 'border border-indigo-500/30 bg-[#161F38] text-indigo-200 hover:bg-[#1E2B4D] hover:text-white hover:border-indigo-400/50 shadow-2xs'
                             )}
                           >
-                            <ActionIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                            <ActionIcon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                             <span>{currentStage.right.actionText}</span>
                           </button>
                         </motion.div>

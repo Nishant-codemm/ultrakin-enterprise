@@ -52,7 +52,7 @@ function HuddleSharedCanvasComponent({
           </div>
         </div>
 
-        {/* Anchored Multiplayer Cursor 1 (Sara Chen - Principal Infra Lead) */}
+        {/* Anchored Multiplayer Cursor 1 (Sara Chen - Principal Infra Lead) — Aperiodic reading path */}
         <motion.div
           className="absolute pointer-events-none z-10 flex items-center gap-1.5"
           style={{ left: '44%', top: '38%' }}
@@ -60,11 +60,16 @@ function HuddleSharedCanvasComponent({
             reduceMotion
               ? undefined
               : {
-                  x: [0, 6, 0],
-                  y: [0, 3, 0],
+                  x: [0, 38, 38, 72, 72, 24, 0],
+                  y: [0, 2, 2, 26, 26, 14, 0],
                 }
           }
-          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            times: [0, 0.22, 0.42, 0.62, 0.8, 0.92, 1],
+          }}
         >
           <svg className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400 drop-shadow" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87a.5.5 0 0 0 .35-.85L6.35 2.85a.5.5 0 0 0-.85.36z" />
@@ -74,7 +79,7 @@ function HuddleSharedCanvasComponent({
           </span>
         </motion.div>
 
-        {/* Anchored Multiplayer Cursor 2 (Alex Mercer - CTO) */}
+        {/* Anchored Multiplayer Cursor 2 (Alex Mercer - CTO) — Distinct inspection trajectory */}
         <motion.div
           className="absolute pointer-events-none z-10 flex items-center gap-1.5"
           style={{ left: '72%', top: '68%' }}
@@ -82,11 +87,17 @@ function HuddleSharedCanvasComponent({
             reduceMotion
               ? undefined
               : {
-                  x: [0, -6, 0],
-                  y: [0, 3, 0],
+                  x: [0, -42, -42, -18, -18, -55, -55, 0],
+                  y: [0, -12, -12, -28, -28, -16, -16, 0],
                 }
           }
-          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 1.2,
+            times: [0, 0.2, 0.38, 0.52, 0.68, 0.82, 0.92, 1],
+          }}
         >
           <svg className="w-3.5 h-3.5 text-indigo-400 fill-indigo-400 drop-shadow" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.87a.5.5 0 0 0 .35-.85L6.35 2.85a.5.5 0 0 0-.85.36z" />

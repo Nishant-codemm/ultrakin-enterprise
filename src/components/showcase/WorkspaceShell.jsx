@@ -345,6 +345,10 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
       <div
         role="tablist"
         aria-label="Mobile workspace modules"
+        style={{
+          maskImage: 'linear-gradient(to right, black 85%, transparent 100%)',
+          WebkitMaskImage: 'linear-gradient(to right, black 85%, transparent 100%)',
+        }}
         className="flex md:hidden items-center gap-1.5 px-3 py-2 bg-obsidian-surface border-b border-obsidian-border overflow-x-auto select-none scrollbar-none"
       >
         {[

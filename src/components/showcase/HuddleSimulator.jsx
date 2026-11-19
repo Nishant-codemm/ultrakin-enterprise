@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { Sparkles, CheckSquare } from 'lucide-react';
 import { useWorkspace } from '../../context/useWorkspace';
 import { HuddleHeader } from './huddle/HuddleHeader';
 import { HuddleParticipantTile } from './huddle/HuddleParticipantTile';
@@ -7,6 +8,7 @@ import { HuddleSharedCanvas } from './huddle/HuddleSharedCanvas';
 import { HuddleAISynthesisCard } from './huddle/HuddleAISynthesisCard';
 import { HuddleTranscriptFeed } from './huddle/HuddleTranscriptFeed';
 import { HuddleControlBar } from './huddle/HuddleControlBar';
+import TypewriterText from '../product/TypewriterText';
 
 const SPEECH_SCENARIOS = [
   {
@@ -102,6 +104,7 @@ function HuddleSimulator() {
   const [activeSpeaker, setActiveSpeaker] = useState('Sara Chen');
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [handRaised, setHandRaised] = useState(false);
+  const [isCallActive, setIsCallActive] = useState(true);
   const [floatingReactions, setFloatingReactions] = useState([]);
   const [callSeconds, setCallSeconds] = useState(504); // 08:24
   const reactionIdRef = useRef(0);
@@ -215,9 +218,9 @@ function HuddleSimulator() {
   }, [speechPromptIdx, simulateHuddleUtterance]);
 
   const handleLeaveCall = useCallback(() => {
-    setActiveModule('chat');
-    addToast('Huddle Concluded', 'Left session. Full meeting transcript linked in #architecture-rfc.', 'info');
-  }, [setActiveModule, addToast]);
+    setIsCallActive(false);
+    addToast('Huddle Concluded', 'Session concluded. Autonomous AI synthesis and action items generated.', 'info');
+  }, [addToast]);
 
   const currentScenario = SPEECH_SCENARIOS[speechPromptIdx % SPEECH_SCENARIOS.length];
 
@@ -229,89 +232,186 @@ function HuddleSimulator() {
         formattedCallTime={formattedCallTime}
         handRaised={handRaised}
         participantCount={PARTICIPANTS.length}
+        isCallActive={isCallActive}
       />
 
-      {/* 2. Main Collaborative Stage */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3.5 p-3.5 overflow-y-auto relative">
-        {/* Left Column (7 cols): Voice Tiles + Shared Canvas + AI Synthesis */}
-        <div className="lg:col-span-7 flex flex-col gap-3 min-h-0">
-          {/* SFU Audio Stream Tiles */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 relative">
-            {PARTICIPANTS.map((participant) => {
-              const isCurrentActive = activeSpeaker === participant.name;
-              const isSaraMuted = participant.name === 'Sara Chen' && huddleMuted;
-              const isSpeakingNow = isCurrentActive && !isSaraMuted;
+      <AnimatePresence mode="wait">
+        {isCallActive ? (
+          <motion.div
+            key="active-huddle-stage"
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.25 }}
+            className="flex-1 flex flex-col min-h-0"
+          >
+            {/* 2. Main Collaborative Stage */}
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3.5 p-3.5 overflow-y-auto relative">
+              {/* Left Column (7 cols): Voice Tiles + Shared Canvas + AI Synthesis */}
+              <div className="lg:col-span-7 flex flex-col gap-3 min-h-0">
+                {/* SFU Audio Stream Tiles */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 relative">
+                  {PARTICIPANTS.map((participant) => {
+                    const isCurrentActive = activeSpeaker === participant.name;
+                    const isSaraMuted = participant.name === 'Sara Chen' && huddleMuted;
+                    const isSpeakingNow = isCurrentActive && !isSaraMuted;
 
-              return (
-                <HuddleParticipantTile
-                  key={participant.id}
-                  participant={participant}
-                  isSpeakingNow={isSpeakingNow}
-                  isMuted={participant.muted || isSaraMuted}
-                  onFocusSpeaker={setActiveSpeaker}
+                    return (
+                      <HuddleParticipantTile
+                        key={participant.id}
+                        participant={participant}
+                        isSpeakingNow={isSpeakingNow}
+                        isMuted={participant.muted || isSaraMuted}
+                        onFocusSpeaker={setActiveSpeaker}
+                        reduceMotion={reduceMotion}
+                      />
+                    );
+                  })}
+                </div>
+
+                {/* Interactive Shared Canvas */}
+                <HuddleSharedCanvas
+                  screenShareActive={huddleScreenShareActive}
+                  onToggleScreenShare={handleToggleScreenShare}
                   reduceMotion={reduceMotion}
                 />
-              );
-            })}
-          </div>
 
-          {/* Interactive Shared Canvas */}
-          <HuddleSharedCanvas
-            screenShareActive={huddleScreenShareActive}
-            onToggleScreenShare={handleToggleScreenShare}
-            reduceMotion={reduceMotion}
-          />
+                {/* Ukin Autonomous Commitment Synthesis */}
+                <HuddleAISynthesisCard
+                  currentScenario={currentScenario}
+                  taskSynced={huddleTaskSynced}
+                  docSynced={huddleDocSynced}
+                  onSyncTask={syncHuddleCommitment}
+                  onSyncDoc={synthesizeHuddleToDoc}
+                />
+              </div>
 
-          {/* Ukin Autonomous Commitment Synthesis */}
-          <HuddleAISynthesisCard
-            currentScenario={currentScenario}
-            taskSynced={huddleTaskSynced}
-            docSynced={huddleDocSynced}
-            onSyncTask={syncHuddleCommitment}
-            onSyncDoc={synthesizeHuddleToDoc}
-          />
-        </div>
+              {/* Right Column (5 cols): Automated STT Transcription Stream */}
+              <HuddleTranscriptFeed
+                transcript={huddleTranscript}
+                activeSpeakerName={activeSpeaker}
+                isSpeaking={!huddleMuted}
+                onSimulateNextSpeech={handleSimulateNextSpeech}
+                onNavigateToDocs={() => setActiveModule('docs')}
+              />
 
-        {/* Right Column (5 cols): Automated STT Transcription Stream */}
-        <HuddleTranscriptFeed
-          transcript={huddleTranscript}
-          activeSpeakerName={activeSpeaker}
-          isSpeaking={!huddleMuted}
-          onSimulateNextSpeech={handleSimulateNextSpeech}
-          onNavigateToDocs={() => setActiveModule('docs')}
-        />
+              {/* Floating Reactions Layer — Anchored to Right Margin for Visual Calm */}
+              <AnimatePresence>
+                {floatingReactions.map((r) => (
+                  <motion.div
+                    key={r.id}
+                    initial={{ opacity: 1, y: 0, scale: 0.85 }}
+                    animate={{ opacity: 0, y: -140, scale: 1.25 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1.8, ease: 'easeOut' }}
+                    style={{ right: `${r.right}px`, bottom: '65px' }}
+                    className="pointer-events-none absolute text-2xl z-40 drop-shadow-lg"
+                  >
+                    {r.emoji}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
 
-        {/* Floating Reactions Layer — Anchored to Right Margin for Visual Calm */}
-        <AnimatePresence>
-          {floatingReactions.map((r) => (
-            <motion.div
-              key={r.id}
-              initial={{ opacity: 1, y: 0, scale: 0.85 }}
-              animate={{ opacity: 0, y: -140, scale: 1.25 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.8, ease: 'easeOut' }}
-              style={{ right: `${r.right}px`, bottom: '65px' }}
-              className="pointer-events-none absolute text-2xl z-40 drop-shadow-lg"
-            >
-              {r.emoji}
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+            {/* 3. Media Controls & Reaction Dock */}
+            <HuddleControlBar
+              huddleMuted={huddleMuted}
+              cameraEnabled={cameraEnabled}
+              screenShareActive={huddleScreenShareActive}
+              handRaised={handRaised}
+              onToggleMute={handleToggleMute}
+              onToggleCamera={handleToggleCamera}
+              onToggleScreenShare={handleToggleScreenShare}
+              onToggleHandRaise={toggleHandRaise}
+              onSendReaction={handleReaction}
+              onLeaveCall={handleLeaveCall}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="post-huddle-summary"
+            initial={reduceMotion ? false : { opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="flex-1 p-4 md:p-6 flex flex-col items-center justify-center overflow-y-auto"
+          >
+            <div className="w-full max-w-2xl rounded-2xl border border-indigo-500/25 bg-[#0B0F19]/95 p-6 shadow-2xl backdrop-blur-xl">
+              <div className="flex items-center justify-between border-b border-white/[0.08] pb-4 mb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-8 w-8 rounded-xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center border border-indigo-500/30">
+                    <Sparkles size={16} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-white">Post-Huddle Autonomous Synthesis</h3>
+                    <p className="text-[11px] text-slate-400 font-mono">Channel: #architecture-rfc · Session Duration: {formattedCallTime}</p>
+                  </div>
+                </div>
+                <span className="text-[10px] font-mono font-medium text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  Auto-Synced to Living RFC
+                </span>
+              </div>
 
-      {/* 3. Media Controls & Reaction Dock */}
-      <HuddleControlBar
-        huddleMuted={huddleMuted}
-        cameraEnabled={cameraEnabled}
-        screenShareActive={huddleScreenShareActive}
-        handRaised={handRaised}
-        onToggleMute={handleToggleMute}
-        onToggleCamera={handleToggleCamera}
-        onToggleScreenShare={handleToggleScreenShare}
-        onToggleHandRaise={toggleHandRaise}
-        onSendReaction={handleReaction}
-        onLeaveCall={handleLeaveCall}
-      />
+              <div className="space-y-4">
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1.5">
+                    Executive Summary (Ukin Scribe)
+                  </span>
+                  <div className="p-3.5 rounded-xl bg-black/40 border border-white/[0.06] text-xs text-slate-200 leading-relaxed font-sans">
+                    <TypewriterText
+                      text="The engineering lead team finalized the Redis Sentinel consensus protocol with quorum = 2 for EU-04 failover. Sara Chen confirmed the token refresh Canary verification in PR #1042. Marcus Lindqvist updated the on-call rota and verified Sprint 24 Task #4082 on Kanban. Alex Mercer committed the architectural sign-off rule directly to living documentation."
+                      speed={18}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 block mb-1.5">
+                    Captured Action Items & Commitments (3)
+                  </span>
+                  <div className="space-y-2">
+                    {[
+                      { task: 'PR #1042 Canary checks added to launch checklist', owner: 'Sara Chen', status: 'Completed' },
+                      { task: 'Sprint 24 Task #4082 moved to Done on Kanban board', owner: 'Marcus Lindqvist', status: 'Completed' },
+                      { task: 'Redis Sentinel quorum = 2 RFC post-mortem signed off', owner: 'Alex Mercer', status: 'Documented' },
+                    ].map((action, i) => (
+                      <div
+                        key={i}
+                        className="flex items-center justify-between gap-3 p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.05] text-xs"
+                      >
+                        <div className="flex items-center gap-2 text-slate-200">
+                          <CheckSquare size={14} className="text-indigo-400 shrink-0" />
+                          <span>{action.task}</span>
+                        </div>
+                        <span className="text-[10px] font-mono text-emerald-400 shrink-0 bg-emerald-500/10 px-2 py-0.5 rounded">
+                          {action.owner} · {action.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-white/[0.08] flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsCallActive(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-white/[0.12] bg-white/[0.04] text-xs font-semibold text-slate-200 hover:bg-white/[0.08] transition-colors cursor-pointer"
+                >
+                  Rejoin Huddle
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveModule('chat')}
+                  className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-brand text-xs font-semibold text-white hover:bg-brand-hover shadow-md transition-colors cursor-pointer"
+                >
+                  Return to Chat
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

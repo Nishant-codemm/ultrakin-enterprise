@@ -230,8 +230,28 @@ export function LaserConduit2({ reduceMotion }) {
 }
 
 /* ── Center: Light-Mode Enterprise Intelligence Core Card with Official Ultrakin Logo ── */
-export function NeuralCoreCard({ activeSignal }) {
-  const reduceMotion = useReducedMotion();
+export function NeuralCoreCard({ activeSignal, reduceMotion: reduceMotionProp }) {
+  const systemReduceMotion = useReducedMotion();
+  const reduceMotion = reduceMotionProp ?? systemReduceMotion;
+  const [coreState, setCoreState] = useState(reduceMotion ? 'READY' : 'SYNTHESIZING');
+
+  useEffect(() => {
+    if (reduceMotion) return;
+
+    const timer1 = setTimeout(() => {
+      setCoreState('COMPLETE');
+    }, 1400);
+
+    const timer2 = setTimeout(() => {
+      setCoreState('READY');
+    }, 2800);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [reduceMotion]);
+
   return (
     <div
       className="relative flex h-[204px] w-[190px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl p-3.5 select-none bg-white border border-slate-200/90 shadow-[0_12px_28px_-8px_rgba(15,23,42,0.08),0_2px_6px_-1px_rgba(15,23,42,0.04),inset_0_1px_0_rgba(255,255,255,1)]"
@@ -245,10 +265,24 @@ export function NeuralCoreCard({ activeSignal }) {
           <UltrakinLogo size={18} />
           <span className="text-[11.5px] font-semibold tracking-tight text-slate-900">Ultrakin Core</span>
         </div>
-        <div className="flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] font-mono text-emerald-700 font-medium">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-          <span>SYNTHESIZING</span>
-        </div>
+        {coreState === 'SYNTHESIZING' && (
+          <div className="flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] font-mono text-emerald-700 font-medium transition-colors">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+            <span>SYNTHESIZING</span>
+          </div>
+        )}
+        {coreState === 'COMPLETE' && (
+          <div className="flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-100/80 px-2 py-0.5 text-[9px] font-mono text-emerald-800 font-semibold transition-colors">
+            <span className="text-[10px] text-emerald-600 leading-none">✓</span>
+            <span>COMPLETE</span>
+          </div>
+        )}
+        {coreState === 'READY' && (
+          <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[9px] font-mono text-slate-600 font-medium transition-colors">
+            <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
+            <span>READY</span>
+          </div>
+        )}
       </div>
 
       {/* Middle: Clear Real-World Context & Intent Correlation */}
@@ -587,7 +621,7 @@ export default function HeroInteractiveStage() {
 
               {/* Column 3: Center Neural Core Card (Width 190px) */}
               <div style={{ transform: 'translateZ(28px)' }}>
-                <NeuralCoreCard activeSignal={activeSignal} reduceMotion={reduceMotion} />
+                <NeuralCoreCard key={activeSignal.id} activeSignal={activeSignal} reduceMotion={reduceMotion} />
               </div>
 
               {/* Column 4: SVG Laser Conduit 2 (Height 184px, Width 24px) */}

@@ -36,6 +36,38 @@ function MatrixChatEngine() {
   const [userReactions, setUserReactions] = useState({});
   const [showNewMessagesPill, setShowNewMessagesPill] = useState(false);
   const [prevChannel, setPrevChannel] = useState(activeChannel);
+  const [isSaraTyping, setIsSaraTyping] = useState(false);
+
+  // Ambient peer presence: simulate Sara Chen typing cadence (3s active / 10s idle)
+  useEffect(() => {
+    let activeTimer;
+    let idleTimer;
+    let isMounted = true;
+
+    const runTypingCycle = () => {
+      if (!isMounted) return;
+      setIsSaraTyping(true);
+      activeTimer = setTimeout(() => {
+        if (!isMounted) return;
+        setIsSaraTyping(false);
+        idleTimer = setTimeout(() => {
+          if (!isMounted) return;
+          runTypingCycle();
+        }, 10000);
+      }, 3000);
+    };
+
+    const initialDelay = setTimeout(() => {
+      runTypingCycle();
+    }, 3500);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(initialDelay);
+      clearTimeout(activeTimer);
+      clearTimeout(idleTimer);
+    };
+  }, []);
 
   // Synchronously adjust state during render on channel switch (React recommended pattern)
   if (prevChannel !== activeChannel) {
@@ -515,6 +547,20 @@ function MatrixChatEngine() {
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.3s]" />
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.15s]" />
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" />
+            </span>
+          </div>
+        )}
+
+        {/* Subtle Ambient Peer Typing Indicator (Sara Chen cycling 3s active / 10s idle) */}
+        {isSaraTyping && !isAgentTyping && (
+          <div className="flex items-center gap-2 px-2 py-1 text-[11px] text-slate-400 select-none animate-in fade-in duration-200">
+            <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="font-medium text-slate-300">Sara Chen</span>
+            <span>is typing</span>
+            <span className="inline-flex items-center gap-0.5 ml-0.5">
+              <span className="h-1 w-1 rounded-full bg-slate-400 animate-bounce [animation-delay:-0.3s]" />
+              <span className="h-1 w-1 rounded-full bg-slate-400 animate-bounce [animation-delay:-0.15s]" />
+              <span className="h-1 w-1 rounded-full bg-slate-400 animate-bounce" />
             </span>
           </div>
         )}
