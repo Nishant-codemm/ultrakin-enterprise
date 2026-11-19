@@ -191,10 +191,10 @@ const MenuItem = memo(function MenuItem({ item, onSelect }) {
       type="button"
       role="menuitem"
       onClick={() => onSelect(item)}
-      className="group flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left transition-colors duration-150 hover:bg-surface-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 cursor-pointer"
+      className="group flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left transition-all duration-150 hover:bg-surface-hover active:scale-[0.985] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 cursor-pointer"
     >
       <span
-        className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] shadow-[0_1px_3px_rgba(0,0,0,0.12)] transition-transform duration-150 group-hover:scale-105 ${
+        className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-[9px] shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_1px_3px_rgba(0,0,0,0.14)] transition-transform duration-150 group-hover:scale-105 ${
           item.color || 'bg-brand text-white'
         }`}
       >
@@ -203,7 +203,7 @@ const MenuItem = memo(function MenuItem({ item, onSelect }) {
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-1.5 text-[13px] font-semibold text-ink leading-tight">
           {item.title}
-          <ArrowDownRight size={12} className="opacity-0 transition-all group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:opacity-70 text-ink-muted" />
+          <ArrowDownRight size={12} className="opacity-0 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-0.5 group-hover:translate-y-0.5 group-hover:opacity-70 text-ink-muted" />
         </span>
         <span className="mt-1 block max-w-[240px] text-xs leading-[1.45] text-ink-muted">{item.description}</span>
       </span>
@@ -217,10 +217,10 @@ const SolutionMenuItem = memo(function SolutionMenuItem({ item, onSelect }) {
       type="button"
       role="menuitem"
       onClick={() => onSelect(item)}
-      className="group flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-[14.5px] font-medium text-ink transition-colors duration-150 hover:bg-surface-soft hover:text-brand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 cursor-pointer"
+      className="group flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-[14.5px] font-medium text-ink transition-all duration-150 hover:bg-surface-soft hover:text-brand active:scale-[0.985] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand/40 cursor-pointer"
     >
       <span>{item.title}</span>
-      <ArrowRight size={13} className="opacity-0 -translate-x-1 transition-all duration-150 group-hover:opacity-100 group-hover:translate-x-0 text-brand shrink-0" />
+      <ArrowRight size={13} className="opacity-0 -translate-x-1 transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-100 group-hover:translate-x-0 text-brand shrink-0" />
     </button>
   );
 });
@@ -271,19 +271,23 @@ function Navbar() {
           return;
         }
 
-        const readingLine = Math.min(window.innerHeight * 0.35, window.innerHeight - 1);
-        const sections = homeScrollSpySections
-          .map(([id, navItem]) => ({ element: document.getElementById(id), navItem }))
-          .filter(({ element }) => element);
-        const visibleSection = sections.find(({ element }) => {
-          const bounds = element.getBoundingClientRect();
-          return bounds.top <= readingLine && bounds.bottom > readingLine;
-        });
-        const lastPassedSection = [...sections].reverse().find(({ element }) => (
-          element.getBoundingClientRect().top <= readingLine
-        ));
-        const currentSection = visibleSection || lastPassedSection;
-        setActiveStickyItem(currentSection?.navItem ?? null);
+        const scrollY = window.scrollY;
+        const readingLine = scrollY + Math.min(window.innerHeight * 0.35, window.innerHeight - 1);
+        let currentItem = null;
+
+        for (const [id, navItem] of homeScrollSpySections) {
+          const el = document.getElementById(id);
+          if (!el) continue;
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (top <= readingLine && top + height > readingLine) {
+            currentItem = navItem;
+            break;
+          } else if (top <= readingLine) {
+            currentItem = navItem;
+          }
+        }
+        setActiveStickyItem(currentItem);
       });
     };
     updateActiveItem();
@@ -394,10 +398,6 @@ function Navbar() {
     ? { initial: false, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.01 } }
     : { initial: { opacity: 0, y: 6 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: 4 }, transition: { duration: 0.18, ease: SMOOTH_EASE } };
 
-  const solutionsMenuMotion = reduceMotion
-    ? { initial: false, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.01 } }
-    : { initial: { opacity: 0, y: 6 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: 4 }, transition: { duration: 0.18, ease: SMOOTH_EASE } };
-
   const routeName = window.location.pathname.replace(/^\//, '').replace(/\/$/, '');
   const activePageRoute = ['workspace', 'agents', 'security', 'pricing'].includes(routeName) ? routeName : '';
   const getCurrentNavState = (id) => activePageRoute
@@ -408,24 +408,24 @@ function Navbar() {
     <nav
       ref={navRef}
       aria-label="Main navigation"
-      className={`fixed inset-x-0 top-0 z-[100] border-b transition-[background-color,border-color,box-shadow] duration-300 ${scrolled || openMenu ? 'border-border bg-surface-glass/90 shadow-[0_10px_35px_rgba(30,35,45,.09)] backdrop-blur-xl' : 'border-transparent bg-surface-glass/80 backdrop-blur-md'}`}
+      className={`fixed inset-x-0 top-0 z-[100] border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300 ${scrolled || openMenu ? 'border-border/80 bg-surface-glass/95 shadow-[0_10px_35px_rgba(30,35,45,.08),0_1px_2px_rgba(0,0,0,.02)] backdrop-blur-xl backdrop-saturate-[160%]' : 'border-transparent bg-surface-glass/85 backdrop-blur-md backdrop-saturate-[140%]'}`}
       onMouseLeave={leaveMenu}
     >
       {/* Scroll progress hairline indicator (M-06) */}
       {!reduceMotion && (
         <motion.div
           aria-hidden="true"
-          className="pointer-events-none absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-brand via-indigo-500 to-sky-400 origin-left"
+          className="pointer-events-none absolute bottom-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-brand via-indigo-500 to-sky-400 origin-left shadow-[0_0_8px_rgba(49,86,207,0.45)]"
           style={{ scaleX: scrollYProgress }}
         />
       )}
       <AnimatePresence mode="wait" initial={false}>
       {isHeroVisible ? (
-      <motion.div key="full-navigation" {...compactTransition} className="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-10">
+      <motion.div key="full-navigation" {...compactTransition} className="mx-auto grid h-16 max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-5 sm:px-8 lg:px-10">
         <a
           href="/"
           aria-label="Ultrakin home"
-          className="group inline-flex shrink-0 items-center gap-2.5 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70"
+          className="group inline-flex shrink-0 items-center gap-2.5 rounded-md justify-self-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50"
           onClick={(event) => {
             event.preventDefault();
             if (window.location.pathname !== '/') {
@@ -439,7 +439,7 @@ function Navbar() {
           <span className="text-[17px] font-semibold tracking-[-0.045em] text-ink">Ultrakin</span>
         </a>
 
-        <div className="hidden h-full items-center gap-1 lg:flex">
+        <div className="hidden h-full items-center gap-1 lg:flex justify-self-center group/nav">
           {['Product', 'Solutions', 'Resources'].map((name) => (
             <button
               key={name}
@@ -450,9 +450,9 @@ function Navbar() {
               onMouseEnter={() => enterMenu(name)}
               onFocus={() => enterMenu(name)}
               onClick={() => setOpenMenu((current) => current === name ? null : name)}
-              className={`inline-flex h-10 items-center gap-1.5 rounded-lg px-3.5 text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 ${openMenu === name ? 'text-ink' : 'text-ink-muted hover:bg-surface-soft hover:text-ink'}`}
+              className={`inline-flex h-9 items-center gap-1.5 rounded-lg px-3.5 text-[13px] font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 ${openMenu === name ? 'text-ink bg-surface-soft/80' : 'text-ink-muted group-hover/nav:text-ink-subtle hover:!text-ink hover:bg-surface-soft/60'}`}
             >
-              {name}<ChevronDown size={14} className={`text-ink-subtle transition-transform duration-200 ${openMenu === name ? 'rotate-180' : ''}`} />
+              {name}<ChevronDown size={14} className={`text-ink-subtle transition-transform duration-240 ease-[cubic-bezier(0.16,1,0.3,1)] ${openMenu === name ? 'rotate-180 text-ink' : ''}`} />
             </button>
           ))}
           <a
@@ -460,7 +460,7 @@ function Navbar() {
             onClick={(e) => { e.preventDefault(); navigate('/security'); }}
             onMouseEnter={() => prefetch(loadSecurity, 'pages/SecurityPage')}
             onFocus={() => prefetch(loadSecurity, 'pages/SecurityPage')}
-            className="rounded-lg px-3.5 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70"
+            className="inline-flex h-9 items-center rounded-lg px-3.5 text-[13px] font-medium text-ink-muted transition-all duration-200 group-hover/nav:text-ink-subtle hover:!text-ink hover:bg-surface-soft/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50"
           >
             Security
           </a>
@@ -469,31 +469,31 @@ function Navbar() {
             onClick={(e) => { e.preventDefault(); navigate('/pricing'); }}
             onMouseEnter={() => prefetch(loadPricing, 'pages/PricingPage')}
             onFocus={() => prefetch(loadPricing, 'pages/PricingPage')}
-            className="rounded-lg px-3.5 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70"
+            className="inline-flex h-9 items-center rounded-lg px-3.5 text-[13px] font-medium text-ink-muted transition-all duration-200 group-hover/nav:text-ink-subtle hover:!text-ink hover:bg-surface-soft/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50"
           >
             Pricing
           </a>
         </div>
 
-        <div className="hidden shrink-0 items-center gap-2.5 lg:flex">
-          <button type="button" onClick={openSearchPalette} aria-label="Search Ultrakin" className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">
-            <Search size={17} strokeWidth={1.8} />
+        <div className="hidden shrink-0 items-center gap-2.5 lg:flex justify-self-end">
+          <button type="button" onClick={openSearchPalette} aria-label="Search Ultrakin" className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-all duration-150 hover:bg-surface-soft hover:text-ink active:scale-[0.97] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 cursor-pointer">
+            <Search size={16} strokeWidth={1.8} />
           </button>
-          <button type="button" onClick={openDemoDrawer} className="rounded-lg border border-transparent px-3.5 py-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:border-border hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">Talk with us</button>
-          <a href={APP_URL} target="_blank" rel="noreferrer" className="group inline-flex h-10 items-center gap-2 rounded-lg border border-brand/20 bg-brand px-4 text-[13px] font-semibold text-white shadow-[0_4px_14px_rgba(49,86,207,.18)] transition-[background-color,box-shadow,transform] hover:-translate-y-px hover:bg-brand-hover hover:shadow-[0_7px_18px_rgba(49,86,207,.24)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-page">
-            Open Ultrakin<ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
+          <button type="button" onClick={openDemoDrawer} className="inline-flex h-9 items-center rounded-lg border border-border/40 px-3.5 text-[13px] font-medium text-ink-muted transition-all duration-150 hover:border-border/80 hover:bg-surface-soft/60 hover:text-ink active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 cursor-pointer">Talk with us</button>
+          <a href={APP_URL} target="_blank" rel="noreferrer" className="group inline-flex h-9 items-center gap-2 rounded-lg border border-brand/20 bg-brand px-4 text-[13px] font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_4px_14px_rgba(49,86,207,.18)] transition-all duration-150 hover:-translate-y-px hover:bg-brand-hover hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_7px_18px_rgba(49,86,207,.24)] active:translate-y-0 active:scale-[0.985] active:shadow-[inset_0_1px_0_rgba(255,255,255,0.15),0_2px_8px_rgba(49,86,207,.20)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 cursor-pointer will-change-transform">
+            Open Ultrakin<ArrowRight size={14} className="transition-transform duration-150 group-hover:translate-x-0.5" />
           </a>
         </div>
 
-        <div className="flex items-center gap-2 lg:hidden">
-          <button type="button" onClick={openSearchPalette} aria-label="Search Ultrakin" className="flex h-10 w-10 items-center justify-center rounded-lg text-ink-muted hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70"><Search size={18} /></button>
-          <button ref={mobileMenuToggleRef} type="button" onClick={() => { setMobileOpen((value) => !value); setMobileGroup(null); }} aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'} aria-expanded={mobileOpen} aria-controls="full-mobile-navigation" className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-ink transition-colors hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70">
+        <div className="flex items-center gap-2 lg:hidden justify-self-end">
+          <button type="button" onClick={openSearchPalette} aria-label="Search Ultrakin" className="flex h-10 w-10 items-center justify-center rounded-lg text-ink-muted hover:bg-surface-soft focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50"><Search size={18} /></button>
+          <button ref={mobileMenuToggleRef} type="button" onClick={() => { setMobileOpen((value) => !value); setMobileGroup(null); }} aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'} aria-expanded={mobileOpen} aria-controls="full-mobile-navigation" className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-ink transition-colors hover:bg-surface-soft active:scale-[0.97] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50">
             {mobileOpen ? <X size={19} /> : <Menu size={19} />}
           </button>
         </div>
       </motion.div>
       ) : (
-        <motion.div key="compact-navigation" {...compactTransition} className="relative mx-auto flex h-14 max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-10">
+        <motion.div key="compact-navigation" {...compactTransition} className="relative mx-auto grid h-14 max-w-[1440px] grid-cols-[1fr_auto_1fr] items-center px-5 sm:px-8 lg:px-10">
           <a
             href="/"
             aria-label="Ultrakin home"
@@ -505,13 +505,13 @@ function Navbar() {
                 scrollToSection('hero');
               }
             }}
-            className="inline-flex shrink-0 items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70"
+            className="inline-flex shrink-0 items-center gap-2 rounded-md justify-self-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50"
           >
             <UltrakinLogo size={27} />
             <span className="text-[15px] font-semibold tracking-[-0.045em] text-ink">Ultrakin</span>
           </a>
 
-          <div className="hidden items-center gap-1 md:flex">
+          <div className="hidden items-center gap-1 md:flex justify-self-center group/sticky-nav">
             {[
               { id: 'features', label: 'Features', href: '/' },
               { id: 'workspace', label: 'Workspace', href: '/workspace' },
@@ -534,25 +534,26 @@ function Navbar() {
                   }
                 }}
                 aria-current={getCurrentNavState(item.id)}
-                className={`rounded-md px-3 py-2 text-[12px] font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 ${activeStickyItem === item.id ? 'text-ink' : 'text-ink-muted hover:text-ink'}`}
+                className={`rounded-md px-3 py-1.5 text-[12px] font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 ${activeStickyItem === item.id ? 'text-ink font-semibold' : 'text-ink-muted group-hover/sticky-nav:text-ink-subtle hover:!text-ink'}`}
               >
                 {item.label}
-                <span className={`mt-1 block h-px rounded-full transition-colors ${activeStickyItem === item.id ? 'bg-brand/80' : 'bg-transparent'}`} />
+                <span className={`mt-1 block h-px rounded-full transition-all duration-200 ${activeStickyItem === item.id ? 'bg-brand/80' : 'bg-transparent'}`} />
               </a>
             ))}
             <a
               href="/pricing"
               onClick={(e) => { e.preventDefault(); navigate('/pricing'); }}
               aria-current={getCurrentNavState('pricing')}
-              className={`rounded-md px-3 py-2 text-[12px] font-medium transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 ${activeStickyItem === 'pricing' ? 'text-ink' : 'text-ink-muted'}`}
+              className={`rounded-md px-3 py-1.5 text-[12px] font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 ${activeStickyItem === 'pricing' ? 'text-ink font-semibold' : 'text-ink-muted group-hover/sticky-nav:text-ink-subtle hover:!text-ink'}`}
             >
               Pricing
+              <span className={`mt-1 block h-px rounded-full transition-all duration-200 ${activeStickyItem === 'pricing' ? 'bg-brand/80' : 'bg-transparent'}`} />
             </a>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2">
-            <a href={APP_URL} target="_blank" rel="noreferrer" className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-brand/20 bg-brand px-3.5 text-[12px] font-semibold text-white shadow-sm transition-colors hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-page">Open Ultrakin<ArrowRight size={13} /></a>
-            <button ref={mobileMenuToggleRef} type="button" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'} aria-expanded={mobileOpen} aria-controls="compact-mobile-navigation" className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/70 md:hidden">{mobileOpen ? <X size={17} /> : <Menu size={17} />}</button>
+          <div className="flex shrink-0 items-center gap-2 justify-self-end">
+            <a href={APP_URL} target="_blank" rel="noreferrer" className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-brand/20 bg-brand px-3.5 text-[12px] font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.22),0_2px_8px_rgba(49,86,207,.16)] transition-all duration-150 hover:bg-brand-hover active:scale-[0.985] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 cursor-pointer">Open Ultrakin<ArrowRight size={13} /></a>
+            <button ref={mobileMenuToggleRef} type="button" onClick={() => setMobileOpen((value) => !value)} aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'} aria-expanded={mobileOpen} aria-controls="compact-mobile-navigation" className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-ink-muted transition-colors hover:bg-surface-soft hover:text-ink active:scale-[0.97] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 md:hidden">{mobileOpen ? <X size={17} /> : <Menu size={17} />}</button>
           </div>
 
           <AnimatePresence>
@@ -606,17 +607,38 @@ function Navbar() {
       )}
       </AnimatePresence>
 
+      {/* Background Dimming Backdrop Overlay */}
+      <AnimatePresence>
+        {isHeroVisible && openMenu && (
+          <motion.div
+            key="nav-dimming-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 top-16 bg-black/[0.04] backdrop-blur-[1px] pointer-events-none z-[-1]"
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {isHeroVisible && openMenu && (
           <motion.div
             id="navigation-mega-menu"
             role="menu"
             aria-label={`${openMenu} navigation menu`}
-            key={openMenu}
-            {...(openMenu === 'Solutions' || openMenu === 'Resources' ? solutionsMenuMotion : menuMotion)}
+            key="mega-menu-frame"
+            {...menuMotion}
             onMouseEnter={() => enterMenu(openMenu)}
-            className="absolute left-1/2 top-[calc(100%+8px)] hidden w-[min(1100px,calc(100vw-48px))] -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-surface-raised/[.98] shadow-[0_32px_96px_rgba(29,35,40,.11),0_2px_6px_rgba(29,35,40,.04)] backdrop-blur-2xl lg:block"
+            className="absolute left-1/2 top-[calc(100%+8px)] hidden w-[min(1100px,calc(100vw-48px))] -translate-x-1/2 overflow-hidden rounded-2xl border border-border/80 bg-surface-raised/[.98] shadow-[0_32px_96px_rgba(29,35,40,.11),0_2px_6px_rgba(29,35,40,.04)] ring-1 ring-black/[0.03] backdrop-blur-2xl before:absolute before:-top-3 before:inset-x-0 before:h-3 before:content-[''] lg:block"
           >
+            <motion.div
+              key={openMenu}
+              initial={reduceMotion ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.14, ease: SMOOTH_EASE }}
+            >
             {openMenu === 'Solutions' ? (
               <div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8 p-7">
@@ -806,6 +828,7 @@ function Navbar() {
                 </div>
               </>
             )}
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
