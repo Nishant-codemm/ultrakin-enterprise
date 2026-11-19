@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
-import { motion, useReducedMotion, useSpring } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion, useSpring } from 'framer-motion';
 import {
   Pause,
   Play,
@@ -251,28 +251,37 @@ export function NeuralCoreCard({ activeSignal }) {
       </div>
 
       {/* Middle: Clear Real-World Context & Intent Correlation */}
-      <div className="relative z-10 space-y-1.5 py-1">
-        {/* Dynamic Channel Badge */}
-        <div className="flex items-center gap-1.5">
-          <span className="rounded px-1.5 py-0.5 text-[9.5px] font-mono font-medium border truncate max-w-[160px] bg-slate-50 border-slate-200 text-slate-700">
-            {activeSignal.channel}
-          </span>
-        </div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeSignal.id}
+          initial={reduceMotion ? false : { opacity: 0, y: 3 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduceMotion ? false : { opacity: 0, y: -3 }}
+          transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+          className="relative z-10 space-y-1.5 py-1"
+        >
+          {/* Dynamic Channel Badge */}
+          <div className="flex items-center gap-1.5">
+            <span className="rounded px-1.5 py-0.5 text-[9.5px] font-mono font-medium border truncate max-w-[160px] bg-slate-50 border-slate-200 text-slate-700 shadow-2xs">
+              {activeSignal.channel}
+            </span>
+          </div>
 
-        {/* Dynamic Signal Title */}
-        <div className="min-w-0">
-          <p className="text-xs font-semibold text-slate-900 leading-snug line-clamp-2">
-            {activeSignal.title}
-          </p>
-        </div>
+          {/* Dynamic Signal Title */}
+          <div className="min-w-0">
+            <p className="text-xs font-semibold text-slate-900 leading-snug line-clamp-2">
+              {activeSignal.title}
+            </p>
+          </div>
 
-        {/* Knowledge Graph Correlation String */}
-        <div className="rounded-md bg-slate-50 border border-slate-200/80 p-1.5">
-          <p className="text-[10px] text-slate-600 font-mono leading-tight">
-            ⚡ {activeSignal.contextEngine}
-          </p>
-        </div>
-      </div>
+          {/* Knowledge Graph Correlation String */}
+          <div className="rounded-md bg-slate-50 border border-slate-200/80 p-1.5 shadow-2xs">
+            <p className="text-[10px] text-slate-600 font-mono leading-tight">
+              ⚡ {activeSignal.contextEngine}
+            </p>
+          </div>
+        </motion.div>
+      </AnimatePresence>
 
       {/* Bottom: Progress & Confidence Metrics */}
       <div className="relative z-10 pt-1 border-t border-slate-100">
@@ -286,7 +295,7 @@ export function NeuralCoreCard({ activeSignal }) {
 }
 
 /* ── Right: Light-Mode Enterprise One Workspace Output Card ── */
-export function WorkspaceOutcomeCard({ activeSignal }) {
+export function WorkspaceOutcomeCard({ activeSignal, reduceMotion }) {
   return (
     <div
       className="relative flex h-[204px] w-[170px] shrink-0 flex-col justify-between overflow-hidden rounded-2xl p-3.5 select-none bg-white border border-slate-200/90 shadow-[0_12px_28px_-8px_rgba(15,23,42,0.08),0_2px_6px_-1px_rgba(15,23,42,0.04),inset_0_1px_0_rgba(255,255,255,1)]"
@@ -307,30 +316,39 @@ export function WorkspaceOutcomeCard({ activeSignal }) {
       </div>
 
       {/* Dynamic Concrete Deliverable Rows */}
-      <div className="relative z-10 space-y-1.5 py-0.5">
-        {activeSignal.deliverables.map(({ icon: Icon, color, label, sub, active }) => (
-          <div
-            key={label}
-            className={cn(
-              'flex items-start gap-2 rounded-lg px-2 py-1.5 transition-all duration-200',
-              active
-                ? 'bg-blue-50/80 border border-blue-200/80 shadow-2xs'
-                : 'opacity-70 hover:opacity-100 hover:bg-slate-50'
-            )}
-          >
-            <Icon style={{ color }} className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between">
-                <p className="truncate text-[10.5px] font-medium text-slate-800">{label}</p>
-                {active && (
-                  <span className="h-1.5 w-1.5 rounded-full bg-blue-600 shrink-0" />
-                )}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeSignal.id}
+          initial={reduceMotion ? false : { opacity: 0, y: 3 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduceMotion ? false : { opacity: 0, y: -3 }}
+          transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+          className="relative z-10 space-y-1.5 py-0.5"
+        >
+          {activeSignal.deliverables.map(({ icon: Icon, color, label, sub, active }) => (
+            <div
+              key={label}
+              className={cn(
+                'flex items-start gap-2 rounded-lg px-2 py-1.5 transition-all duration-200',
+                active
+                  ? 'bg-blue-50/80 border border-blue-200/80 shadow-2xs'
+                  : 'opacity-70 hover:opacity-100 hover:bg-slate-50'
+              )}
+            >
+              <Icon style={{ color }} className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between">
+                  <p className="truncate text-[10.5px] font-medium text-slate-800">{label}</p>
+                  {active && (
+                    <span className="h-1.5 w-1.5 rounded-full bg-blue-600 shrink-0" />
+                  )}
+                </div>
+                <p className="truncate text-[9.5px] text-slate-500 font-mono">{sub}</p>
               </div>
-              <p className="truncate text-[9.5px] text-slate-500 font-mono">{sub}</p>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Bottom Row */}
       <div className="relative z-10 border-t border-slate-100 pt-1">
@@ -531,10 +549,10 @@ export default function HeroInteractiveStage() {
                         setIsPaused(true);
                       }}
                       className={cn(
-                        'relative flex h-10 w-full items-center gap-2 rounded-xl border px-2.5 text-left transition-all duration-200 cursor-pointer shadow-sm',
+                        'relative flex h-10 w-full items-center gap-2 rounded-xl border px-2.5 text-left transition-all duration-200 cursor-pointer shadow-sm active:scale-[0.985] motion-reduce:active:scale-100',
                         isActive
-                          ? 'border-blue-600 bg-white text-blue-700 font-semibold ring-2 ring-blue-500/20 shadow-[0_4px_14px_rgba(37,99,235,0.18)]'
-                          : 'border-sky-200/80 bg-white/90 text-slate-700 hover:border-blue-400 hover:bg-white hover:text-slate-900'
+                          ? 'border-blue-600 bg-white text-blue-700 font-semibold ring-2 ring-blue-500/20 shadow-[0_4px_14px_rgba(37,99,235,0.18),inset_0_1px_0_rgba(255,255,255,1)]'
+                          : 'border-sky-200/80 bg-white/90 text-slate-700 hover:border-blue-400 hover:bg-white hover:text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]'
                       )}
                     >
                       <Icon
@@ -577,7 +595,7 @@ export default function HeroInteractiveStage() {
 
               {/* Column 5: Right One Workspace Card (Width 170px) */}
               <div style={{ transform: 'translateZ(22px)' }}>
-                <WorkspaceOutcomeCard activeSignal={activeSignal} />
+                <WorkspaceOutcomeCard activeSignal={activeSignal} reduceMotion={reduceMotion} />
               </div>
             </div>
 

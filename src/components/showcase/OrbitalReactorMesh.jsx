@@ -61,8 +61,8 @@ const RAW_BUILT_IN_CONFIGS = {
   // Outer Inclined Orbit γ (Tilt: -24°, Tau: 92s, Trine constellation: 120° equidistant)
   Meetings: {
     ring: 3,
-    a: 246,
-    b: 106,
+    a: 232,
+    b: 98,
     tilt: -24,
     period: 92,
     initialPhase: 40, // North-East
@@ -71,8 +71,8 @@ const RAW_BUILT_IN_CONFIGS = {
   },
   'Ukin agent': {
     ring: 3,
-    a: 246,
-    b: 106,
+    a: 232,
+    b: 98,
     tilt: -24,
     period: 92,
     initialPhase: 160, // South-West
@@ -81,8 +81,8 @@ const RAW_BUILT_IN_CONFIGS = {
   },
   Calendar: {
     ring: 3,
-    a: 246,
-    b: 106,
+    a: 232,
+    b: 98,
     tilt: -24,
     period: 92,
     initialPhase: 280, // South-East
@@ -140,8 +140,8 @@ const RAW_EXTENSION_CONFIGS = {
   // Outer Inclined Orbit γ (Tilt: -24°, Tau: 92s, Opposition delta: 180°)
   PostHog: {
     ring: 3,
-    a: 246,
-    b: 106,
+    a: 232,
+    b: 98,
     tilt: -24,
     period: 92,
     initialPhase: 40, // North-East
@@ -150,8 +150,8 @@ const RAW_EXTENSION_CONFIGS = {
   },
   Forms: {
     ring: 3,
-    a: 246,
-    b: 106,
+    a: 232,
+    b: 98,
     tilt: -24,
     period: 92,
     initialPhase: 220, // South-West
@@ -444,8 +444,8 @@ function OrbitalReactorMesh({
             <ellipse
               cx="310"
               cy="210"
-              rx="246"
-              ry="106"
+              rx="232"
+              ry="98"
               fill="none"
               stroke={targetConfig?.ring === 3 ? 'rgba(56,189,248,0.48)' : 'rgba(56,189,248,0.2)'}
               strokeWidth={targetConfig?.ring === 3 ? '1.25' : '0.8'}
@@ -453,8 +453,8 @@ function OrbitalReactorMesh({
             />
             {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
               const rad = (deg * Math.PI) / 180;
-              const tx = 310 + 246 * Math.cos(rad);
-              const ty = 210 + 106 * Math.sin(rad);
+              const tx = 310 + 232 * Math.cos(rad);
+              const ty = 210 + 98 * Math.sin(rad);
               return (
                 <circle
                   key={`r3-tick-${deg}`}
