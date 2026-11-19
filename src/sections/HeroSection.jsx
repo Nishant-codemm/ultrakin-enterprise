@@ -146,7 +146,7 @@ function HeroWorkspaceContent() {
                 <Button
                   variant="secondary"
                   size="lg"
-                  className="w-full sm:w-auto text-[15px] px-6 h-12 border border-border/80 shadow-2xs"
+                  className="w-full sm:w-auto text-[15px] px-6 h-12 border border-slate-200 hover:border-slate-300 shadow-2xs"
                   iconRight={ArrowRight}
                   onClick={() => document.getElementById('workspace-showcase')?.scrollIntoView({ behavior: 'smooth' })}
                 >

@@ -233,10 +233,22 @@ p {
   animation: liveDot 2s ease-in-out infinite;
 }
 
-/* Accessibility: High-Contrast Visible Focus Ring (Section 11.1) */
+/* Accessibility: High-Contrast Visible Focus Ring (Pass1-24) */
 :focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--color-page), 0 0 0 4px var(--color-focus);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
 /* Linear-Grade Dual-Border Elevation */
@@ -390,6 +402,9 @@ p {
 @media (prefers-reduced-motion: reduce) {
   .spotlight-card::before {
     display: none !important;
+  }
+  .animate-marquee {
+    animation: none !important;
   }
   .frame-perspective-3d, .frame-perspective-3d:hover {
     transform: none !important;

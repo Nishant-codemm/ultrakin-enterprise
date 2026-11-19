@@ -150,7 +150,7 @@ function FAQSection() {
             id="faq-heading"
             className="font-display text-3xl font-normal leading-[1.08] tracking-[-0.035em] text-ink sm:text-[2.65rem]"
           >
-            Architected for enterprise clarity.
+            Security questions. Direct answers.
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-ink-muted sm:text-base">
             Direct answers on data security, zero-retention AI guarantees, hybrid VPC deployment, and licensing for engineering leaders and procurement teams.

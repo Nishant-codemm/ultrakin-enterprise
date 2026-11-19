@@ -138,7 +138,7 @@ function TrustStrip() {
               className="pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-gradient-to-l from-page to-transparent"
             />
 
-            <div className="animate-marquee hover:[animation-play-state:paused] flex items-center py-2">
+            <div className="animate-marquee motion-reduce:animate-none hover:[animation-play-state:paused] flex items-center py-2">
               {/* Primary Track */}
               <div className="flex shrink-0 items-center justify-around gap-12 sm:gap-16 pr-12 sm:pr-16" role="list" aria-label="Partner organizations">
                 {BRAND_LOGOS.map(({ id, component: Wordmark }) => (

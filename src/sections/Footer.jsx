@@ -58,7 +58,7 @@ function Footer() {
                 href="https://github.com/ultrakin/ultrakin-enterprise"
                 target="_blank"
                 rel="noreferrer"
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface-raised transition-colors hover:border-brand/40 hover:text-brand-text"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface-raised transition-colors duration-150 hover:border-slate-400 hover:text-slate-700"
                 aria-label="GitHub Repository"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -69,7 +69,7 @@ function Footer() {
                 href="https://x.com/ultrakin"
                 target="_blank"
                 rel="noreferrer"
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface-raised transition-colors hover:border-brand/40 hover:text-brand-text"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface-raised transition-colors duration-150 hover:border-slate-400 hover:text-slate-700"
                 aria-label="X / Twitter"
               >
                 <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -80,7 +80,7 @@ function Footer() {
                 href="https://linkedin.com/company/ultrakin"
                 target="_blank"
                 rel="noreferrer"
-                className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface-raised transition-colors hover:border-brand/40 hover:text-brand-text"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-border bg-surface-raised transition-colors duration-150 hover:border-slate-400 hover:text-slate-700"
                 aria-label="LinkedIn"
               >
                 <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
