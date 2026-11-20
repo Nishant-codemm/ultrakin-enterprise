@@ -5,6 +5,7 @@ import { cn } from '../lib/cn';
 import { useReveal } from '../lib/useReveal';
 import { getSectionHeaderMotion } from '../lib/motion';
 import { CATEGORIES, INTEGRATIONS, PRODUCT_ICON_CONFIG } from '../data/integrationData';
+import { handleSpotlightMove } from '../lib/interaction';
 import OrbitalTopologyMap from '../components/showcase/OrbitalTopologyMap';
 import IntegrationSurfacePreview from '../components/showcase/IntegrationSurfacePreview';
 
@@ -75,12 +76,20 @@ function IntegrationsSection() {
                   aria-controls="integration-tabpanel"
                   onClick={() => selectCategory(category)}
                   className={cn(
-                    'shrink-0 rounded-full px-3.5 py-1.5 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus cursor-pointer',
+                    'relative shrink-0 rounded-full px-3.5 py-1.5 text-xs transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus cursor-pointer active:scale-95',
                     isSelected
-                      ? 'bg-brand-soft text-brand-text font-medium'
+                      ? 'text-brand-text font-semibold'
                       : 'text-ink-subtle hover:bg-surface-hover hover:text-ink-soft'
                   )}
                 >
+                  {isSelected && (
+                    <motion.span
+                      layoutId="activeIntegrationCategory"
+                      className="absolute inset-0 rounded-full bg-brand-soft border border-brand/20 -z-10 shadow-2xs"
+                      transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 450, damping: 34, mass: 0.6 }}
+                      aria-hidden="true"
+                    />
+                  )}
                   {category}
                 </button>
               );
@@ -114,8 +123,11 @@ function IntegrationsSection() {
             inView={inView}
           />
 
-          {/* ── Detail panel ── */}
-          <div className="relative min-h-[250px] border-t border-border pt-8 pl-0 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-10 lg:min-h-[290px]">
+          {/* ── Detail panel with cursor spotlight tracking ── */}
+          <div
+            onMouseMove={handleSpotlightMove}
+            className="spotlight-card relative min-h-[250px] border-t border-border pt-8 pl-0 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-10 lg:min-h-[290px] rounded-r-2xl"
+          >
             {/* Top border hairline accent */}
             <div aria-hidden="true" className="hidden lg:block absolute -left-px top-0 h-8 w-px bg-brand/70" />
 

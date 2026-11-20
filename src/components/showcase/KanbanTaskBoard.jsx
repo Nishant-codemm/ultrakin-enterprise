@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   CheckSquare,
   Clock,
@@ -48,6 +49,7 @@ function KanbanTaskBoard() {
     addToast,
   } = useWorkspace();
 
+  const reduceMotion = useReducedMotion();
   const [draggedTaskId, setDraggedTaskId] = useState(null);
   const [dragOverCol, setDragOverCol] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -319,21 +321,28 @@ function KanbanTaskBoard() {
 
               {/* Tasks List */}
               <div className="flex-1 p-2 space-y-2.5 overflow-y-auto max-h-[calc(100vh-280px)]">
-                {colTasks.map((task) => {
+                <AnimatePresence mode="popLayout" initial={false}>
+                  {colTasks.map((task) => {
                   const isDragging = draggedTaskId === task.id;
                   const totalSubs = task.subtasks ? task.subtasks.length : 0;
                   const doneSubs = task.subtasks ? task.subtasks.filter((s) => s.done).length : 0;
 
                   return (
-                    <div
+                    <motion.div
                       key={task.id}
+                      layout={!isDragging && !reduceMotion ? 'position' : false}
+                      layoutId={!isDragging && !reduceMotion ? `task-card-${task.id}` : undefined}
+                      initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={reduceMotion ? false : { opacity: 0, scale: 0.94 }}
+                      transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 360, damping: 28, mass: 0.7 }}
                       data-kanban-card="true"
                       draggable
                       onDragStart={(e) => handleDragStart(e, task.id)}
                       onDragEnd={handleDragEnd}
                       onClick={() => openTaskDrawer(task)}
                       className={cn(
-                        'p-3.5 rounded-xl border bg-obsidian-surface transition-all duration-150 cursor-grab active:cursor-grabbing group relative select-none',
+                        'p-3.5 rounded-xl border bg-obsidian-surface transition-colors duration-150 cursor-grab active:cursor-grabbing group relative select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]',
                         'hover:border-white/[0.14] hover:bg-[#0F1626]',
                         isDragging
                           ? 'rotate-[1deg] scale-[1.01] shadow-[0_12px_28px_-4px_rgba(0,0,0,0.75)] border-sky-500 opacity-90'
@@ -445,9 +454,10 @@ function KanbanTaskBoard() {
                           </button>
                         )}
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
+                </AnimatePresence>
 
                 {colTasks.length === 0 && (
                   <div

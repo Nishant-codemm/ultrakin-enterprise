@@ -1,4 +1,5 @@
 import React, { useState, memo } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import {
   GitBranch,
   Play,
@@ -49,6 +50,7 @@ function getNodeHeaderColor(type) {
 }
 
 function VisualAutomationsCanvas() {
+  const reduceMotion = useReducedMotion();
   const {
     automationsWorkflows,
     activeWorkflowId,
@@ -96,24 +98,66 @@ function VisualAutomationsCanvas() {
 
     return (
       <g key={edge.id}>
-        {/* Background path */}
+        {/* Ambient glow underlay */}
         <path
           d={pathData}
           fill="none"
-          stroke={isStepActive ? 'rgba(56, 189, 248, 0.3)' : 'rgba(255, 255, 255, 0.04)'}
-          strokeWidth={isStepActive ? '4' : '2'}
+          stroke={isStepActive ? 'rgba(56, 189, 248, 0.28)' : 'rgba(255, 255, 255, 0.03)'}
+          strokeWidth={isStepActive ? '5' : '2'}
+          filter={isStepActive ? 'url(#dag-flow-glow)' : undefined}
         />
         {/* Foreground clean path */}
         <path
           d={pathData}
           fill="none"
-          stroke={isStepActive ? '#38BDF8' : '#475569'}
+          stroke={isStepActive ? '#38BDF8' : '#334155'}
           strokeWidth="1.5"
           strokeDasharray={isStepActive ? '6 4' : 'none'}
+          className="transition-colors duration-200"
         />
-        {/* Terminal arrow points */}
-        <circle cx={endX} cy={endY} r="3" fill={isStepActive ? '#38BDF8' : '#64748B'} />
+        {/* Gumloop-grade traveling energy pulse along active Bezier spline */}
+        {isStepActive && !reduceMotion && (
+          <>
+            <motion.path
+              d={pathData}
+              fill="none"
+              stroke="#38BDF8"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              strokeDasharray="16 120"
+              filter="url(#dag-flow-glow)"
+              animate={{ strokeDashoffset: [136, -136] }}
+              transition={{ duration: 1.15, repeat: Infinity, ease: 'linear' }}
+            />
+            <motion.path
+              d={pathData}
+              fill="none"
+              stroke="#FFFFFF"
+              strokeWidth="1.3"
+              strokeLinecap="round"
+              strokeDasharray="8 128"
+              animate={{ strokeDashoffset: [136, -136] }}
+              transition={{ duration: 1.15, repeat: Infinity, ease: 'linear' }}
+            />
+          </>
+        )}
+        {/* Terminal and origin anchor points */}
         <circle cx={startX} cy={startY} r="3" fill={isStepActive ? '#38BDF8' : '#64748B'} />
+        <circle cx={endX} cy={endY} r="3" fill={isStepActive ? '#38BDF8' : '#64748B'} />
+        {/* Reactive reception ping at target port */}
+        {isStepActive && !reduceMotion && (
+          <motion.circle
+            cx={endX}
+            cy={endY}
+            r="3"
+            fill="none"
+            stroke="#38BDF8"
+            strokeWidth="1.2"
+            animate={{ scale: [1, 2.5], opacity: [0.8, 0] }}
+            transition={{ duration: 1.15, repeat: Infinity, ease: 'easeOut' }}
+            style={{ transformOrigin: `${endX}px ${endY}px` }}
+          />
+        )}
       </g>
     );
   };
@@ -214,6 +258,15 @@ function VisualAutomationsCanvas() {
             className="absolute inset-0 pointer-events-none min-w-[1200px] min-h-[800px] z-10"
             style={{ width: '1200px', height: '800px' }}
           >
+            <defs>
+              <filter id="dag-flow-glow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="1.5" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
             {activeWorkflow.edges.map(renderEdgePath)}
           </svg>
 
@@ -237,13 +290,23 @@ function VisualAutomationsCanvas() {
                     width: '260px',
                   }}
                   className={cn(
-                    'rounded-xl border bg-obsidian-surface shadow-md transition-all duration-200 cursor-pointer select-none',
+                    'rounded-xl border bg-obsidian-surface shadow-md shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-all duration-200 cursor-pointer select-none relative',
                     isSelected
                       ? 'ring-1 ring-sky-400 border-sky-400 shadow-sm'
                       : 'border-white/[0.08] hover:border-white/[0.16]',
                     isExecuting && 'ring-1 ring-emerald-400 border-emerald-400 scale-[1.01]'
                   )}
                 >
+                  {/* Subtle execution ambient pulse glow */}
+                  {isExecuting && !reduceMotion && (
+                    <motion.div
+                      className="pointer-events-none absolute -inset-1 rounded-2xl bg-emerald-500/20 blur-sm -z-10"
+                      initial={{ opacity: 0.4 }}
+                      animate={{ opacity: [0.4, 0.85, 0.4] }}
+                      transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+                      aria-hidden="true"
+                    />
+                  )}
                   {/* Node Header */}
                   <div
                     className={cn(

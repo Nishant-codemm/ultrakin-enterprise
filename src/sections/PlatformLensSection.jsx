@@ -330,12 +330,12 @@ function PlatformLensSection() {
                     onKeyDown={(e) => handleTabKeyDown(e, index)}
                     onClick={() => setActive(item.id)}
                     className={cn(
-                      'group relative min-w-[155px] shrink-0 border-b border-border py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus lg:min-w-0 lg:flex-none lg:shrink lg:py-5 cursor-pointer',
-                      selected ? 'text-ink' : 'text-ink-subtle hover:text-ink-soft',
+                      'group relative min-w-[155px] shrink-0 border-b border-border py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus lg:min-w-0 lg:flex-none lg:shrink lg:py-4 cursor-pointer lg:px-3 lg:rounded-xl',
+                      selected ? 'text-ink lg:bg-brand/[0.04]' : 'text-ink-subtle hover:text-ink-soft',
                     )}
                   >
                     <span className="flex items-center gap-3">
-                      <span className={cn('font-mono text-[10px]', selected ? 'text-brand-text' : 'text-ink-muted')}>{item.number}</span>
+                      <span className={cn('font-mono text-[10px]', selected ? 'text-brand-text font-semibold' : 'text-ink-muted')}>{item.number}</span>
                       <Icon className={cn('h-3.5 w-3.5', selected ? 'text-brand-text' : 'text-ink-subtle')} />
                       <span className="text-xs font-medium">{item.label}</span>
                     </span>
@@ -343,7 +343,8 @@ function PlatformLensSection() {
                     {selected && (
                       <motion.span
                         layoutId="lens-indicator"
-                        className="absolute bottom-[-1px] left-0 right-0 h-px bg-brand/70 lg:right-auto lg:top-0 lg:h-auto lg:w-px"
+                        className="absolute bottom-[-1px] left-0 right-0 h-0.5 bg-gradient-to-r from-brand via-indigo-500 to-brand lg:right-auto lg:top-2.5 lg:bottom-2.5 lg:left-0 lg:h-auto lg:w-1 lg:rounded-r-full"
+                        transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 450, damping: 35 }}
                       />
                     )}
                   </button>
@@ -367,7 +368,7 @@ function PlatformLensSection() {
                 id="lens-panel"
                 role="tabpanel"
                 aria-labelledby={`lens-tab-${active}`}
-                className="relative isolate min-h-[400px] overflow-hidden bg-[#0b0e14] px-4 py-6 shadow-[0_18px_42px_-34px_rgba(0,0,0,.72),inset_0_1px_0_rgba(255,255,255,.055)] sm:px-6 sm:py-8 lg:min-h-[430px] lg:px-10 lg:py-9"
+                className="relative isolate min-h-[400px] overflow-hidden bg-[#0b0e14] px-4 py-6 shadow-[0_18px_42px_-34px_rgba(0,0,0,.72),inset_0_1px_0_rgba(255,255,255,.08)] sm:px-6 sm:py-8 lg:min-h-[430px] lg:px-10 lg:py-9"
               >
                 <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_76%_44%,rgba(105,111,200,.12),transparent_56%),linear-gradient(132deg,rgba(255,255,255,.035),transparent_28%,transparent_74%,rgba(146,151,255,.035))]" />
                 <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-20 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
@@ -378,6 +379,7 @@ function PlatformLensSection() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -5 }}
                     transition={{ duration: 0.22, ease: ULTRAKIN_EASE }}
+                    style={reduceMotion ? undefined : { transform: 'translateZ(6px)' }}
                   >
                     {content}
                   </motion.div>

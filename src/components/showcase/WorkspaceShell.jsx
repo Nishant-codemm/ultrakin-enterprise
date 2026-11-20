@@ -433,21 +433,29 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
               tabIndex={activeModule === 'chat' ? 0 : -1}
               onClick={() => setActiveModule('chat')}
               className={cn(
-                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95',
                 activeModule === 'chat'
-                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  ? 'text-white font-medium'
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
               )}
               title="Spaces Chat (⌘1)"
               aria-label="Spaces Chat"
             >
               {activeModule === 'chat' && (
-                <motion.span
-                  layoutId="activeModuleIndicator"
-                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
-                  aria-hidden="true"
-                />
+                <>
+                  <motion.span
+                    layoutId="activeModuleIndicator"
+                    className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                    aria-hidden="true"
+                  />
+                  <motion.span
+                    layoutId="activeModuleChassis"
+                    className="absolute inset-0 rounded-xl bg-white/[0.12] border border-white/[0.15] shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.14)] -z-10"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 36, mass: 0.5 }}
+                    aria-hidden="true"
+                  />
+                </>
               )}
               <MessageSquare className="w-5 h-5" />
             </button>
@@ -461,21 +469,29 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
               tabIndex={activeModule === 'threads' ? 0 : -1}
               onClick={() => setActiveModule('threads')}
               className={cn(
-                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95',
                 activeModule === 'threads'
-                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  ? 'text-white font-medium'
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
               )}
               title="Threads (⌘2)"
               aria-label="Threads"
             >
               {activeModule === 'threads' && (
-                <motion.span
-                  layoutId="activeModuleIndicator"
-                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
-                  aria-hidden="true"
-                />
+                <>
+                  <motion.span
+                    layoutId="activeModuleIndicator"
+                    className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                    aria-hidden="true"
+                  />
+                  <motion.span
+                    layoutId="activeModuleChassis"
+                    className="absolute inset-0 rounded-xl bg-white/[0.12] border border-white/[0.15] shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.14)] -z-10"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 36, mass: 0.5 }}
+                    aria-hidden="true"
+                  />
+                </>
               )}
               <AtSign className="w-5 h-5" />
             </button>
@@ -491,21 +507,29 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
               onMouseEnter={() => prefetch(loadMail)}
               onFocus={() => prefetch(loadMail)}
               className={cn(
-                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95',
                 activeModule === 'mail'
-                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  ? 'text-white font-medium'
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
               )}
               title="Custom Domain Email (⌘3)"
               aria-label="Custom Domain Email"
             >
               {activeModule === 'mail' && (
-                <motion.span
-                  layoutId="activeModuleIndicator"
-                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
-                  aria-hidden="true"
-                />
+                <>
+                  <motion.span
+                    layoutId="activeModuleIndicator"
+                    className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                    aria-hidden="true"
+                  />
+                  <motion.span
+                    layoutId="activeModuleChassis"
+                    className="absolute inset-0 rounded-xl bg-white/[0.12] border border-white/[0.15] shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.14)] -z-10"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 36, mass: 0.5 }}
+                    aria-hidden="true"
+                  />
+                </>
               )}
               <Mail className="w-5 h-5" />
               {unreadEmailCount > 0 && (
@@ -524,21 +548,29 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
               onMouseEnter={() => prefetch(loadDocs)}
               onFocus={() => prefetch(loadDocs)}
               className={cn(
-                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95',
                 activeModule === 'docs'
-                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  ? 'text-white font-medium'
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
               )}
               title="TipTap Living Docs (⌘4)"
               aria-label="TipTap Living Docs"
             >
               {activeModule === 'docs' && (
-                <motion.span
-                  layoutId="activeModuleIndicator"
-                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
-                  aria-hidden="true"
-                />
+                <>
+                  <motion.span
+                    layoutId="activeModuleIndicator"
+                    className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                    aria-hidden="true"
+                  />
+                  <motion.span
+                    layoutId="activeModuleChassis"
+                    className="absolute inset-0 rounded-xl bg-white/[0.12] border border-white/[0.15] shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.14)] -z-10"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 36, mass: 0.5 }}
+                    aria-hidden="true"
+                  />
+                </>
               )}
               <FileText className="w-5 h-5" />
             </button>
@@ -554,21 +586,29 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
               onMouseEnter={() => prefetch(loadCalendar)}
               onFocus={() => prefetch(loadCalendar)}
               className={cn(
-                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95',
                 activeModule === 'calendar'
-                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  ? 'text-white font-medium'
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
               )}
               title="Team Calendar & Events (⌘5)"
               aria-label="Team Calendar & Events"
             >
               {activeModule === 'calendar' && (
-                <motion.span
-                  layoutId="activeModuleIndicator"
-                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
-                  aria-hidden="true"
-                />
+                <>
+                  <motion.span
+                    layoutId="activeModuleIndicator"
+                    className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                    aria-hidden="true"
+                  />
+                  <motion.span
+                    layoutId="activeModuleChassis"
+                    className="absolute inset-0 rounded-xl bg-white/[0.12] border border-white/[0.15] shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.14)] -z-10"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 36, mass: 0.5 }}
+                    aria-hidden="true"
+                  />
+                </>
               )}
               <CalendarIcon className="w-5 h-5" />
             </button>
@@ -584,21 +624,29 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
               onMouseEnter={() => prefetch(loadHuddle)}
               onFocus={() => prefetch(loadHuddle)}
               className={cn(
-                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95',
                 activeModule === 'huddle'
-                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  ? 'text-white font-medium'
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
               )}
               title="Huddle Video Chamber (⌘6)"
               aria-label="Huddle"
             >
               {activeModule === 'huddle' && (
-                <motion.span
-                  layoutId="activeModuleIndicator"
-                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
-                  aria-hidden="true"
-                />
+                <>
+                  <motion.span
+                    layoutId="activeModuleIndicator"
+                    className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                    aria-hidden="true"
+                  />
+                  <motion.span
+                    layoutId="activeModuleChassis"
+                    className="absolute inset-0 rounded-xl bg-white/[0.12] border border-white/[0.15] shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.14)] -z-10"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 36, mass: 0.5 }}
+                    aria-hidden="true"
+                  />
+                </>
               )}
               <Video className="w-5 h-5" />
               <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-emerald-400" />
@@ -615,21 +663,29 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
               onMouseEnter={() => prefetch(loadTasks)}
               onFocus={() => prefetch(loadTasks)}
               className={cn(
-                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95',
                 activeModule === 'tasks'
-                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  ? 'text-white font-medium'
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
               )}
               title="Tasks & Sprint Board (⌘7)"
               aria-label="Tasks Kanban Board"
             >
               {activeModule === 'tasks' && (
-                <motion.span
-                  layoutId="activeModuleIndicator"
-                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
-                  aria-hidden="true"
-                />
+                <>
+                  <motion.span
+                    layoutId="activeModuleIndicator"
+                    className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                    aria-hidden="true"
+                  />
+                  <motion.span
+                    layoutId="activeModuleChassis"
+                    className="absolute inset-0 rounded-xl bg-white/[0.12] border border-white/[0.15] shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.14)] -z-10"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 36, mass: 0.5 }}
+                    aria-hidden="true"
+                  />
+                </>
               )}
               <CheckSquare className="w-5 h-5" />
               {kanbanTasks.length > 0 && (
@@ -646,21 +702,29 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
               tabIndex={activeModule === 'files' ? 0 : -1}
               onClick={() => setActiveModule('files')}
               className={cn(
-                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95',
                 activeModule === 'files'
-                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  ? 'text-white font-medium'
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
               )}
               title="Files & Evidence (⌘8)"
               aria-label="Files"
             >
               {activeModule === 'files' && (
-                <motion.span
-                  layoutId="activeModuleIndicator"
-                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
-                  aria-hidden="true"
-                />
+                <>
+                  <motion.span
+                    layoutId="activeModuleIndicator"
+                    className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                    aria-hidden="true"
+                  />
+                  <motion.span
+                    layoutId="activeModuleChassis"
+                    className="absolute inset-0 rounded-xl bg-white/[0.12] border border-white/[0.15] shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.14)] -z-10"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 36, mass: 0.5 }}
+                    aria-hidden="true"
+                  />
+                </>
               )}
               <FolderOpen className="w-5 h-5" />
             </button>
@@ -676,21 +740,29 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
               onMouseEnter={() => prefetch(loadAutomations)}
               onFocus={() => prefetch(loadAutomations)}
               className={cn(
-                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer',
+                'relative w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer active:scale-95',
                 activeModule === 'automations'
-                  ? 'bg-white/[0.12] text-white border border-white/[0.14] font-medium'
+                  ? 'text-white font-medium'
                   : 'text-slate-400 hover:text-white hover:bg-white/[0.05]',
               )}
               title="Workflow Automations & Agents (⌘9)"
               aria-label="Automations and Agents"
             >
               {activeModule === 'automations' && (
-                <motion.span
-                  layoutId="activeModuleIndicator"
-                  className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
-                  transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
-                  aria-hidden="true"
-                />
+                <>
+                  <motion.span
+                    layoutId="activeModuleIndicator"
+                    className="absolute -left-1 top-2.5 bottom-2.5 w-1 rounded-r-full bg-indigo-400"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                    aria-hidden="true"
+                  />
+                  <motion.span
+                    layoutId="activeModuleChassis"
+                    className="absolute inset-0 rounded-xl bg-white/[0.12] border border-white/[0.15] shadow-[0_2px_8px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.14)] -z-10"
+                    transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 36, mass: 0.5 }}
+                    aria-hidden="true"
+                  />
+                </>
               )}
               <GitBranch className="w-5 h-5" />
             </button>
@@ -842,12 +914,20 @@ export default function WorkspaceShell({ className = '', onExitFullscreen }) {
                     setActiveModule('chat');
                   }}
                   className={cn(
-                    'w-full flex items-center justify-between px-2.5 py-1.5 rounded-md font-medium transition-colors cursor-pointer text-left',
+                    'relative w-full flex items-center justify-between px-2.5 py-1.5 rounded-md font-medium transition-colors cursor-pointer text-left active:scale-[0.98]',
                     isSelected
-                      ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/30'
+                      ? 'text-indigo-300'
                       : 'text-slate-400 hover:text-slate-200 hover:bg-white/5',
                   )}
                 >
+                  {isSelected && (
+                    <motion.span
+                      layoutId="activeChannelHighlight"
+                      className="absolute inset-0 rounded-md bg-indigo-600/20 border border-indigo-500/30 -z-10 shadow-2xs"
+                      transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }}
+                      aria-hidden="true"
+                    />
+                  )}
                   <span className="flex items-center gap-2 truncate">
                     <span className={isSelected ? 'text-indigo-400' : 'text-obsidian-muted'}>
                       #

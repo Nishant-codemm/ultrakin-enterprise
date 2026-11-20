@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
 import { Terminal, CheckCircle2, ShieldCheck, Share2 } from 'lucide-react';
 
@@ -12,8 +12,37 @@ function HuddleSharedCanvasComponent({
   onToggleScreenShare,
   reduceMotion,
 }) {
+  const [ripples, setRipples] = useState([]);
+
+  const handleCanvasClick = useCallback((e) => {
+    if (reduceMotion) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const newRipple = { id: Date.now() + Math.random(), x, y };
+    setRipples((prev) => [...prev.slice(-2), newRipple]);
+    setTimeout(() => {
+      setRipples((prev) => prev.filter((r) => r.id !== newRipple.id));
+    }, 600);
+  }, [reduceMotion]);
+
   return (
-    <div className="flex-1 min-h-[220px] rounded-xl border border-white/[0.08] bg-[#060810] p-3.5 flex flex-col justify-between shadow-xl relative overflow-hidden select-none">
+    <div
+      onClick={handleCanvasClick}
+      className="flex-1 min-h-[220px] rounded-xl border border-white/[0.08] bg-[#060810] p-3.5 flex flex-col justify-between shadow-xl relative overflow-hidden select-none cursor-pointer"
+    >
+      {/* Transient Multiplayer Click Ripples */}
+      {ripples.map((r) => (
+        <motion.span
+          key={r.id}
+          initial={{ scale: 0, opacity: 0.8 }}
+          animate={{ scale: 3.2, opacity: 0 }}
+          transition={{ duration: 0.55, ease: 'easeOut' }}
+          style={{ left: r.x, top: r.y, transform: 'translate(-50%, -50%)' }}
+          className="pointer-events-none absolute w-6 h-6 rounded-full border border-cyan-400 bg-cyan-400/20"
+          aria-hidden="true"
+        />
+      ))}
       {/* Canvas Top Bar */}
       <div className="flex items-center justify-between border-b border-white/[0.08] pb-2 text-xs">
         <div className="flex items-center gap-2 text-slate-200">

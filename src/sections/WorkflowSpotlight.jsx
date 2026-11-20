@@ -323,32 +323,40 @@ function StageArrow({ active }) {
 }
 
 /* ─── Stage interactive pill button with progress hairline ─── */
-function StagePill({ stage, isActive, isSelected, onClick, progress = 0 }) {
+function StagePill({ stage, isActive, isSelected, onClick, progress = 0, reduceMotion = false }) {
   const Icon = stage.icon;
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        'group relative overflow-hidden flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
+        'group relative overflow-hidden flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-medium transition-colors duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus',
         isSelected
-          ? 'bg-brand text-white shadow-[0_2px_8px_rgba(49,86,207,0.3)] ring-1 ring-brand'
+          ? 'text-white'
           : isActive
           ? 'bg-brand/[0.08] text-brand-text ring-1 ring-brand/15 hover:bg-brand/[0.12]'
           : 'text-ink-muted hover:text-ink hover:bg-surface-hover',
       )}
       aria-current={isSelected ? 'step' : undefined}
     >
+      {isSelected && (
+        <motion.span
+          layoutId="activeWorkflowStagePill"
+          className="absolute inset-0 rounded-full bg-brand shadow-[0_2px_8px_rgba(49,86,207,0.3)] ring-1 ring-brand"
+          transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 450, damping: 35, mass: 0.6 }}
+          aria-hidden="true"
+        />
+      )}
       <Icon
-        className="h-3 w-3 shrink-0"
+        className="relative z-10 h-3 w-3 shrink-0"
         style={{ color: isSelected ? '#ffffff' : isActive ? stage.color : undefined }}
         aria-hidden="true"
       />
-      <span>{stage.label}</span>
+      <span className="relative z-10">{stage.label}</span>
       {isSelected && progress > 0 && (
         <span
-          className="pointer-events-none absolute bottom-0 left-0 h-[2px] bg-white/70 transition-all duration-75 ease-linear"
-          style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+          className="pointer-events-none absolute bottom-0 left-0 right-0 h-[2px] bg-white/70 origin-left transition-transform duration-75 ease-linear"
+          style={{ transform: `scaleX(${Math.min(1, Math.max(0, progress / 100))})` }}
           aria-hidden="true"
         />
       )}
@@ -456,6 +464,7 @@ function WorkflowSpotlight() {
                       isActive={i <= activeStageIdx}
                       isSelected={i === activeStageIdx}
                       progress={i === activeStageIdx ? stageProgress : 0}
+                      reduceMotion={reduceMotion}
                       onClick={() => {
                         setActiveStageIdx(i);
                         setStageProgress(0);
@@ -517,15 +526,23 @@ function WorkflowSpotlight() {
                           aria-label={`Step ${i + 1}: ${stg.label}`}
                           title={`${stg.label} (Step ${i + 1})`}
                           className={cn(
-                            'flex h-5 w-5 items-center justify-center rounded text-[9px] font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400',
+                            'relative flex h-5 w-5 items-center justify-center rounded text-[9px] font-semibold transition-all duration-200 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400',
                             i === activeStageIdx
-                              ? 'bg-indigo-500 text-white shadow-sm ring-1 ring-indigo-400'
+                              ? 'text-white'
                               : i < activeStageIdx
                               ? 'bg-indigo-500/25 text-indigo-200 ring-1 ring-indigo-400/30'
                               : 'bg-white/[0.04] text-obsidian-muted hover:text-slate-200',
                           )}
                         >
-                          {stg.letter}
+                          {i === activeStageIdx && (
+                            <motion.span
+                              layoutId="activePipelineStep"
+                              className="absolute inset-0 rounded bg-indigo-500 shadow-sm ring-1 ring-indigo-400"
+                              transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 450, damping: 35 }}
+                              aria-hidden="true"
+                            />
+                          )}
+                          <span className="relative z-10">{stg.letter}</span>
                         </button>
                         {i < WORKFLOW_STAGES.length - 1 && (
                           <span className="h-px w-1 bg-obsidian-border-soft" aria-hidden="true" />

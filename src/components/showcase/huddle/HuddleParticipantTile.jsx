@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import { motion } from 'framer-motion';
 import { Mic, MicOff, Bot, Volume2 } from 'lucide-react';
 import { StudioAudioWaveform } from './StudioAudioWaveform';
 import { cn } from '../../../lib/cn';
@@ -22,12 +23,21 @@ function HuddleParticipantTileComponent({
       aria-label={`Focus audio on ${participant.name}${isSpeakingNow ? ' (currently speaking)' : ''}`}
       aria-pressed={isSpeakingNow}
       className={cn(
-        'relative p-2.5 rounded-xl border transition-all duration-200 flex flex-col items-center justify-between text-center cursor-pointer group select-none',
+        'relative p-2.5 rounded-xl border transition-all duration-200 flex flex-col items-center justify-between text-center cursor-pointer group select-none shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]',
         isSpeakingNow
           ? 'border-emerald-500/40 bg-[#0F172A]/90 ring-1 ring-emerald-500/20'
           : 'border-white/[0.06] bg-[#0B0F19]/60 hover:border-white/[0.12] hover:bg-[#0F172A]/40',
       )}
     >
+      {/* Voice Activity Organic Breathing Glow */}
+      {isSpeakingNow && !reduceMotion && (
+        <motion.span
+          animate={{ scale: [1, 1.025, 1], opacity: [0.3, 0.65, 0.3] }}
+          transition={{ duration: 2.0, repeat: Infinity, ease: 'easeInOut' }}
+          className="pointer-events-none absolute -inset-0.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 blur-xs -z-10"
+          aria-hidden="true"
+        />
+      )}
       {/* Top Status Bar: Speaking Indicator & Mic State */}
       <div className="w-full flex items-center justify-between mb-1.5 text-[9.5px] font-mono">
         <span
