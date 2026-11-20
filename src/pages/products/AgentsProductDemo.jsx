@@ -82,7 +82,7 @@ export default function AgentsProductDemo() {
         </div>
 
         {/* Right: Human Approval Gate Card */}
-        <div className="rounded-xl border border-white/[0.08] bg-[#0F172A] p-3.5 flex flex-col justify-between shadow-lg">
+        <div className="rounded-xl border border-white/[0.08] bg-[#0F172A] p-3.5 flex flex-col justify-between shadow-lg min-h-[220px]">
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">

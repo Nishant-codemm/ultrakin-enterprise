@@ -63,7 +63,8 @@ function IntegrationsSection() {
 
         {/* Filter tabs */}
         <div className="mt-12 border-y border-border py-4 flex flex-wrap items-center justify-between gap-3">
-          <div role="tablist" aria-label="Explore workspace surfaces and extensions" className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <div className="relative">
+            <div role="tablist" aria-label="Explore workspace surfaces and extensions" className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             {CATEGORIES.map((category) => {
               const isSelected = selectedCat === category;
               return (
@@ -95,6 +96,8 @@ function IntegrationsSection() {
               );
             })}
           </div>
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-10 bg-gradient-to-l from-page to-transparent" aria-hidden="true" />
+        </div>
 
           {/* MCP Compatible Protocol Badge */}
           <div className="flex items-center gap-1.5 rounded-full border border-indigo-500/25 bg-indigo-50/70 px-3 py-1 text-[11px] font-mono text-indigo-700 font-medium select-none shadow-2xs">

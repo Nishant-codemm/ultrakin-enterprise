@@ -84,7 +84,7 @@ export default function WorkspaceAppRail({
                   ? 'text-white shadow-xs ring-2'
                   : isDark
                   ? 'text-white/50 hover:text-white hover:bg-white/10'
-                  : 'text-[#667085] hover:text-[#111827] hover:bg-[#eeece7]'
+                  : 'text-ink-muted hover:text-ink hover:bg-surface-hover'
               )}
               style={
                 isActive

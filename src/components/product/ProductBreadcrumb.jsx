@@ -17,18 +17,18 @@ export default function ProductBreadcrumb({
   parentPath = '/products/chat',
 }) {
   return (
-    <nav className="mb-8 flex items-center gap-2 text-[13px] text-[#667085]" aria-label="Breadcrumb">
+    <nav className="mb-8 flex items-center gap-2 text-[13px] text-ink-muted" aria-label="Breadcrumb">
       <button
         type="button"
         onClick={() => navigate(parentPath)}
-        className="hover:text-[#111827] transition-colors duration-150 focus-visible:outline-none focus-visible:underline cursor-pointer"
+        className="hover:text-ink transition-colors duration-150 focus-visible:outline-none focus-visible:underline cursor-pointer"
       >
         {parentLabel}
       </button>
-      <ChevronRight size={12} className="text-[#d0cdc7]" aria-hidden="true" />
+      <ChevronRight size={12} className="text-border-strong" aria-hidden="true" />
       <span
         aria-current="page"
-        className="flex items-center gap-1.5 font-medium text-[#111827]"
+        className="flex items-center gap-1.5 font-medium text-ink"
       >
         {Icon ? (
           <span

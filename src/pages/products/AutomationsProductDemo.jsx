@@ -7,7 +7,7 @@
  * - Node selection: Click any node to inspect its live trigger or approval condition
  * - Respects useReducedMotion
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Mail, Filter, PlusSquare, ShieldCheck, Play, Settings2 } from 'lucide-react';
 import { AUTOMATIONS_DATA } from '../../data/productPageData';
@@ -24,6 +24,13 @@ export default function AutomationsProductDemo() {
   const [selectedNodeId, setSelectedNodeId] = useState('trigger');
   const [testRunComplete, setTestRunComplete] = useState(false);
 
+  // Auto-reset the test run after 2.5 s so users can replay it
+  useEffect(() => {
+    if (!testRunComplete) return;
+    const timer = setTimeout(() => setTestRunComplete(false), 2500);
+    return () => clearTimeout(timer);
+  }, [testRunComplete]);
+
   const selectedNode = AUTOMATIONS_DATA.nodes.find((n) => n.id === selectedNodeId) || AUTOMATIONS_DATA.nodes[0];
 
   return (
@@ -37,7 +44,7 @@ export default function AutomationsProductDemo() {
             <span className="text-xs font-semibold text-slate-200">Support Inbound Triager</span>
             <span className="text-[10px] font-mono text-slate-500">v2.1 · Active</span>
           </div>
-          <button type="button" onClick={() => setTestRunComplete(true)} className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 text-[10px] font-semibold hover:bg-indigo-600/50 transition-colors">
+          <button type="button" onClick={() => setTestRunComplete(true)} aria-label={testRunComplete ? 'Test passed — will reset shortly' : 'Run automation test'} className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 text-[10px] font-semibold hover:bg-indigo-600/50 transition-colors">
             {testRunComplete ? <ShieldCheck size={10} /> : <Play size={10} fill="currentColor" />}
             {testRunComplete ? 'Test passed' : 'Test Run'}
           </button>
@@ -55,6 +62,7 @@ export default function AutomationsProductDemo() {
                   type="button"
                   onClick={() => setSelectedNodeId(node.id)}
                   aria-pressed={isSelected}
+                  aria-label={`${node.label} — ${node.type} step`}
                   className={`flex w-full items-center gap-3 p-3 rounded-xl border text-left transition-all cursor-pointer ${
                     isSelected
                       ? 'border-indigo-400 bg-[#1E293B] shadow-[0_0_20px_rgba(99,102,241,0.2)] ring-1 ring-indigo-400'

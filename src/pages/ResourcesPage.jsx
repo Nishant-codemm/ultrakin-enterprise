@@ -7,6 +7,7 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useClipboard } from '../lib/useClipboard';
+import { navigate } from '../lib/navigate';
 import { useFocusTrap } from '../lib/useFocusTrap';
 import {
   Search,
@@ -102,16 +103,16 @@ export default function ResourcesPage() {
   }, [activeArticle]);
 
   return (
-    <div className="min-h-screen bg-[#faf9f7] text-[#111827] select-none font-sans pt-24 pb-20">
+    <div className="min-h-screen bg-page text-ink select-none font-sans pt-24 pb-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* ─── Hero Section ─────────────────────────────────────────────────── */}
         <div className="max-w-3xl mb-12">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#e5e2dc] bg-white px-3 py-1 text-[11px] font-semibold text-[#667085] shadow-2xs mb-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-3 py-1 text-[11px] font-semibold text-ink-muted shadow-2xs mb-4">
             <span className="h-1.5 w-1.5 rounded-full bg-[#2563eb]" />
             <span>KNOWLEDGE & ARCHITECTURE</span>
           </div>
 
-          <h1 className="font-serif text-[clamp(2.4rem,4.5vw,3.8rem)] font-normal leading-[1.06] tracking-[-0.03em] text-[#111827]">
+          <h1 className="font-serif text-[clamp(2.4rem,4.5vw,3.8rem)] font-normal leading-[1.06] tracking-[-0.03em] text-ink">
             Resources, Guides, and <br />
             Platform Architecture.
           </h1>
@@ -130,19 +131,19 @@ export default function ResourcesPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search guides, architecture docs, whitepapers, or tags (e.g. MCP, WebSockets)..."
-              className="w-full rounded-xl border border-[#e5e2dc] bg-white pl-10 pr-24 py-3 text-xs text-[#111827] placeholder-[#9ca3af] focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/10 focus:outline-none transition-all shadow-2xs"
+              className="w-full rounded-xl border border-border bg-white pl-10 pr-24 py-3 text-xs text-ink placeholder-[#9ca3af] focus:border-[#2563eb] focus:ring-2 focus:ring-[#2563eb]/10 focus:outline-none transition-all shadow-2xs"
             />
             {searchQuery ? (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-[#9ca3af] hover:text-[#111827]"
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-ink-muted hover:text-ink"
               >
                 Clear
               </button>
             ) : (
               <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                <span className="font-mono text-[10px] text-[#9ca3af] bg-[#f0ede8] px-1.5 py-0.5 rounded border border-[#e5e2dc]">
+                <span className="font-mono text-[10px] text-ink-muted bg-surface-soft px-1.5 py-0.5 rounded border border-border">
                   ⌘K
                 </span>
               </div>
@@ -277,21 +278,21 @@ export default function ResourcesPage() {
 
         {/* ─── Resource Grid ────────────────────────────────────────────────── */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between text-xs text-[#667085]">
+          <div className="flex items-center justify-between text-xs text-ink-muted">
             <p>
-              Showing <strong className="text-[#111827]">{filteredResources.length}</strong> resources
+              Showing <strong className="text-ink">{filteredResources.length}</strong> resources
               {activeCategory !== 'all' && ` in ${activeCategory}`}
               {searchQuery && ` matching "${searchQuery}"`}
             </p>
           </div>
 
           {filteredResources.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-[#e5e2dc] bg-white p-12 text-center space-y-3">
-              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#f0ede8] text-[#667085]">
+            <div className="rounded-2xl border border-dashed border-border bg-white p-12 text-center space-y-3">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-surface-soft text-ink-muted">
                 <Search size={18} />
               </div>
-              <p className="text-sm font-semibold text-[#111827]">No resources found</p>
-              <p className="text-xs text-[#667085] max-w-sm mx-auto">
+              <p className="text-sm font-semibold text-ink">No resources found</p>
+              <p className="text-xs text-ink-muted max-w-sm mx-auto">
                 No guides or architecture papers match "{searchQuery}". Try searching for "MCP", "WebSockets", "Zendesk", or "Security".
               </p>
               <button
@@ -300,7 +301,7 @@ export default function ResourcesPage() {
                   setSearchQuery('');
                   setActiveCategory('all');
                 }}
-                className="rounded-md border border-[#e5e2dc] bg-white px-3 py-1.5 text-xs font-semibold text-[#111827] hover:bg-[#faf9f7] cursor-pointer"
+                className="rounded-md border border-border bg-white px-3 py-1.5 text-xs font-semibold text-ink hover:bg-page cursor-pointer"
               >
                 Reset filters
               </button>
@@ -387,15 +388,15 @@ export default function ResourcesPage() {
         </div>
 
         {/* ─── Enterprise Architecture Consultation CTA ────────────────────── */}
-        <div className="mt-20 rounded-2xl border border-[#e5e2dc] bg-white p-8 sm:p-10 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="mt-20 rounded-2xl border border-border bg-white p-8 sm:p-10 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-xl">
             <span className="text-[10.5px] font-semibold uppercase tracking-wider text-[#2563eb]">
               SOLUTIONS ARCHITECTURE
             </span>
-            <h3 className="font-serif text-2xl font-normal text-[#111827]">
+            <h3 className="font-serif text-2xl font-normal text-ink">
               Need a custom architectural evaluation or security debrief?
             </h3>
-            <p className="text-xs sm:text-sm text-[#4b5563] leading-relaxed">
+            <p className="text-xs sm:text-sm text-ink-soft leading-relaxed">
               Our engineering team works directly with enterprise architects to review deployment topology, data retention policies, and single-tenant self-hosting requirements.
             </p>
           </div>
@@ -407,12 +408,13 @@ export default function ResourcesPage() {
             >
               Request Architecture Brief
             </a>
-            <a
-              href="/security"
-              className="w-full sm:w-auto text-center rounded-lg border border-[#e5e2dc] bg-white text-[#374151] px-5 py-2.5 text-xs font-semibold hover:bg-[#faf9f7] transition-colors cursor-pointer"
+            <button
+              type="button"
+              onClick={() => navigate('/security')}
+              className="w-full sm:w-auto text-center rounded-lg border border-border bg-surface-raised text-ink-soft px-5 py-2.5 text-xs font-semibold hover:bg-page transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
             >
               Security Overview
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -429,15 +431,15 @@ export default function ResourcesPage() {
               initial={reduceMotion ? false : { opacity: 0, scale: 0.96, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 10 }}
-              className="w-full max-w-2xl max-h-[85vh] rounded-2xl bg-white border border-[#e5e2dc] shadow-2xl flex flex-col overflow-hidden"
+              className="w-full max-w-2xl max-h-[85vh] rounded-2xl bg-white border border-border shadow-2xl flex flex-col overflow-hidden"
             >
               {/* Reader Header */}
-              <div className="flex items-center justify-between border-b border-[#e5e2dc] px-6 py-4 bg-[#fdfcfb]">
+              <div className="flex items-center justify-between border-b border-border px-6 py-4 bg-surface-raised">
                 <div className="flex items-center gap-2 truncate pr-4">
                   <span className="rounded bg-indigo-50 border border-indigo-200 px-2 py-0.5 text-[10px] font-semibold text-indigo-700">
                     {activeArticle.categoryLabel}
                   </span>
-                  <span className="text-xs text-[#9ca3af] font-mono">
+                  <span className="text-xs text-ink-muted font-mono">
                     {activeArticle.readTime}
                   </span>
                 </div>
@@ -445,7 +447,7 @@ export default function ResourcesPage() {
                   <button
                     type="button"
                     onClick={handleShareArticle}
-                    className="flex items-center gap-1.5 rounded-md border border-[#e5e2dc] bg-white px-2.5 py-1 text-xs font-medium text-[#4b5563] hover:bg-[#f5f3ef] cursor-pointer transition-colors"
+                    className="flex items-center gap-1.5 rounded-md border border-border bg-surface-raised px-2.5 py-1 text-xs font-medium text-ink-soft hover:bg-surface-hover cursor-pointer transition-colors"
                   >
                     {copiedLink ? <CheckCircle2 size={12} className="text-emerald-600" /> : <Share2 size={12} />}
                     <span>{copiedLink ? 'Copied' : 'Share'}</span>
@@ -455,7 +457,7 @@ export default function ResourcesPage() {
                     type="button"
                     onClick={() => setActiveArticle(null)}
                     aria-label="Close document reader"
-                    className="flex h-7 w-7 items-center justify-center rounded-md border border-[#e5e2dc] text-[#6b7280] hover:text-[#111827] hover:bg-[#f0ede8] transition-colors cursor-pointer"
+                    className="flex h-7 w-7 items-center justify-center rounded-md border border-border text-[#6b7280] hover:text-ink hover:bg-surface-soft transition-colors cursor-pointer"
                   >
                     <X size={15} />
                   </button>
@@ -463,28 +465,28 @@ export default function ResourcesPage() {
               </div>
 
               {/* Reader Body */}
-              <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-xs sm:text-sm text-[#374151] leading-relaxed">
+              <div className="p-6 sm:p-8 overflow-y-auto space-y-6 text-xs sm:text-sm text-ink-soft leading-relaxed">
                 <div>
-                  <h2 id="reader-article-title" className="font-serif text-2xl sm:text-3xl font-normal text-[#111827] leading-tight">
+                  <h2 id="reader-article-title" className="font-serif text-2xl sm:text-3xl font-normal text-ink leading-tight">
                     {activeArticle.title}
                   </h2>
-                  <p className="mt-2 text-xs sm:text-sm text-[#667085]">
+                  <p className="mt-2 text-xs sm:text-sm text-ink-muted">
                     {activeArticle.description || activeArticle.subtitle}
                   </p>
                 </div>
 
                 {/* Author Card */}
-                <div className="flex items-center gap-3 py-3 border-y border-[#f0ede8]">
+                <div className="flex items-center gap-3 py-3 border-y border-border">
                   <AvatarChip
                     name={activeArticle.author.name}
                     color={activeArticle.author.color}
                     size="sm"
                   />
                   <div>
-                    <p className="text-xs font-semibold text-[#111827]">
+                    <p className="text-xs font-semibold text-ink">
                       {activeArticle.author.name}
                     </p>
-                    <p className="text-[11px] text-[#667085]">
+                    <p className="text-[11px] text-ink-muted">
                       {activeArticle.author.role} · Published {activeArticle.date}
                     </p>
                   </div>
@@ -496,18 +498,18 @@ export default function ResourcesPage() {
                     <h3 className="font-semibold text-sm sm:text-base text-[#111827]">
                       {section.heading}
                     </h3>
-                    <p className="text-xs sm:text-sm text-[#4b5563] leading-relaxed">
+                    <p className="text-xs sm:text-sm text-ink-soft leading-relaxed">
                       {section.body}
                     </p>
                   </div>
                 ))}
 
                 {/* Tags Footer */}
-                <div className="pt-4 border-t border-[#f0ede8] flex flex-wrap gap-1.5">
+                <div className="pt-4 border-t border-border flex flex-wrap gap-1.5">
                   {activeArticle.tags?.map((t) => (
                     <span
                       key={t}
-                      className="rounded bg-[#faf9f7] border border-[#e5e2dc] px-2 py-0.5 text-[10px] font-mono text-[#667085]"
+                      className="rounded bg-page border border-border px-2 py-0.5 text-[10px] font-mono text-ink-muted"
                     >
                       #{t}
                     </span>
@@ -516,14 +518,14 @@ export default function ResourcesPage() {
               </div>
 
               {/* Reader Footer */}
-              <div className="border-t border-[#e5e2dc] px-6 py-3.5 bg-[#faf9f7] flex items-center justify-between text-xs">
+              <div className="border-t border-border px-6 py-3.5 bg-page flex items-center justify-between text-xs">
                 <span className="text-[#6b7280]">
                   Ultrakin Architecture & Knowledge Base
                 </span>
                 <button
                   type="button"
                   onClick={() => setActiveArticle(null)}
-                  className="rounded-md bg-[#111827] text-white px-3 py-1.5 text-xs font-semibold hover:bg-black transition-colors cursor-pointer"
+                  className="rounded-md bg-ink text-white px-3 py-1.5 text-xs font-semibold hover:bg-black transition-colors cursor-pointer"
                 >
                   Close Document
                 </button>

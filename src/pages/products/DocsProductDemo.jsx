@@ -104,12 +104,13 @@ export default function DocsProductDemo() {
                   aria-pressed={task.done}
                   className="flex w-full items-center gap-2 p-1.5 rounded-md hover:bg-slate-100 cursor-pointer text-left text-xs"
                 >
+                  <span className="sr-only">{task.done ? 'Mark incomplete:' : 'Mark complete:'} {task.text}</span>
                   {task.done ? (
-                    <CheckSquare size={14} className="text-emerald-600 shrink-0" />
+                    <CheckSquare size={14} className="text-emerald-600 shrink-0" aria-hidden="true" />
                   ) : (
-                    <Square size={14} className="text-slate-400 shrink-0" />
+                    <Square size={14} className="text-slate-400 shrink-0" aria-hidden="true" />
                   )}
-                  <span className={task.done ? 'line-through text-slate-400' : 'text-slate-700'}>
+                  <span className={task.done ? 'line-through text-slate-400' : 'text-slate-700'} aria-hidden="true">
                     {task.text}
                   </span>
                 </button>

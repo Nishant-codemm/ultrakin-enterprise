@@ -16,10 +16,10 @@ export default function ProductCTARow({ primaryLabel = 'Create a workspace' }) {
         href={WORKSPACE_URL}
         target="_blank"
         rel="noopener noreferrer"
-        className="group inline-flex h-11 items-center gap-2 rounded-xl bg-[#111827] px-5 text-sm font-semibold text-white
+        className="group inline-flex h-11 items-center gap-2 rounded-xl bg-ink px-5 text-sm font-semibold text-white
                    transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)]
                    hover:bg-[#1f2937] hover:-translate-y-px active:translate-y-0
-                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#111827] focus-visible:ring-offset-2
+                   focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2
                    motion-reduce:transform-none motion-reduce:transition-none"
       >
         {primaryLabel}
@@ -30,7 +30,7 @@ export default function ProductCTARow({ primaryLabel = 'Create a workspace' }) {
       </a>
       <a
         href={SALES_EMAIL}
-        className="text-sm font-medium text-[#667085] underline-offset-2 hover:text-[#111827] hover:underline
+        className="text-sm font-medium text-ink-muted underline-offset-2 hover:text-ink hover:underline
                    transition-colors duration-150 focus-visible:outline-none focus-visible:underline"
       >
         Talk to us

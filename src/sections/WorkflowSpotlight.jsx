@@ -561,7 +561,7 @@ function WorkflowSpotlight() {
                   <div className="relative rounded-xl">
                     <div
                       className={cn(
-                        'relative rounded-xl border bg-obsidian-surface px-4 py-4 shadow-[0_16px_32px_-24px_rgba(0,0,0,.88),inset_0_1px_0_rgba(220,224,255,.055)] sm:min-h-[220px] sm:p-5 transition-all duration-300',
+                        'relative rounded-xl border bg-obsidian-surface px-4 py-4 shadow-[0_16px_32px_-24px_rgba(0,0,0,.88),inset_0_1px_0_rgba(220,224,255,.055)] min-h-[180px] sm:min-h-[220px] sm:p-5 transition-all duration-300',
                         'border-indigo-500/30 shadow-[0_0_24px_-6px_rgba(99,102,241,0.2)]',
                       )}
                     >
@@ -616,7 +616,7 @@ function WorkflowSpotlight() {
                   <div className="relative rounded-xl">
                     <div
                       className={cn(
-                        'relative rounded-xl border bg-obsidian-base px-4 py-4 text-white shadow-[0_18px_38px_-25px_rgba(0,0,0,.72),inset_0_1px_0_rgba(220,224,255,.07)] sm:min-h-[220px] sm:px-5 sm:py-5 transition-all duration-300',
+                        'relative rounded-xl border bg-obsidian-base px-4 py-4 text-white shadow-[0_18px_38px_-25px_rgba(0,0,0,.72),inset_0_1px_0_rgba(220,224,255,.07)] min-h-[180px] sm:min-h-[220px] sm:px-5 sm:py-5 transition-all duration-300',
                         'border-violet-500/35 shadow-[0_0_24px_-6px_rgba(139,92,246,0.22)]',
                       )}
                     >

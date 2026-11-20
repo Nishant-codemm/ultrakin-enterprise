@@ -24,6 +24,7 @@ import SolutionBreadcrumb from '../components/solution/SolutionBreadcrumb';
 import ProductCTARow from '../components/product/ProductCTARow';
 import ProductFeatureGrid from '../components/product/ProductFeatureGrid';
 import DemoWindowFrame from '../components/product/DemoWindowFrame';
+import { navigate } from '../lib/navigate';
 
 const SOLUTION_ICONS = {
   'customer-support': Headphones,
@@ -62,13 +63,13 @@ const DEMO_MAP = {
 function DemoSkeleton() {
   return (
     <div className="h-full w-full animate-pulse bg-white">
-      <div className="h-10 bg-[#f0ede8] mb-0" />
+      <div className="h-10 bg-surface-soft mb-0" />
       <div className="p-4 space-y-3">
-        <div className="h-4 bg-[#f0ede8] rounded-full w-3/4" />
-        <div className="h-4 bg-[#f0ede8] rounded-full w-1/2" />
-        <div className="h-4 bg-[#f0ede8] rounded-full w-5/6" />
-        <div className="mt-6 h-4 bg-[#f0ede8] rounded-full w-2/3" />
-        <div className="h-4 bg-[#f0ede8] rounded-full w-3/4" />
+        <div className="h-4 bg-surface-soft rounded-full w-3/4" />
+        <div className="h-4 bg-surface-soft rounded-full w-1/2" />
+        <div className="h-4 bg-surface-soft rounded-full w-5/6" />
+        <div className="mt-6 h-4 bg-surface-soft rounded-full w-2/3" />
+        <div className="h-4 bg-surface-soft rounded-full w-3/4" />
       </div>
     </div>
   );
@@ -77,7 +78,7 @@ function DemoSkeleton() {
 // ─── Hero H1 with line breaks ─────────────────────────────────────────────────
 function HeroH1({ lines = [], accentColor }) {
   return (
-    <h1 className="font-display text-[clamp(2.1rem,4vw,3.4rem)] font-normal leading-[1.08] tracking-[-0.03em] text-[#111827]">
+    <h1 className="font-display text-[clamp(2.1rem,4vw,3.4rem)] font-normal leading-[1.08] tracking-[-0.03em] text-ink">
       {lines.map((line, i) => (
         <React.Fragment key={i}>
           {i === lines.length - 1 ? (
@@ -302,12 +303,19 @@ export default function SolutionPage() {
   const slug = window.location.pathname.replace('/solutions/', '').replace(/\/$/, '');
   const meta = SOLUTION_META[slug];
 
-  // Update page title & meta
+  // Update all page-level meta: title, description, OpenGraph, Twitter
+  // Runs AFTER App.jsx's meta effect so solution-specific meta wins
   useEffect(() => {
-    if (meta) {
-      document.title = meta.pageTitle;
-      document.querySelector('meta[name="description"]')?.setAttribute('content', meta.pageDesc);
-    }
+    if (!meta) return;
+    const url = window.location.href;
+    document.title = meta.pageTitle;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', meta.pageDesc);
+    document.querySelector('meta[property="og:title"]')?.setAttribute('content', meta.pageTitle);
+    document.querySelector('meta[property="og:description"]')?.setAttribute('content', meta.pageDesc);
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', url);
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', url);
+    document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', meta.pageTitle);
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', meta.pageDesc);
   }, [meta]);
 
   if (!meta) {
@@ -315,9 +323,13 @@ export default function SolutionPage() {
       <div className="min-h-screen flex items-center justify-center bg-page">
         <div className="text-center">
           <p className="text-[#667085] text-sm">Solution page not found.</p>
-          <a href="/solutions" className="mt-4 inline-block text-sm text-[#3156cf] hover:underline">
+          <button
+            type="button"
+            onClick={() => navigate('/solutions')}
+            className="mt-4 inline-block text-sm text-[#3156cf] hover:underline cursor-pointer"
+          >
             ← View all solutions
-          </a>
+          </button>
         </div>
       </div>
     );
@@ -346,7 +358,7 @@ export default function SolutionPage() {
           </motion.div>
 
           {/* Two-column hero */}
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16 lg:items-center">
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-10 lg:grid-cols-2 lg:gap-16 lg:items-center">
             {/* Left: copy */}
             <motion.div variants={leftVariants} className="max-w-lg">
               {/* Eyebrow */}

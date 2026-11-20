@@ -58,6 +58,9 @@
 
   /* Kinetic Easing */
   --ease-kinetic: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Custom Breakpoints */
+  --breakpoint-xs: 400px;
 }
 
 :root {

@@ -90,7 +90,7 @@ export default function PricingPage() {
           </div>
         </header>
 
-        <section aria-label="Pricing plans" className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:gap-5">
+        <section aria-label="Pricing plans" className="mt-12 grid gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:gap-5">
           {plans.map((plan) => (
             <article
               key={plan.id}

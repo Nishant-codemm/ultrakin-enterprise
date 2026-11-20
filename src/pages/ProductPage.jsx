@@ -25,6 +25,16 @@ import ProductCTARow from '../components/product/ProductCTARow';
 import ProductFeatureGrid from '../components/product/ProductFeatureGrid';
 import DemoWindowFrame from '../components/product/DemoWindowFrame';
 import { ProductHandoffs, ProductClosingCTA } from '../components/product/ProductContinuitySections';
+import { navigate } from '../lib/navigate';
+
+// ─── Slug resolver — extracts the product slug from any recognised pathname ───
+function resolveProductSlug(path) {
+  if (path === '/events' || path === '/calendar' || path === '/events/calendar') return 'events';
+  if (path === '/products/tasks') return 'lists';
+  if (path === '/agents') return 'agents';
+  const stripped = path.replace('/products/', '').replace('/products', '');
+  return stripped || 'chat';
+}
 
 const PRODUCT_ICONS = {
   chat: MessageSquare,
@@ -65,13 +75,13 @@ const DEMO_MAP = {
 function DemoSkeleton() {
   return (
     <div className="h-full w-full animate-pulse">
-      <div className="h-10 bg-[#f0ede8] mb-0" />
+      <div className="h-10 bg-surface-soft mb-0" />
       <div className="p-4 space-y-3">
-        <div className="h-4 bg-[#f0ede8] rounded-full w-3/4" />
-        <div className="h-4 bg-[#f0ede8] rounded-full w-1/2" />
-        <div className="h-4 bg-[#f0ede8] rounded-full w-5/6" />
-        <div className="mt-6 h-4 bg-[#f0ede8] rounded-full w-2/3" />
-        <div className="h-4 bg-[#f0ede8] rounded-full w-3/4" />
+        <div className="h-4 bg-surface-soft rounded-full w-3/4" />
+        <div className="h-4 bg-surface-soft rounded-full w-1/2" />
+        <div className="h-4 bg-surface-soft rounded-full w-5/6" />
+        <div className="mt-6 h-4 bg-surface-soft rounded-full w-2/3" />
+        <div className="h-4 bg-surface-soft rounded-full w-3/4" />
       </div>
     </div>
   );
@@ -89,19 +99,25 @@ function HeroH1({ title }) {
 // ─── Main ProductPage ─────────────────────────────────────────────────────────
 export default function ProductPage() {
   const reduceMotion = useReducedMotion();
+
+  // Derive slug from pathname — extracted into a named function for clarity and testability
   const path = window.location.pathname.replace(/\/$/, '');
-  const rawSlug = path === '/events' || path === '/calendar' || path === '/events/calendar'
-    ? 'events'
-    : (path === '/products/tasks' ? 'lists' : (path === '/agents' ? 'agents' : path.replace('/products/', '').replace('/products', '')));
-  const slug = rawSlug || 'chat';
+  const slug = resolveProductSlug(path);
   const meta = PRODUCT_META[slug];
 
-  // Update page title
+  // Update all page-level meta: title, description, OpenGraph, Twitter
+  // Runs AFTER App.jsx's meta effect (component mount fires later than App's pathname effect)
   useEffect(() => {
-    if (meta) {
-      document.title = meta.pageTitle;
-      document.querySelector('meta[name="description"]')?.setAttribute('content', meta.pageDesc);
-    }
+    if (!meta) return;
+    const url = window.location.href;
+    document.title = meta.pageTitle;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', meta.pageDesc);
+    document.querySelector('meta[property="og:title"]')?.setAttribute('content', meta.pageTitle);
+    document.querySelector('meta[property="og:description"]')?.setAttribute('content', meta.pageDesc);
+    document.querySelector('meta[property="og:url"]')?.setAttribute('content', url);
+    document.querySelector('link[rel="canonical"]')?.setAttribute('href', url);
+    document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', meta.pageTitle);
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', meta.pageDesc);
   }, [meta]);
 
   if (!meta) {
@@ -109,7 +125,13 @@ export default function ProductPage() {
       <div className="min-h-screen flex items-center justify-center bg-page">
         <div className="text-center">
           <p className="text-[#667085] text-sm">Product page not found.</p>
-          <a href="/" className="mt-4 inline-block text-sm text-[#3156cf] hover:underline">← Back to home</a>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="mt-4 inline-block text-sm text-[#3156cf] hover:underline cursor-pointer"
+          >
+            ← Back to home
+          </button>
         </div>
       </div>
     );
@@ -138,7 +160,7 @@ export default function ProductPage() {
           </motion.div>
 
           {/* Two-column hero */}
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16 lg:items-center">
+          <div className="grid grid-cols-1 gap-12 md:grid-cols-2 md:gap-10 lg:grid-cols-2 lg:gap-16 lg:items-center">
             {/* Left: copy */}
             <motion.div variants={leftVariants} className="max-w-lg">
               {/* H1 */}

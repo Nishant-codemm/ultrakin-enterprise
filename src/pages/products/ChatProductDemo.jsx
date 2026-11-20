@@ -14,9 +14,23 @@ import { CHAT_DATA } from '../../data/productPageData';
 export default function ChatProductDemo() {
   const reduceMotion = useReducedMotion();
   const [activeChannelId, setActiveChannelId] = useState('support');
+  const [activeDmId, setActiveDmId] = useState(null); // null = channel view
 
   const activeChannel = CHAT_DATA.channels.find((c) => c.id === activeChannelId) || CHAT_DATA.channels[0];
-  const channelMessages = CHAT_DATA.messages[activeChannelId] || [];
+  const channelMessages = activeDmId
+    ? (CHAT_DATA.dmMessages[activeDmId] || [])
+    : (CHAT_DATA.messages[activeChannelId] || []);
+
+  const activeDm = activeDmId ? CHAT_DATA.dms.find((d) => d.id === activeDmId) : null;
+
+  const switchToChannel = (id) => {
+    setActiveDmId(null);
+    setActiveChannelId(id);
+  };
+
+  const switchToDm = (id) => {
+    setActiveDmId(id);
+  };
 
   return (
     <div className="flex h-full w-full overflow-hidden bg-[#0B0F19] text-slate-200 select-none">
@@ -24,7 +38,7 @@ export default function ChatProductDemo() {
       <WorkspaceAppRail activeApp="chat" theme="dark" />
 
       {/* ── Left Sidebar (Channels & DMs) ── */}
-      <div className="hidden xs:flex w-[140px] sm:w-[190px] shrink-0 border-r border-white/[0.08] bg-[#07090E] flex flex-col justify-between p-3">
+      <div className="hidden sm:flex w-[140px] sm:w-[190px] shrink-0 border-r border-white/[0.08] bg-[#07090E] flex flex-col justify-between p-3">
         <div className="space-y-4">
           <div>
             <div className="flex items-center justify-between px-2 mb-1.5">
@@ -38,8 +52,8 @@ export default function ChatProductDemo() {
                   <button
                     key={ch.id}
                     type="button"
-                    onClick={() => setActiveChannelId(ch.id)}
-                    aria-pressed={isActive}
+                    onClick={() => switchToChannel(ch.id)}
+                    aria-pressed={isActive && !activeDmId}
                     className={`flex items-center justify-between w-full px-2 py-1.5 rounded-lg text-left text-xs transition-colors duration-150 cursor-pointer ${
                       isActive
                         ? 'bg-indigo-600/25 text-indigo-300 font-semibold border border-indigo-500/30'
@@ -67,15 +81,30 @@ export default function ChatProductDemo() {
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
             </div>
             <div className="space-y-1">
-              {CHAT_DATA.dms.map((dm) => (
-                <div
-                  key={dm.id}
-                  className="flex items-center gap-2 px-2 py-1 rounded-md text-xs text-slate-400"
-                >
-                  <AvatarChip person={dm.person} size="xs" online={dm.online} />
-                  <span className="truncate">{dm.person.name}</span>
-                </div>
-              ))}
+              {CHAT_DATA.dms.map((dm) => {
+                const isActiveDm = activeDmId === dm.id;
+                return (
+                  <button
+                    key={dm.id}
+                    type="button"
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => switchToDm(dm.id)}
+                    aria-pressed={isActiveDm}
+                    className={`flex w-full items-center gap-2 px-2 py-1 rounded-md text-xs transition-colors duration-150 cursor-pointer ${
+                      isActiveDm
+                        ? 'bg-indigo-600/20 text-slate-200 border border-indigo-500/20'
+                        : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    <AvatarChip person={dm.person} size="xs" online={dm.online} />
+                    <span className="truncate">{dm.person.name}</span>
+                    {dm.online && !isActiveDm && (
+                      <span className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400" aria-label="Online" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -90,25 +119,88 @@ export default function ChatProductDemo() {
         </div>
       </div>
 
+      {/* ── Mobile Channel Selector (visible only when sidebar is hidden) ── */}
+      <div className="sm:hidden shrink-0 flex items-center gap-1.5 overflow-x-auto scrollbar-none border-b border-white/[0.08] bg-[#07090E] px-2 py-1.5">
+        {CHAT_DATA.channels.map((ch) => {
+          const isActive = ch.id === activeChannelId;
+          return (
+            <button
+              key={ch.id}
+              type="button"
+              onClick={() => switchToChannel(ch.id)}
+              aria-pressed={isActive && !activeDmId}
+              className={`flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-semibold transition-colors cursor-pointer ${
+                isActive
+                  ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/30'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.06]'
+              }`}
+            >
+              <Hash size={9} className={isActive ? 'text-indigo-400' : 'text-slate-500'} />
+              {ch.name}
+              {ch.unread > 0 && !isActive && (
+                <span className="flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-indigo-500 px-0.5 text-[8px] font-bold text-white">
+                  {ch.unread}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
       {/* ── Main Message Pane ── */}
       <div className="flex-1 flex flex-col overflow-hidden bg-[#0B0F19]">
         {/* Header */}
         <div className="h-10 shrink-0 border-b border-white/[0.08] flex items-center justify-between px-4 bg-[#0B0F19]/90 backdrop-blur">
           <div className="flex items-center gap-2">
-            <Hash size={14} className="text-indigo-400" />
-            <span className="text-xs font-semibold text-slate-100">{activeChannel.name}</span>
+            {activeDm ? (
+              <>
+                <AvatarChip person={activeDm.person} size="xs" online={activeDm.online} />
+                <span className="text-xs font-semibold text-slate-100">{activeDm.person.name}</span>
+                {activeDm.online && (
+                  <span className="text-[10px] text-emerald-400 font-mono">· Active now</span>
+                )}
+              </>
+            ) : (
+              <>
+                <Hash size={14} className="text-indigo-400" />
+                <span className="text-xs font-semibold text-slate-100">{activeChannel.name}</span>
+              </>
+            )}
           </div>
           <span className="text-[11px] text-slate-500 font-mono">
-            {activeChannel.members || 12} members
+            {activeDm ? 'Direct Message' : `${activeChannel.members || 12} members`}
           </span>
         </div>
 
         {/* Messages Feed */}
         <div className="flex-1 overflow-y-auto p-4 space-y-3.5">
           <AnimatePresence initial={false}>
-            {channelMessages.map((msg, index) => (
+            {channelMessages.map((msg, index) => {
+              const paneKey = activeDmId || activeChannelId;
+              if (msg.isSelf) {
+                return (
+                  <motion.div
+                    key={`${paneKey}-${msg.id}`}
+                    initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.25, delay: index * 0.03 }}
+                    className="flex justify-end text-xs"
+                  >
+                    <div className="max-w-[75%]">
+                      <div className="flex items-center justify-end gap-2 mb-0.5">
+                        <span className="text-[10px] text-slate-500 font-mono tabular-nums">{msg.time}</span>
+                        <span className="font-semibold text-slate-200 text-[12px]">You</span>
+                      </div>
+                      <p className="rounded-xl rounded-tr-sm bg-indigo-600/30 border border-indigo-500/20 px-3 py-2 text-slate-200 leading-relaxed text-[12.5px]">
+                        {msg.text}
+                      </p>
+                    </div>
+                  </motion.div>
+                );
+              }
+              return (
               <motion.div
-                key={`${activeChannelId}-${msg.id}`}
+                key={`${paneKey}-${msg.id}`}
                 initial={reduceMotion ? false : { opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, delay: index * 0.03 }}
@@ -213,14 +305,15 @@ export default function ChatProductDemo() {
                   </div>
                 </div>
               </motion.div>
-            ))}
+            );
+            })}
           </AnimatePresence>
         </div>
 
         {/* Read-only composer keeps the product preview grounded as a sample UI. */}
         <div aria-hidden="true" className="p-3 border-t border-white/[0.08] bg-[#07090E]">
           <div className="rounded-xl bg-white/[0.05] border border-white/[0.1] px-3 py-2 text-xs text-slate-500">
-            Message #{activeChannel.name}…
+            {activeDm ? `Message ${activeDm.person.name}…` : `Message #${activeChannel.name}…`}
           </div>
         </div>
       </div>

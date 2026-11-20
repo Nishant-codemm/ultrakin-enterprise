@@ -14,9 +14,9 @@ export default function ProductFeatureGrid({ features = [], productColor, produc
 
   if (variant === 'capabilities') {
     return (
-      <section className="mt-20 border-t border-[#e7e4de] pt-16 pb-20">
+      <section className="mt-20 border-t border-border pt-16 pb-20">
         <div className="mx-auto max-w-7xl px-5 lg:px-8">
-          <h2 className="mb-10 font-sans text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-[1.1] tracking-[-0.04em] text-[#111827]">
+          <h2 className="mb-10 font-sans text-[clamp(1.75rem,3vw,2.5rem)] font-semibold leading-[1.1] tracking-[-0.04em] text-ink">
             What you can do with {productName}.
           </h2>
 
@@ -28,10 +28,10 @@ export default function ProductFeatureGrid({ features = [], productColor, produc
                 whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
                 transition={{ duration: 0.4, delay: index * 0.05, ease: [0.16, 1, 0.3, 1] }}
-                className="border-t border-[#e7e4de] py-5"
+                className="border-t border-border py-5"
               >
-                <h3 className="text-sm font-semibold leading-5 text-[#111827]">{feature.title}</h3>
-                <p className="mt-2 text-[13px] leading-5 text-[#667085]">{feature.description}</p>
+                <h3 className="text-sm font-semibold leading-5 text-ink">{feature.title}</h3>
+                <p className="mt-2 text-[13px] leading-5 text-ink-muted">{feature.description}</p>
               </motion.article>
             ))}
           </div>
@@ -41,11 +41,11 @@ export default function ProductFeatureGrid({ features = [], productColor, produc
   }
 
   return (
-    <section className="mt-20 border-t border-[#e7e4de] pt-16 pb-20">
+    <section className="mt-20 border-t border-border pt-16 pb-20">
       <div className="mx-auto max-w-5xl px-5 lg:px-8">
-        <h2 className="font-display text-[clamp(1.75rem,3vw,2.5rem)] font-normal leading-[1.1] tracking-[-0.025em] text-[#111827] mb-12">
+        <h2 className="font-display text-[clamp(1.75rem,3vw,2.5rem)] font-normal leading-[1.1] tracking-[-0.025em] text-ink mb-12">
           What gets in the way,<br />
-          <span className="text-[#667085] font-normal">and what changes.</span>
+          <span className="text-ink-muted font-normal">and what changes.</span>
         </h2>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -56,14 +56,14 @@ export default function ProductFeatureGrid({ features = [], productColor, produc
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.45, delay: i * 0.07, ease: ULTRAKIN_EASE }}
-              className="rounded-xl border border-[#e7e4de] bg-[#fafaf9] p-5"
+              className="rounded-xl border border-border bg-surface-raised p-5"
             >
               {/* Problem */}
               <div className="flex items-start gap-3 mb-3">
                 <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-red-50 border border-red-100">
                   <X size={11} className="text-red-400" />
                 </span>
-                <p className="text-[13px] leading-5 text-[#667085] line-through decoration-[#d0cdc7]">
+                <p className="text-[13px] leading-5 text-ink-muted line-through decoration-[#d0cdc7]">
                   {f.problem}
                 </p>
               </div>
@@ -75,7 +75,7 @@ export default function ProductFeatureGrid({ features = [], productColor, produc
                 >
                   <Check size={11} style={{ color: productColor || '#059669' }} />
                 </span>
-                <p className="text-[13px] leading-5 text-[#111827] font-medium">
+                <p className="text-[13px] leading-5 text-ink font-medium">
                   {f.solution}
                 </p>
               </div>

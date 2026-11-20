@@ -193,6 +193,12 @@ export default function App() {
     (pathname.startsWith('/solutions/') ? UniversalSolutionPage : (isHome ? null : NotFoundPage)));
 
   useEffect(() => {
+    // Product and solution sub-pages own their own meta via their component useEffect.
+    // Skip App-level meta updates for those routes to prevent homepage metadata overwriting
+    // the per-page title/description set by ProductPage.jsx / SolutionPage.jsx.
+    const isSubPage = pathname.startsWith('/products/') || pathname.startsWith('/solutions/');
+    if (isSubPage) return;
+
     const isNotFound = !isHome && !ROUTE_PAGES[pathname] && !pathname.startsWith('/products/') && !pathname.startsWith('/solutions/');
     const metadata = isNotFound
       ? {
@@ -200,7 +206,7 @@ export default function App() {
           description: 'The requested page could not be found.',
         }
       : (PAGE_METADATA[pathname] || PAGE_METADATA['/']);
-    const canonicalUrl = `https://ultrakin.com${pathname === '/' ? '/' : pathname}`;
+    const canonicalUrl = `https://ultrakin-enterprise.vercel.app${pathname === '/' ? '/' : pathname}`;
     document.title = metadata.title;
     document.querySelector('meta[name="description"]')?.setAttribute('content', metadata.description);
     document.querySelector('link[rel="canonical"]')?.setAttribute('href', canonicalUrl);

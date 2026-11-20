@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, Compass } from 'lucide-react';
+import { navigate } from '../lib/navigate';
 
 export default function NotFoundPage() {
   return (
@@ -18,19 +19,21 @@ export default function NotFoundPage() {
       </p>
 
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-        <a
-          href="/"
-          className="inline-flex items-center gap-2 rounded-lg bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="inline-flex items-center gap-2 rounded-lg bg-ink px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus cursor-pointer"
         >
           Back to Home
           <ArrowRight className="h-3.5 w-3.5" />
-        </a>
-        <a
-          href="/pricing"
-          className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-raised px-4 py-2.5 text-xs font-medium text-ink transition-colors hover:bg-surface-hover hover:border-brand/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+        </button>
+        <button
+          type="button"
+          onClick={() => navigate('/pricing')}
+          className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-raised px-4 py-2.5 text-xs font-medium text-ink transition-colors hover:bg-surface-hover hover:border-brand/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus cursor-pointer"
         >
           View Plans
-        </a>
+        </button>
       </div>
     </div>
   );
