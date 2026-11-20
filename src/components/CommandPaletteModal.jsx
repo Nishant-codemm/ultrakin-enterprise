@@ -17,8 +17,12 @@ import {
   Calendar,
   AtSign,
   FolderOpen,
+  Copy,
+  CreditCard,
+  Layers,
 } from 'lucide-react';
 import { useWorkspace } from '../context/useWorkspace';
+import { navigate } from '../lib/navigate';
 import { cn } from '../lib/cn';
 import { scrimMotion, MODAL_DIALOG_TRANSITION } from '../lib/motion';
 import { useFocusTrap } from '../lib/useFocusTrap';
@@ -55,6 +59,16 @@ export default function CommandPaletteModal() {
     initialFocusRef: inputRef,
     onEscape: closeSearchPalette,
   });
+
+  const jumpToModule = useCallback(
+    (mod) => {
+      setActiveModule(mod);
+      if (typeof window !== 'undefined' && window.location.pathname !== '/workspace') {
+        navigate('/workspace');
+      }
+    },
+    [setActiveModule]
+  );
 
   const executeAiAction = useCallback((statusMessage, callback) => {
     setAiGeneratingState(statusMessage);
@@ -343,131 +357,226 @@ export default function CommandPaletteModal() {
       // Contextual AI Copilot Actions for active module
       ...aiContextActions,
 
-      // Commands
+      // Workspace Modules
       {
         id: 'cmd_chat',
         type: 'command',
-        category: 'Commands',
+        category: 'Workspace Modules',
         title: 'Open Spaces Chat (⌘1)',
         subtitle: 'Real-time multi-agent communication and Ukin assistant channel',
         icon: MessageSquare,
-        action: () => setActiveModule('chat'),
+        action: () => jumpToModule('chat'),
         badge: 'Chat',
-        badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
-      },
-      {
-        id: 'cmd_threads',
-        type: 'command',
-        category: 'Commands',
-        title: 'Open Incident Threads (⌘2)',
-        subtitle: 'Focused discussions and incident resolution threads',
-        icon: AtSign,
-        action: () => setActiveModule('threads'),
-        badge: 'Threads',
-        badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
-      },
-      {
-        id: 'cmd_mail',
-        type: 'command',
-        category: 'Commands',
-        title: 'Compose Domain Email (⌘3)',
-        subtitle: 'Draft a message in the sample workspace',
-        icon: Mail,
-        action: () => setActiveModule('mail'),
-        badge: 'Action',
-        badgeColor: 'bg-sky-50 text-sky-800 border-sky-200',
-      },
-      {
-        id: 'cmd_docs',
-        type: 'command',
-        category: 'Commands',
-        title: 'Open Living Docs (⌘4)',
-        subtitle: 'TipTap collaborative documents, architecture specs, and RFCs',
-        icon: FileText,
-        action: () => setActiveModule('docs'),
-        badge: 'Docs',
-        badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-      },
-      {
-        id: 'cmd_calendar',
-        type: 'command',
-        category: 'Commands',
-        title: 'Open Team Calendar & Schedule (⌘5)',
-        subtitle: 'View multi-timezone calendar and upcoming architecture sessions',
-        icon: Calendar,
-        action: () => setActiveModule('calendar'),
-        badge: 'Calendar',
         badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
       },
       {
         id: 'cmd_huddle',
         type: 'command',
-        category: 'Commands',
+        category: 'Workspace Modules',
         title: 'Start WebRTC Huddle (⌘6)',
-        subtitle: 'Start a Huddle and capture discussion notes',
+        subtitle: 'Start a live voice session and capture AI discussion notes',
         icon: Video,
-        action: () => setActiveModule('huddle'),
-        badge: 'Action',
+        action: () => jumpToModule('huddle'),
+        badge: 'Huddle',
         badgeColor: 'bg-violet-50 text-violet-800 border-violet-200',
       },
       {
         id: 'cmd_task',
         type: 'command',
-        category: 'Commands',
-        title: 'Create Kanban Task (⌘7)',
-        subtitle: 'Spawn a ticket in Sprint 24 pipeline',
+        category: 'Workspace Modules',
+        title: 'Open Sprint Kanban (⌘7)',
+        subtitle: 'Triage and track tasks in the Sprint 24 pipeline',
         icon: CheckSquare,
-        action: () => setActiveModule('tasks'),
-        badge: 'Action',
+        action: () => jumpToModule('tasks'),
+        badge: 'Tasks',
         badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+      },
+      {
+        id: 'cmd_dag',
+        type: 'command',
+        category: 'Workspace Modules',
+        title: 'Open Automations Canvas (⌘9)',
+        subtitle: 'Visual DAG workflow builder with cycle validation & simulation',
+        icon: GitBranch,
+        action: () => {
+          jumpToModule('automations');
+          testAutomationsWorkflow();
+        },
+        badge: 'Automations',
+        badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      },
+      {
+        id: 'cmd_calendar',
+        type: 'command',
+        category: 'Workspace Modules',
+        title: 'Open Team Calendar (⌘5)',
+        subtitle: 'View multi-timezone calendar and upcoming architecture sessions',
+        icon: Calendar,
+        action: () => jumpToModule('calendar'),
+        badge: 'Calendar',
+        badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+      },
+      {
+        id: 'cmd_docs',
+        type: 'command',
+        category: 'Workspace Modules',
+        title: 'Open Living Docs (⌘4)',
+        subtitle: 'Collaborative documents, architecture specs, and living RFCs',
+        icon: FileText,
+        action: () => jumpToModule('docs'),
+        badge: 'Docs',
+        badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      },
+      {
+        id: 'cmd_mail',
+        type: 'command',
+        category: 'Workspace Modules',
+        title: 'Compose Domain Email (⌘3)',
+        subtitle: 'Draft and review verified communications with customer context',
+        icon: Mail,
+        action: () => jumpToModule('mail'),
+        badge: 'Mail',
+        badgeColor: 'bg-sky-50 text-sky-800 border-sky-200',
+      },
+      {
+        id: 'cmd_threads',
+        type: 'command',
+        category: 'Workspace Modules',
+        title: 'Open Incident Threads (⌘2)',
+        subtitle: 'Focused discussions and incident resolution threads',
+        icon: AtSign,
+        action: () => jumpToModule('threads'),
+        badge: 'Threads',
+        badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
       },
       {
         id: 'cmd_files',
         type: 'command',
-        category: 'Commands',
+        category: 'Workspace Modules',
         title: 'Browse Files & Evidence (⌘8)',
         subtitle: 'Explore uploaded audit specifications, hashes, and compliance evidence',
         icon: FolderOpen,
-        action: () => setActiveModule('files'),
+        action: () => jumpToModule('files'),
         badge: 'Files',
         badgeColor: 'bg-slate-50 text-slate-800 border-slate-200',
       },
-    {
-      id: 'cmd_dag',
-      type: 'command',
-      category: 'Commands',
-      title: 'Test Automations DAG Execution',
-      subtitle: 'Run Tarjan cycle validator and step through node simulation',
-      icon: GitBranch,
-      action: () => {
-        setActiveModule('automations');
-        testAutomationsWorkflow();
+
+      // Key Pages
+      {
+        id: 'page_pricing',
+        type: 'page',
+        category: 'Key Pages',
+        title: 'Pricing & Enterprise Plans',
+        subtitle: 'Compare Starter, Pro, and Enterprise tiers with volume SLAs',
+        icon: CreditCard,
+        action: () => navigate('/pricing'),
+        badge: 'Page',
+        badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
       },
-      badge: 'Action',
-      badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    },
-    {
-      id: 'cmd_demo',
-      type: 'command',
-      category: 'Commands',
-      title: 'Contact the Ultrakin team',
-      subtitle: 'Open an email draft to ask about a product evaluation',
-      icon: Terminal,
-      action: () => openDemoDrawer(),
-      badge: 'Sales',
-      badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
-    },
-    {
-      id: 'cmd_shortcuts',
-      type: 'command',
-      category: 'Commands',
-      title: 'Keyboard Shortcuts Cheatsheet (⌘/)',
-      subtitle: 'View the keyboard shortcuts available in this preview',
-      icon: Keyboard,
-      action: () => setIsKeyboardModalOpen(true),
-      badge: 'Help',
-      badgeColor: 'bg-surface-soft text-ink-muted border-border',
-    },
+      {
+        id: 'page_security',
+        type: 'page',
+        category: 'Key Pages',
+        title: 'Security & Enterprise Trust',
+        subtitle: 'SOC 2 Type II, CMEK encryption, audit logs, and data sovereignty',
+        icon: Shield,
+        action: () => navigate('/security'),
+        badge: 'Page',
+        badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      },
+      {
+        id: 'page_agents',
+        type: 'page',
+        category: 'Key Pages',
+        title: 'AI Agents & Workflows',
+        subtitle: 'Autonomous agents with human-in-the-loop inspection and review',
+        icon: Sparkles,
+        action: () => navigate('/agents'),
+        badge: 'Page',
+        badgeColor: 'bg-violet-50 text-violet-800 border-violet-200',
+      },
+      {
+        id: 'page_solutions',
+        type: 'page',
+        category: 'Key Pages',
+        title: 'Solutions Directory',
+        subtitle: 'Customer Support, Sales, Engineering, Operations, and Marketing solutions',
+        icon: Layers,
+        action: () => navigate('/solutions'),
+        badge: 'Page',
+        badgeColor: 'bg-sky-50 text-sky-800 border-sky-200',
+      },
+      {
+        id: 'page_resources',
+        type: 'page',
+        category: 'Key Pages',
+        title: 'Resources & Architecture Playbooks',
+        subtitle: 'Architectural whitepapers, operational playbooks, and case studies',
+        icon: FileText,
+        action: () => navigate('/resources'),
+        badge: 'Page',
+        badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
+      },
+
+      // Quick Actions
+      {
+        id: 'action_open_workspace',
+        type: 'action',
+        category: 'Quick Actions',
+        title: 'Open Interactive Workspace',
+        subtitle: 'Launch full multi-agent collaborative workspace shell',
+        icon: Terminal,
+        action: () => navigate('/workspace'),
+        badge: 'Launch',
+        badgeColor: 'bg-brand/10 text-brand-text border-brand/20',
+      },
+      {
+        id: 'action_copy_link',
+        type: 'action',
+        category: 'Quick Actions',
+        title: 'Copy Live Production Link',
+        subtitle: 'Copy https://ultrakin-enterprise.vercel.app to clipboard',
+        icon: Copy,
+        action: () => {
+          const liveUrl = 'https://ultrakin-enterprise.vercel.app';
+          if (navigator.clipboard?.writeText) {
+            navigator.clipboard
+              .writeText(liveUrl)
+              .then(() => {
+                addToast('Link Copied', 'Production URL copied to clipboard.', 'success');
+              })
+              .catch(() => {
+                addToast('Live Link', liveUrl, 'info');
+              });
+          } else {
+            addToast('Live Link', liveUrl, 'info');
+          }
+        },
+        badge: 'Share',
+        badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      },
+      {
+        id: 'cmd_demo',
+        type: 'command',
+        category: 'Quick Actions',
+        title: 'Talk with Us (Enterprise Sales)',
+        subtitle: 'Open the consultation drawer for pilot pricing and deployment SLA',
+        icon: Terminal,
+        action: () => openDemoDrawer(),
+        badge: 'Sales',
+        badgeColor: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+      },
+      {
+        id: 'cmd_shortcuts',
+        type: 'command',
+        category: 'Quick Actions',
+        title: 'Keyboard Shortcuts Cheatsheet (⌘/)',
+        subtitle: 'View all keyboard navigation shortcuts across the workspace',
+        icon: Keyboard,
+        action: () => setIsKeyboardModalOpen(true),
+        badge: 'Help',
+        badgeColor: 'bg-surface-soft text-ink-muted border-border',
+      },
 
     // Spaces Chat
     {
@@ -478,7 +587,7 @@ export default function CommandPaletteModal() {
       subtitle: 'Coordinate a rollout and review team updates',
       icon: MessageSquare,
       action: () => {
-        setActiveModule('chat');
+        jumpToModule('chat');
         setActiveChannel('incident-war-room');
       },
       badge: 'Space',
@@ -492,7 +601,7 @@ export default function CommandPaletteModal() {
       subtitle: 'VIP client SLA triage & high-priority webhook alerts',
       icon: MessageSquare,
       action: () => {
-        setActiveModule('chat');
+        jumpToModule('chat');
         setActiveChannel('client-escalations');
       },
       badge: 'Space',
@@ -506,7 +615,7 @@ export default function CommandPaletteModal() {
       subtitle: 'Product notes and decisions from the sample workspace',
       icon: MessageSquare,
       action: () => {
-        setActiveModule('chat');
+        jumpToModule('chat');
         setActiveChannel('product-architecture');
       },
       badge: 'Space',
@@ -521,7 +630,7 @@ export default function CommandPaletteModal() {
       title: 'Q4 EU Cluster RFC (doc_rfc_2026)',
       subtitle: 'Shared workspace doc with comments and checklists',
       icon: FileText,
-      action: () => setActiveModule('docs'),
+      action: () => jumpToModule('docs'),
       badge: 'Living Doc',
       badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
     },
@@ -532,7 +641,7 @@ export default function CommandPaletteModal() {
       title: 'Master Service Agreement 2026.pdf',
       subtitle: 'Sample enterprise service and security terms',
       icon: Shield,
-      action: () => setActiveModule('docs'),
+      action: () => jumpToModule('docs'),
       badge: 'Security',
       badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
     },
@@ -545,7 +654,7 @@ export default function CommandPaletteModal() {
       title: 'david@acmecorp.com: SSL timeout on EU cluster',
       subtitle: 'P0 escalation converted to Sprint task #tsk_1',
       icon: Mail,
-      action: () => setActiveModule('mail'),
+      action: () => jumpToModule('mail'),
       badge: 'Email',
       badgeColor: 'bg-sky-50 text-sky-800 border-sky-200',
     },
@@ -556,7 +665,7 @@ export default function CommandPaletteModal() {
       title: 'elena@fintechscale.io: SOC 2 & CMEK key rotation audit',
       subtitle: 'AWS KMS customer-managed key verification request',
       icon: Mail,
-      action: () => setActiveModule('mail'),
+      action: () => jumpToModule('mail'),
       badge: 'Email',
       badgeColor: 'bg-sky-50 text-sky-800 border-sky-200',
     },
@@ -569,7 +678,7 @@ export default function CommandPaletteModal() {
       title: 'Task #tsk_1: Investigate SSL handshake timeouts',
       subtitle: 'Priority P1 · Assigned to Sara Chen',
       icon: CheckSquare,
-      action: () => setActiveModule('tasks'),
+      action: () => jumpToModule('tasks'),
       badge: 'P1 Task',
       badgeColor: 'bg-amber-50 text-amber-800 border-amber-200',
     },
@@ -580,20 +689,21 @@ export default function CommandPaletteModal() {
       title: 'Task #tsk_2: Revert token caching logic (PR #1042)',
       subtitle: 'Priority P0 · Extracted from Huddle #18 commitment',
       icon: CheckSquare,
-      action: () => setActiveModule('tasks'),
-        badge: 'P0 Task',
-        badgeColor: 'bg-rose-50 text-rose-800 border-rose-200',
-      },
-    ],
-    [
-      aiContextActions,
-      setActiveModule,
-      setActiveChannel,
-      openDemoDrawer,
-      testAutomationsWorkflow,
-      setIsKeyboardModalOpen,
-    ]
-  );
+      action: () => jumpToModule('tasks'),
+      badge: 'P0 Task',
+      badgeColor: 'bg-rose-50 text-rose-800 border-rose-200',
+    },
+  ],
+  [
+    aiContextActions,
+    jumpToModule,
+    setActiveChannel,
+    openDemoDrawer,
+    testAutomationsWorkflow,
+    setIsKeyboardModalOpen,
+    addToast,
+  ]
+);
 
   // Filtering matching items
   const filtered = entities.filter((item) => {
@@ -643,18 +753,21 @@ export default function CommandPaletteModal() {
         closeSearchPalette();
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
+        e.stopPropagation();
         const nextIndex = filtered.length ? (selectedIndex + 1) % filtered.length : 0;
         setSelectedIndex(nextIndex);
         resultRefs.current[nextIndex]?.scrollIntoView({ block: 'nearest' });
         if (document.activeElement !== inputRef.current) resultRefs.current[nextIndex]?.focus();
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
+        e.stopPropagation();
         const nextIndex = filtered.length ? (selectedIndex - 1 + filtered.length) % filtered.length : 0;
         setSelectedIndex(nextIndex);
         resultRefs.current[nextIndex]?.scrollIntoView({ block: 'nearest' });
         if (document.activeElement !== inputRef.current) resultRefs.current[nextIndex]?.focus();
       } else if (e.key === 'Enter') {
         e.preventDefault();
+        e.stopPropagation();
         if (filtered[selectedIndex]) {
           filtered[selectedIndex].action();
           closeSearchPalette();
@@ -845,7 +958,7 @@ export default function CommandPaletteModal() {
                   <button
                     type="button"
                     onClick={() => {
-                      setActiveModule('chat');
+                      jumpToModule('chat');
                       closeSearchPalette();
                     }}
                     className="flex items-center justify-between px-3 py-2 rounded-lg bg-surface-soft hover:bg-surface-hover border border-border text-xs text-ink transition-colors cursor-pointer text-left"
@@ -859,7 +972,7 @@ export default function CommandPaletteModal() {
                   <button
                     type="button"
                     onClick={() => {
-                      setActiveModule('tasks');
+                      jumpToModule('tasks');
                       closeSearchPalette();
                     }}
                     className="flex items-center justify-between px-3 py-2 rounded-lg bg-surface-soft hover:bg-surface-hover border border-border text-xs text-ink transition-colors cursor-pointer text-left"

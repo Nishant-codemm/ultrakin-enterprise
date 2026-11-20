@@ -476,8 +476,17 @@ function Navbar() {
         </div>
 
         <div className="hidden shrink-0 items-center gap-2.5 lg:flex justify-self-end">
-          <button type="button" onClick={openSearchPalette} aria-label="Search Ultrakin" className="flex h-9 w-9 items-center justify-center rounded-lg text-ink-muted transition-all duration-150 hover:bg-surface-soft hover:text-ink active:scale-[0.97] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 cursor-pointer">
-            <Search size={16} strokeWidth={1.8} />
+          <button
+            type="button"
+            onClick={openSearchPalette}
+            aria-label="Search Ultrakin (⌘K)"
+            className="flex items-center gap-2 h-9 px-2.5 rounded-lg border border-border/50 text-ink-muted transition-all duration-150 hover:border-border/80 hover:bg-surface-soft/60 hover:text-ink active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 cursor-pointer shadow-2xs"
+          >
+            <Search size={14} strokeWidth={2} className="text-ink-subtle" />
+            <span className="hidden xl:inline text-xs font-normal text-ink-subtle">Search...</span>
+            <kbd className="hidden sm:inline-flex items-center gap-0.5 rounded border border-border bg-surface-raised px-1.5 py-0.5 font-mono text-[10px] text-ink-muted">
+              ⌘K
+            </kbd>
           </button>
           <button type="button" onClick={openDemoDrawer} className="inline-flex h-9 items-center rounded-lg border border-border/40 px-3.5 text-[13px] font-medium text-ink-muted transition-all duration-150 hover:border-border/80 hover:bg-surface-soft/60 hover:text-ink active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-focus/50 cursor-pointer">Talk with us</button>
           <a

@@ -1251,6 +1251,7 @@ export function WorkspaceProvider({ children }) {
     const handleGlobalShortcuts = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
+        e.stopPropagation();
         setIsSearchPaletteOpen((prev) => !prev);
         return;
       }
