@@ -1,210 +1,167 @@
 # Ultrakin Enterprise
 
-[![React](https://img.shields.io/badge/React-19.3-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
-[![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.3-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-[![Oxlint](https://img.shields.io/badge/Linter-Oxlint-F59E0B?style=flat-square)](https://oxc.rs/)
-[![Bundle Size](https://img.shields.io/badge/JavaScript_Gzip-%7E190_KB-10B981?style=flat-square)](https://github.com/Nishant-codemm/ultrakin-enterprise)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+**The autonomous workspace for fast teams.** Chat, shared mail, living docs, huddles, Kanban tasks, and context-aware AI agents — unified in one SPA.
 
-> The Autonomous Unified Workspace for High-Velocity Teams. A single, sovereign surface uniting decentralized chat, living docs, domain email, and real-time execution.
-
----
-
-## Overview
-
-Modern software teams spend hours every week context-switching across fragmented tools: chat clients, standalone wiki documents, siloed ticketing boards, and disconnected customer mailboxes.
-
-**Ultrakin** unifies these critical primitives into a cohesive enterprise operating surface. Powered by an in-memory event bus and reactive workspace kernel, conversations and inbound client emails automatically synthesize into executable tasks, living documentation, and structured team workflows.
-
-This repository contains the complete enterprise landing page and interactive product showcase, built with React 19, Vite 8, and Tailwind CSS 4.
-
----
-
-## Key Features
-
-- **Interactive Workspace Showcase:** Sample product experiences for Chat, Threads, Huddles, Docs, Files, Mail, Agents, and Tasks.
-- **Speculative Dynamic Import Prefetching:** Non-blocking hover/idle preloading with idempotent Promise memoization for 0ms perceived module switching.
-- **WAI-ARIA Modal Focus Trap:** Accessible focus containment, keyboard cycling, and frame-deferred focus restoration compliant with WCAG 2.1 AA.
-- **Deployment Chunk Invalidation Recovery:** React Error Boundary with automatic single-attempt reload guards against post-deploy chunk 404s and localized failure isolation.
-- **Real-Time Network State Machine:** Synchronized client online/offline status monitoring with optimistic UI feedback and automatic telemetry notifications.
-- **In-Memory Event Bus Telemetry:** Live event ledger demonstrating real-time message ingestion, task generation, and automated cross-system updates.
-- **Dynamic Navigation Morph System:** A smart scroll-responsive top navigation bar that smoothly transitions between a full enterprise header and an elevated sticky command bar.
-- **Global Command Palette (`⌘K` / `Ctrl+K`):** Fast workspace switching, quick action dispatching, and fuzzy section search.
-- **Enterprise Design System:** Custom dark-mode UI with high-contrast typography, refined glassmorphic surfaces, layered elevation, and fluid spring micro-interactions.
-- **Code-Split Production Build:** Vite splits React, motion, icons, and application code into separate production chunks.
+🔗 **Live:** [ultrakin-enterprise.vercel.app](https://ultrakin-enterprise.vercel.app)
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Version | Purpose |
-| :--- | :--- | :--- | :--- |
-| **Runtime / UI** | React | `^19.3.1` | Component model, state management, and DOM reconciliation |
-| **Bundler & Dev Server** | Vite | `^8.3.4` | Lightning-fast HMR and optimized production rollup |
-| **Styling** | Tailwind CSS | `^4.3.3` | Utility-first design tokens and CSS variables |
-| **Motion** | Framer Motion | `^14.4.0` | Fluid gesture controls, spring physics, and morphing transitions |
-| **Icons** | Lucide React | `^1.59.0` | Consistent, accessible icon set |
-| **Linter** | Oxlint | `^1.88.0` | High-performance Rust-based static code analysis |
+| Layer | Choice |
+|---|---|
+| UI Framework | React 19 (concurrent, lazy-loaded routes) |
+| Build | Vite 8 (Rolldown bundler, sub-5s production builds) |
+| Styling | Tailwind CSS v4 (`@theme` semantic design tokens) |
+| Animation | Framer Motion 14 (GPU-composited, `layoutId` springs) |
+| Linter | Oxlint (127-file sweep, 104 rules, ~350ms) |
+| Deployment | Vercel (auto-deploy on `main` push) |
 
 ---
 
-## Architecture
+## Engineering Highlights
 
-The project is structured around decoupled presentation and state layers:
+- **60fps GPU-composited motion** — every transition uses `transform`/`opacity` only; zero layout-thrashing properties animated.
+- **`Cmd+K` Command Palette** — O(1) pre-indexed entity lookup across all modules with fuzzy search, keyboard navigation, and context-aware AI prompts per active module.
+- **Semantic design token system** — full `@theme` layer in Tailwind v4 (`text-ink`, `text-ink-muted`, `bg-surface`, `border-border`, `ring-focus`, etc.). Zero raw hex in component layer.
+- **Lazy-loaded route chunks** — every page and demo is a separate Vite chunk; `react-vendor` (219 kB gz 68 kB) and `motion-vendor` (148 kB gz 49 kB) split into their own long-cached assets.
+- **Prefers-reduced-motion** — scroll behaviour and all entrance animations respect the OS accessibility setting.
+- **SPA routing** — custom `navigate.js` helper intercepts all internal links; zero full-page reloads on client navigation.
+- **Error boundaries** — component-level `ErrorBoundary` with chunk-load auto-recovery and optional telemetry callback.
+- **OG / Twitter meta** — dynamic per-route Open Graph and Twitter Card tags injected via `useEffect` on product and solution sub-pages.
+
+---
+
+## Project Structure
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                       App Container                         │
-├──────────────────────────────┬──────────────────────────────┤
-│  Top Command Navigation      │  Global Command Palette (⌘K) │
-│  (Navbar & Scroll Spy)       │  Keyboard Shortcuts Modal    │
-├──────────────────────────────┴──────────────────────────────┤
-│                      WorkspaceContext                       │
-│    • Active Section & Scroll Position                       │
-│    • Workspace Module State (Chat, Threads, Huddles, Docs,  │
-│      Files, Mail, Agents, Tasks)                              │
-│    • Real-Time Event Bus Queue & Telemetry                  │
-├─────────────────────────────────────────────────────────────┤
-│                    Application Sections                     │
-│    • HeroSection & Interactive Product Showcase             │
-│    • WorkflowSpotlight & BentoGrid                           │
-│    • Integrations and Security                               │
-│    • Workspace, Agents, Security, and Pricing routes         │
-│    • Footer & Global Brand Anchors                          │
-└─────────────────────────────────────────────────────────────┘
+src/
+├── App.jsx                    # SPA router, lazy imports, canonical meta
+├── index.css                  # Tailwind v4 @theme token definitions
+│
+├── components/
+│   ├── common/                # ErrorBoundary, shared utilities
+│   ├── primitives/            # UltrakinLogo, Badge, Button, TiltCard, AvatarChip
+│   ├── product/               # ProductPage composition layer
+│   │   ├── DemoWindowFrame    # Chrome frame wrapper for all product demos
+│   │   ├── ProductFeatureGrid # 3-col capability grid with token-based theming
+│   │   ├── ProductContinuitySections # Cross-sell handoff rows
+│   │   ├── WorkspaceAppRail   # Persistent left-rail navigation shell
+│   │   └── ...
+│   ├── showcase/              # Interactive homepage showcase components
+│   │   ├── calendar/          # Full calendar engine (month/week/day/agenda views)
+│   │   ├── huddle/            # Huddle Simulator (audio waveform, transcript, canvas)
+│   │   ├── HeroInteractiveDemo
+│   │   ├── HuddleSimulator
+│   │   ├── KanbanTaskBoard
+│   │   ├── LivingDocEditor
+│   │   ├── OrbitalReactorMesh # WebGL-free GPU mesh animation
+│   │   └── VisualAutomationsCanvas
+│   └── solution/              # Agent showcase cards per solution vertical
+│
+├── context/
+│   └── WorkspaceContext.jsx   # Global module state (active app, cmd palette open)
+│
+├── data/
+│   ├── productPageData.js     # PRODUCT_META, DEMO_MAP, dmMessages
+│   └── solutionPageData.js    # SOLUTION_META, SOLUTION_MAP, SOLUTION_TEMPLATES_ASIDE
+│
+├── lib/
+│   ├── navigate.js            # SPA navigate helper (reduced-motion aware)
+│   ├── useClipboard.js
+│   └── useFocusTrap.js
+│
+├── pages/
+│   ├── ProductPage.jsx        # Universal /products/:slug handler
+│   ├── SolutionPage.jsx       # Universal /solutions/:slug handler
+│   ├── PricingPage.jsx
+│   ├── SecurityPage.jsx
+│   ├── SolutionsOverviewPage.jsx
+│   ├── ResourcesPage.jsx      # Architecture hub with article reader modal
+│   ├── WorkspacePage.jsx
+│   ├── LegalPage.jsx          # /privacy, /terms, /dpa, /subprocessors, /soc2
+│   ├── NotFoundPage.jsx
+│   ├── products/              # Per-product interactive demos
+│   │   ├── ChatProductDemo    # DM rows, channel switcher, mobile pill bar
+│   │   ├── DocsProductDemo
+│   │   ├── ListsProductDemo
+│   │   ├── MailProductDemo
+│   │   ├── AgentsProductDemo
+│   │   ├── AutomationsProductDemo
+│   │   ├── CallsProductDemo
+│   │   └── ...
+│   └── solutions/             # Per-solution interactive demos (11 verticals)
+│
+└── sections/                  # Homepage sections
+    ├── HeroSection
+    ├── PlatformLensSection
+    ├── WorkflowSpotlight
+    ├── IntegrationsSection
+    ├── EvaluationSection
+    ├── FAQSection
+    ├── CTASection
+    ├── SecuritySection
+    ├── TrustStrip
+    └── Footer
 ```
 
 ---
 
-## Folder Structure
+## Routes
 
-```
-ultrakin-enterprise/
-├── docs/                        # Product, design, and engineering references
-├── public/                      # Favicon, web manifest, robots, and sitemap
-├── src/
-│   ├── components/
-│   │   ├── primitives/           # Button, Badge, and UltrakinLogo
-│   │   ├── showcase/             # Interactive workspace and agent demos
-│   │   ├── CommandPaletteModal.jsx
-│   │   ├── KeyboardShortcutsModal.jsx
-│   │   └── Navbar.jsx
-│   ├── context/                  # Shared workspace state
-│   ├── lib/                      # Small shared utilities
-│   ├── pages/                    # Workspace, Agents, Security, and Pricing routes
-│   ├── sections/                 # Landing page sections
-│   ├── App.jsx
-│   ├── index.css
-│   └── main.jsx
-├── index.html
-├── package.json
-└── vite.config.js
-```
+| Path | Page |
+|---|---|
+| `/` | Homepage |
+| `/products/:slug` | Product sub-page (chat, docs, lists, mail, agents, automations, calls, connectors, forms, templates, search, ukin) |
+| `/solutions/:slug` | Solution sub-page (11 verticals: sales, engineering, marketing, operations, people, agencies, customer-support, education, ecommerce, professional-services, field-services) |
+| `/solutions` | Solutions overview hub |
+| `/pricing` | Pricing & plan comparison |
+| `/security` | Trust & compliance |
+| `/resources` | Architecture & resource hub |
+| `/workspace` | Workspace OS overview |
+| `/agents` | AI agents overview |
+| `/privacy` `/terms` `/dpa` `/subprocessors` `/soc2` | Legal |
 
 ---
 
-## Getting Started
-
-### Prerequisites
-
-- **Node.js:** `>= 18.0.0`
-- **npm:** `>= 9.0.0`
-
-### Installation
-
-Clone the repository and install dependencies:
+## Local Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/Nishant-codemm/ultrakin-enterprise.git
-
-# Navigate into the project directory
-cd ultrakin-enterprise
-
-# Install dependencies
+# Install
 npm install
-```
 
-### Running Locally
-
-Start the local development server with Hot Module Replacement (HMR):
-
-```bash
+# Dev server (http://localhost:5173)
 npm run dev
+
+# Lint (oxlint, ~350ms)
+npm run lint
+
+# Production build
+npm run build
+
+# Preview production build
+npm run preview
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+**Node ≥ 20** required.
 
 ---
 
-## Available Scripts
+## Build Output
 
-| Command | Description |
-| :--- | :--- |
-| `npm run dev` | Starts Vite local development server on `http://localhost:5173` |
-| `npm run build` | Compiles and minifies assets into `/dist` for production deployment |
-| `npm run lint` | Runs `oxlint` static code analysis across all source files |
-| `npm run preview` | Locally serves the production build in `/dist` for verification |
+```
+dist/assets/index.js          387 kB │ gz 94 kB   (app shell + all sections)
+dist/assets/react-vendor.js   219 kB │ gz 68 kB   (React 19 + ReactDOM)
+dist/assets/motion-vendor.js  148 kB │ gz 49 kB   (Framer Motion)
+dist/assets/CalendarEngine.js  56 kB │ gz 12 kB   (calendar views — lazy)
+dist/assets/ProductPage.js     39 kB │ gz 13 kB   (product shell — lazy)
+dist/assets/index.css         249 kB │ gz 34 kB   (Tailwind v4 compiled)
+```
 
----
-
-## Performance & Optimization
-
-- **Bundle Efficiency:** The current production build emits about **190 KB gzipped JavaScript** and **23 KB gzipped CSS**, split across application and vendor chunks.
-- **Motion:** Framer Motion and CSS transitions are used for interactive states; `prefers-reduced-motion` is respected. No frame-rate guarantee is implied by the build output.
-- **Typography Optimization:** Preconnected Google Fonts (`Inter`, `Inter Display`, `JetBrains Mono`) with `font-display: swap` to prevent render blocking.
-- **Resource Hygiene:** Zero unoptimized heavy runtime dependencies; SVG icons are modularly tree-shaken via `lucide-react`.
-
----
-
-## Accessibility & UX
-
-- **Semantic HTML:** Uses navigation, main, section, article, and footer landmarks.
-- **Keyboard Navigation:** Interactive navigation and dialogs provide keyboard access and visible focus states.
-- **Reduced Motion:** CSS motion rules and Framer Motion respond to the user's reduced-motion preference.
-- **Contrast:** Main body copy and controls use high-contrast foreground colors on the dark surfaces.
-
----
-
-## Documentation
-
-Comprehensive engineering blueprints and research specifications are available in the [`/docs`](./docs) folder:
-
-- [`00_Ultrakin_Master_Specification.md`](./docs/00_Ultrakin_Master_Specification.md) — Master product specification and requirements.
-- [`05_Ultrakin_Enterprise_Experience_Architecture.md`](./docs/05_Ultrakin_Enterprise_Experience_Architecture.md) — Component architecture and state lifecycle.
-- [`06_Ultrakin_Enterprise_Design_System_Specification.md`](./docs/06_Ultrakin_Enterprise_Design_System_Specification.md) — Color tokens, typography, and elevations.
-- [`07_Ultrakin_Engineering_Implementation_Blueprint.md`](./docs/07_Ultrakin_Engineering_Implementation_Blueprint.md) — Implementation architecture and technical roadmap.
-
----
-
-## Browser Support
-
-| Browser | Supported Versions |
-| :--- | :--- |
-| **Google Chrome** | Latest 2 versions |
-| **Mozilla Firefox** | Latest 2 versions |
-| **Apple Safari** | Latest 2 versions (macOS & iOS) |
-| **Microsoft Edge** | Latest 2 versions |
-
----
-
-## Future Roadmap
-
-- [ ] WebRTC direct peer-to-peer data channels for zero-latency screen sharing.
-- [ ] End-to-end client-side encryption key management integration (Vault / AWS KMS).
-- [ ] Native desktop application wrappers using Tauri.
-
----
-
-## Author
-
-**Nishant Kumar**
-- GitHub: [@Nishant-codemm](https://github.com/Nishant-codemm)
-- Repository: [ultrakin-enterprise](https://github.com/Nishant-codemm/ultrakin-enterprise)
+Each product demo, solution demo, and legal page is a separate lazy chunk (0.5–26 kB gz).
 
 ---
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+MIT — see [LICENSE](LICENSE).
