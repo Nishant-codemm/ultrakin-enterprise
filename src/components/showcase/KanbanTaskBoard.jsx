@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, memo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import {
   CheckSquare,
@@ -153,14 +153,32 @@ function KanbanTaskBoard() {
     }
   };
 
-  // Filter tasks
-  const filteredTasks = kanbanTasks.filter((task) => {
-    const matchesSearch =
-      task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (task.description && task.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesPriority = filterPriority === 'ALL' || task.priority === filterPriority;
-    return matchesSearch && matchesPriority;
-  });
+  // Filter tasks with memoization
+  const filteredTasks = useMemo(() => {
+    const q = searchQuery.toLowerCase();
+    return kanbanTasks.filter((task) => {
+      const matchesSearch =
+        !q ||
+        task.title.toLowerCase().includes(q) ||
+        (task.description && task.description.toLowerCase().includes(q));
+      const matchesPriority = filterPriority === 'ALL' || task.priority === filterPriority;
+      return matchesSearch && matchesPriority;
+    });
+  }, [kanbanTasks, searchQuery, filterPriority]);
+
+  // Pre-group tasks into columns in a single O(N) pass, eliminating O(C*N) repeated filtering
+  const tasksByColumn = useMemo(() => {
+    const map = { backlog: [], in_progress: [], review: [], done: [] };
+    for (const t of filteredTasks) {
+      const colId = getTaskCol(t);
+      if (map[colId]) {
+        map[colId].push(t);
+      } else {
+        map[colId] = [t];
+      }
+    }
+    return map;
+  }, [filteredTasks]);
 
   const getSourceIcon = (sourceType) => {
     switch (sourceType) {
@@ -276,7 +294,7 @@ function KanbanTaskBoard() {
 
       <div className="flex-1 overflow-x-auto p-4 flex gap-4 min-h-[500px]">
         {COLUMNS.map((col) => {
-          const colTasks = filteredTasks.filter((t) => getTaskCol(t) === col.id);
+          const colTasks = tasksByColumn[col.id] || [];
           const isOver = dragOverCol === col.id;
 
           return (

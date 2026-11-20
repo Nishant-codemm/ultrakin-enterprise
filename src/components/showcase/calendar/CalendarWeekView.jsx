@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { cn } from '../../../lib/cn';
 import { CALENDAR_DAYS, CALENDAR_HOURS } from '../../../data/calendarData';
 import EventCardBlock from './EventCardBlock';
@@ -11,6 +11,17 @@ export default function CalendarWeekView({
 }) {
   const [draggedEventId, setDraggedEventId] = useState(null);
   const [dragOverCell, setDragOverCell] = useState(null); // { day, hour }
+
+  // Pre-index events by slot composite key (day_hour) for O(1) grid rendering
+  const eventsBySlot = useMemo(() => {
+    const map = new Map();
+    for (const e of events) {
+      const key = `${e.day}_${Math.floor(e.startHour)}`;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key).push(e);
+    }
+    return map;
+  }, [events]);
 
   const handleDragOver = (e, dayIdx, hour) => {
     e.preventDefault();
@@ -87,10 +98,8 @@ export default function CalendarWeekView({
                     dragOverCell && dragOverCell.day === dayIdx && dragOverCell.hour === hour;
                   const isTodayCol = dayIdx === 3;
 
-                  // Find events matching this slot
-                  const slotEvents = events.filter(
-                    (e) => e.day === dayIdx && Math.floor(e.startHour) === hour
-                  );
+                  // O(1) slot event lookup
+                  const slotEvents = eventsBySlot.get(`${dayIdx}_${hour}`) || [];
 
                   return (
                     <div

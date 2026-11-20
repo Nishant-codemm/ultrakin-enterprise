@@ -403,7 +403,6 @@ export default function HeroInteractiveStage() {
   const [activeId, setActiveId] = useState('chat');
   const [isPaused, setIsPaused] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 280, y: 160 });
   const cardRef = useRef(null);
 
   // Framer Motion physics springs for butter-smooth physical momentum (calibrated, dignified tilt)
@@ -444,7 +443,9 @@ export default function HeroInteractiveStage() {
     rotateY.set(normX * 5);
     scale.set(1.01);
 
-    setMousePos({ x, y });
+    // Strictly DOM/CSS-variable driven spotlight - zero React state re-renders
+    el.style.setProperty('--hero-mouse-x', `${x}px`);
+    el.style.setProperty('--hero-mouse-y', `${y}px`);
   }, [reduceMotion, rotateX, rotateY, scale]);
 
   const handleMouseEnter = useCallback(() => {
@@ -488,7 +489,7 @@ export default function HeroInteractiveStage() {
           style={{
             opacity: isHovered ? 1 : 0.45,
             background: isHovered
-              ? `radial-gradient(380px circle at ${mousePos.x}px ${mousePos.y}px, rgba(49,86,207,0.35), rgba(99,102,241,0.18) 40%, transparent 68%)`
+              ? 'radial-gradient(380px circle at var(--hero-mouse-x, 280px) var(--hero-mouse-y, 160px), rgba(49,86,207,0.35), rgba(99,102,241,0.18) 40%, transparent 68%)'
               : 'linear-gradient(135deg, rgba(226,232,240,0.85) 0%, rgba(203,213,225,0.6) 50%, rgba(226,232,240,0.85) 100%)',
           }}
         />
@@ -540,7 +541,8 @@ export default function HeroInteractiveStage() {
               <div
                 className="pointer-events-none absolute inset-0 z-0 transition-opacity duration-300"
                 style={{
-                  background: `radial-gradient(340px circle at ${mousePos.x}px ${mousePos.y}px, rgba(255, 255, 255, 0.16) 0%, rgba(56, 189, 248, 0.05) 40%, transparent 65%)`,
+                  background:
+                    'radial-gradient(340px circle at var(--hero-mouse-x, 280px) var(--hero-mouse-y, 160px), rgba(255, 255, 255, 0.16) 0%, rgba(56, 189, 248, 0.05) 40%, transparent 65%)',
                 }}
               />
             )}

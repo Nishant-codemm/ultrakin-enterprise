@@ -169,6 +169,42 @@ const COMPILED_ORBITAL_CONFIGS = Object.freeze(
   )
 );
 
+/* Precompile static coordinate tick positions and photon offsets to eliminate runtime allocations */
+const PHOTON_OFFSETS = Object.freeze([0, 125, 245]);
+
+const RING_3_TICKS = Object.freeze(
+  [0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
+    const rad = (deg * Math.PI) / 180;
+    return {
+      deg,
+      cx: 310 + 232 * Math.cos(rad),
+      cy: 210 + 98 * Math.sin(rad),
+    };
+  })
+);
+
+const RING_2_TICKS = Object.freeze(
+  [0, 60, 120, 180, 240, 300].map((deg) => {
+    const rad = (deg * Math.PI) / 180;
+    return {
+      deg,
+      cx: 310 + 196 * Math.cos(rad),
+      cy: 210 + 86 * Math.sin(rad),
+    };
+  })
+);
+
+const RING_1_TICKS = Object.freeze(
+  [0, 90, 180, 270].map((deg) => {
+    const rad = (deg * Math.PI) / 180;
+    return {
+      deg,
+      cx: 310 + 138 * Math.cos(rad),
+      cy: 210 + 60 * Math.sin(rad),
+    };
+  })
+);
+
 /* ─── Floating Service Satellite Node Component ─── */
 function SatelliteNode({
   item,
@@ -332,7 +368,7 @@ function OrbitalRingPhotons({ targetConfig, time, reduceMotion }) {
 
   return (
     <g className="pointer-events-none">
-      {[0, 125, 245].map((phaseOffset, idx) => (
+      {PHOTON_OFFSETS.map((phaseOffset, idx) => (
         <RingPhoton
           key={`photon-${targetConfig.ring}-${idx}`}
           config={targetConfig}
@@ -526,20 +562,15 @@ function OrbitalReactorMesh({
               strokeWidth={targetConfig?.ring === 3 ? '1.25' : '0.8'}
               className="transition-colors duration-300"
             />
-            {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
-              const rad = (deg * Math.PI) / 180;
-              const tx = 310 + 232 * Math.cos(rad);
-              const ty = 210 + 98 * Math.sin(rad);
-              return (
-                <circle
-                  key={`r3-tick-${deg}`}
-                  cx={tx}
-                  cy={ty}
-                  r="1"
-                  fill="rgba(56,189,248,0.3)"
-                />
-              );
-            })}
+            {RING_3_TICKS.map(({ deg, cx, cy }) => (
+              <circle
+                key={`r3-tick-${deg}`}
+                cx={cx}
+                cy={cy}
+                r="1"
+                fill="rgba(56,189,248,0.3)"
+              />
+            ))}
           </g>
 
           {/* Ring 2: Mid Equatorial Orbit */}
@@ -562,20 +593,15 @@ function OrbitalReactorMesh({
               strokeWidth={targetConfig?.ring === 2 ? '1.25' : '0.85'}
               className="transition-colors duration-300"
             />
-            {[0, 60, 120, 180, 240, 300].map((deg) => {
-              const rad = (deg * Math.PI) / 180;
-              const tx = 310 + 196 * Math.cos(rad);
-              const ty = 210 + 86 * Math.sin(rad);
-              return (
-                <circle
-                  key={`r2-tick-${deg}`}
-                  cx={tx}
-                  cy={ty}
-                  r="1.2"
-                  fill={isExtension ? 'rgba(14,165,233,0.35)' : 'rgba(99,102,241,0.35)'}
-                />
-              );
-            })}
+            {RING_2_TICKS.map(({ deg, cx, cy }) => (
+              <circle
+                key={`r2-tick-${deg}`}
+                cx={cx}
+                cy={cy}
+                r="1.2"
+                fill={isExtension ? 'rgba(14,165,233,0.35)' : 'rgba(99,102,241,0.35)'}
+              />
+            ))}
           </g>
 
           {/* Ring 1: Inner Transverse Orbit */}
@@ -598,20 +624,15 @@ function OrbitalReactorMesh({
               strokeWidth={targetConfig?.ring === 1 ? '1.25' : '0.85'}
               className="transition-colors duration-300"
             />
-            {[0, 90, 180, 270].map((deg) => {
-              const rad = (deg * Math.PI) / 180;
-              const tx = 310 + 138 * Math.cos(rad);
-              const ty = 210 + 60 * Math.sin(rad);
-              return (
-                <circle
-                  key={`r1-tick-${deg}`}
-                  cx={tx}
-                  cy={ty}
-                  r="1.2"
-                  fill={isExtension ? 'rgba(168,85,247,0.35)' : 'rgba(244,63,94,0.35)'}
-                />
-              );
-            })}
+            {RING_1_TICKS.map(({ deg, cx, cy }) => (
+              <circle
+                key={`r1-tick-${deg}`}
+                cx={cx}
+                cy={cy}
+                r="1.2"
+                fill={isExtension ? 'rgba(168,85,247,0.35)' : 'rgba(244,63,94,0.35)'}
+              />
+            ))}
           </g>
 
           {/* ── Layer 3: Traversing Energy Photons on Active Orbital Ring ── */}

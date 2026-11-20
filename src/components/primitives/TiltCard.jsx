@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { cn } from '../../lib/cn';
 
@@ -51,6 +51,12 @@ export default function TiltCard({
   const onLeave = useCallback(() => {
     if (rafId.current) cancelAnimationFrame(rafId.current);
     setTilt({ rx: 0, ry: 0, gx: 50, gy: 50, on: false });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+    };
   }, []);
 
   return (

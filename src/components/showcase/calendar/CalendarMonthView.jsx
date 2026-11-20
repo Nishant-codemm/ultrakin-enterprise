@@ -1,26 +1,34 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { cn } from '../../../lib/cn';
 import { CALENDAR_DAYS } from '../../../data/calendarData';
 
-export default function CalendarMonthView({ events = [], onSelectEvent, onSlotClick }) {
-  // Generate a standard 35-cell November 2026 month matrix
-  // Nov 1 starts on Sunday (col 6), so Oct 26-31 fill preceding cells
+// Static 35-cell November 2026 month matrix (computed once at module load)
+const MONTH_CELLS = (() => {
   const DAYS_IN_MONTH = 30;
-
-  const cells = [];
-  // Previous month trailing
+  const list = [];
   for (let i = 26; i <= 31; i++) {
-    cells.push({ dayNumber: i, isCurrentMonth: false, monthIdx: -1 });
+    list.push({ dayNumber: i, isCurrentMonth: false, monthIdx: -1 });
   }
-  // Current month
   for (let i = 1; i <= DAYS_IN_MONTH; i++) {
-    cells.push({ dayNumber: i, isCurrentMonth: true, monthIdx: 0 });
+    list.push({ dayNumber: i, isCurrentMonth: true, monthIdx: 0 });
   }
-  // Next month leading to complete 35 cells
   let nextDay = 1;
-  while (cells.length < 35) {
-    cells.push({ dayNumber: nextDay++, isCurrentMonth: false, monthIdx: 1 });
+  while (list.length < 35) {
+    list.push({ dayNumber: nextDay++, isCurrentMonth: false, monthIdx: 1 });
   }
+  return Object.freeze(list);
+})();
+
+export default function CalendarMonthView({ events = [], onSelectEvent, onSlotClick }) {
+  // Pre-index events by day of week for O(1) month cell lookup
+  const eventsByDay = useMemo(() => {
+    const map = new Map();
+    for (const e of events) {
+      if (!map.has(e.day)) map.set(e.day, []);
+      map.get(e.day).push(e);
+    }
+    return map;
+  }, [events]);
 
   return (
     <div className="flex-1 flex flex-col h-full min-h-0 bg-obsidian-canvas text-slate-200 overflow-hidden">
@@ -38,13 +46,13 @@ export default function CalendarMonthView({ events = [], onSelectEvent, onSlotCl
 
       {/* ── 5x7 Month Grid ── */}
       <div className="flex-1 grid grid-cols-7 grid-rows-5 overflow-y-auto">
-        {cells.map((cell, idx) => {
+        {MONTH_CELLS.map((cell, idx) => {
           const isToday = cell.isCurrentMonth && cell.dayNumber === 12; // Nov 12
           const dayOfWeekIdx = idx % 7;
 
-          // Filter events matching this day
+          // O(1) day events lookup
           const dayEvents = cell.isCurrentMonth
-            ? events.filter((e) => e.day === dayOfWeekIdx)
+            ? eventsByDay.get(dayOfWeekIdx) || []
             : [];
 
           return (

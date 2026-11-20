@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { CALENDAR_HOURS } from '../../../data/calendarData';
 import EventCardBlock from './EventCardBlock';
 import { Clock } from 'lucide-react';
@@ -9,7 +9,17 @@ export default function CalendarDayView({
   onSlotClick,
   selectedDay = 3, // Thursday (today)
 }) {
-  const dayEvents = events.filter((e) => e.day === selectedDay);
+  const dayEvents = useMemo(() => events.filter((e) => e.day === selectedDay), [events, selectedDay]);
+
+  const eventsByHour = useMemo(() => {
+    const map = new Map();
+    for (const e of dayEvents) {
+      const h = Math.floor(e.startHour);
+      if (!map.has(h)) map.set(h, []);
+      map.get(h).push(e);
+    }
+    return map;
+  }, [dayEvents]);
 
   return (
     <div className="flex-1 flex flex-col h-full min-h-0 bg-obsidian-canvas text-slate-200 overflow-hidden">
@@ -48,7 +58,7 @@ export default function CalendarDayView({
         <div className="grid grid-cols-[70px_1fr] min-w-[500px]">
           {CALENDAR_HOURS.map((hour) => {
             const formatH = hour > 12 ? `${hour - 12} PM` : hour === 12 ? '12 PM' : `${hour} AM`;
-            const slotEvents = dayEvents.filter((e) => Math.floor(e.startHour) === hour);
+            const slotEvents = eventsByHour.get(hour) || [];
 
             return (
               <React.Fragment key={hour}>

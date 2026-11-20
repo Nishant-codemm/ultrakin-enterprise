@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react';
+import React, { useState, useMemo, memo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   GitBranch,
@@ -68,13 +68,23 @@ function VisualAutomationsCanvas() {
   const activeWorkflow =
     automationsWorkflows.find((w) => w.id === activeWorkflowId) || automationsWorkflows[0];
 
-  const selectedNode =
-    activeWorkflow.nodes.find((n) => n.id === selectedNodeId) || activeWorkflow.nodes[0] || null;
+  const nodeMap = useMemo(() => {
+    const map = new Map();
+    if (activeWorkflow?.nodes) {
+      for (const n of activeWorkflow.nodes) {
+        map.set(n.id, n);
+      }
+    }
+    return map;
+  }, [activeWorkflow.nodes]);
 
-  // SVG Bezier Curve Generator between two nodes
+  const selectedNode =
+    nodeMap.get(selectedNodeId) || activeWorkflow?.nodes?.[0] || null;
+
+  // SVG Bezier Curve Generator between two nodes (O(1) node lookup)
   const renderEdgePath = (edge) => {
-    const fromNode = activeWorkflow.nodes.find((n) => n.id === edge.from);
-    const toNode = activeWorkflow.nodes.find((n) => n.id === edge.to);
+    const fromNode = nodeMap.get(edge.from);
+    const toNode = nodeMap.get(edge.to);
     if (!fromNode || !toNode) return null;
 
     // Node width is 260px, height is ~110px. Output port is on right middle; input port is on left middle.

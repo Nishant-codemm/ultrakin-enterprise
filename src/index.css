@@ -127,37 +127,6 @@ p {
   text-wrap: pretty;
 }
 
-/* Glassmorphic Utilities */
-.glass-panel {
-  background: color-mix(in srgb, var(--color-surface) 88%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--uk-border-hairline);
-}
-
-.glass-card {
-  background: color-mix(in srgb, var(--color-surface-raised) 94%, transparent);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--uk-border-hairline);
-  box-shadow: var(--uk-shadow-raised);
-}
-
-.glass-card-hover {
-  transition: background-color 180ms cubic-bezier(0.16, 1, 0.3, 1), border-color 180ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-.glass-card-hover:hover {
-  background: var(--color-surface-raised);
-  border-color: var(--color-border-strong);
-  box-shadow: 0 24px 52px -38px rgba(17, 24, 39, 0.24), 0 4px 14px rgba(17, 24, 39, 0.055);
-}
-
-/* Specular Hairline Borders */
-.border-specular {
-  border: 1px solid var(--color-border);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.85);
-}
-
 .premium-card {
   position: relative;
   border-color: color-mix(in srgb, var(--color-border) 84%, white);
@@ -166,22 +135,6 @@ p {
     inset 0 1px 0 rgba(255, 255, 255, 0.96),
     0 1px 2px rgba(39, 34, 25, 0.025),
     0 20px 46px -38px rgba(39, 34, 25, 0.22);
-}
-
-.premium-card-interactive {
-  transition:
-    transform 200ms var(--ease-kinetic),
-    border-color 200ms var(--ease-kinetic),
-    box-shadow 200ms var(--ease-kinetic);
-}
-
-.premium-card-interactive:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-border-strong);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 2px 6px rgba(39, 34, 25, 0.035),
-    0 26px 56px -38px rgba(39, 34, 25, 0.27);
 }
 
 /* Custom Scrollbar for Terminals & Virtual Streams */
@@ -200,17 +153,7 @@ p {
   background: var(--uk-scroll-thumb-hover);
 }
 
-/* Kinetic Pulse & Animations */
-@keyframes pulseGlow {
-  0%, 100% { opacity: 0.35; transform: scale(1); }
-  50% { opacity: 0.65; transform: scale(1.04); }
-}
-
-@keyframes liveDot {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.5); opacity: 0.5; }
-}
-
+/* Kinetic Marquee */
 @keyframes marquee {
   0% { transform: translateX(0%); }
   100% { transform: translateX(-50%); }
@@ -223,14 +166,6 @@ p {
 }
 .animate-marquee:hover {
   animation-play-state: paused;
-}
-
-.animate-pulse-glow {
-  animation: pulseGlow 6s ease-in-out infinite;
-}
-
-.animate-live-dot {
-  animation: liveDot 2s ease-in-out infinite;
 }
 
 /* Accessibility: High-Contrast Visible Focus Ring (Pass1-24) */
@@ -249,16 +184,6 @@ select:focus-visible,
 [tabindex]:focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
-}
-
-/* Linear-Grade Dual-Border Elevation */
-.elevation-dual-border {
-  border: 1px solid var(--color-border);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.9), var(--uk-shadow-raised);
-}
-.elevation-dual-border:hover {
-  border-color: var(--color-border-strong);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.95), 0 24px 52px -38px rgba(17, 24, 39, 0.25);
 }
 
 /* Hairline Gradient Section Divider */
@@ -334,34 +259,6 @@ select:focus-visible,
   box-shadow: 0 34px 78px -52px rgba(39, 34, 25, 0.34), 0 8px 20px rgba(39, 34, 25, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-.marketing-browser-toolbar {
-  display: grid;
-  grid-template-columns: 42px minmax(0, 1fr) 42px;
-  align-items: center;
-  gap: 1rem;
-  min-height: 44px;
-  padding: 0 1rem;
-  border-bottom: 1px solid var(--color-border);
-  background: var(--color-surface-raised);
-}
-
-.marketing-browser-address {
-  overflow: hidden;
-  max-width: 420px;
-  justify-self: center;
-  width: 100%;
-  padding: 0.35rem 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
-  background: var(--color-surface-soft);
-  color: var(--color-ink-muted);
-  font-size: 0.6875rem;
-  line-height: 1.25rem;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 /* Raycast / Linear Mouse-Tracking Radial Spotlight */
 .spotlight-card {
   position: relative;
@@ -414,9 +311,5 @@ select:focus-visible,
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
-  }
-
-  .premium-card-interactive:hover {
-    transform: none;
   }
 }
